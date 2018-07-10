@@ -1,0 +1,83 @@
+group = 'de.svg.kotlin'
+version = '1.0.0'
+
+apply plugin: "kotlin2js"
+
+apply plugin: 'com.moowork.node'
+
+buildscript {
+
+    ext.web_dir = 'web'
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.51"
+        classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js"
+}
+
+
+clean.doFirst() {
+    delete("${web_dir}/website")
+    delete("${web_dir}/node_modules")
+    delete("${web_dir}/package-lock.json")
+    delete("out")
+}
+
+jar {
+    includeEmptyDirs = false
+
+    from {
+        configurations.compile.collect {
+            if (it.exists()) {
+                ((it.isDirectory() || !it.exists()) ? it : zipTree(it)).getFiles().findAll {
+                    it.name ==~ "^[a-z|-]+.js(.map)?\$"
+                }
+            } else {
+                ArrayList
+            }
+        }
+    }
+
+    exclude "**/*.kjsm", "**/META-INF/*", "META-INF/*", "**/*meta*"
+    into "website"
+}
+
+build.doLast() {
+    copy {
+        File artifact = new File("build/libs/${project.name}-${project.version}.jar")
+        includeEmptyDirs = false
+
+        from zipTree(artifact)
+        into "${web_dir}"
+        include { fileTreeElement ->
+            def path = fileTreeElement.path
+            !path.contains("META-INF") && !path.endsWith("sass")
+        }
+    }
+}
+
+task run(type: NodeTask) {
+    dependsOn build
+    dependsOn npmInstall
+    script = file("${web_dir}/index.js")
+}
+
+node {
+    workDir = file("${project.buildDir}/${web_dir}")
+    npmWorkDir = file("${project.buildDir}/${web_dir}")
+    nodeModulesDir = file("${project.projectDir}/${web_dir}/node_modules")
+}
