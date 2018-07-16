@@ -28,6 +28,7 @@ body, html {
   border: solid 1px $border-color;
   border-radius: 0.2rem;
   position: absolute;
+  z-index: 1;
   & > div {
     padding: 0.4rem;
     &:not(:last-child) {

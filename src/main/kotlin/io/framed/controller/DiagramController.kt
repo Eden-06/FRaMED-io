@@ -1,11 +1,11 @@
 package io.framed.controller
 
+import io.framed.arr
 import io.framed.async
 import io.framed.jsPlumb
 import io.framed.model.CompartmentType
 import io.framed.model.Diagram
 import io.framed.obj
-import io.framed.arr
 import io.framed.view.NavigationView
 import io.framed.view.View
 
@@ -23,6 +23,14 @@ class DiagramController(
     var compartments: Map<CompartmentType, View<*>> = emptyMap()
 
     init {
+        val jsPlumbInstance = jsPlumb.getInstance()
+        jsPlumbInstance.setContainer(navigationView.container)
+
+        navigationView.zoomListener.on {
+            jsPlumbInstance.setZoom(it)
+        }
+        jsPlumbInstance.setZoom(1.0)
+
         diagram.compartments.forEach {
             val c = CompartmentTypeController(it)
             navigationView.container.appendChild(c.view.html)
@@ -30,9 +38,9 @@ class DiagramController(
         }
 
         async {
-
-            val jsPlumbInstance = jsPlumb.getInstance()
-            jsPlumbInstance.setContainer(navigationView.container)
+            compartments.values.forEach {
+                jsPlumbInstance.draggable(it.html)
+            }
 
             diagram.relations.forEach {
                 jsPlumbInstance.connect(obj {
@@ -43,6 +51,7 @@ class DiagramController(
 
                     connector = arr("Flowchart", obj { cornerRadius = 5 })
 
+                    endpoint = "Blank"
                     paintStyle = obj {
                         stroke = "black"
                         strokeWidth = 8
@@ -57,6 +66,7 @@ class DiagramController(
 
                     connector = arr("Flowchart", obj { cornerRadius = 5 })
 
+                    endpoint = "Blank"
                     paintStyle = obj {
                         stroke = "white"
                         strokeWidth = 5.5
@@ -70,6 +80,7 @@ class DiagramController(
 
                     connector = arr("Flowchart", obj { cornerRadius = 5 })
 
+                    endpoint = "Blank"
                     paintStyle = obj {
                         stroke = "black"
                         strokeWidth = 1.5

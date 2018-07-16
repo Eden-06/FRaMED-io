@@ -1,5 +1,6 @@
 package io.framed.view
 
+import io.framed.util.EventHandler
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -24,8 +25,13 @@ class NavigationView : View<HTMLDivElement>("div") {
     val zoomSteps = listOf(0.1, 0.3, 0.5, 0.67, 0.8, 0.9, 1.0, 1.1, 1.2, 1.33, 1.5, 1.7, 2.0, 2.4, 3.0, 4.0)
     var zoom: Double = 1.0
         set(value) {
+            val old = field
             field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, value))
+            if (field != old) {
+                zoomListener.fire(field)
+            }
         }
+    val zoomListener = EventHandler<Double>()
 
     fun zoomBy(delta: Double, x: Double = 0.5, y: Double = 0.5) =
             zoomTo(zoom + delta, x, y)

@@ -15,6 +15,8 @@ external class jsPlumb {
 external class JsPlumbInstance {
     fun setContainer(element: Element)
     fun connect(data: dynamic)
+    fun draggable(element: Element)
+    fun setZoom(zoom: Double)
 }
 
 fun obj(init: dynamic.() -> Unit): dynamic {
