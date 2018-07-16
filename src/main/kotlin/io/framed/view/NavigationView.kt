@@ -1,0 +1,120 @@
+package io.framed.view
+
+import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.events.WheelEvent
+import kotlin.browser.window
+import kotlin.math.max
+import kotlin.math.min
+
+/**
+ * @author lars
+ */
+class NavigationView : View<HTMLDivElement>("div") {
+
+    private val transformBox = createView<HTMLDivElement>().also {
+        html.appendChild(it)
+    }
+    val container = createView<HTMLDivElement>().also {
+        transformBox.appendChild(it)
+    }
+
+    val zoomSteps = listOf(0.1, 0.3, 0.5, 0.67, 0.8, 0.9, 1.0, 1.1, 1.2, 1.33, 1.5, 1.7, 2.0, 2.4, 3.0, 4.0)
+    var zoom: Double = 1.0
+        set(value) {
+            field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, value))
+        }
+
+    fun zoomBy(delta: Double, x: Double = 0.5, y: Double = 0.5) =
+            zoomTo(zoom + delta, x, y)
+
+    fun zoomTo(zoom: Double, x: Double = 0.5, y: Double = 0.5) {
+        val old = this.zoom
+        this.zoom = zoom
+        val new = this.zoom
+
+        //val dx = ((0.5 - x) * clientWidth * (new - old))
+        //val dy = ((0.5 - y) * clientHeight * (new - old))
+
+        val dx = (clientWidth * (0.5 - x) * (1 / new - 1 / old))
+        val dy = (clientHeight * (0.5 - y) * (1 / new - 1 / old))
+
+        pan = Coordinate(pan.x - dx, pan.y - dy)
+
+        updateTransform()
+    }
+
+    var pan: Coordinate = Coordinate(0.0, 0.0)
+
+    fun panBy(x: Double, y: Double) = panTo(pan.x + x, pan.y + y)
+
+    fun panTo(x: Double, y: Double) {
+        pan = Coordinate(x, y)
+        updateTransform()
+    }
+
+    private fun updateTransform() {
+        transformBox.style.transform = "scale($zoom) translate($pan)"
+    }
+
+    private var moveStartX: Int = 0
+    private var moveStartY: Int = 0
+
+    private val moveStartListener = object : EventListener {
+        override fun handleEvent(event: Event) {
+            (event as? MouseEvent)?.let { e ->
+                moveStartX = e.clientX
+                moveStartY = e.clientY
+
+                window.addEventListener("mousemove", movePerformListener)
+                window.addEventListener("mouseup", moveEndListener)
+                window.addEventListener("mouseleave", moveEndListener)
+            }
+        }
+    }
+    private val movePerformListener = object : EventListener {
+        override fun handleEvent(event: Event) {
+            (event as? MouseEvent)?.let { e ->
+                panBy((e.clientX - moveStartX).toDouble() / zoom, (e.clientY - moveStartY).toDouble() / zoom)
+                moveStartX = e.clientX
+                moveStartY = e.clientY
+            }
+        }
+    }
+    private val moveEndListener = object : EventListener {
+        override fun handleEvent(event: Event) {
+            window.removeEventListener("mousemove", movePerformListener)
+            window.removeEventListener("mouseup", this)
+            window.removeEventListener("mouseleave", this)
+        }
+    }
+    private val scrollListener = object : EventListener {
+        override fun handleEvent(event: Event) {
+            (event as? WheelEvent)?.let { e ->
+                val delta = when (e.deltaMode) {
+                    WheelEvent.DOM_DELTA_PIXEL -> 1.0
+                    WheelEvent.DOM_DELTA_LINE -> 1.0
+                    else -> 1.0
+                } * if (e.deltaY < 0) -1.0 else 1.0
+
+                zoomBy(delta / 40, e.clientX.toDouble() / clientWidth, e.clientY.toDouble() / clientHeight)
+            }
+        }
+    }
+
+    init {
+        html.addEventListener("mousedown", moveStartListener)
+        html.addEventListener("wheel", scrollListener)
+    }
+
+    data class Coordinate(
+            val x: Double,
+            val y: Double
+    ) {
+        override fun toString(): String {
+            return "${x}px, ${y}px"
+        }
+    }
+}

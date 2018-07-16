@@ -10,12 +10,12 @@ class Method {
     var parameters: List<Parameter> = emptyList()
 
     override fun toString(): String =
-            "${visibility.symbol} $name(" + parameters.joinToString(", ") { it.toString() } + ")" + type.let {
+            "${visibility.symbol ?: ""} $name(" + parameters.joinToString(", ") { it.toString() } + ")" + type.let {
                 if (type.isBlank()) "" else ": $it"
-            }
+            }.trim()
 }
 
-fun CompartmentType.method(name: String, type: String = "", visibility: Visibility = Visibility.NONE, init: Method.() -> Unit): Method {
+fun CompartmentType.method(name: String, type: String = "", visibility: Visibility = Visibility.NONE, init: Method.() -> Unit = {}): Method {
     val method = Method()
     methods += method
     method.name = name

@@ -1,4 +1,6 @@
-body, svg {
+$border-color: #000;
+
+body, html {
   top: 0;
   left: 0;
   width: 100%;
@@ -8,6 +10,66 @@ body, svg {
   overflow: hidden;
 }
 
-.compartment-type {
-  background: red;
+* {
+  font-family: "RobotoMono Nerd Font", Roboto, Arial, sans-serif;
+}
+
+.compartment-type-view {
+  display: inline-block;
+  background: #B3E5FC;
+  border: solid 1px $border-color;
+  border-radius: 0.2rem;
+  & > div {
+    padding: 0.4rem;
+    &:not(:last-child) {
+      border-bottom: solid 1px $border-color;
+    }
+  }
+}
+
+.attribute-view {
+  display: block;
+}
+
+.method-view {
+  display: block;
+}
+
+.text-view {
+  width: 100%;
+  display: inline-block;
+  line-height: 100%;
+}
+
+.text-view[contenteditable="true"]:focus {
+  background: white;
+}
+
+[contenteditable="true"].single-line {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+[contenteditable="true"].single-line br {
+  display: none;
+}
+
+[contenteditable="true"].single-line * {
+  display: inline;
+  white-space: nowrap;
+}
+
+.navigation-view {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  & > div {
+    min-width: 100%;
+    min-height: 100%;
+    & > div {
+      position: relative;
+    }
+  }
 }

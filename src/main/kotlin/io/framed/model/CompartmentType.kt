@@ -9,9 +9,10 @@ class CompartmentType() {
     var methods: List<Method> = emptyList()
 }
 
-fun compartmentType(name: String, init: CompartmentType.() -> Unit): CompartmentType {
+fun Diagram.compartmentType(name: String, init: CompartmentType.() -> Unit): CompartmentType {
     val compartmentType = CompartmentType()
     compartmentType.name = name
     compartmentType.init()
+    compartments += compartmentType
     return compartmentType
 }

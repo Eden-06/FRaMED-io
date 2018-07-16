@@ -1,6 +1,6 @@
 package io.framed
 
-import io.framed.controller.CompartmentTypeController
+import io.framed.controller.controller
 import io.framed.model.*
 import kotlin.browser.document
 import kotlin.browser.window
@@ -14,17 +14,26 @@ fun main(args: Array<String>) {
 
 fun init() {
     async {
-        val c1 = compartmentType("Account") {
-            attr("amount", "Money")
-            attr("id", "String")
-            method("doSomething", "void") {
-                param("foo", "bar")
+        val d = diagram {
+            val account = compartmentType("Account") {
+                attr("amount", "Money")
+                attr("id", "String", Visibility.PRIVATE)
+                method("doSomething", "void") {
+                    param("foo", "bar")
+                }
             }
+
+            val bank = compartmentType("Bank") {
+                attr("name", "String")
+                method("insolvency", "void")
+            }
+
+            relation(bank, account, "customers")
         }
 
-        val controller = CompartmentTypeController(c1)
+        val controller = d.controller()
 
-        document.body?.appendChild(controller.compartmentView.html)
+        document.body?.appendChild(controller.view.html)
     }
 }
 

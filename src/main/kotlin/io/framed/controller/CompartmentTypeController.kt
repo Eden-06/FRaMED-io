@@ -15,7 +15,7 @@ class CompartmentTypeController(
     override val view: View<*>
         get() = compartmentView
 
-    val compartmentView = ListView()
+    private val compartmentView = ListView()
 
     private val titleList = ListView().also {
         compartmentView += it
@@ -28,10 +28,17 @@ class CompartmentTypeController(
     }
 
     init {
+        compartmentView.classes += "compartment-type-view"
         val header = TextView().also {
             titleList += it
         }
         header.text = compartmentType.name
+        header.contentEditable = true
+        header.singleLine = true
+
+        header.change.on {
+            compartmentType.name = it.trim()
+        }
 
         compartmentType.attributes.forEach {
             attributeList += AttributeController(it).view

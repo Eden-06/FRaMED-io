@@ -9,9 +9,9 @@ class Attribute() {
     var visibility: Visibility = Visibility.NONE
 
     override fun toString(): String =
-            "${visibility.symbol} $name" + type.let {
+            "${visibility.symbol ?: ""} $name" + type.let {
                 if (type.isBlank()) "" else ": $it"
-            }
+            }.trim()
 }
 
 fun CompartmentType.attr(name: String, type: String = "", visibility: Visibility = Visibility.NONE): Attribute {
