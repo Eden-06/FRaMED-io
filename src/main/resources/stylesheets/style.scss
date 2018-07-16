@@ -1,5 +1,13 @@
 $border-color: #000;
 
+@mixin no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 body, html {
   top: 0;
   left: 0;
@@ -19,6 +27,7 @@ body, html {
   background: #B3E5FC;
   border: solid 1px $border-color;
   border-radius: 0.2rem;
+  position: absolute;
   & > div {
     padding: 0.4rem;
     &:not(:last-child) {
@@ -39,10 +48,15 @@ body, html {
   width: 100%;
   display: inline-block;
   line-height: 100%;
+  text-overflow: ellipsis;
 }
 
 .text-view[contenteditable="true"]:focus {
   background: white;
+}
+
+.text-view[contenteditable="true"]:not(:focus) {
+  @include no-select
 }
 
 [contenteditable="true"].single-line {

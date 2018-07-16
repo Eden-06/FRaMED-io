@@ -37,6 +37,27 @@ abstract class View<V : HTMLElement>(view: V) {
     val clientHeight: Int
         get() = html.clientHeight
 
+    var top: Double
+        get() = html.style.top.replace("px","").toDoubleOrNull() ?: 0.0
+        set(value) {
+            html.style.top = "${value}px"
+        }
+    var left: Double
+        get() = html.style.left.replace("px","").toDoubleOrNull() ?: 0.0
+        set(value) {
+            html.style.left = "${value}px"
+        }
+    var width: Double
+        get() = html.style.width.replace("px","").toDoubleOrNull() ?: clientWidth.toDouble()
+        set(value) {
+            html.style.width = "${value}px"
+        }
+    var height: Double
+        get() = html.style.height.replace("px","").toDoubleOrNull() ?: clientHeight.toDouble()
+        set(value) {
+            html.style.height = "${value}px"
+        }
+
     /**
      * Request focus to this view
      */
