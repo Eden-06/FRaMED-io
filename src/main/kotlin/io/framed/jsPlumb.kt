@@ -1,6 +1,7 @@
 package io.framed
 
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLElement
 
 /**
  * @author lars
@@ -12,23 +13,39 @@ external class jsPlumb {
     }
 }
 
-external class JsPlumbInstance {
+external interface JsPlumbInstance {
     fun setContainer(element: Element)
-    fun connect(data: dynamic)
+    fun connect(data: JsPlumbConnect)
     fun draggable(element: Element)
     fun setZoom(zoom: Double)
+
+    fun revalidate(element: Element)
+    fun repaintEverything()
 }
 
-fun obj(init: dynamic.() -> Unit): dynamic {
-    val d = js("{}")
-    init(d)
-    return d
+external interface JsPlumbConnect {
+    var source: HTMLElement
+    var target: HTMLElement
+    var anchor: Array<Any>
+    var connector: Array<Any>
+    var endpoint: String
+    var paintStyle: JsPlumbPaintStyle
 }
 
-fun arr(vararg item: dynamic): dynamic {
-    val d = js("[]")
-    item.forEach {
-        d.push(it)
-    }
-    return d
+fun JsPlumbConnect(init: JsPlumbConnect.() -> Unit = {}): JsPlumbConnect {
+    val h = js("{}")
+    init(h)
+    return h
+}
+
+external interface JsPlumbPaintStyle {
+    var stroke: String
+    var strokeWidth: Number
+    var dashstyle: String
+}
+
+fun JsPlumbPaintStyle(init: JsPlumbPaintStyle.() -> Unit = {}): JsPlumbPaintStyle {
+    val h = js("{}")
+    init(h)
+    return h
 }

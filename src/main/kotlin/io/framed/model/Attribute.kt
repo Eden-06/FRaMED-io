@@ -3,22 +3,20 @@ package io.framed.model
 /**
  * @author lars
  */
-class Attribute() {
+class Attribute: Model {
     var name: String = ""
     var type: String = ""
-    var visibility: Visibility = Visibility.NONE
 
     override fun toString(): String =
-            "${visibility.symbol ?: ""} $name" + type.let {
+            name + type.let {
                 if (type.isBlank()) "" else ": $it"
             }.trim()
 }
 
-fun CompartmentType.attr(name: String, type: String = "", visibility: Visibility = Visibility.NONE): Attribute {
+fun Class.attr(name: String, type: String = ""): Attribute {
     val attribute = Attribute()
     attributes += attribute
     attribute.name = name
     attribute.type = type
-    attribute.visibility = visibility
     return attribute
 }

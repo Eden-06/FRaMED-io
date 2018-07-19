@@ -3,7 +3,7 @@ package io.framed.model
 /**
  * @author lars
  */
-class Parameter {
+class Parameter:Model {
     var name: String = ""
     var type: String = ""
 

@@ -1,4 +1,9 @@
 $border-color: #000;
+$main-color: #2196F3;
+$light-color: #E3F2FD;
+$text-color: #111;
+
+$tabber-height: 3.5rem;
 
 @mixin no-select {
   -webkit-touch-callout: none;
@@ -16,17 +21,32 @@ body, html {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  color: $text-color;
 }
 
 * {
   font-family: "RobotoMono Nerd Font", Roboto, Arial, sans-serif;
 }
 
-.compartment-type-view {
+.class-view {
   display: inline-block;
-  background: #B3E5FC;
+  background: $light-color;
   border: solid 1px $border-color;
   border-radius: 0.2rem;
+  position: absolute;
+  z-index: 1;
+  & > div {
+    padding: 0.4rem;
+    &:not(:last-child) {
+      border-bottom: solid 1px $border-color;
+    }
+  }
+}
+
+.container-view {
+  display: inline-block;
+  background: $light-color;
+  border: solid 1px $border-color;
   position: absolute;
   z-index: 1;
   & > div {
@@ -45,35 +65,6 @@ body, html {
   display: block;
 }
 
-.text-view {
-  width: 100%;
-  display: inline-block;
-  line-height: 100%;
-  text-overflow: ellipsis;
-}
-
-.text-view[contenteditable="true"]:focus {
-  background: white;
-}
-
-.text-view[contenteditable="true"]:not(:focus) {
-  @include no-select
-}
-
-[contenteditable="true"].single-line {
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-[contenteditable="true"].single-line br {
-  display: none;
-}
-
-[contenteditable="true"].single-line * {
-  display: inline;
-  white-space: nowrap;
-}
-
 .navigation-view {
   position: relative;
   top: 0;
@@ -87,4 +78,74 @@ body, html {
       position: relative;
     }
   }
+}
+
+input {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: none;
+  background: transparent;
+  &:focus {
+    background: white;
+  }
+}
+
+.application {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.toolbar {
+  background: $main-color;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: $tabber-height;
+  line-height: $tabber-height;
+  z-index: 1;
+  font-size: 1.1rem;
+
+  box-shadow: 0 0 4px rgba(0, 0, 0, .14), 0 4px 8px rgba(0, 0, 0, .28);
+}
+
+.left-bar {
+  float: left;
+  span {
+    height: $tabber-height;
+    line-height: $tabber-height;
+    padding: 0 .6rem;
+    display: inline-block;
+    &:hover {
+      background: rgba(0,0,0,.1);
+    }
+  }
+}
+
+.right-bar {
+  float: right;
+  font-size: 1.3rem;
+
+  span {
+    height: $tabber-height;
+    line-height: $tabber-height;
+    width: 3rem;
+    text-align: center;
+    display: inline-block;
+    &:hover {
+      background: rgba(0,0,0,.1);
+    }
+  }
+}
+
+.workspace {
+  position: absolute;
+  top: $tabber-height;
+  left: 0;
+  bottom: 0;
+  width: 100%;
 }

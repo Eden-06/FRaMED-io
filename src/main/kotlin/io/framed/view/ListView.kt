@@ -19,4 +19,12 @@ class ListView : View<HTMLDivElement>("div") {
     operator fun plusAssign(view: View<*>) {
         children += view
     }
+
+    fun insertBegin(view: View<*>) {
+        children = listOf(view) + children
+    }
+
+    fun clear() {
+        children = emptyList()
+    }
 }

@@ -15,6 +15,8 @@ import kotlin.math.min
  */
 class NavigationView : View<HTMLDivElement>("div") {
 
+    var touchpadControl: Boolean = false
+
     private val transformBox = createView<HTMLDivElement>().also {
         html.appendChild(it)
     }
@@ -99,13 +101,27 @@ class NavigationView : View<HTMLDivElement>("div") {
     private val scrollListener = object : EventListener {
         override fun handleEvent(event: Event) {
             (event as? WheelEvent)?.let { e ->
-                val delta = when (e.deltaMode) {
-                    WheelEvent.DOM_DELTA_PIXEL -> 1.0
-                    WheelEvent.DOM_DELTA_LINE -> 1.0
-                    else -> 1.0
-                } * if (e.deltaY < 0) -1.0 else 1.0
+                e.preventDefault()
 
-                zoomBy(delta / 40, e.clientX.toDouble() / clientWidth, e.clientY.toDouble() / clientHeight)
+                val (deltaX, deltaY) = when (e.deltaMode) {
+                    WheelEvent.DOM_DELTA_PIXEL -> {
+                        Pair(e.deltaX / 6, e.deltaY / 6)
+                    }
+                    WheelEvent.DOM_DELTA_LINE -> {
+                        Pair(
+                                min(1.0, max(-1.0, e.deltaX)) * 8,
+                                min(1.0, max(-1.0, e.deltaY)) * 8
+                        )
+                    }
+                    else -> Pair(e.deltaX, e.deltaY)
+                }
+
+
+                if (!touchpadControl || e.ctrlKey) {
+                    zoomBy(deltaY / 150, e.clientX.toDouble() / clientWidth, (e.clientY.toDouble() - offsetTop) / clientHeight)
+                } else {
+                    panBy(-1 * deltaX, -1 * deltaY)
+                }
             }
         }
     }

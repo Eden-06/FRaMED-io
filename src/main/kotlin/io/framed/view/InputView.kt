@@ -1,7 +1,7 @@
 package io.framed.view
 
 import io.framed.util.EventHandler
-import org.w3c.dom.HTMLSpanElement
+import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.KeyboardEvent
@@ -9,36 +9,24 @@ import org.w3c.dom.events.KeyboardEvent
 /**
  * @author lars
  */
-class TextView(
-        value: String = ""
-) : View<HTMLSpanElement>("span") {
-    var text: String
-        get() = html.textContent ?: ""
+class InputView : View<HTMLInputElement>("input") {
+    var value: String
+        get() = html.value
         set(value) {
-            html.textContent = value
+            html.value = value
         }
 
-    /**
-     * Sets the content to editable
-     */
-    var contentEditable: Boolean by AttributeDelegate(Boolean::class, false)
 
-    /**
-     * If the content is editable, prevents the insertion of line breaks
-     */
-    var singleLine: Boolean by ClassDelegate()
-
+    var readOnly: Boolean by AttributeDelegate(Boolean::class, false)
     /**
      * Fires on every user change to the content
      */
     val change = EventHandler<String>()
 
     init {
-        text = value
-
         val changeListener = object : EventListener {
             override fun handleEvent(event: Event) {
-                change.fire(text)
+                change.fire(value)
 
                 (event as? KeyboardEvent)?.let { e ->
                     when (e.keyCode) {

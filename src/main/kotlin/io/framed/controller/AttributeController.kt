@@ -1,8 +1,7 @@
 package io.framed.controller
 
 import io.framed.model.Attribute
-import io.framed.model.Visibility
-import io.framed.view.TextView
+import io.framed.view.InputView
 import io.framed.view.View
 
 /**
@@ -13,21 +12,16 @@ class AttributeController(
 ) : Controller {
 
     override val view: View<*>
-        get() = textView
+        get() = inputView
 
-    private val textView = TextView()
+    private val inputView = InputView()
 
     init {
-        textView.classes += "attribute-view"
-        textView.contentEditable = true
-        textView.singleLine = true
+        inputView.classes += "attribute-view"
 
-        textView.text = attribute.toString()
-        textView.change.on {
-            val line = it.trim()
-            attribute.visibility = Visibility.parse(line[0])
-            val split = (if (attribute.visibility == Visibility.NONE) line else line.substring(1).trim())
-                    .split(";", limit = 2)
+        inputView.value = attribute.toString()
+        inputView.change.on {
+            val split = it.trim().split(";", limit = 2)
                     .map { it.trim() }
 
             attribute.name = split[0]

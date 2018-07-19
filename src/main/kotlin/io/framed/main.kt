@@ -1,7 +1,8 @@
 package io.framed
 
-import io.framed.controller.controller
+import io.framed.controller.ContainerController
 import io.framed.model.*
+import io.framed.view.Application
 import kotlin.browser.document
 import kotlin.browser.window
 
@@ -13,40 +14,43 @@ fun main(args: Array<String>) {
 }
 
 fun init() {
-    async {
-        var account: CompartmentType? = null
-        var bank: CompartmentType? = null
+    val app = Application()
 
-        val d = diagram {
-            account = compartmentType("Account") {
-                attr("amount", "Money")
-                attr("id", "String", Visibility.PRIVATE)
-                method("doSomething", "void") {
-                    param("foo", "bar")
-                }
+    val container = container {
+        name = "Economy"
+        val account = clazz("Account") {
+            attr("amount", "Money")
+            attr("id", "String")
+            method("doSomething", "void") {
+                param("foo", "bar")
             }
-
-            bank = compartmentType("Bank") {
-                attr("name", "String")
-                method("insolvency", "void")
-            }
-
-            relation(bank!!, account!!, "customers")
         }
 
-        val controller = d.controller()
+        val bank = clazz("Bank") {
+            attr("name", "String")
+            method("insolvency", "void")
+        }
 
-        controller.compartments[account!!]?.top = 10.0
-        controller.compartments[account!!]?.left = 10.0
-        controller.compartments[account!!]?.width = 300.0
-        controller.compartments[account!!]?.height = 200.0
+        container {
+            name = "Library"
+            val book = clazz("Book") {
+                attr("isbn", "String")
+            }
+        }
 
-        controller.compartments[bank!!]?.top = 300.0
-        controller.compartments[bank!!]?.left = 300.0
-        controller.compartments[bank!!]?.width = 200.0
-        controller.compartments[bank!!]?.height = 200.0
+        relation(bank, account, "customers")
+    }
 
-        document.body?.appendChild(controller.view.html)
+    val controller = ContainerController(container)
+
+    async {
+        document.body?.appendChild(app.html)
+
+        app.controller = controller
+
+        async {
+            controller.autoLayout()
+        }
     }
 }
 

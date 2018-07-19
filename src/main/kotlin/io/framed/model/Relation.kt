@@ -4,12 +4,12 @@ package io.framed.model
  * @author lars
  */
 class Relation(
-    var source: CompartmentType,
-    var target: CompartmentType
+        var source: Class,
+        var target: Class
 ) {
     var name: String = ""
 }
-fun Diagram.relation(source: CompartmentType, target: CompartmentType, name: String = ""): Relation {
+fun Container.relation(source: Class, target: Class, name: String = ""): Relation {
     val relation = Relation(source, target)
     relation.name = name
     relations += relation

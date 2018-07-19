@@ -23,9 +23,14 @@ abstract class View<V : HTMLElement>(view: V) {
     }
 
     /**
-     * Fires on every click
+     * Fires on click
      */
     val click = EventHandler<Unit>()
+
+    /**
+     * Fires on context menu open
+     */
+    val context = EventHandler<Unit>()
 
     /**
      * Access css classes of this view
@@ -38,24 +43,48 @@ abstract class View<V : HTMLElement>(view: V) {
         get() = html.clientHeight
 
     var top: Double
-        get() = html.style.top.replace("px","").toDoubleOrNull() ?: 0.0
+        get() = html.style.top.replace("px", "").toDoubleOrNull() ?: 0.0
         set(value) {
             html.style.top = "${value}px"
         }
     var left: Double
-        get() = html.style.left.replace("px","").toDoubleOrNull() ?: 0.0
+        get() = html.style.left.replace("px", "").toDoubleOrNull() ?: 0.0
         set(value) {
             html.style.left = "${value}px"
         }
     var width: Double
-        get() = html.style.width.replace("px","").toDoubleOrNull() ?: clientWidth.toDouble()
+        get() = html.style.width.replace("px", "").toDoubleOrNull() ?: clientWidth.toDouble()
         set(value) {
             html.style.width = "${value}px"
         }
     var height: Double
-        get() = html.style.height.replace("px","").toDoubleOrNull() ?: clientHeight.toDouble()
+        get() = html.style.height.replace("px", "").toDoubleOrNull() ?: clientHeight.toDouble()
         set(value) {
             html.style.height = "${value}px"
+        }
+
+    val offsetTop: Int
+        get() {
+            var offset = html.offsetTop
+            var h = html.offsetParent as? HTMLElement
+            while (h != null) {
+                offset += h.offsetTop
+                h = h.offsetParent as? HTMLElement
+            }
+
+            return offset
+        }
+
+    val offsetLeft: Int
+        get() {
+            var offset = html.offsetLeft
+            var h = html.offsetParent as? HTMLElement
+            while (h != null) {
+                offset += h.offsetLeft
+                h = h.offsetParent as? HTMLElement
+            }
+
+            return offset
         }
 
     /**
@@ -76,6 +105,13 @@ abstract class View<V : HTMLElement>(view: V) {
         html.addEventListener("click", object : EventListener {
             override fun handleEvent(event: Event) {
                 click.fire(Unit)
+            }
+        })
+
+        html.addEventListener("contextmenu", object : EventListener {
+            override fun handleEvent(event: Event) {
+                event.preventDefault()
+                context.fire(Unit)
             }
         })
     }
