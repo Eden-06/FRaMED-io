@@ -4,6 +4,7 @@ import io.framed.JsPlumbConnect
 import io.framed.JsPlumbPaintStyle
 import io.framed.model.Relation
 import io.framed.view.View
+import io.framed.view.contextMenu
 
 /**
  * @author lars

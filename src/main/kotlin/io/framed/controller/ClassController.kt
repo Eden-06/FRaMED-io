@@ -1,9 +1,7 @@
 package io.framed.controller
 
 import io.framed.model.Class
-import io.framed.view.InputView
-import io.framed.view.ListView
-import io.framed.view.View
+import io.framed.view.*
 
 /**
  * @author lars
@@ -44,6 +42,22 @@ class ClassController(
 
         clazz.methods.forEach {
             methodList += MethodController(it).view
+        }
+
+        view.context.on {
+            it.stopPropagation()
+            contextMenu {
+                title = "Class: " + clazz.name
+                addItem(MaterialIcon.ADD, "Add attribute") {
+
+                }
+                addItem(MaterialIcon.ADD, "Add method") {
+
+                }
+                addItem(MaterialIcon.DELETE, "Delete") {
+
+                }
+            }.open(it.clientX.toDouble(), it.clientY.toDouble())
         }
     }
 }

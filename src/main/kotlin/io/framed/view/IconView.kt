@@ -6,7 +6,7 @@ import kotlin.dom.clear
 /**
  * @author lars
  */
-class IconView : View<HTMLSpanElement>("span") {
+class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
     var icon: Icon? = null
         set(value) {
             field = value
@@ -15,4 +15,8 @@ class IconView : View<HTMLSpanElement>("span") {
                 html.appendChild(it.element)
             }
         }
+
+    init {
+        this.icon = icon
+    }
 }

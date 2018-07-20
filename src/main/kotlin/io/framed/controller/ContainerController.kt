@@ -98,6 +98,16 @@ class ContainerController(
             }
         }
 
+        view.context.on {
+            it.stopPropagation()
+            contextMenu {
+                title = "Package: " + container.name
+                addItem(MaterialIcon.ADD, "Add class") {
+
+                }
+            }.open(it.clientX.toDouble(), it.clientY.toDouble())
+        }
+
 
         // As content view
         listView.classes += "container-view"
@@ -133,7 +143,19 @@ class ContainerController(
         }
 
         listView.context.on {
-            application?.controller = this
+            it.stopPropagation()
+            contextMenu {
+                title = "Package: " + container.name
+                addItem(MaterialIcon.ARROW_FORWARD, "Open") {
+                    application?.controller = this@ContainerController
+                }
+                addItem(MaterialIcon.ADD, "Add class") {
+
+                }
+                addItem(MaterialIcon.DELETE, "Delete") {
+
+                }
+            }.open(it.clientX.toDouble(), it.clientY.toDouble())
         }
     }
 }

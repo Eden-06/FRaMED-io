@@ -5,6 +5,7 @@ import io.framed.util.EventHandler
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.reflect.KClass
 
@@ -25,12 +26,12 @@ abstract class View<V : HTMLElement>(view: V) {
     /**
      * Fires on click
      */
-    val click = EventHandler<Unit>()
+    val click = EventHandler<MouseEvent>()
 
     /**
      * Fires on context menu open
      */
-    val context = EventHandler<Unit>()
+    val context = EventHandler<MouseEvent>()
 
     /**
      * Access css classes of this view
@@ -87,6 +88,16 @@ abstract class View<V : HTMLElement>(view: V) {
             return offset
         }
 
+    var visible: Boolean
+        get() = html.style.display != "none"
+        set(value) {
+            if (value) {
+                html.style.removeProperty("display")
+            } else {
+                html.style.display = "none"
+            }
+        }
+
     /**
      * Request focus to this view
      */
@@ -104,14 +115,19 @@ abstract class View<V : HTMLElement>(view: V) {
     init {
         html.addEventListener("click", object : EventListener {
             override fun handleEvent(event: Event) {
-                click.fire(Unit)
+                event.preventDefault()
+                (event as? MouseEvent)?.let { e ->
+                    click.fire(e)
+                }
             }
         })
 
         html.addEventListener("contextmenu", object : EventListener {
             override fun handleEvent(event: Event) {
                 event.preventDefault()
-                context.fire(Unit)
+                (event as? MouseEvent)?.let { e ->
+                    context.fire(e)
+                }
             }
         })
     }
