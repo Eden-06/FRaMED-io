@@ -7,11 +7,17 @@ import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.KeyboardEvent
 
 /**
+ * Represents a html span element.
+ *
  * @author lars
  */
 class TextView(
         value: String = ""
 ) : View<HTMLSpanElement>("span") {
+
+    /**
+     * Text to display.
+     */
     var text: String
         get() = html.textContent ?: ""
         set(value) {
@@ -19,17 +25,17 @@ class TextView(
         }
 
     /**
-     * Sets the content to editable
+     * Sets the content to editable.
      */
     var contentEditable: Boolean by AttributeDelegate(Boolean::class, false)
 
     /**
-     * If the content is editable, prevents the insertion of line breaks
+     * If the content is editable, prevents the insertion of line breaks.
      */
     var singleLine: Boolean by ClassDelegate()
 
     /**
-     * Fires on every user change to the content
+     * Fires on every user change to the content.
      */
     val change = EventHandler<String>()
 

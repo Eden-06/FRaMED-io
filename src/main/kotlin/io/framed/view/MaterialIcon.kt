@@ -3,6 +3,9 @@ package io.framed.view
 import org.w3c.dom.Element
 import kotlin.browser.document
 
+/**
+ * List of material design icons.
+ */
 enum class MaterialIcon(private val ligature: String) : Icon {
     ROTATION_3D("3d_rotation"),
     AC_UNIT("ac_unit"),

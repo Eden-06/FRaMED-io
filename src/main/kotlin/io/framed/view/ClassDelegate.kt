@@ -5,6 +5,8 @@ import org.w3c.dom.Element
 import kotlin.reflect.KProperty
 
 /**
+ * Delegate to easily set css classes as boolean attributes.
+ *
  * @author lars
  */
 class ClassDelegate(

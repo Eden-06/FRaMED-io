@@ -11,20 +11,42 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
+ * Represents a canvas object.
+ *
  * @author lars
  */
 class NavigationView : View<HTMLDivElement>("div") {
 
+    /**
+     * Set the zoom and pan mode.
+     *
+     * mouse control: zoom with scroll, pan with mouse.
+     * touchpad control: zoom with scroll + ctrl, pan with scroll or mouse.
+     */
     var touchpadControl: Boolean = false
 
+    /**
+     * Html container to apply transformations.
+     */
     private val transformBox = createView<HTMLDivElement>().also {
         html.appendChild(it)
     }
+
+    /**
+     * Content html container.
+     */
     val container = createView<HTMLDivElement>().also {
         transformBox.appendChild(it)
     }
 
+    /**
+     * List of zoom steps for stepped zooming.
+     */
     val zoomSteps = listOf(0.1, 0.3, 0.5, 0.67, 0.8, 0.9, 1.0, 1.1, 1.2, 1.33, 1.5, 1.7, 2.0, 2.4, 3.0, 4.0)
+
+    /**
+     * Current zoom depth. Zoom step lies between 0.1 and 4.0.
+     */
     var zoom: Double = 1.0
         set(value) {
             val old = field
@@ -33,11 +55,30 @@ class NavigationView : View<HTMLDivElement>("div") {
                 zoomListener.fire(field)
             }
         }
+
+    /**
+     * Listener for zoom changes.
+     */
     val zoomListener = EventHandler<Double>()
 
+    /**
+     * Zoom by a relative zoom step.
+     *
+     * @param delta Relative zoom step.
+     * @param x Left zoom center in percent. Defaults to 50%.
+     * @param y Top zoom center in percent. Defaults to 50%.
+     */
     fun zoomBy(delta: Double, x: Double = 0.5, y: Double = 0.5) =
             zoomTo(zoom + delta, x, y)
 
+
+    /**
+     * Zoom to a absolute zoom step.
+     *
+     * @param zoom Absolute zoom step.
+     * @param x Left zoom center in percent. Defaults to 50%.
+     * @param y Top zoom center in percent. Defaults to 50%.
+     */
     fun zoomTo(zoom: Double, x: Double = 0.5, y: Double = 0.5) {
         val old = this.zoom
         this.zoom = zoom
@@ -54,22 +95,50 @@ class NavigationView : View<HTMLDivElement>("div") {
         updateTransform()
     }
 
+    /**
+     * Current pan.
+     */
     var pan: Coordinate = Coordinate(0.0, 0.0)
 
+    /**
+     * Pan by a relative width.
+     *
+     * @param x x delta.
+     * @param y y delta.
+     */
     fun panBy(x: Double, y: Double) = panTo(pan.x + x, pan.y + y)
 
+    /**
+     * Pan to a absolute coordinate.
+     *
+     * @param x x position.
+     * @param y y position.
+     */
     fun panTo(x: Double, y: Double) {
         pan = Coordinate(x, y)
         updateTransform()
     }
 
+    /**
+     * Apply transformation to transformBox.
+     */
     private fun updateTransform() {
         transformBox.style.transform = "scale($zoom) translate($pan)"
     }
 
+    /**
+     * Move reference x  position for pan.
+     */
     private var moveStartX: Int = 0
+
+    /**
+     * Move reference y position for pan.
+     */
     private var moveStartY: Int = 0
 
+    /**
+     * Mouse down event listener.
+     */
     private val moveStartListener = object : EventListener {
         override fun handleEvent(event: Event) {
             (event as? MouseEvent)?.let { e ->
@@ -82,6 +151,10 @@ class NavigationView : View<HTMLDivElement>("div") {
             }
         }
     }
+
+    /**
+     * Mouse move event listener.
+     */
     private val movePerformListener = object : EventListener {
         override fun handleEvent(event: Event) {
             (event as? MouseEvent)?.let { e ->
@@ -91,6 +164,10 @@ class NavigationView : View<HTMLDivElement>("div") {
             }
         }
     }
+
+    /**
+     * Mouse up an mouse leave listener.
+     */
     private val moveEndListener = object : EventListener {
         override fun handleEvent(event: Event) {
             window.removeEventListener("mousemove", movePerformListener)
@@ -98,6 +175,10 @@ class NavigationView : View<HTMLDivElement>("div") {
             window.removeEventListener("mouseleave", this)
         }
     }
+
+    /**
+     * Wheel listener.
+     */
     private val scrollListener = object : EventListener {
         override fun handleEvent(event: Event) {
             (event as? WheelEvent)?.let { e ->
@@ -131,6 +212,9 @@ class NavigationView : View<HTMLDivElement>("div") {
         html.addEventListener("wheel", scrollListener)
     }
 
+    /**
+     * Helper class for coordinates.
+     */
     data class Coordinate(
             val x: Double,
             val y: Double

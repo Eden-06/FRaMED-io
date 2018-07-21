@@ -1,9 +1,16 @@
-$border-color: #000;
 $main-color: #2196F3;
-$light-color: #E3F2FD;
-$text-color: #111;
+$main-text: #FFFFFF;
 
-$tabber-height: 3.5rem;
+$uml-color: #E3F2FD;
+$uml-border: #000;
+
+$primary-background: #FFFFFF;
+$secondary-background: #EEEEEE;
+$text-color: #111;
+$border-color: #bbb;
+
+$toolbar-height: 3.5rem;
+$border-radius: 0.2rem;
 
 @mixin no-select {
   -webkit-touch-callout: none;
@@ -22,37 +29,37 @@ body, html {
   padding: 0;
   overflow: hidden;
   color: $text-color;
-}
-
-* {
-  font-family: "RobotoMono Nerd Font", Roboto, Arial, sans-serif;
+  background: $secondary-background;
+  font-family: Roboto, Arial, sans-serif;
 }
 
 .class-view {
   display: inline-block;
-  background: $light-color;
-  border: solid 1px $border-color;
+  background: $uml-color;
+  border: solid 1px $uml-border;
   border-radius: 0.2rem;
   position: absolute;
   z-index: 1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .14);
   & > div {
     padding: 0.4rem;
     &:not(:last-child) {
-      border-bottom: solid 1px $border-color;
+      border-bottom: solid 1px $uml-border;
     }
   }
 }
 
 .container-view {
   display: inline-block;
-  background: $light-color;
-  border: solid 1px $border-color;
+  background: $uml-color;
+  border: solid 1px $uml-border;
   position: absolute;
   z-index: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .14);
   & > div {
     padding: 0.4rem;
     &:not(:last-child) {
-      border-bottom: solid 1px $border-color;
+      border-bottom: solid 1px $uml-border;
     }
   }
 }
@@ -71,12 +78,28 @@ body, html {
   left: 0;
   width: 100%;
   height: 100%;
+
+  background-color: $primary-background;
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+  background-image: linear-gradient($secondary-background 2px, transparent 2px),
+  linear-gradient(90deg, $secondary-background 2px, transparent 2px),
+  linear-gradient($secondary-background 1px, transparent 1px),
+  linear-gradient(90deg, $secondary-background 1px, transparent 1px);
+
+  * {
+    font-family: "RobotoMono Nerd Font", Roboto, Arial, sans-serif;
+  }
+
   & > div {
     min-width: 100%;
     min-height: 100%;
     & > div {
       position: relative;
     }
+  }
+  input {
+    display: block;
   }
 }
 
@@ -87,7 +110,7 @@ input {
   border: none;
   background: transparent;
   &:focus {
-    background: white;
+    background: $primary-background;
   }
 }
 
@@ -101,12 +124,13 @@ input {
 
 .toolbar {
   background: $main-color;
+  color: $main-text;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: $tabber-height;
-  line-height: $tabber-height;
+  height: $toolbar-height;
+  line-height: $toolbar-height;
   z-index: 1;
   font-size: 1.1rem;
 
@@ -116,8 +140,8 @@ input {
 .left-bar {
   float: left;
   span {
-    height: $tabber-height;
-    line-height: $tabber-height;
+    height: $toolbar-height;
+    line-height: $toolbar-height;
     padding: 0 .6rem;
     display: inline-block;
     &:hover {
@@ -131,8 +155,8 @@ input {
   font-size: 1.3rem;
 
   span {
-    height: $tabber-height;
-    line-height: $tabber-height;
+    height: $toolbar-height;
+    line-height: $toolbar-height;
     width: 3rem;
     text-align: center;
     display: inline-block;
@@ -144,7 +168,7 @@ input {
 
 .workspace {
   position: absolute;
-  top: $tabber-height;
+  top: $toolbar-height;
   left: 0;
   bottom: 0;
   width: 100%;
@@ -161,28 +185,31 @@ input {
     position: absolute;
     background: white;
     border: solid 1px $border-color;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+    border-radius: $border-radius;
+    min-width: 12rem;
     & > span {
-      padding: 0.3rem;
+      padding: 0.5rem;
       display: block;
       border-bottom: solid 1px $border-color;
     }
     & > div {
-      line-height: 2rem;
+      line-height: 2.2rem;
 
       .icon-view {
-        width: 1.6rem;
-        height: 2rem;
+        width: 1.8rem;
+        height: 2.2rem;
         display: inline-block;
         text-align: center;
         float: left;
       }
       .text-view {
-        padding-right: 0.6rem;
+        padding-right: 1rem;
         display: inline-block;
       }
 
       &:hover {
-        background: rgba(0, 0, 0, .1);
+        background: rgba(0, 0, 0, .05);
       }
       &:first-of-type {
         margin-top: 0.4rem

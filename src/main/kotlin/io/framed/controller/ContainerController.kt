@@ -20,6 +20,10 @@ class ContainerController(
             childContainer.forEach {
                 it.application = value
             }
+
+            async {
+                jsPlumbInstance.repaintEverything()
+            }
         }
 
     data class Position(

@@ -5,6 +5,8 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 /**
+ * Delegate to easily access html attributes.
+ *
  * @author lars
  */
 class AttributeDelegate<T : Any>(
