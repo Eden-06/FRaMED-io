@@ -6,9 +6,15 @@ import org.w3c.dom.HTMLDivElement
 import kotlin.dom.clear
 
 /**
+ * Main view.
+ *
  * @author lars
  */
 class Application : View<HTMLDivElement>("div") {
+
+    /**
+     * Uml part to draw.
+     */
     var controller: ContainerController = ContainerController(Container(), null)
         set(value) {
             field = value
@@ -18,10 +24,10 @@ class Application : View<HTMLDivElement>("div") {
             workspace.clear()
             workspace.appendChild(value.view.html)
 
-            updateTabber()
+            updateToolbar()
         }
 
-    private fun updateTabber() {
+    private fun updateToolbar() {
         leftBar.clear()
 
         var c: ContainerController? = controller
@@ -65,6 +71,7 @@ class Application : View<HTMLDivElement>("div") {
             controller.touchpadControl = touchpadControl
         }
     }
+
     val touchpadControl: Boolean
         get() = controlMethodView.icon == MaterialIcon.TOUCH_APP
 

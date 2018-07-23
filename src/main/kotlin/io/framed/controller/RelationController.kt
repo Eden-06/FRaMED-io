@@ -1,10 +1,10 @@
 package io.framed.controller
 
 import io.framed.JsPlumbConnect
+import io.framed.JsPlumbConnection
 import io.framed.JsPlumbPaintStyle
 import io.framed.model.Relation
 import io.framed.view.View
-import io.framed.view.contextMenu
 
 /**
  * @author lars
@@ -17,8 +17,23 @@ class RelationController(
     override val view: View<*>
         get() = throw UnsupportedOperationException("A relation does not provide its on view")
 
+    private var connections: List<JsPlumbConnection> = emptyList()
+
+    val jsPlumbInstance = parent.jsPlumbInstance
+
+    /**
+     * Remove this relation.
+     */
+    fun remove() {
+        connections.forEach {
+            jsPlumbInstance.deleteConnection(it)
+        }
+        connections = emptyList()
+    }
+
+
     init {
-        val jsPlumbInstance = parent.jsPlumbInstance
+        console.log(jsPlumbInstance)
 
         val sourceController = parent.views[relation.source]
         val targetController = parent.views[relation.target]
@@ -27,7 +42,7 @@ class RelationController(
             throw IllegalArgumentException()
         }
 
-        jsPlumbInstance.connect(JsPlumbConnect {
+        connections += jsPlumbInstance.connect(JsPlumbConnect {
             source = sourceController.html
             target = targetController.html
 
@@ -43,7 +58,7 @@ class RelationController(
                 dashstyle = "1 0.3"
             }
         })
-        jsPlumbInstance.connect(JsPlumbConnect {
+        connections += jsPlumbInstance.connect(JsPlumbConnect {
             source = sourceController.html
             target = targetController.html
 
@@ -58,7 +73,7 @@ class RelationController(
                 strokeWidth = 5.5
             }
         })
-        jsPlumbInstance.connect(JsPlumbConnect {
+        connections += jsPlumbInstance.connect(JsPlumbConnect {
             source = sourceController.html
             target = targetController.html
 

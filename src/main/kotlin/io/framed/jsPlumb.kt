@@ -2,6 +2,7 @@ package io.framed
 
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.svg.SVGSVGElement
 
 /**
  * Typed headers for jsPlumb.
@@ -38,8 +39,17 @@ external interface JsPlumbInstance {
      * Create a new connection.
      *
      * @param data Connection properties.
+     *
+     * @return Connection instance.
      */
-    fun connect(data: JsPlumbConnect)
+    fun connect(data: JsPlumbConnectInit): JsPlumbConnection
+
+    /**
+     * Remove a connection.
+     *
+     * @param connection Connection instance.
+     */
+    fun deleteConnection(connection: JsPlumbConnection)
 
     /**
      * Make an element draggable.
@@ -69,9 +79,9 @@ external interface JsPlumbInstance {
 }
 
 /**
- * jsPlumb connection properties.
+ * jsPlumb connection init properties.
  */
-external interface JsPlumbConnect {
+external interface JsPlumbConnectInit {
 
     /**
      * Source dom element.
@@ -111,7 +121,7 @@ external interface JsPlumbConnect {
  *
  * @return The new connection property object.
  */
-fun JsPlumbConnect(init: JsPlumbConnect.() -> Unit = {}): JsPlumbConnect {
+fun JsPlumbConnect(init: JsPlumbConnectInit.() -> Unit = {}): JsPlumbConnectInit {
     val h = js("{}")
     init(h)
     return h
@@ -149,4 +159,11 @@ fun JsPlumbPaintStyle(init: JsPlumbPaintStyle.() -> Unit = {}): JsPlumbPaintStyl
     val h = js("{}")
     init(h)
     return h
+}
+
+/**
+ * jsPlumb connection instance
+ */
+external interface JsPlumbConnection {
+    val canvas: SVGSVGElement
 }

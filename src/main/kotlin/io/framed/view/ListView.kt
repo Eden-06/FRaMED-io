@@ -33,6 +33,13 @@ class ListView : View<HTMLDivElement>("div") {
     }
 
     /**
+     * Remove view from the list.
+     */
+    operator fun minusAssign(view: View<*>) {
+        children -= view
+    }
+
+    /**
      * Remove all views from the list.
      */
     fun clear() {

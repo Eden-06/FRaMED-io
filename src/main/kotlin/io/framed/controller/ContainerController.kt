@@ -2,8 +2,10 @@ package io.framed.controller
 
 import io.framed.async
 import io.framed.jsPlumb
+import io.framed.model.Class
 import io.framed.model.Container
 import io.framed.model.Model
+import io.framed.model.Relation
 import io.framed.view.*
 
 /**
@@ -76,40 +78,144 @@ class ContainerController(
         setZoom(1.0)
     }
 
-    init {
+    private var classMap: Map<Class, Pair<ClassController, InputView>> = emptyMap()
+    fun addClass(clazz: Class, x: Double = 0.0, y: Double = 0.0): ClassController {
         // As root view
-        container.classes.forEach {
-            val c = ClassController(it)
-            navigationView.container.appendChild(c.view.html)
-            views += it to c.view
-        }
+        val c = ClassController(clazz, this)
+        navigationView.container.appendChild(c.view.html)
+        views += clazz to c.view
 
-        container.containers.forEach {
-            val c = ContainerController(it, this)
-            c.application = application
-            navigationView.container.appendChild(c.listView.html)
-            views += it to c.listView
-            childContainer += c
-        }
+        c.view.left = x
+        c.view.top = y
 
         async {
-            views.values.forEach {
-                jsPlumbInstance.draggable(it.html)
-            }
+            jsPlumbInstance.draggable(c.view.html)
+        }
 
-            container.relations.forEach {
-                RelationController(it, this)
+        // As content view
+        val input = InputView().also {
+            contentList += it
+        }
+        input.value = clazz.name
+
+        input.change.on {
+            clazz.name = it.trim()
+        }
+
+        classMap += clazz to (c to input)
+        return c
+    }
+
+    fun removeClass(clazz: Class) {
+        classMap[clazz]?.let { (c, input) ->
+            navigationView.container.removeChild(c.view.html)
+            contentList -= input
+            container.classes -= clazz
+        }
+
+        container.relations.filter { it.source == clazz || it.target == clazz }.forEach {
+            removeRelation(it)
+        }
+    }
+
+    private var containerMap: Map<Container, Pair<ContainerController, InputView>> = emptyMap()
+    fun addContainer(cont: Container, x: Double = 0.0, y: Double = 0.0): ContainerController {
+        // As root view
+        val c = ContainerController(cont, this)
+        c.application = application
+        navigationView.container.appendChild(c.listView.html)
+        views += cont to c.listView
+        childContainer += c
+
+        c.view.left = x
+        c.view.top = y
+
+        async {
+            jsPlumbInstance.draggable(c.listView.html)
+        }
+
+        // As content view
+        val input = InputView().also {
+            contentList += it
+        }
+        input.value = cont.name
+
+        input.change.on {
+            cont.name = it.trim()
+        }
+
+        containerMap += cont to (c to input)
+        return c
+    }
+
+    fun removeContainer(cont: Container) {
+        containerMap[cont]?.let { (c, input) ->
+            navigationView.container.removeChild(c.listView.html)
+            contentList -= input
+            container.containers -= cont
+        }
+    }
+
+    private var relationMap: Map<Relation, RelationController> = emptyMap()
+    fun addRelation(relation: Relation): RelationController {
+        val c = RelationController(relation, this)
+        relationMap += relation to c
+        return c
+    }
+
+    fun removeRelation(relation: Relation) {
+        relationMap[relation]?.let {
+            container.relations -= relation
+            it.remove()
+        }
+    }
+
+    private fun openContextMenu(open: Boolean, clientX: Double, clientY: Double) = contextMenu {
+        title = "Package: " + container.name
+        if (open) {
+            addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
+                application?.controller = this@ContainerController
             }
+        }
+        addItem(MaterialIcon.ADD, "Add class") {
+            val c = Class()
+            c.name = "Unnamed class"
+
+            container.classes += c
+
+            val (x, y) = navigationView.mouseToCanvas(clientX, clientY)
+            addClass(c, x, y)
+        }
+        addItem(MaterialIcon.ADD, "Add package") {
+            val c = Container()
+            c.name = "Unnamed package"
+
+            container.containers += c
+
+            val (x, y) = navigationView.mouseToCanvas(clientX, clientY)
+            addContainer(c, x, y)
+        }
+        parent?.let {
+            addItem(MaterialIcon.DELETE, "Delete") {
+                it.removeContainer(container)
+                application?.controller = it
+            }
+        }
+    }.open(clientX, clientY)
+
+    init {
+        container.classes.forEach { addClass(it) }
+
+        container.containers.forEach { addContainer(it) }
+
+        // As root view
+        async {
+            container.relations.forEach { addRelation(it) }
         }
 
         view.context.on {
             it.stopPropagation()
-            contextMenu {
-                title = "Package: " + container.name
-                addItem(MaterialIcon.ADD, "Add class") {
-
-                }
-            }.open(it.clientX.toDouble(), it.clientY.toDouble())
+            openContextMenu(false, it.clientX.toDouble(), it.clientY.toDouble())
         }
 
 
@@ -124,42 +230,9 @@ class ContainerController(
             container.name = it.trim()
         }
 
-        container.classes.forEach { clazz ->
-            val input = InputView().also {
-                contentList += it
-            }
-            input.value = clazz.name
-
-            input.change.on {
-                clazz.name = it.trim()
-            }
-        }
-
-        container.containers.forEach { cont ->
-            val input = InputView().also {
-                contentList += it
-            }
-            input.value = cont.name
-
-            input.change.on {
-                cont.name = it.trim()
-            }
-        }
-
         listView.context.on {
             it.stopPropagation()
-            contextMenu {
-                title = "Package: " + container.name
-                addItem(MaterialIcon.ARROW_FORWARD, "Open") {
-                    application?.controller = this@ContainerController
-                }
-                addItem(MaterialIcon.ADD, "Add class") {
-
-                }
-                addItem(MaterialIcon.DELETE, "Delete") {
-
-                }
-            }.open(it.clientX.toDouble(), it.clientY.toDouble())
+            openContextMenu(true, it.clientX.toDouble(), it.clientY.toDouble())
         }
     }
 }

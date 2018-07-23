@@ -1,13 +1,16 @@
 package io.framed.controller
 
+import io.framed.model.Attribute
 import io.framed.model.Class
+import io.framed.model.Method
 import io.framed.view.*
 
 /**
  * @author lars
  */
 class ClassController(
-        val clazz: Class
+        val clazz: Class,
+        val parent: ContainerController
 ) : Controller {
 
     override val view: View<*>
@@ -25,6 +28,34 @@ class ClassController(
         classView += it
     }
 
+    private var attributeMap: Map<Attribute, AttributeController> = emptyMap()
+    fun addAttribute(attribute: Attribute) = AttributeController(attribute, this).also {
+        attributeList += it.view
+        attributeMap += attribute to it
+    }
+
+    fun removeAttribute(attribute: Attribute) {
+        attributeMap[attribute]?.let {
+            attributeList -= it.view
+            attributeMap -= attribute
+            clazz.attributes -= attribute
+        }
+    }
+
+    private var methodMap: Map<Method, MethodController> = emptyMap()
+    fun addMethod(method: Method) = MethodController(method, this).also {
+        methodList += it.view
+        methodMap += method to it
+    }
+
+    fun removeMethod(method: Method) {
+        methodMap[method]?.let {
+            methodList -= it.view
+            methodMap -= method
+            clazz.methods -= method
+        }
+    }
+
     init {
         classView.classes += "class-view"
         val header = InputView().also {
@@ -36,26 +67,30 @@ class ClassController(
             clazz.name = it.trim()
         }
 
-        clazz.attributes.forEach {
-            attributeList += AttributeController(it).view
-        }
+        clazz.attributes.forEach { addAttribute(it) }
 
-        clazz.methods.forEach {
-            methodList += MethodController(it).view
-        }
+        clazz.methods.forEach { addMethod(it) }
 
         view.context.on {
             it.stopPropagation()
             contextMenu {
                 title = "Class: " + clazz.name
                 addItem(MaterialIcon.ADD, "Add attribute") {
+                    val a = Attribute()
+                    a.name = "unnamed"
+                    clazz.attributes += a
 
+                    addAttribute(a)
                 }
                 addItem(MaterialIcon.ADD, "Add method") {
+                    val m = Method()
+                    m.name = "unnamed"
+                    clazz.methods += m
 
+                    addMethod(m)
                 }
                 addItem(MaterialIcon.DELETE, "Delete") {
-
+                    parent.removeClass(clazz)
                 }
             }.open(it.clientX.toDouble(), it.clientY.toDouble())
         }

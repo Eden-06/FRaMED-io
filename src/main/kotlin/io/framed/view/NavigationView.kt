@@ -84,9 +84,6 @@ class NavigationView : View<HTMLDivElement>("div") {
         this.zoom = zoom
         val new = this.zoom
 
-        //val dx = ((0.5 - x) * clientWidth * (new - old))
-        //val dy = ((0.5 - y) * clientHeight * (new - old))
-
         val dx = (clientWidth * (0.5 - x) * (1 / new - 1 / old))
         val dy = (clientHeight * (0.5 - y) * (1 / new - 1 / old))
 
@@ -99,6 +96,7 @@ class NavigationView : View<HTMLDivElement>("div") {
      * Current pan.
      */
     var pan: Coordinate = Coordinate(0.0, 0.0)
+        private set
 
     /**
      * Pan by a relative width.
@@ -124,6 +122,16 @@ class NavigationView : View<HTMLDivElement>("div") {
      */
     private fun updateTransform() {
         transformBox.style.transform = "scale($zoom) translate($pan)"
+    }
+
+    fun mouseToCanvas(x: Double, y: Double): Pair<Double, Double> {
+        val cx = (x - offsetLeft) / clientWidth - 0.5
+        val cy = (y - offsetTop) / clientHeight - 0.5
+
+        val hx = clientWidth / 2.0 + cx * clientWidth / zoom - pan.x
+        val hy = clientHeight / 2.0 + cy * clientHeight / zoom - pan.y
+
+        return hx to hy
     }
 
     /**

@@ -10,7 +10,8 @@ import io.framed.view.contextMenu
  * @author lars
  */
 class AttributeController(
-        val attribute: Attribute
+        val attribute: Attribute,
+        val parent: ClassController
 ) : Controller {
 
     override val view: View<*>
@@ -37,7 +38,7 @@ class AttributeController(
             contextMenu {
                 title = "Attribute: " + attribute.name
                 addItem(MaterialIcon.DELETE, "Delete") {
-
+                    parent.removeAttribute(attribute)
                 }
             }.open(it.clientX.toDouble(), it.clientY.toDouble())
         }

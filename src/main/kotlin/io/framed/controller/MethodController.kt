@@ -10,7 +10,8 @@ import io.framed.view.contextMenu
  * @author lars
  */
 class MethodController(
-        val method: Method
+        val method: Method,
+        val parent: ClassController
 ) : Controller {
 
     override val view: View<*>
@@ -39,7 +40,7 @@ class MethodController(
             contextMenu {
                 title = "Method: " + method.name
                 addItem(MaterialIcon.DELETE, "Delete") {
-
+                    parent.removeMethod(method)
                 }
             }.open(it.clientX.toDouble(), it.clientY.toDouble())
         }
