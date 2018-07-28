@@ -1,7 +1,7 @@
 package io.framed.controller
 
 import io.framed.async
-import io.framed.jsPlumb
+import io.framed.JsPlumb
 import io.framed.model.Class
 import io.framed.model.Container
 import io.framed.model.Model
@@ -14,7 +14,14 @@ import io.framed.view.*
 class ContainerController(
         val container: Container,
         val parent: ContainerController? = null
-) : Controller {
+) : NamedController() {
+
+    override var name: String
+        get() = container.name
+        set(value) {
+            container.name = value
+            nameChange.fire(value)
+        }
 
     var application: Application? = null
         set(value) {
@@ -49,9 +56,9 @@ class ContainerController(
     }
 
     override val view: View<*>
-        get() = navigationView
+        get() = listView
 
-    private val navigationView = NavigationView()
+    val navigationView = NavigationView()
     var touchpadControl: Boolean
         get() = navigationView.touchpadControl
         set(value) {
@@ -69,7 +76,7 @@ class ContainerController(
     var views: Map<Model, View<*>> = emptyMap()
     var childContainer: List<ContainerController> = emptyList()
 
-    val jsPlumbInstance = jsPlumb.getInstance().apply {
+    val jsPlumbInstance = JsPlumb.getInstance().apply {
         setContainer(navigationView.container)
 
         navigationView.zoomListener.on {
@@ -96,10 +103,14 @@ class ContainerController(
         val input = InputView().also {
             contentList += it
         }
-        input.value = clazz.name
+        input.value = c.name
 
         input.change.on {
-            clazz.name = it.trim()
+            c.name = it.trim()
+        }
+
+        c.nameChange.on {
+            input.value = it
         }
 
         classMap += clazz to (c to input)
@@ -119,7 +130,7 @@ class ContainerController(
     }
 
     private var containerMap: Map<Container, Pair<ContainerController, InputView>> = emptyMap()
-    fun addContainer(cont: Container, x: Double = 0.0, y: Double = 0.0): ContainerController {
+    private fun addContainer(cont: Container, x: Double = 0.0, y: Double = 0.0): ContainerController {
         // As root view
         val c = ContainerController(cont, this)
         c.application = application
@@ -138,17 +149,21 @@ class ContainerController(
         val input = InputView().also {
             contentList += it
         }
-        input.value = cont.name
+        input.value = c.name
 
         input.change.on {
-            cont.name = it.trim()
+            c.name = it.trim()
+        }
+
+        c.nameChange.on {
+            input.value = it
         }
 
         containerMap += cont to (c to input)
         return c
     }
 
-    fun removeContainer(cont: Container) {
+    private fun removeContainer(cont: Container) {
         containerMap[cont]?.let { (c, input) ->
             navigationView.container.removeChild(c.listView.html)
             contentList -= input
@@ -157,13 +172,13 @@ class ContainerController(
     }
 
     private var relationMap: Map<Relation, RelationController> = emptyMap()
-    fun addRelation(relation: Relation): RelationController {
+    private fun addRelation(relation: Relation): RelationController {
         val c = RelationController(relation, this)
         relationMap += relation to c
         return c
     }
 
-    fun removeRelation(relation: Relation) {
+    private fun removeRelation(relation: Relation) {
         relationMap[relation]?.let {
             container.relations -= relation
             it.remove()
@@ -171,7 +186,7 @@ class ContainerController(
     }
 
     private fun openContextMenu(open: Boolean, clientX: Double, clientY: Double) = contextMenu {
-        title = "Package: " + container.name
+        title = "Package: " + name
         if (open) {
             addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
                 application?.controller = this@ContainerController
@@ -213,21 +228,25 @@ class ContainerController(
             container.relations.forEach { addRelation(it) }
         }
 
-        view.context.on {
+        navigationView.context.on {
             it.stopPropagation()
             openContextMenu(false, it.clientX.toDouble(), it.clientY.toDouble())
         }
-
 
         // As content view
         listView.classes += "container-view"
         val header = InputView().also {
             titleList += it
         }
-        header.value = container.name
+        header.value = name
 
         header.change.on {
-            container.name = it.trim()
+            name = it.trim()
+        }
+        nameChange.on {
+            if (header.value != it) {
+                header.value = it
+            }
         }
 
         listView.context.on {

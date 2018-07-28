@@ -22,7 +22,7 @@ class Application : View<HTMLDivElement>("div") {
             value.touchpadControl = touchpadControl
 
             workspace.clear()
-            workspace.appendChild(value.view.html)
+            workspace.appendChild(value.navigationView.html)
 
             updateToolbar()
         }

@@ -11,10 +11,17 @@ import io.framed.view.*
 class ClassController(
         val clazz: Class,
         val parent: ContainerController
-) : Controller {
+) : NamedController() {
 
     override val view: View<*>
         get() = classView
+
+    override var name: String
+        get() = clazz.name
+        set(value) {
+            clazz.name = value
+            nameChange.fire(value)
+        }
 
     private val classView = ListView()
 
@@ -29,7 +36,7 @@ class ClassController(
     }
 
     private var attributeMap: Map<Attribute, AttributeController> = emptyMap()
-    fun addAttribute(attribute: Attribute) = AttributeController(attribute, this).also {
+    private fun addAttribute(attribute: Attribute) = AttributeController(attribute, this).also {
         attributeList += it.view
         attributeMap += attribute to it
     }
@@ -43,7 +50,7 @@ class ClassController(
     }
 
     private var methodMap: Map<Method, MethodController> = emptyMap()
-    fun addMethod(method: Method) = MethodController(method, this).also {
+    private fun addMethod(method: Method) = MethodController(method, this).also {
         methodList += it.view
         methodMap += method to it
     }
@@ -61,10 +68,15 @@ class ClassController(
         val header = InputView().also {
             titleList += it
         }
-        header.value = clazz.name
+        header.value = name
 
         header.change.on {
-            clazz.name = it.trim()
+            name = it.trim()
+        }
+        nameChange.on {
+            if (header.value != it) {
+                header.value = it
+            }
         }
 
         clazz.attributes.forEach { addAttribute(it) }
@@ -74,7 +86,7 @@ class ClassController(
         view.context.on {
             it.stopPropagation()
             contextMenu {
-                title = "Class: " + clazz.name
+                title = "Class: $name"
                 addItem(MaterialIcon.ADD, "Add attribute") {
                     val a = Attribute()
                     a.name = "unnamed"

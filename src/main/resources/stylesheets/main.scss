@@ -1,0 +1,132 @@
+@import "config";
+
+body, html {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: $text-color;
+  background: $secondary-background;
+  font-family: Roboto, Arial, sans-serif;
+}
+
+input {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: none;
+  background: transparent;
+  &:focus {
+    background: $primary-background;
+  }
+}
+
+.application {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.toolbar {
+  background: $main-color;
+  color: $main-text;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: $toolbar-height;
+  line-height: $toolbar-height;
+  z-index: 1;
+  font-size: 1.1rem;
+
+  box-shadow: 0 0 4px rgba(0, 0, 0, .14), 0 4px 8px rgba(0, 0, 0, .28);
+}
+
+.left-bar {
+  float: left;
+  span {
+    height: $toolbar-height;
+    line-height: $toolbar-height;
+    padding: 0 .6rem;
+    display: inline-block;
+    &:hover {
+      background: rgba(0, 0, 0, .1);
+    }
+  }
+}
+
+.right-bar {
+  float: right;
+  font-size: 1.3rem;
+
+  span {
+    height: $toolbar-height;
+    line-height: $toolbar-height;
+    width: 3rem;
+    text-align: center;
+    display: inline-block;
+    &:hover {
+      background: rgba(0, 0, 0, .1);
+    }
+  }
+}
+
+.workspace {
+  position: absolute;
+  top: $toolbar-height;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.context-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  & > div {
+    position: absolute;
+    background: white;
+    border: solid 1px $border-color;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+    border-radius: $border-radius;
+    min-width: 12rem;
+    & > span {
+      padding: 0.5rem;
+      display: block;
+      border-bottom: solid 1px $border-color;
+    }
+    & > div {
+      line-height: 2.2rem;
+
+      .icon-view {
+        width: 1.8rem;
+        height: 2.2rem;
+        display: inline-block;
+        text-align: center;
+        float: left;
+      }
+      .text-view {
+        padding-right: 1rem;
+        display: inline-block;
+      }
+
+      &:hover {
+        background: rgba(0, 0, 0, .05);
+      }
+      &:first-of-type {
+        margin-top: 0.4rem
+      }
+      &:last-of-type {
+        margin-bottom: 0.4rem
+      }
+    }
+  }
+}

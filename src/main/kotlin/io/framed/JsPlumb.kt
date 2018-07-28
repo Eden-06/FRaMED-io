@@ -1,3 +1,5 @@
+@file:Suppress("UnsafeCastFromDynamic")
+
 package io.framed
 
 import org.w3c.dom.Element
@@ -13,7 +15,8 @@ import org.w3c.dom.svg.SVGSVGElement
 /**
  * jsPlumb root object.
  */
-external class jsPlumb {
+@JsName("jsPlumb")
+external class JsPlumb {
     companion object {
         /**
          * Create a new jsPlumb instance.
@@ -121,7 +124,7 @@ external interface JsPlumbConnectInit {
  *
  * @return The new connection property object.
  */
-fun JsPlumbConnect(init: JsPlumbConnectInit.() -> Unit = {}): JsPlumbConnectInit {
+fun jsPlumbConnect(init: JsPlumbConnectInit.() -> Unit = {}): JsPlumbConnectInit {
     val h = js("{}")
     init(h)
     return h
@@ -155,7 +158,7 @@ external interface JsPlumbPaintStyle {
  *
  * @return The new line style property object.
  */
-fun JsPlumbPaintStyle(init: JsPlumbPaintStyle.() -> Unit = {}): JsPlumbPaintStyle {
+fun jsPlumbPaintStyle(init: JsPlumbPaintStyle.() -> Unit = {}): JsPlumbPaintStyle {
     val h = js("{}")
     init(h)
     return h

@@ -1,8 +1,8 @@
 package io.framed.controller
 
-import io.framed.JsPlumbConnect
+import io.framed.jsPlumbConnect
 import io.framed.JsPlumbConnection
-import io.framed.JsPlumbPaintStyle
+import io.framed.jsPlumbPaintStyle
 import io.framed.model.Relation
 import io.framed.view.View
 
@@ -10,7 +10,7 @@ import io.framed.view.View
  * @author lars
  */
 class RelationController(
-        val relation: Relation,
+        relation: Relation,
         val parent: ContainerController
 ) : Controller {
 
@@ -42,7 +42,7 @@ class RelationController(
             throw IllegalArgumentException()
         }
 
-        connections += jsPlumbInstance.connect(JsPlumbConnect {
+        connections += jsPlumbInstance.connect(jsPlumbConnect {
             source = sourceController.html
             target = targetController.html
 
@@ -52,13 +52,13 @@ class RelationController(
             })
             endpoint = "Blank"
 
-            paintStyle = JsPlumbPaintStyle {
+            paintStyle = jsPlumbPaintStyle {
                 stroke = "black"
                 strokeWidth = 8
                 dashstyle = "1 0.3"
             }
         })
-        connections += jsPlumbInstance.connect(JsPlumbConnect {
+        connections += jsPlumbInstance.connect(jsPlumbConnect {
             source = sourceController.html
             target = targetController.html
 
@@ -68,12 +68,12 @@ class RelationController(
             })
             endpoint = "Blank"
 
-            paintStyle = JsPlumbPaintStyle {
+            paintStyle = jsPlumbPaintStyle {
                 stroke = "white"
                 strokeWidth = 5.5
             }
         })
-        connections += jsPlumbInstance.connect(JsPlumbConnect {
+        connections += jsPlumbInstance.connect(jsPlumbConnect {
             source = sourceController.html
             target = targetController.html
 
@@ -83,7 +83,7 @@ class RelationController(
             })
             endpoint = "Blank"
 
-            paintStyle = JsPlumbPaintStyle {
+            paintStyle = jsPlumbPaintStyle {
                 stroke = "black"
                 strokeWidth = 1.5
             }

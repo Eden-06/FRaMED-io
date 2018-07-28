@@ -1,0 +1,21 @@
+$main-color: #2196F3;
+$main-text: #FFFFFF;
+
+$uml-color: #E3F2FD;
+$uml-border: #000;
+
+$primary-background: #FFFFFF;
+$secondary-background: #EEEEEE;
+$text-color: #111;
+$border-color: #bbb;
+
+$toolbar-height: 3.5rem;
+$border-radius: 0.2rem;
+
+@mixin no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
