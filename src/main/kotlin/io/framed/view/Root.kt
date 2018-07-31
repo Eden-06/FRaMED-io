@@ -6,5 +6,5 @@ import kotlin.browser.document
 /**
  * @author lars
  */
-object Root : View<HTMLElement>(document.body!!) {
+object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
 }

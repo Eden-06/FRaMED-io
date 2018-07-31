@@ -1,7 +1,6 @@
 package io.framed.view
 
 import org.w3c.dom.HTMLDivElement
-import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.min
 
@@ -51,7 +50,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
      * @param y Top position in px.
      */
     fun open(x: Double, y: Double) {
-        document.body?.appendChild(html)
+        Root += this
 
         val left = min(window.innerWidth - listView.clientWidth - 8.0, x)
         val top = min(window.innerHeight - listView.clientHeight - 8.0, y)
@@ -64,7 +63,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
      * Close the onContext menu.
      */
     fun close() {
-        document.body?.removeChild(html)
+        Root -= this
     }
 
     init {
@@ -73,6 +72,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
         html.appendChild(listView.html)
 
         onClick {
+            println("asdfas")
             it.stopPropagation()
             close()
         }

@@ -3,8 +3,6 @@ package io.framed.view
 import io.framed.toDashCase
 import io.framed.util.EventHandler
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.Event
-import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.reflect.KClass
@@ -185,23 +183,12 @@ abstract class View<V : HTMLElement>(view: V) {
     var isMouseDown by ClassDelegate("mouse-down")
 
     init {
-        html.addEventListener("onClick", object : EventListener {
-            override fun handleEvent(event: Event) {
-                event.preventDefault()
-                (event as? MouseEvent)?.let { e ->
-                    onClick.fire(e)
-                }
-            }
-        })
+        html.addEventListener("click", onClick.eventListener)
+        html.addEventListener("contextmenu", onContext.eventListener)
+        onContext {
+            it.preventDefault()
+        }
 
-        html.addEventListener("contextmenu", object : EventListener {
-            override fun handleEvent(event: Event) {
-                event.preventDefault()
-                (event as? MouseEvent)?.let { e ->
-                    onContext.fire(e)
-                }
-            }
-        })
         html.addEventListener("mousedown", onMouseDown.eventListener)
         html.addEventListener("mousemove", onMouseMove.eventListener)
         html.addEventListener("mouseup", onMouseUp.eventListener)
