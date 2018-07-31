@@ -1,5 +1,7 @@
 var express = require('express');
 var path = require('path');
+var fs = require('fs');
+
 var app = express();
 
 app.use(require('node-sass-middleware')({
@@ -13,8 +15,26 @@ app.use(require('node-sass-middleware')({
 app.use('/public', express.static(path.join(__dirname, 'website')));
 
 app.use(function (req, res) {
-    res.status(200);
-    res.sendFile(path.join(__dirname, 'website/index.html'));
+    fs.readFile(path.join(__dirname, 'website/index.html'), 'utf8', function (err, data) {
+        if (err) {
+            res.status(404);
+            res.send("Not found!")
+        } else {
+
+            var theme = "style";
+
+            if (req.headers.cookie && req.headers.cookie.indexOf("dark") >= 0) {
+                theme = "dark";
+            }
+
+            res.status(200);
+            res.send(data.replace(
+                "/public/stylesheets/style.css",
+                "/public/stylesheets/" + theme + ".css"
+            ))
+        }
+    });
+    //res.sendFile(path.join(__dirname, 'website/index.html'));
 });
 
 app.listen(3000, function () {

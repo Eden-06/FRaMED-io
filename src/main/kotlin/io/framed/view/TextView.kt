@@ -57,3 +57,15 @@ class TextView(
         html.addEventListener("keypress", changeListener)
     }
 }
+
+fun ListView.textView(init: TextView.() -> Unit): TextView {
+    val view = TextView()
+    append(view)
+    init(view)
+    return view
+}
+
+fun ListView.textView(text: String, init: TextView.() -> Unit = {}) = textView {
+    this.text = text
+    init(this)
+}

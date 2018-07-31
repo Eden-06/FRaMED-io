@@ -1,9 +1,10 @@
 package io.framed.controller
 
-import io.framed.jsPlumbConnect
 import io.framed.JsPlumbConnection
+import io.framed.jsPlumbConnect
 import io.framed.jsPlumbPaintStyle
 import io.framed.model.Relation
+import io.framed.view.Sidebar
 import io.framed.view.View
 
 /**
@@ -16,6 +17,8 @@ class RelationController(
 
     override val view: View<*>
         get() = throw UnsupportedOperationException("A relation does not provide its on view")
+
+    override val sidebar: Sidebar = parent.createSidebar()
 
     private var connections: List<JsPlumbConnection> = emptyList()
 
@@ -33,8 +36,6 @@ class RelationController(
 
 
     init {
-        console.log(jsPlumbInstance)
-
         val sourceController = parent.views[relation.source]
         val targetController = parent.views[relation.target]
 
@@ -53,7 +54,7 @@ class RelationController(
             endpoint = "Blank"
 
             paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
+                stroke = parent.application?.textColor ?: "black"
                 strokeWidth = 8
                 dashstyle = "1 0.3"
             }
@@ -69,7 +70,7 @@ class RelationController(
             endpoint = "Blank"
 
             paintStyle = jsPlumbPaintStyle {
-                stroke = "white"
+                stroke = parent.application?.backgroundColor ?: "white"
                 strokeWidth = 5.5
             }
         })
@@ -84,7 +85,7 @@ class RelationController(
             endpoint = "Blank"
 
             paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
+                stroke = parent.application?.textColor ?: "black"
                 strokeWidth = 1.5
             }
         })

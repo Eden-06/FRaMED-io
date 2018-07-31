@@ -2,6 +2,8 @@ package io.framed.view
 
 import org.w3c.dom.HTMLDivElement
 import kotlin.browser.document
+import kotlin.browser.window
+import kotlin.math.min
 
 /**
  * Represents a context menu with optional header.
@@ -51,8 +53,11 @@ class ContextMenu : View<HTMLDivElement>("div") {
     fun open(x: Double, y: Double) {
         document.body?.appendChild(html)
 
-        listView.left = x
-        listView.top = y
+        val left = min(window.innerWidth - listView.clientWidth - 8.0, x)
+        val top = min(window.innerHeight - listView.clientHeight - 8.0, y)
+
+        listView.left = left
+        listView.top = top
     }
 
     /**
@@ -81,7 +86,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
 /**
  * Create a new context menu.
  *
- * @param init Build for the new context menu.
+ * @param init Builder for the new context menu.
  *
  * @return The new context menu.
  */

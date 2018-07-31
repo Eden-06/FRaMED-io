@@ -1,7 +1,7 @@
 package io.framed.controller
 
-import io.framed.async
 import io.framed.JsPlumb
+import io.framed.async
 import io.framed.model.Class
 import io.framed.model.Container
 import io.framed.model.Model
@@ -23,10 +23,23 @@ class ContainerController(
             nameChange.fire(value)
         }
 
+    private var sidebars: List<Sidebar> = emptyList()
+
+    fun createSidebar() = Sidebar().also {
+        it.application = application
+        sidebars += it
+    }
+
+    override val sidebar = createSidebar()
+
     var application: Application? = null
         set(value) {
             field = value
             childContainer.forEach {
+                it.application = value
+            }
+
+            sidebars.forEach {
                 it.application = value
             }
 
@@ -127,6 +140,7 @@ class ContainerController(
         container.relations.filter { it.source == clazz || it.target == clazz }.forEach {
             removeRelation(it)
         }
+        sidebar.display()
     }
 
     private var containerMap: Map<Container, Pair<ContainerController, InputView>> = emptyMap()
@@ -169,6 +183,7 @@ class ContainerController(
             contentList -= input
             container.containers -= cont
         }
+        sidebar.display()
     }
 
     private var relationMap: Map<Relation, RelationController> = emptyMap()
@@ -183,13 +198,20 @@ class ContainerController(
             container.relations -= relation
             it.remove()
         }
+        sidebar.display()
     }
 
     private fun openContextMenu(open: Boolean, clientX: Double, clientY: Double) = contextMenu {
-        title = "Package: " + name
+        title = "Package: $name"
         if (open) {
             addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
                 application?.controller = this@ContainerController
+            }
+        } else {
+            parent?.let {
+                addItem(MaterialIcon.ARROW_BACK, "Step out") {
+                    application?.controller = it
+                }
             }
         }
         addItem(MaterialIcon.ADD, "Add class") {
@@ -252,6 +274,17 @@ class ContainerController(
         listView.context.on {
             it.stopPropagation()
             openContextMenu(true, it.clientX.toDouble(), it.clientY.toDouble())
+        }
+
+        sidebar.setup(navigationView, listView, header) {
+            title("Container")
+            input("Name", name) {
+                name = it
+            }.also { i ->
+                nameChange {
+                    i.value = it
+                }
+            }
         }
     }
 }

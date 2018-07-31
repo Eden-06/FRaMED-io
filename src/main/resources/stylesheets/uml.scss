@@ -66,7 +66,18 @@
       position: relative;
     }
   }
+
   input {
+    margin: 0;
+    padding: 0.1rem;
+    border-color: transparent;
+    background: transparent;
     display: block;
+    color: $uml-text;
+    &:focus {
+      background: $primary-background;
+      color: $text-color;
+      border-color: $toolbar-color;
+    }
   }
 }

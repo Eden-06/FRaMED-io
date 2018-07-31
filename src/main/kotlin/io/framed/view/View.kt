@@ -143,6 +143,16 @@ abstract class View<V : HTMLElement>(view: V) {
             }
         }
 
+    var hiddenVisibility: Boolean
+        get() = html.style.visibility == "hidden"
+        set(value) {
+            if (value) {
+                html.style.visibility = "hidden"
+            } else {
+                html.style.removeProperty("visibility")
+            }
+        }
+
     /**
      * Request focus to this view.
      */

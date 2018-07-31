@@ -16,6 +16,10 @@ class ClassController(
     override val view: View<*>
         get() = classView
 
+    override val sidebar: Sidebar = parent.createSidebar()
+
+    fun createSidebar() = parent.createSidebar()
+
     override var name: String
         get() = clazz.name
         set(value) {
@@ -47,6 +51,7 @@ class ClassController(
             attributeMap -= attribute
             clazz.attributes -= attribute
         }
+        sidebar.display()
     }
 
     private var methodMap: Map<Method, MethodController> = emptyMap()
@@ -61,6 +66,7 @@ class ClassController(
             methodMap -= method
             clazz.methods -= method
         }
+        sidebar.display()
     }
 
     init {
@@ -105,6 +111,17 @@ class ClassController(
                     parent.removeClass(clazz)
                 }
             }.open(it.clientX.toDouble(), it.clientY.toDouble())
+        }
+
+        sidebar.setup(view, header) {
+            title("Class")
+            input("Name", name) {
+                name = it
+            }.also { i ->
+                nameChange {
+                    i.value = it
+                }
+            }
         }
     }
 }

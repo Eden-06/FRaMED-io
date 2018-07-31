@@ -13,8 +13,9 @@ class EventHandler<E : Any> {
      *
      * @param listener Listener to add.
      */
-    fun addListener(listener: (event: E) -> Unit) {
+    fun addListener(listener: (event: E) -> Unit): (E) -> Unit {
         listeners += listener
+        return listener
     }
 
     /**
@@ -34,6 +35,8 @@ class EventHandler<E : Any> {
      * @param listener Listener to add.
      */
     fun on(listener: (event: E) -> Unit) = addListener(listener)
+
+    operator fun invoke(listener: (event: E) -> Unit) = addListener(listener)
 
     /**
      * Remove all listener from this event.

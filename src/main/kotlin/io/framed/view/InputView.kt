@@ -4,6 +4,7 @@ import io.framed.util.EventHandler
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.FocusEvent
 import org.w3c.dom.events.KeyboardEvent
 
 /**
@@ -32,6 +33,18 @@ class InputView : View<HTMLInputElement>("input") {
      */
     val change = EventHandler<String>()
 
+    /**
+     * Fires on focus leave.
+     */
+    val focusLeave = EventHandler<FocusEvent>()
+
+    /**
+     * Fires on focus gain.
+     */
+    val focusEnter = EventHandler<FocusEvent>()
+
+    var invalid by ClassDelegate()
+
     init {
         val changeListener = object : EventListener {
             override fun handleEvent(event: Event) {
@@ -45,6 +58,30 @@ class InputView : View<HTMLInputElement>("input") {
             }
         }
         html.addEventListener("change", changeListener)
-        html.addEventListener("keypress", changeListener)
+        html.addEventListener("keyup", changeListener)
+
+        val focusListener = object : EventListener {
+            override fun handleEvent(event: Event) {
+                (event as? FocusEvent)?.let {
+                    focusEnter.fire(it)
+                }
+            }
+        }
+        val blurListener = object : EventListener {
+            override fun handleEvent(event: Event) {
+                (event as? FocusEvent)?.let {
+                    focusLeave.fire(it)
+                }
+            }
+        }
+        html.addEventListener("focus", focusListener)
+        html.addEventListener("blur", blurListener)
     }
+}
+
+fun ListView.inputView(init: InputView.() -> Unit): InputView {
+    val view = InputView()
+    append(view)
+    init(view)
+    return view
 }
