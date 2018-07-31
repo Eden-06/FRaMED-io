@@ -24,7 +24,7 @@ class ClassController(
         get() = clazz.name
         set(value) {
             clazz.name = value
-            nameChange.fire(value)
+            onNameChange.fire(value)
         }
 
     private val classView = ListView()
@@ -76,10 +76,10 @@ class ClassController(
         }
         header.value = name
 
-        header.change.on {
+        header.onChange {
             name = it.trim()
         }
-        nameChange.on {
+        onNameChange {
             if (header.value != it) {
                 header.value = it
             }
@@ -89,7 +89,7 @@ class ClassController(
 
         clazz.methods.forEach { addMethod(it) }
 
-        view.context.on {
+        view.onContext {
             it.stopPropagation()
             contextMenu {
                 title = "Class: $name"
@@ -118,7 +118,7 @@ class ClassController(
             input("Name", name) {
                 name = it
             }.also { i ->
-                nameChange {
+                onNameChange {
                     i.value = it
                 }
             }

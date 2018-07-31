@@ -29,26 +29,26 @@ class InputView : View<HTMLInputElement>("input") {
     var readOnly: Boolean by AttributeDelegate(Boolean::class, false)
 
     /**
-     * Fires on every user change to the content
+     * Fires on every user onChange to the content
      */
-    val change = EventHandler<String>()
+    val onChange = EventHandler<String>()
 
     /**
      * Fires on focus leave.
      */
-    val focusLeave = EventHandler<FocusEvent>()
+    val onFocusLeave = EventHandler<FocusEvent>()
 
     /**
      * Fires on focus gain.
      */
-    val focusEnter = EventHandler<FocusEvent>()
+    val onFocusEnter = EventHandler<FocusEvent>()
 
     var invalid by ClassDelegate()
 
     init {
         val changeListener = object : EventListener {
             override fun handleEvent(event: Event) {
-                change.fire(value)
+                onChange.fire(value)
 
                 (event as? KeyboardEvent)?.let { e ->
                     when (e.keyCode) {
@@ -57,25 +57,11 @@ class InputView : View<HTMLInputElement>("input") {
                 }
             }
         }
-        html.addEventListener("change", changeListener)
+        html.addEventListener("onChange", changeListener)
         html.addEventListener("keyup", changeListener)
 
-        val focusListener = object : EventListener {
-            override fun handleEvent(event: Event) {
-                (event as? FocusEvent)?.let {
-                    focusEnter.fire(it)
-                }
-            }
-        }
-        val blurListener = object : EventListener {
-            override fun handleEvent(event: Event) {
-                (event as? FocusEvent)?.let {
-                    focusLeave.fire(it)
-                }
-            }
-        }
-        html.addEventListener("focus", focusListener)
-        html.addEventListener("blur", blurListener)
+        html.addEventListener("focus", onFocusEnter.eventListener)
+        html.addEventListener("blur", onFocusLeave.eventListener)
     }
 }
 

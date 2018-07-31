@@ -38,14 +38,14 @@ abstract class View<V : HTMLElement>(view: V) {
     }
 
     /**
-     * Fires on click.
+     * Fires on onClick.
      */
-    val click = EventHandler<MouseEvent>()
+    val onClick = EventHandler<MouseEvent>()
 
     /**
-     * Fires on context menu open.
+     * Fires on onContext menu open.
      */
-    val context = EventHandler<MouseEvent>()
+    val onContext = EventHandler<MouseEvent>()
 
     /**
      * Access css classes of this view.
@@ -80,6 +80,15 @@ abstract class View<V : HTMLElement>(view: V) {
         get() = html.style.left.replace("px", "").toDoubleOrNull() ?: 0.0
         set(value) {
             html.style.left = "${value}px"
+        }
+
+    /**
+     * Css right position in px.
+     */
+    var right: Double
+        get() = html.style.right.replace("px", "").toDoubleOrNull() ?: 0.0
+        set(value) {
+            html.style.right = "${value}px"
         }
 
     /**
@@ -167,12 +176,20 @@ abstract class View<V : HTMLElement>(view: V) {
         html.blur()
     }
 
+    val onMouseDown = EventHandler<MouseEvent>()
+    val onMouseMove = EventHandler<MouseEvent>()
+    val onMouseUp = EventHandler<MouseEvent>()
+    val onMouseEnter = EventHandler<MouseEvent>()
+    val onMouseLeave = EventHandler<MouseEvent>()
+
+    var isMouseDown by ClassDelegate("mouse-down")
+
     init {
-        html.addEventListener("click", object : EventListener {
+        html.addEventListener("onClick", object : EventListener {
             override fun handleEvent(event: Event) {
                 event.preventDefault()
                 (event as? MouseEvent)?.let { e ->
-                    click.fire(e)
+                    onClick.fire(e)
                 }
             }
         })
@@ -181,10 +198,22 @@ abstract class View<V : HTMLElement>(view: V) {
             override fun handleEvent(event: Event) {
                 event.preventDefault()
                 (event as? MouseEvent)?.let { e ->
-                    context.fire(e)
+                    onContext.fire(e)
                 }
             }
         })
+        html.addEventListener("mousedown", onMouseDown.eventListener)
+        html.addEventListener("mousemove", onMouseMove.eventListener)
+        html.addEventListener("mouseup", onMouseUp.eventListener)
+        html.addEventListener("mouseenter", onMouseEnter.eventListener)
+        html.addEventListener("mouseleave", onMouseLeave.eventListener)
+
+        onMouseDown {
+            isMouseDown = true
+        }
+        onMouseUp {
+            isMouseDown = false
+        }
     }
 
     companion object {

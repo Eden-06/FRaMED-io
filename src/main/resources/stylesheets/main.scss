@@ -13,6 +13,10 @@ body, html {
   font-family: Roboto, Arial, sans-serif;
 }
 
+.resize-ew * {
+  cursor: ew-resize;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -104,7 +108,7 @@ input {
   z-index: 0;
 }
 
-.propertyBar {
+.property-bar {
   position: absolute;
   top: $toolbar-height;
   right: 0;
@@ -114,7 +118,27 @@ input {
   overflow-y: scroll;
   background: $secondary-background;
   z-index: 1;
-  box-shadow: 0 0 4px rgba(0, 0, 0, .14)
+  box-shadow: 0 0 4px rgba(0, 0, 0, .14);
+  border-left: solid 1px $border-color;
+}
+.property-bar-resizer {
+  position: absolute;
+  top: $toolbar-height;
+  right: $sidebar-width;
+  bottom: 0;
+  width: 0.4rem;
+  margin-right: -0.3rem;
+  z-index: 2;
+  background: transparent;
+  cursor: ew-resize;
+  &:hover, &.mouse-down {
+    background: rgba($text-color, .1);
+  }
+  &.side{
+    margin-right: 0;
+    width: 0.6rem;
+    background: rgba($text-color, .2);
+  }
 }
 
 .context-menu {

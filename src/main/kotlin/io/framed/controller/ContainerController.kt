@@ -20,7 +20,7 @@ class ContainerController(
         get() = container.name
         set(value) {
             container.name = value
-            nameChange.fire(value)
+            onNameChange.fire(value)
         }
 
     private var sidebars: List<Sidebar> = emptyList()
@@ -92,7 +92,7 @@ class ContainerController(
     val jsPlumbInstance = JsPlumb.getInstance().apply {
         setContainer(navigationView.container)
 
-        navigationView.zoomListener.on {
+        navigationView.onZoom {
             setZoom(it)
         }
         setZoom(1.0)
@@ -118,11 +118,11 @@ class ContainerController(
         }
         input.value = c.name
 
-        input.change.on {
+        input.onChange {
             c.name = it.trim()
         }
 
-        c.nameChange.on {
+        c.onNameChange {
             input.value = it
         }
 
@@ -165,11 +165,11 @@ class ContainerController(
         }
         input.value = c.name
 
-        input.change.on {
+        input.onChange {
             c.name = it.trim()
         }
 
-        c.nameChange.on {
+        c.onNameChange {
             input.value = it
         }
 
@@ -250,7 +250,7 @@ class ContainerController(
             container.relations.forEach { addRelation(it) }
         }
 
-        navigationView.context.on {
+        navigationView.onContext {
             it.stopPropagation()
             openContextMenu(false, it.clientX.toDouble(), it.clientY.toDouble())
         }
@@ -262,16 +262,16 @@ class ContainerController(
         }
         header.value = name
 
-        header.change.on {
+        header.onChange {
             name = it.trim()
         }
-        nameChange.on {
+        onNameChange {
             if (header.value != it) {
                 header.value = it
             }
         }
 
-        listView.context.on {
+        listView.onContext {
             it.stopPropagation()
             openContextMenu(true, it.clientX.toDouble(), it.clientY.toDouble())
         }
@@ -281,7 +281,7 @@ class ContainerController(
             input("Name", name) {
                 name = it
             }.also { i ->
-                nameChange {
+                onNameChange {
                     i.value = it
                 }
             }

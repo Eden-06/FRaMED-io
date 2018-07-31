@@ -27,7 +27,7 @@ class Dialog : View<HTMLDivElement>("div") {
 
     fun addButton(name: String, primary: Boolean = false, onClick: () -> Unit = {}): TextView =
             buttonView.textView(name) {
-                click {
+                onClick {
                     close()
                     onClick()
                     it.stopPropagation()
@@ -49,7 +49,6 @@ class Dialog : View<HTMLDivElement>("div") {
 
         async {
             val w = min(listView.clientWidth, clientWidth / 2)
-            val changed = w != listView.clientWidth
             listView.width = w.toDouble()
             listView.left = (clientWidth - w) / 2.0
             async {
@@ -81,7 +80,7 @@ class Dialog : View<HTMLDivElement>("div") {
         buttonView.classes += "dialog-button"
         listView += buttonView
 
-        click {
+        onClick {
             if (closable) {
                 close()
             }

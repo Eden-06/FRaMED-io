@@ -28,7 +28,7 @@ class MethodController(
                 cellBox {
                     inputView {
                         value = param.name
-                        change {
+                        onChange {
                             param.name = it
                             update.fire(2)
                         }
@@ -38,7 +38,7 @@ class MethodController(
                 cellBox {
                     inputView {
                         value = param.type
-                        change {
+                        onChange {
                             param.type = it
                             update.fire(2)
                         }
@@ -46,7 +46,7 @@ class MethodController(
                 }
                 cellBox {
                     iconView(MaterialIcon.CLEAR) {
-                        click {
+                        onClick {
                             method.parameters -= param
                             update.fire(-1)
                         }
@@ -64,11 +64,11 @@ class MethodController(
         inputView.classes += "method-view"
 
         inputView.value = method.toString()
-        inputView.change.on {
+        inputView.onChange {
             inputView.invalid = parse(it) >= 0
             update.fire(1)
         }
-        inputView.focusLeave {
+        inputView.onFocusLeave {
             if (!inputView.invalid) {
                 inputView.value = method.toString()
             }
@@ -80,7 +80,7 @@ class MethodController(
             }
         }
 
-        view.context.on {
+        view.onContext {
             it.stopPropagation()
             contextMenu {
                 title = "Method: " + method.name
@@ -100,7 +100,7 @@ class MethodController(
                     if (it != 0)
                         i.value = method.name
                 }
-                i.focusLeave {
+                i.onFocusLeave {
                     i.value = method.name
                 }
             }
@@ -112,7 +112,7 @@ class MethodController(
                     if (it != 0)
                         i.value = method.type
                 }
-                i.focusLeave {
+                i.onFocusLeave {
                     i.value = method.type
                 }
             }
@@ -123,7 +123,7 @@ class MethodController(
                 listView {
                     iconView(MaterialIcon.ADD)
                     textView("Add parameter")
-                    click {
+                    onClick {
                         method.param("")
                         update.fire(-1)
                     }

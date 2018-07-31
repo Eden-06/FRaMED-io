@@ -25,11 +25,11 @@ class AttributeController(
         inputView.classes += "attribute-view"
 
         inputView.value = attribute.toString()
-        inputView.change {
+        inputView.onChange {
             inputView.invalid = parse(it) >= 0
             update.fire(1)
         }
-        inputView.focusLeave {
+        inputView.onFocusLeave {
             if (!inputView.invalid) {
                 inputView.value = attribute.toString()
             }
@@ -41,7 +41,7 @@ class AttributeController(
             }
         }
 
-        view.context.on {
+        view.onContext {
             it.stopPropagation()
             contextMenu {
                 title = "Attribute: " + attribute.name
@@ -61,7 +61,7 @@ class AttributeController(
                     if (it != 0)
                         i.value = attribute.name
                 }
-                i.focusLeave {
+                i.onFocusLeave {
                     i.value = attribute.name
                 }
             }
@@ -73,7 +73,7 @@ class AttributeController(
                     if (it != 0)
                         i.value = attribute.type
                 }
-                i.focusLeave {
+                i.onFocusLeave {
                     i.value = attribute.type
                 }
             }

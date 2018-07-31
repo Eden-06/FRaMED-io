@@ -6,9 +6,10 @@ import io.framed.model.Container
 import io.framed.setCookie
 import io.framed.util.EventHandler
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.browser.window
-import kotlin.dom.clear
+import kotlin.math.max
 
 /**
  * Main view.
@@ -27,7 +28,7 @@ class Application : View<HTMLDivElement>("div") {
             value.touchpadControl = touchpadControl
 
             workspace.clear()
-            workspace.appendChild(value.navigationView.html)
+            workspace += value.navigationView
 
             updateToolbar()
         }
@@ -45,11 +46,11 @@ class Application : View<HTMLDivElement>("div") {
         while (c != null) {
             c = c.let { cont ->
                 leftBar.prepand(TextView(cont.container.name).apply {
-                    click {
+                    onClick {
                         controller = cont
                     }
 
-                    toolbarListeners += cont.nameChange to cont.nameChange {
+                    toolbarListeners += cont.onNameChange to cont.onNameChange {
                         text = it
                     }
                 })
@@ -76,7 +77,7 @@ class Application : View<HTMLDivElement>("div") {
         rightBar += icon
         icon.icon = MaterialIcon.MOUSE
 
-        icon.click.on {
+        icon.onClick {
             icon.icon = if (touchpadControl) {
                 MaterialIcon.MOUSE
             } else {
@@ -92,11 +93,11 @@ class Application : View<HTMLDivElement>("div") {
 
         val validity = 24 * 60 * 60
 
-        icon.click.on {
+        icon.onClick {
             val isDark = document.getCookie("theme") == "dark"
             dialog {
                 title = "Switch to ${if (isDark) "light" else "dark"} theme"
-                contentView.textView("To change the theme the page must be reloaded. All unsaved changes will go lost.")
+                contentView.textView("To onChange the theme the page must be reloaded. All unsaved changes will go lost.")
                 closable = true
                 addButton("Reload", true) {
                     document.setCookie("theme", if (isDark) "light" else "dark", validity)
@@ -110,15 +111,54 @@ class Application : View<HTMLDivElement>("div") {
 
     val propertyBar = ListView().also {
         html.appendChild(it.html)
-        it.classes += "propertyBar"
+        it.classes += "property-bar"
+    }
+
+    val propertyBarResizer = ListView().also { resizer ->
+        html.appendChild(resizer.html)
+        resizer.classes += "property-bar-resizer"
+
+        var up: ((MouseEvent) -> Unit) = {}
+
+        resizer.onMouseDown {
+            it.preventDefault()
+            Root.classes += "resize-ew"
+            val move = Root.onMouseMove {
+                it.preventDefault()
+                val w = (clientWidth - it.clientX).toDouble()
+
+                if (w < 50) {
+                    propertyBar.visible = false
+
+                    resizer.right = 0.0
+                    resizer.classes += "side"
+                    workspace.right = 0.0
+                } else {
+                    propertyBar.visible = true
+                    val newWidth = max(w, 150.0)
+
+                    propertyBar.width = newWidth
+                    resizer.right = newWidth
+                    resizer.classes -= "side"
+                    workspace.right = newWidth
+                }
+
+            }
+            up = Root.onMouseUp {
+                it.preventDefault()
+                Root.classes -= "resize-ew"
+                Root.onMouseMove.removeListener(move)
+                Root.onMouseUp.removeListener(up)
+            }
+        }
     }
 
     val touchpadControl: Boolean
         get() = controlMethodView.icon == MaterialIcon.TOUCH_APP
 
-    private val workspace = createView<HTMLDivElement>().also {
-        html.appendChild(it)
-        it.classList.add("workspace")
+    private val workspace = ListView().also {
+        html.appendChild(it.html)
+        it.classes += "workspace"
     }
 
     private val colorDiv = (document.createElement("div") as HTMLDivElement).also {

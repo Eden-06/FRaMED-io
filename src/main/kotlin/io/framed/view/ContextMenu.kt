@@ -6,7 +6,7 @@ import kotlin.browser.window
 import kotlin.math.min
 
 /**
- * Represents a context menu with optional header.
+ * Represents a onContext menu with optional header.
  *
  * @author lars
  */
@@ -28,7 +28,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
         }
 
     /**
-     * Add an item to the context menu.
+     * Add an item to the onContext menu.
      *
      * @param icon Icon for the menu entry. `null` means no icon.
      * @param name Name for the menu entry.
@@ -38,14 +38,14 @@ class ContextMenu : View<HTMLDivElement>("div") {
         val l = ListView()
         l += IconView(icon)
         l += TextView(name)
-        l.click.on {
+        l.onClick {
             callback()
         }
         listView += l
     }
 
     /**
-     * Open the context menu at the given position, relative to the body.
+     * Open the onContext menu at the given position, relative to the body.
      *
      * @param x Left position in px.
      * @param y Top position in px.
@@ -61,7 +61,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
     }
 
     /**
-     * Close the context menu.
+     * Close the onContext menu.
      */
     fun close() {
         document.body?.removeChild(html)
@@ -72,11 +72,11 @@ class ContextMenu : View<HTMLDivElement>("div") {
 
         html.appendChild(listView.html)
 
-        click.on {
+        onClick {
             it.stopPropagation()
             close()
         }
-        context.on {
+        onContext {
             it.stopPropagation()
             close()
         }
@@ -84,11 +84,11 @@ class ContextMenu : View<HTMLDivElement>("div") {
 }
 
 /**
- * Create a new context menu.
+ * Create a new onContext menu.
  *
- * @param init Builder for the new context menu.
+ * @param init Builder for the new onContext menu.
  *
- * @return The new context menu.
+ * @return The new onContext menu.
  */
 fun contextMenu(init: ContextMenu.() -> Unit): ContextMenu {
     val cm = ContextMenu()
