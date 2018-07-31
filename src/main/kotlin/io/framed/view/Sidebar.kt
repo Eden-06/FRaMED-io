@@ -45,6 +45,17 @@ class Sidebar() : ViewCollection<View<*>, HTMLDivElement>("div") {
         return i
     }
 
+    fun button(label: String, onClick: () -> Unit = {}): Button {
+        val b = Button()
+        b.text = label
+        b.onClick { onClick() }
+
+        append(ListView().also {
+            it += b
+        })
+        return b
+    }
+
     fun custom(init: ListView.() -> Unit): ListView {
         val view = ListView()
         append(view)

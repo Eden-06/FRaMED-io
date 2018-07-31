@@ -2,6 +2,7 @@ package io.framed.view
 
 import io.framed.async
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.events.KeyboardEvent
 import kotlin.browser.document
 import kotlin.math.min
 
@@ -25,8 +26,11 @@ class Dialog : View<HTMLDivElement>("div") {
             titleView.visible = value.isNotBlank()
         }
 
-    fun addButton(name: String, primary: Boolean = false, onClick: () -> Unit = {}): TextView =
-            buttonView.textView(name) {
+    var primaryListener: (() -> Unit)? = null
+
+    fun addButton(name: String, primary: Boolean = false, onClick: () -> Unit = {}): Button =
+            buttonView.button {
+                text = name
                 onClick {
                     close()
                     onClick()
@@ -34,11 +38,14 @@ class Dialog : View<HTMLDivElement>("div") {
                 }
 
                 if (primary) {
-                    classes += "primary"
+                    this.primary = true
+                    primaryListener = onClick
                 }
             }
 
     var closable: Boolean = false
+
+    private var k: (KeyboardEvent) -> Unit = {}
 
     /**
      * Open the dialog.
@@ -58,6 +65,19 @@ class Dialog : View<HTMLDivElement>("div") {
                 }
             }
         }
+
+        k = Root.onKeyUp {
+            when (it.keyCode) {
+                27 -> if (closable) {
+                    close()
+                }
+                13 -> primaryListener?.let {
+                    close()
+                    it()
+                }
+            }
+        }
+
     }
 
     /**
@@ -65,6 +85,7 @@ class Dialog : View<HTMLDivElement>("div") {
      */
     fun close() {
         document.body?.removeChild(html)
+        Root.onKeyUp.removeListener(k)
     }
 
     init {
@@ -85,6 +106,8 @@ class Dialog : View<HTMLDivElement>("div") {
                 close()
             }
         }
+
+        listView.onClick { it.stopPropagation() }
     }
 }
 

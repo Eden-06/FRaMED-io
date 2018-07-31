@@ -3,6 +3,7 @@ package io.framed.view
 import io.framed.toDashCase
 import io.framed.util.EventHandler
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.reflect.KClass
@@ -180,6 +181,10 @@ abstract class View<V : HTMLElement>(view: V) {
     val onMouseEnter = EventHandler<MouseEvent>()
     val onMouseLeave = EventHandler<MouseEvent>()
 
+    val onKeyDown = EventHandler<KeyboardEvent>()
+    val onKeyPress = EventHandler<KeyboardEvent>()
+    val onKeyUp = EventHandler<KeyboardEvent>()
+
     var isMouseDown by ClassDelegate("mouse-down")
 
     init {
@@ -194,6 +199,10 @@ abstract class View<V : HTMLElement>(view: V) {
         html.addEventListener("mouseup", onMouseUp.eventListener)
         html.addEventListener("mouseenter", onMouseEnter.eventListener)
         html.addEventListener("mouseleave", onMouseLeave.eventListener)
+
+        html.addEventListener("keydown", onKeyDown.eventListener)
+        html.addEventListener("keypress", onKeyPress.eventListener)
+        html.addEventListener("keyup", onKeyUp.eventListener)
 
         onMouseDown {
             isMouseDown = true

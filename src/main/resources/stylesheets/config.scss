@@ -3,7 +3,7 @@ $toolbar-color: #2196F3;
 $toolbar-text: #FFFFFF;
 $toolbar-hover: rgba(0, 0, 0, .1);
 
-$uml-border: #333;
+$uml-border: rgba(0,0,0,.3);
 $uml-color: linear-gradient(to bottom, #fffbd9 0%, #fff7c4 100%);
 $uml-text: #111;
 
@@ -14,7 +14,11 @@ $border-color: #BDBDBD;
 $main-hover: rgba(0, 0, 0, .05);
 
 $error-primary: #F44336;
+$error-text: #FFFFFF;
 $error-secondary: #FFEBEE;
+
+$alert-primary: #FFEB3B;
+$alert-text: #FFFFFF;
 
 $dialog-background: #F9F9F9;
 $dialog-text: $text-color;

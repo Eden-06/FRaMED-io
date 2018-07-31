@@ -121,6 +121,7 @@ input {
   box-shadow: 0 0 4px rgba(0, 0, 0, .14);
   border-left: solid 1px $border-color;
 }
+
 .property-bar-resizer {
   position: absolute;
   top: $toolbar-height;
@@ -134,7 +135,7 @@ input {
   &:hover, &.mouse-down {
     background: rgba($text-color, .1);
   }
-  &.side{
+  &.side {
     margin-right: 0;
     width: 0.6rem;
     background: rgba($text-color, .2);
@@ -207,6 +208,9 @@ table {
     .header {
       font-size: 1.3rem;
     }
+    .button {
+      width: 100%;
+    }
   }
   table {
     padding: 0;
@@ -258,21 +262,38 @@ table {
 
 .dialog-button {
   padding: 0 0.3rem;
-  span {
-    min-width: 5rem;
-    line-height: 2.3rem;
-    padding: 0 1rem;
-    text-align: center;
-    display: block;
-    background: $dialog-button;
-    color: $text-color;
+  .button {
     float: right;
     margin: 0.5rem 0.3rem;
-    border-radius: $border-radius;
-    @include no-select();
-    &.primary {
-      background: $toolbar-color;
-      color: $toolbar-text
-    }
+  }
+}
+
+.button {
+  min-width: 5rem;
+  line-height: 2.3rem;
+  padding: 0 1rem;
+  text-align: center;
+  display: block;
+  border-radius: $border-radius;
+  @include no-select();
+  border: solid 1px $border-color;
+  outline: none;
+
+  background: $primary-background;
+  color: $text-color;
+
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .14);
+
+  &.primary {
+    background: $toolbar-color;
+    color: $toolbar-text;
+  }
+  &.alert {
+    background: $alert-primary;
+    color: $alert-text;
+  }
+  &.error {
+    background: $error-primary;
+    color: $error-text;
   }
 }

@@ -285,6 +285,15 @@ class ContainerController(
                     i.value = it
                 }
             }
+            button("Auto layout") {
+                autoLayout()
+            }
+            button("Reset zoom") {
+                navigationView.zoomTo(1.0)
+            }
+            button("Reset pan") {
+                navigationView.panTo(0.0, 0.0)
+            }
         }
     }
 }

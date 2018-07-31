@@ -26,6 +26,7 @@ class Application : View<HTMLDivElement>("div") {
             field = value
             value.application = this
             value.touchpadControl = touchpadControl
+            value.sidebar.display()
 
             workspace.clear()
             workspace += value.navigationView
