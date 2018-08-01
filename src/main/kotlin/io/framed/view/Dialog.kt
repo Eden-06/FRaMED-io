@@ -52,7 +52,7 @@ class Dialog : View<HTMLDivElement>("div") {
      */
     fun open() {
         listView.hiddenVisibility = true
-        document.body?.appendChild(html)
+        Root += this
 
         async {
             val w = min(listView.clientWidth, clientWidth / 2)
@@ -77,14 +77,13 @@ class Dialog : View<HTMLDivElement>("div") {
                 }
             }
         }
-
     }
 
     /**
      * Close the dialog.
      */
     fun close() {
-        document.body?.removeChild(html)
+        Root -= this
         Root.onKeyUp.removeListener(k)
     }
 

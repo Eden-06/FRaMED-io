@@ -72,7 +72,6 @@ class ContextMenu : View<HTMLDivElement>("div") {
         html.appendChild(listView.html)
 
         onClick {
-            println("asdfas")
             it.stopPropagation()
             close()
         }
