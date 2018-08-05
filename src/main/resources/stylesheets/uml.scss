@@ -30,6 +30,26 @@
     }
   }
 }
+.front-end-label {
+  background-color: rgba(255,255,255,.6);
+}
+
+.front-end-label:hover {
+  padding: .5rem;
+  background-color: rgba(255,255,255,.9);
+  border: 2px solid rgba(0,0,0,.4);
+  border-radius: 5px;
+}
+
+.front-end-arrow-inheritance {
+  fill: white;
+  border: 2px solid grey;
+}
+
+.front-end-arrow-aggregation {
+  fill: white;
+  border: 2px solid grey;
+}
 
 .attribute-view {
   display: block;

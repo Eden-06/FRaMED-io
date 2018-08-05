@@ -32,6 +32,20 @@ class Relation(
      * Cardinality for the target side of this relation.
      */
     var targetCardinality: String = ""
+
+    /**
+     * Type of this relation
+     */
+    var type: Type = Type.ASSOCIATION
+
+    /**
+     * Possible types
+     */
+    enum class Type {
+        INHERITANCE,
+        ASSOCIATION,
+        AGGREGATION
+    }
 }
 
 /**

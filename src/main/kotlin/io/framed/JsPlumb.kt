@@ -107,6 +107,11 @@ external interface JsPlumbConnectInit {
     var connector: Array<Any>
 
     /**
+     * Overlays (Arrows ...).
+     */
+    var overlays: Array<Any>
+
+    /**
      * Endpoint style.
      */
     var endpoint: String

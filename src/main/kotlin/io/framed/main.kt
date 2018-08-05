@@ -51,7 +51,6 @@ fun init() {
             }
             relation(book, shelf)
         }
-
         relation(bank, account, "customers")
     }
 
