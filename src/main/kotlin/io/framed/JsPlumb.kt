@@ -4,6 +4,7 @@ package io.framed
 
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.events.Event
 import org.w3c.dom.svg.SVGSVGElement
 
 /**
@@ -174,4 +175,6 @@ fun jsPlumbPaintStyle(init: JsPlumbPaintStyle.() -> Unit = {}): JsPlumbPaintStyl
  */
 external interface JsPlumbConnection {
     val canvas: SVGSVGElement
+
+    fun bind(event: String, listener: (JsPlumbConnection, Event) -> Unit)
 }

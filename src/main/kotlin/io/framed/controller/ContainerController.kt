@@ -193,7 +193,7 @@ class ContainerController(
         return c
     }
 
-    private fun removeRelation(relation: Relation) {
+    fun removeRelation(relation: Relation) {
         relationMap[relation]?.let {
             container.relations -= relation
             it.remove()
