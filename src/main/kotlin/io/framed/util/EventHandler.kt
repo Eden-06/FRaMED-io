@@ -1,5 +1,8 @@
 package io.framed.util
 
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventListener
+
 /**
  * Utility class for generic event based patterns.
  *
@@ -13,8 +16,9 @@ class EventHandler<E : Any> {
      *
      * @param listener Listener to add.
      */
-    fun addListener(listener: (event: E) -> Unit) {
+    fun addListener(listener: (event: E) -> Unit): (E) -> Unit {
         listeners += listener
+        return listener
     }
 
     /**
@@ -26,14 +30,7 @@ class EventHandler<E : Any> {
         listeners -= listener
     }
 
-    /**
-     * Add a listener to this event.
-     *
-     * @see addListener
-     *
-     * @param listener Listener to add.
-     */
-    fun on(listener: (event: E) -> Unit) = addListener(listener)
+    operator fun invoke(listener: (event: E) -> Unit) = addListener(listener)
 
     /**
      * Remove all listener from this event.
@@ -50,4 +47,14 @@ class EventHandler<E : Any> {
     fun fire(event: E) {
         listeners.forEach { it(event) }
     }
+
+    @Suppress("UNCHECKED_CAST")
+    val eventListener: EventListener
+        get() = object : EventListener {
+            override fun handleEvent(event: Event) {
+                (event as? E)?.let {
+                    fire(it)
+                }
+            }
+        }
 }

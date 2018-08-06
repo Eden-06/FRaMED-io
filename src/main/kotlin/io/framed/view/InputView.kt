@@ -4,6 +4,7 @@ import io.framed.util.EventHandler
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.FocusEvent
 import org.w3c.dom.events.KeyboardEvent
 
 /**
@@ -28,14 +29,26 @@ class InputView : View<HTMLInputElement>("input") {
     var readOnly: Boolean by AttributeDelegate(Boolean::class, false)
 
     /**
-     * Fires on every user change to the content
+     * Fires on every user onChange to the content
      */
-    val change = EventHandler<String>()
+    val onChange = EventHandler<String>()
+
+    /**
+     * Fires on focus leave.
+     */
+    val onFocusLeave = EventHandler<FocusEvent>()
+
+    /**
+     * Fires on focus gain.
+     */
+    val onFocusEnter = EventHandler<FocusEvent>()
+
+    var invalid by ClassDelegate()
 
     init {
         val changeListener = object : EventListener {
             override fun handleEvent(event: Event) {
-                change.fire(value)
+                onChange.fire(value)
 
                 (event as? KeyboardEvent)?.let { e ->
                     when (e.keyCode) {
@@ -44,7 +57,17 @@ class InputView : View<HTMLInputElement>("input") {
                 }
             }
         }
-        html.addEventListener("change", changeListener)
-        html.addEventListener("keypress", changeListener)
+        html.addEventListener("onChange", changeListener)
+        html.addEventListener("keyup", changeListener)
+
+        html.addEventListener("focus", onFocusEnter.eventListener)
+        html.addEventListener("blur", onFocusLeave.eventListener)
     }
+}
+
+fun ListView.inputView(init: InputView.() -> Unit): InputView {
+    val view = InputView()
+    append(view)
+    init(view)
+    return view
 }

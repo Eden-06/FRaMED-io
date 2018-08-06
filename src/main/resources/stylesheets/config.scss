@@ -1,15 +1,60 @@
-$main-color: #2196F3;
-$main-text: #FFFFFF;
+// Default theme
+$toolbar-color: #2196F3;
+$toolbar-text: #FFFFFF;
+$toolbar-hover: rgba(0, 0, 0, .1);
 
-$uml-color: #E3F2FD;
-$uml-border: #000;
+$uml-border: rgba(0,0,0,.3);
+$uml-color: linear-gradient(to bottom, #fffbd9 0%, #fff7c4 100%);
+$uml-text: #111;
 
 $primary-background: #FFFFFF;
 $secondary-background: #EEEEEE;
 $text-color: #111;
-$border-color: #bbb;
+$border-color: #BDBDBD;
+$main-hover: rgba(0, 0, 0, .05);
 
+$error-primary: #F44336;
+$error-text: #FFFFFF;
+$error-secondary: #FFEBEE;
+
+$alert-primary: #FFEB3B;
+$alert-text: #FFFFFF;
+
+$dialog-background: #F9F9F9;
+$dialog-text: $text-color;
+$dialog-button: $secondary-background;
+
+// Custom themes
+$theme: "light" !default;
+
+// Dark theme
+@if $theme == "dark" {
+  $toolbar-color: #0d4699;
+  $toolbar-text: #FFFFFF;
+  $toolbar-hover: rgba(255, 255, 255, .1);
+
+  $uml-border: #ddd;
+  $uml-color: #455A64;
+  $uml-text: #fff;
+
+  $primary-background: #333;
+  $secondary-background: #444;
+  $text-color: #fff;
+  $border-color: #BDBDBD;
+  $main-hover: rgba(255, 255, 255, .1);
+
+  $error-primary: #F44336;
+  $error-secondary: #6a1212;
+
+  $dialog-background: #3D3D3D;
+  $dialog-text: $text-color;
+  $dialog-button: $secondary-background;
+}
+
+// Common
+$input-border-size: 1px;
 $toolbar-height: 3.5rem;
+$sidebar-width: 16rem;
 $border-radius: 0.2rem;
 
 @mixin no-select {

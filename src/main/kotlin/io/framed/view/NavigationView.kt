@@ -52,14 +52,14 @@ class NavigationView : View<HTMLDivElement>("div") {
             val old = field
             field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, value))
             if (field != old) {
-                zoomListener.fire(field)
+                onZoom.fire(field)
             }
         }
 
     /**
      * Listener for zoom changes.
      */
-    val zoomListener = EventHandler<Double>()
+    val onZoom = EventHandler<Double>()
 
     /**
      * Zoom by a relative zoom step.

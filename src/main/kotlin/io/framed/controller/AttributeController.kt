@@ -1,10 +1,8 @@
 package io.framed.controller
 
 import io.framed.model.Attribute
-import io.framed.view.InputView
-import io.framed.view.MaterialIcon
-import io.framed.view.View
-import io.framed.view.contextMenu
+import io.framed.util.EventHandler
+import io.framed.view.*
 
 /**
  * @author lars
@@ -17,23 +15,33 @@ class AttributeController(
     override val view: View<*>
         get() = inputView
 
+    override val sidebar: Sidebar = parent.createSidebar()
+
     private val inputView = InputView()
+
+    private val update = EventHandler<Int>()
 
     init {
         inputView.classes += "attribute-view"
 
         inputView.value = attribute.toString()
-        inputView.change.on {
-            val split = it.trim().split(";", limit = 2)
-                    .map { it.trim() }
-
-            attribute.name = split[0]
-            if (split.size == 2) {
-                attribute.type = split[1]
+        inputView.onChange {
+            inputView.invalid = parse(it) >= 0
+            update.fire(1)
+        }
+        inputView.onFocusLeave {
+            if (!inputView.invalid) {
+                inputView.value = attribute.toString()
+            }
+        }
+        update {
+            if (it != 1) {
+                inputView.value = attribute.toString()
+                inputView.invalid = false
             }
         }
 
-        view.context.on {
+        view.onContext {
             it.stopPropagation()
             contextMenu {
                 title = "Attribute: " + attribute.name
@@ -42,5 +50,75 @@ class AttributeController(
                 }
             }.open(it.clientX.toDouble(), it.clientY.toDouble())
         }
+
+        sidebar.setup(view, inputView) {
+            title("Attribute")
+            input("Name", attribute.name) {
+                attribute.name = it
+                update.fire(0)
+            }.also { i ->
+                update {
+                    if (it != 0)
+                        i.value = attribute.name
+                }
+                i.onFocusLeave {
+                    i.value = attribute.name
+                }
+            }
+            input("Type", attribute.type) {
+                attribute.type = it.trim()
+                update.fire(0)
+            }.also { i ->
+                update {
+                    if (it != 0)
+                        i.value = attribute.type
+                }
+                i.onFocusLeave {
+                    i.value = attribute.type
+                }
+            }
+        }
+    }
+
+    private fun parse(input: String): Int {
+        var state = State.NAME
+
+        var name = ""
+        var type = ""
+
+        input.forEachIndexed { index, char ->
+            state = when (state) {
+                State.NAME -> {
+                    when (char) {
+                        ':' -> {
+                            State.TYPE
+                        }
+                        '(', ')' -> return index
+                        else -> {
+                            name += char
+                            State.NAME
+                        }
+                    }
+                }
+                State.TYPE -> {
+                    when (char) {
+                        ':', '(', ')' -> return index
+                        else -> {
+                            type += char
+                            State.TYPE
+                        }
+                    }
+                }
+            }
+        }
+
+        attribute.name = name.trim()
+        attribute.type = type.trim()
+
+        return -1
+    }
+
+    private enum class State {
+        NAME, TYPE
     }
 }

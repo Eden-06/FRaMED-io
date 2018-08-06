@@ -3,8 +3,7 @@ package io.framed.view
 import io.framed.toDashCase
 import io.framed.util.EventHandler
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.Event
-import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.reflect.KClass
@@ -38,14 +37,14 @@ abstract class View<V : HTMLElement>(view: V) {
     }
 
     /**
-     * Fires on click.
+     * Fires on onClick.
      */
-    val click = EventHandler<MouseEvent>()
+    val onClick = EventHandler<MouseEvent>()
 
     /**
-     * Fires on context menu open.
+     * Fires on onContext menu open.
      */
-    val context = EventHandler<MouseEvent>()
+    val onContext = EventHandler<MouseEvent>()
 
     /**
      * Access css classes of this view.
@@ -80,6 +79,15 @@ abstract class View<V : HTMLElement>(view: V) {
         get() = html.style.left.replace("px", "").toDoubleOrNull() ?: 0.0
         set(value) {
             html.style.left = "${value}px"
+        }
+
+    /**
+     * Css right position in px.
+     */
+    var right: Double
+        get() = html.style.right.replace("px", "").toDoubleOrNull() ?: 0.0
+        set(value) {
+            html.style.right = "${value}px"
         }
 
     /**
@@ -143,6 +151,16 @@ abstract class View<V : HTMLElement>(view: V) {
             }
         }
 
+    var hiddenVisibility: Boolean
+        get() = html.style.visibility == "hidden"
+        set(value) {
+            if (value) {
+                html.style.visibility = "hidden"
+            } else {
+                html.style.removeProperty("visibility")
+            }
+        }
+
     /**
      * Request focus to this view.
      */
@@ -157,24 +175,41 @@ abstract class View<V : HTMLElement>(view: V) {
         html.blur()
     }
 
-    init {
-        html.addEventListener("click", object : EventListener {
-            override fun handleEvent(event: Event) {
-                event.preventDefault()
-                (event as? MouseEvent)?.let { e ->
-                    click.fire(e)
-                }
-            }
-        })
+    val onMouseDown = EventHandler<MouseEvent>()
+    val onMouseMove = EventHandler<MouseEvent>()
+    val onMouseUp = EventHandler<MouseEvent>()
+    val onMouseEnter = EventHandler<MouseEvent>()
+    val onMouseLeave = EventHandler<MouseEvent>()
 
-        html.addEventListener("contextmenu", object : EventListener {
-            override fun handleEvent(event: Event) {
-                event.preventDefault()
-                (event as? MouseEvent)?.let { e ->
-                    context.fire(e)
-                }
-            }
-        })
+    val onKeyDown = EventHandler<KeyboardEvent>()
+    val onKeyPress = EventHandler<KeyboardEvent>()
+    val onKeyUp = EventHandler<KeyboardEvent>()
+
+    var isMouseDown by ClassDelegate("mouse-down")
+
+    init {
+        html.addEventListener("click", onClick.eventListener)
+        html.addEventListener("contextmenu", onContext.eventListener)
+        onContext {
+            it.preventDefault()
+        }
+
+        html.addEventListener("mousedown", onMouseDown.eventListener)
+        html.addEventListener("mousemove", onMouseMove.eventListener)
+        html.addEventListener("mouseup", onMouseUp.eventListener)
+        html.addEventListener("mouseenter", onMouseEnter.eventListener)
+        html.addEventListener("mouseleave", onMouseLeave.eventListener)
+
+        html.addEventListener("keydown", onKeyDown.eventListener)
+        html.addEventListener("keypress", onKeyPress.eventListener)
+        html.addEventListener("keyup", onKeyUp.eventListener)
+
+        onMouseDown {
+            isMouseDown = true
+        }
+        onMouseUp {
+            isMouseDown = false
+        }
     }
 
     companion object {

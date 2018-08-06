@@ -16,11 +16,15 @@ class ClassController(
     override val view: View<*>
         get() = classView
 
+    override val sidebar: Sidebar = parent.createSidebar()
+
+    fun createSidebar() = parent.createSidebar()
+
     override var name: String
         get() = clazz.name
         set(value) {
             clazz.name = value
-            nameChange.fire(value)
+            onNameChange.fire(value)
         }
 
     private val classView = ListView()
@@ -47,6 +51,7 @@ class ClassController(
             attributeMap -= attribute
             clazz.attributes -= attribute
         }
+        sidebar.display()
     }
 
     private var methodMap: Map<Method, MethodController> = emptyMap()
@@ -61,6 +66,7 @@ class ClassController(
             methodMap -= method
             clazz.methods -= method
         }
+        sidebar.display()
     }
 
     init {
@@ -70,10 +76,10 @@ class ClassController(
         }
         header.value = name
 
-        header.change.on {
+        header.onChange {
             name = it.trim()
         }
-        nameChange.on {
+        onNameChange {
             if (header.value != it) {
                 header.value = it
             }
@@ -83,7 +89,7 @@ class ClassController(
 
         clazz.methods.forEach { addMethod(it) }
 
-        view.context.on {
+        view.onContext {
             it.stopPropagation()
             contextMenu {
                 title = "Class: $name"
@@ -105,6 +111,17 @@ class ClassController(
                     parent.removeClass(clazz)
                 }
             }.open(it.clientX.toDouble(), it.clientY.toDouble())
+        }
+
+        sidebar.setup(view, header) {
+            title("Class")
+            input("Name", name) {
+                name = it
+            }.also { i ->
+                onNameChange {
+                    i.value = it
+                }
+            }
         }
     }
 }

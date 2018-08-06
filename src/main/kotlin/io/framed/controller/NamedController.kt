@@ -7,5 +7,5 @@ import io.framed.util.EventHandler
  */
 abstract class NamedController : Controller {
     abstract var name: String
-    val nameChange = EventHandler<String>()
+    val onNameChange = EventHandler<String>()
 }

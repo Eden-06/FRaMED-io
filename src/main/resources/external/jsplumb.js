@@ -1023,15 +1023,15 @@
 
     /**
      * Mottle offers support for abstracting out the differences
-     * between touch and mouse devices, plus "smart click" functionality
-     * (don't fire click if the mouse has moved between mousedown and mouseup),
-     * and synthesized click/tap events.
+     * between touch and mouse devices, plus "smart onClick" functionality
+     * (don't fire onClick if the mouse has moved between mousedown and mouseup),
+     * and synthesized onClick/tap events.
      * @class Mottle
      * @constructor
      * @param {Object} params Constructor params
-     * @param {Number} [params.clickThreshold=250] Threshold, in milliseconds beyond which a touchstart followed by a touchend is not considered to be a click.
-     * @param {Number} [params.dblClickThreshold=450] Threshold, in milliseconds beyond which two successive tap events are not considered to be a click.
-     * @param {Boolean} [params.smartClicks=false] If true, won't fire click events if the mouse has moved between mousedown and mouseup. Note that this functionality
+     * @param {Number} [params.clickThreshold=250] Threshold, in milliseconds beyond which a touchstart followed by a touchend is not considered to be a onClick.
+     * @param {Number} [params.dblClickThreshold=450] Threshold, in milliseconds beyond which two successive tap events are not considered to be a onClick.
+     * @param {Boolean} [params.smartClicks=false] If true, won't fire onClick events if the mouse has moved between mousedown and mouseup. Note that this functionality
      * requires that Mottle consume the mousedown event, and so may not be viable in all use cases.
      */
     root.Mottle = function (params) {
@@ -2400,7 +2400,7 @@
 
         /**
          * Sets the posse(s) for the element with the given id, creating those that do not yet exist, and removing from
-         * the element any current Posses that are not specified by this method call. This method will not change the
+         * the element any current Posses that are not specified by this method call. This method will not onChange the
          * active/passive state if it is given a posse in which the element is already a member.
          * @method setPosse
          * @param {Element} el Element to set posse(s) on.
@@ -2475,8 +2475,8 @@
 
         /**
          * Changes the participation state for the element in the Posse with the given ID.
-         * @param {Element|Element[]} el Element(s) to change state for.
-         * @param {String} posseId ID of the Posse to change element state for.
+         * @param {Element|Element[]} el Element(s) to onChange state for.
+         * @param {String} posseId ID of the Posse to onChange element state for.
          * @param {Boolean} state True to make active, false to make passive.
          */
         this.setPosseState = function(el, posseId, state) {
@@ -2574,7 +2574,7 @@
         }
     }
     function merge(a, b, collations) {
-        // first change the collations array - if present - into a lookup table, because its faster.
+        // first onChange the collations array - if present - into a lookup table, because its faster.
         var cMap = {}, ar, i;
         collations = collations || [];
         for (i = 0; i < collations.length; i++) {
@@ -4530,7 +4530,7 @@
         /**
          * checks for a listener for the given condition, executing it if found, passing in the given value.
          * condition listeners would have been attached using "bind" (which is, you could argue, now overloaded, since
-         * firing click events etc is a bit different to what this does).  i thought about adding a "bindCondition"
+         * firing onClick events etc is a bit different to what this does).  i thought about adding a "bindCondition"
          * or something, but decided against it, for the sake of simplicity. jsPlumb will never fire one of these
          * condition events anyway.
          */
@@ -4604,7 +4604,7 @@
                 sep = this[_st.epDefs][sid];
 
                 if (sid === c[_st.elId]) {
-                    ep = null; // dont change source/target if the element is already the one given.
+                    ep = null; // dont onChange source/target if the element is already the one given.
                 }
                 else if (sep) {
                     for (var t in sep) {
@@ -4816,7 +4816,7 @@
             return _currentInstance;
         };
 
-        /// not public.  but of course its exposed. how to change this.
+        /// not public.  but of course its exposed. how to onChange this.
         this.deleteObject = function (params) {
             var result = {
                     endpoints: {},
@@ -6432,7 +6432,7 @@
         setIdChanged: function (oldId, newId) {
             this.setId(oldId, newId, true);
         },
-        // set parent: change the parent for some node and update all the registrations we need to.
+        // set parent: onChange the parent for some node and update all the registrations we need to.
         setParent: function (el, newParent) {
             var _dom = this.getElement(el),
                 _id = this.getId(_dom),
@@ -8325,7 +8325,7 @@
                     this.connections[i].setVisible(v);
                     if (!doNotNotifyOtherEndpoint) {
                         var oIdx = this === this.connections[i].endpoints[0] ? 1 : 0;
-                        // only change the other endpoint if this is its only connection.
+                        // only onChange the other endpoint if this is its only connection.
                         if (this.connections[i].endpoints[oIdx].connections.length === 1) {
                             this.connections[i].endpoints[oIdx].setVisible(v, true, true);
                         }
@@ -11940,9 +11940,9 @@
         /*
          * Function: clearCachedDimensions
          * Clears the cached dimensions for the label. As a performance enhancement, label dimensions are
-         * cached from 1.3.12 onwards. The cache is cleared when you change the label text, of course, but
-         * there are other reasons why the text dimensions might change - if you make a change through CSS, for
-         * example, you might change the font size.  in that case you should explicitly call this method.
+         * cached from 1.3.12 onwards. The cache is cleared when you onChange the label text, of course, but
+         * there are other reasons why the text dimensions might onChange - if you make a onChange through CSS, for
+         * example, you might onChange the font size.  in that case you should explicitly call this method.
          */
         clearCachedDimensions: function () {
             this._jsPlumb.cachedDimensions = null;
@@ -12169,10 +12169,10 @@
         },
         on : function(el, event, callback) {
             // TODO: here we would like to map the tap event if we know its
-            // an internal bind to a click. we have to know its internal because only
+            // an internal bind to a onClick. we have to know its internal because only
             // then can we be sure that the UP event wont be consumed (tap is a synthesized
             // event from a mousedown followed by a mouseup).
-            //event = { "click":"tap", "dblclick":"dbltap"}[event] || event;
+            //event = { "onClick":"tap", "dblclick":"dbltap"}[event] || event;
             this.getEventManager().on.apply(this, arguments);
             return this;
         },
@@ -12602,7 +12602,7 @@
      * @param {Element} params.el The DOM element representing the Group.
      * @param {String} [params.id] Optional ID for the Group. A UUID will be assigned as the Group's ID if you do not provide one.
      * @param {Boolean} [params.constrain=false] If true, child elements will not be able to be dragged outside of the Group container.
-     * @param {Boolean} [params.revert=true] By default, child elements revert to the container if dragged outside. You can change this by setting `revert:false`. This behaviour is also overridden if you set `orphan` or `prune`.
+     * @param {Boolean} [params.revert=true] By default, child elements revert to the container if dragged outside. You can onChange this by setting `revert:false`. This behaviour is also overridden if you set `orphan` or `prune`.
      * @param {Boolean} [params.orphan=false] If true, child elements dropped outside of the Group container will be removed from the Group (but not from the DOM).
      * @param {Boolean} [params.prune=false] If true, child elements dropped outside of the Group container will be removed from the Group and also from the DOM.
      * @param {Boolean} [params.dropOverride=false] If true, a child element that has been dropped onto some other Group will not be subject to the controls imposed by `prune`, `revert` or `orphan`.
@@ -13723,7 +13723,7 @@
             // steer it around that node.  this will work within limits, but i think those limits would also be the likely
             // limits for, once again, aesthetic good sense in the layout of a chart using these connectors.
             //
-            // the second possible change is actually two possible changes: firstly, it is possible we should gradually
+            // the second possible onChange is actually two possible changes: firstly, it is possible we should gradually
             // decrease the 'curviness' as the distance between the anchors decreases; start tailing it off to 0 at some
             // point (which should be configurable).  secondly, we might slightly increase the 'curviness' for connectors
             // with respect to how far their anchor is from the center of its respective face. this could either look cool,

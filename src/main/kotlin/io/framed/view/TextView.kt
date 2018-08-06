@@ -35,16 +35,16 @@ class TextView(
     var singleLine: Boolean by ClassDelegate()
 
     /**
-     * Fires on every user change to the content.
+     * Fires on every user onChange to the content.
      */
-    val change = EventHandler<String>()
+    val onChange = EventHandler<String>()
 
     init {
         text = value
 
         val changeListener = object : EventListener {
             override fun handleEvent(event: Event) {
-                change.fire(text)
+                onChange.fire(text)
 
                 (event as? KeyboardEvent)?.let { e ->
                     when (e.keyCode) {
@@ -53,7 +53,19 @@ class TextView(
                 }
             }
         }
-        html.addEventListener("change", changeListener)
+        html.addEventListener("onChange", changeListener)
         html.addEventListener("keypress", changeListener)
     }
+}
+
+fun ListView.textView(init: TextView.() -> Unit): TextView {
+    val view = TextView()
+    append(view)
+    init(view)
+    return view
+}
+
+fun ListView.textView(text: String, init: TextView.() -> Unit = {}) = textView {
+    this.text = text
+    init(this)
 }

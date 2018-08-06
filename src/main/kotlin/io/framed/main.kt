@@ -3,7 +3,7 @@ package io.framed
 import io.framed.controller.ContainerController
 import io.framed.model.*
 import io.framed.view.Application
-import kotlin.browser.document
+import io.framed.view.Root
 import kotlin.browser.window
 
 /**
@@ -51,12 +51,14 @@ fun init() {
             }
             relation(book, shelf)
         }
-        relation(bank, account, "customers")
+        relation(bank, account, "customers") {
+            type = Relation.Type.INHERITANCE
+        }
     }
 
     val controller = ContainerController(container)
 
-    document.body?.appendChild(app.html)
+    Root += app
 
     app.controller = controller
 

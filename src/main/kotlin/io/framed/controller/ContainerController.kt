@@ -1,7 +1,7 @@
 package io.framed.controller
 
-import io.framed.async
 import io.framed.JsPlumb
+import io.framed.async
 import io.framed.model.Class
 import io.framed.model.Container
 import io.framed.model.Model
@@ -20,13 +20,26 @@ class ContainerController(
         get() = container.name
         set(value) {
             container.name = value
-            nameChange.fire(value)
+            onNameChange.fire(value)
         }
+
+    private var sidebars: List<Sidebar> = emptyList()
+
+    fun createSidebar() = Sidebar().also {
+        it.application = application
+        sidebars += it
+    }
+
+    override val sidebar = createSidebar()
 
     var application: Application? = null
         set(value) {
             field = value
             childContainer.forEach {
+                it.application = value
+            }
+
+            sidebars.forEach {
                 it.application = value
             }
 
@@ -79,7 +92,7 @@ class ContainerController(
     val jsPlumbInstance = JsPlumb.getInstance().apply {
         setContainer(navigationView.container)
 
-        navigationView.zoomListener.on {
+        navigationView.onZoom {
             setZoom(it)
         }
         setZoom(1.0)
@@ -105,11 +118,11 @@ class ContainerController(
         }
         input.value = c.name
 
-        input.change.on {
+        input.onChange {
             c.name = it.trim()
         }
 
-        c.nameChange.on {
+        c.onNameChange {
             input.value = it
         }
 
@@ -127,6 +140,7 @@ class ContainerController(
         container.relations.filter { it.source == clazz || it.target == clazz }.forEach {
             removeRelation(it)
         }
+        sidebar.display()
     }
 
     private var containerMap: Map<Container, Pair<ContainerController, InputView>> = emptyMap()
@@ -151,11 +165,11 @@ class ContainerController(
         }
         input.value = c.name
 
-        input.change.on {
+        input.onChange {
             c.name = it.trim()
         }
 
-        c.nameChange.on {
+        c.onNameChange {
             input.value = it
         }
 
@@ -169,6 +183,7 @@ class ContainerController(
             contentList -= input
             container.containers -= cont
         }
+        sidebar.display()
     }
 
     private var relationMap: Map<Relation, RelationController> = emptyMap()
@@ -183,13 +198,20 @@ class ContainerController(
             container.relations -= relation
             it.remove()
         }
+        sidebar.display()
     }
 
     private fun openContextMenu(open: Boolean, clientX: Double, clientY: Double) = contextMenu {
-        title = "Package: " + name
+        title = "Package: $name"
         if (open) {
             addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
                 application?.controller = this@ContainerController
+            }
+        } else {
+            parent?.let {
+                addItem(MaterialIcon.ARROW_BACK, "Step out") {
+                    application?.controller = it
+                }
             }
         }
         addItem(MaterialIcon.ADD, "Add class") {
@@ -228,7 +250,7 @@ class ContainerController(
             container.relations.forEach { addRelation(it) }
         }
 
-        navigationView.context.on {
+        navigationView.onContext {
             it.stopPropagation()
             openContextMenu(false, it.clientX.toDouble(), it.clientY.toDouble())
         }
@@ -240,18 +262,38 @@ class ContainerController(
         }
         header.value = name
 
-        header.change.on {
+        header.onChange {
             name = it.trim()
         }
-        nameChange.on {
+        onNameChange {
             if (header.value != it) {
                 header.value = it
             }
         }
 
-        listView.context.on {
+        listView.onContext {
             it.stopPropagation()
             openContextMenu(true, it.clientX.toDouble(), it.clientY.toDouble())
+        }
+
+        sidebar.setup(navigationView, listView, header) {
+            title("Container")
+            input("Name", name) {
+                name = it
+            }.also { i ->
+                onNameChange {
+                    i.value = it
+                }
+            }
+            button("Auto layout") {
+                autoLayout()
+            }
+            button("Reset zoom") {
+                navigationView.zoomTo(1.0)
+            }
+            button("Reset pan") {
+                navigationView.panTo(0.0, 0.0)
+            }
         }
     }
 }

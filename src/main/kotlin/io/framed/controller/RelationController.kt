@@ -1,10 +1,11 @@
 package io.framed.controller
 
-import io.framed.jsPlumbConnect
 import io.framed.JsPlumbConnection
+import io.framed.jsPlumbConnect
 import io.framed.jsPlumbPaintStyle
 import io.framed.model.Relation
 import io.framed.view.InputView
+import io.framed.view.Sidebar
 import io.framed.view.View
 
 /**
@@ -17,6 +18,8 @@ class RelationController(
 
     override val view: View<*>
         get() = throw UnsupportedOperationException("A relation does not provide its on view")
+
+    override val sidebar: Sidebar = parent.createSidebar()
 
     private var connections: List<JsPlumbConnection> = emptyList()
 
@@ -44,7 +47,7 @@ class RelationController(
             endpoint = "Blank"
 
             paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
+                stroke = parent.application?.textColor ?: "black"
                 strokeWidth = 1
             }
 
@@ -93,7 +96,7 @@ class RelationController(
             endpoint = "Blank"
 
             paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
+                stroke = parent.application?.textColor ?: "black"
                 strokeWidth = 1
             }
 
@@ -136,7 +139,7 @@ class RelationController(
             endpoint = "Blank"
 
             paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
+                stroke = parent.application?.textColor ?: "black"
                 strokeWidth = 1
             }
 
@@ -174,8 +177,6 @@ class RelationController(
     }
 
     init {
-        console.log(jsPlumbInstance)
-
         val sourceController = parent.views[relation.source]
         val targetController = parent.views[relation.target]
 
@@ -188,54 +189,5 @@ class RelationController(
             Relation.Type.ASSOCIATION -> drawAssociation(sourceController, targetController, relation.name, relation.sourceCardinality, relation.targetCardinality)
             Relation.Type.AGGREGATION -> drawAggregation(sourceController, targetController, relation.name, relation.sourceCardinality, relation.targetCardinality)
         }
-
-        /*
-
-        connections += jsPlumbInstance.connect(jsPlumbConnect {
-            source = sourceController.html
-            target = targetController.html
-
-            anchor = arrayOf("Top", "Left", "Bottom", "Right")
-            connector = arrayOf("Flowchart", object {
-                val cornerRadius = 5
-            })
-            endpoint = "Blank"
-
-            paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
-                strokeWidth = 8
-                dashstyle = "1 0.3"
-            }
-        })
-        connections += jsPlumbInstance.connect(jsPlumbConnect {
-            source = sourceController.html
-            target = targetController.html
-
-            anchor = arrayOf("Top", "Left", "Bottom", "Right")
-            connector = arrayOf("Flowchart", object {
-                val cornerRadius = 5
-            })
-            endpoint = "Blank"
-
-            paintStyle = jsPlumbPaintStyle {
-                stroke = "white"
-                strokeWidth = 5.5
-            }
-        })
-        connections += jsPlumbInstance.connect(jsPlumbConnect {
-            source = sourceController.html
-            target = targetController.html
-
-            anchor = arrayOf("Top", "Left", "Bottom", "Right")
-            connector = arrayOf("Flowchart", object {
-                val cornerRadius = 5
-            })
-            endpoint = "Blank"
-
-            paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
-                strokeWidth = 1.5
-            }
-            */
     }
 }
