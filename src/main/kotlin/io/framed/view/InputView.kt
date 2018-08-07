@@ -57,7 +57,8 @@ class InputView : View<HTMLInputElement>("input") {
                 }
             }
         }
-        html.addEventListener("onChange", changeListener)
+        
+        html.addEventListener("onchange", changeListener)
         html.addEventListener("keyup", changeListener)
 
         html.addEventListener("focus", onFocusEnter.eventListener)
