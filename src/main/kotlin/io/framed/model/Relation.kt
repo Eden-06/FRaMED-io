@@ -41,10 +41,12 @@ class Relation(
     /**
      * Possible types
      */
-    enum class Type {
-        INHERITANCE,
-        ASSOCIATION,
-        AGGREGATION
+    enum class Type(val printableName: String) {
+        INHERITANCE("Inheritance"),
+        ASSOCIATION("Association"),
+        AGGREGATION("Aggregation");
+
+        override fun toString() = printableName
     }
 
     companion object {

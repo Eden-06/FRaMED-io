@@ -91,6 +91,24 @@ abstract class View<V : HTMLElement>(view: V) {
         }
 
     /**
+     * Css margin top in px.
+     */
+    var marginTop: Double
+        get() = html.style.marginTop.replace("px", "").toDoubleOrNull() ?: 0.0
+        set(value) {
+            html.style.marginTop = "${value}px"
+        }
+
+    /**
+     * Css margin left in px.
+     */
+    var marginLeft: Double
+        get() = html.style.marginLeft.replace("px", "").toDoubleOrNull() ?: 0.0
+        set(value) {
+            html.style.marginLeft = "${value}px"
+        }
+
+    /**
      * Css width in px.
      */
     var width: Double
@@ -187,6 +205,9 @@ abstract class View<V : HTMLElement>(view: V) {
 
     var isMouseDown by ClassDelegate("mouse-down")
 
+    var draggable = DragType.NONE
+    val onDrag = EventHandler<Pair<Double, Double>>()
+
     init {
         html.addEventListener("click", onClick.eventListener)
         html.addEventListener("contextmenu", onContext.eventListener)
@@ -204,11 +225,61 @@ abstract class View<V : HTMLElement>(view: V) {
         html.addEventListener("keypress", onKeyPress.eventListener)
         html.addEventListener("keyup", onKeyUp.eventListener)
 
+        var isCurrentlyDragging = false
+        var lastDragPosition = Pair(0, 0)
+        val dragMove = { event: MouseEvent ->
+            val deltaX = (event.clientX - lastDragPosition.first) / Root.innerZoom
+            val deltaY = (event.clientY - lastDragPosition.second) / Root.innerZoom
+
+            when (draggable) {
+                View.DragType.NONE -> throw IllegalStateException()
+                View.DragType.ABSOLUTE -> {
+                    left += deltaX
+                    top += deltaY
+                }
+                View.DragType.MARGIN -> {
+                    marginLeft += deltaX
+                    marginTop += deltaY
+                }
+            }
+            onDrag.fire(Pair(deltaX, deltaY))
+            lastDragPosition = Pair(event.clientX, event.clientY)
+        }
+        var dragEnd: (MouseEvent) -> Unit = {}
+        fun removeDrag() {
+            isCurrentlyDragging = false
+
+            Root.onMouseMove -= dragMove
+            Root.onMouseUp -= dragEnd
+            Root.onMouseLeave -= dragEnd
+        }
+        dragEnd = { _: MouseEvent ->
+            removeDrag()
+        }
+
         onMouseDown {
             isMouseDown = true
+
+            if (draggable != DragType.NONE) {
+                it.stopPropagation()
+            }
         }
         onMouseUp {
             isMouseDown = false
+        }
+
+        onMouseMove {
+            if (isMouseDown && !isCurrentlyDragging && draggable != DragType.NONE) {
+                it.preventDefault()
+                it.stopPropagation()
+
+                lastDragPosition = Pair(it.clientX, it.clientY)
+                Root.onMouseMove += dragMove
+                Root.onMouseUp += dragEnd
+                Root.onMouseLeave += dragEnd
+
+                isCurrentlyDragging = true
+            }
         }
     }
 
@@ -235,5 +306,11 @@ abstract class View<V : HTMLElement>(view: V) {
          */
         @Suppress("UNCHECKED_CAST")
         fun <V : HTMLElement> createView(tagName: String): V = document.createElement(tagName) as V
+    }
+
+    enum class DragType {
+        NONE,
+        ABSOLUTE,
+        MARGIN
     }
 }

@@ -106,7 +106,10 @@ class ContainerController(
         c.view.top = y
 
         async {
-            jsPlumbInstance.draggable(c.view.html)
+            c.view.draggable = View.DragType.ABSOLUTE
+            c.view.onDrag {_ ->
+                jsPlumbInstance.revalidate(c.view.html)
+            }
         }
 
         // As content view
@@ -145,7 +148,10 @@ class ContainerController(
         c.view.top = y
 
         async {
-            jsPlumbInstance.draggable(c.listView.html)
+            c.listView.draggable = View.DragType.ABSOLUTE
+            c.listView.onDrag {_ ->
+                jsPlumbInstance.revalidate(c.listView.html)
+            }
         }
 
         // As content view
@@ -225,6 +231,11 @@ class ContainerController(
         container.classes.forEach { addClass(it) }
 
         container.containers.forEach { addContainer(it) }
+
+        navigationView.onZoom {
+            Root.innerZoom = it
+        }
+        Root.innerZoom = 1.0
 
         // As root view
         async {

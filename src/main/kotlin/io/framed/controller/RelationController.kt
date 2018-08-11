@@ -76,6 +76,7 @@ class RelationController(
                         val length = 20
                         val location = 1
                         val cssClass = "front-end-arrow-inheritance"
+                        val foldback = 1.0
                     }),
                     arrayOf("Custom", object {
                         val create = { _: dynamic ->
@@ -248,6 +249,10 @@ class RelationController(
     }
 
     init {
+        nameView.draggable = View.DragType.MARGIN
+        sourceCardinalityView.draggable = View.DragType.MARGIN
+        targetCardinalityView.draggable = View.DragType.MARGIN
+
         sidebar.setup {
             title("Relation")
 
@@ -257,7 +262,6 @@ class RelationController(
 
             val types = Relation.Type.values().toList()
             select("Type", types, relation.type) {
-                println(it)
                 relation.type = it
                 draw()
             }

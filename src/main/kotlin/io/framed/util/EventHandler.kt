@@ -21,6 +21,10 @@ class EventHandler<E : Any> {
         return listener
     }
 
+    operator fun plusAssign(listener: (event: E) -> Unit) {
+        addListener(listener)
+    }
+
     /**
      * Remove a listener from this event.
      *
@@ -29,6 +33,8 @@ class EventHandler<E : Any> {
     fun removeListener(listener: (event: E) -> Unit) {
         listeners -= listener
     }
+
+    operator fun minusAssign(listener: (event: E) -> Unit) = removeListener(listener)
 
     operator fun invoke(listener: (event: E) -> Unit) = addListener(listener)
 
