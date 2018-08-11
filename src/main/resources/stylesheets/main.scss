@@ -37,6 +37,22 @@ input {
   }
 }
 
+select {
+  padding: 0.2rem;
+  background: $primary-background;
+  color: $text-color;
+  border-radius: $border-radius;
+  outline: none;
+  border: solid 1px $border-color;
+  &:focus {
+    border-color: $toolbar-color;
+  }
+  &.invalid {
+    border-color: $error-primary !important;
+    background: $error-secondary !important;
+  }
+}
+
 .color-box {
   position: fixed;
   top: -10px;
@@ -202,7 +218,7 @@ table {
     span {
       padding: 0.2rem;
     }
-    input {
+    input, select {
       width: 100%;
     }
     .header {

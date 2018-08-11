@@ -46,6 +46,20 @@ class Relation(
         ASSOCIATION,
         AGGREGATION
     }
+
+    companion object {
+        val PRESETS = listOf(
+                "0",
+                "1",
+                "*",
+                "0..0",
+                "0..1",
+                "0..*",
+                "1..1",
+                "1..*",
+                "m..n"
+        )
+    }
 }
 
 /**

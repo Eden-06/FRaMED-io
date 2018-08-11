@@ -46,14 +46,12 @@ class Application : View<HTMLDivElement>("div") {
         var c: ContainerController? = controller
         while (c != null) {
             c = c.let { cont ->
-                leftBar.prepand(TextView(cont.container.name).apply {
+                leftBar.prepand(TextView().apply {
                     onClick {
                         controller = cont
                     }
 
-                    toolbarListeners += cont.onNameChange to cont.onNameChange {
-                        text = it
-                    }
+                    bind(cont.nameProperty)
                 })
 
                 cont.parent

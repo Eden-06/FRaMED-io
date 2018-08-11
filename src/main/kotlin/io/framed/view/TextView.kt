@@ -1,9 +1,11 @@
 package io.framed.view
 
 import io.framed.util.EventHandler
+import io.framed.util.Property
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.FocusEvent
 import org.w3c.dom.events.KeyboardEvent
 
 /**
@@ -35,9 +37,36 @@ class TextView(
     var singleLine: Boolean by ClassDelegate()
 
     /**
-     * Fires on every user onChange to the content.
+     * Fires on every user change to the content
      */
     val onChange = EventHandler<String>()
+
+    /**
+     * Fires on focus leave.
+     */
+    val onFocusLeave = EventHandler<FocusEvent>()
+
+    /**
+     * Fires on focus gain.
+     */
+    val onFocusEnter = EventHandler<FocusEvent>()
+
+
+    fun bind(property: Property<String>) {
+        text = property.get()
+        onChange {
+            property.set(it)
+        }
+        onFocusLeave {
+            property.set(text.trim())
+        }
+
+        property.onChange {
+            if (text != it) {
+                text = it
+            }
+        }
+    }
 
     init {
         text = value
@@ -53,8 +82,11 @@ class TextView(
                 }
             }
         }
-        html.addEventListener("onChange", changeListener)
+        html.addEventListener("onchange", changeListener)
         html.addEventListener("keypress", changeListener)
+
+        html.addEventListener("focus", onFocusEnter.eventListener)
+        html.addEventListener("blur", onFocusLeave.eventListener)
     }
 }
 

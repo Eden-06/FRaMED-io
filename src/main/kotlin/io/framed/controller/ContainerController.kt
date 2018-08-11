@@ -6,6 +6,7 @@ import io.framed.model.Class
 import io.framed.model.Container
 import io.framed.model.Model
 import io.framed.model.Relation
+import io.framed.util.Property
 import io.framed.view.*
 
 /**
@@ -14,14 +15,10 @@ import io.framed.view.*
 class ContainerController(
         val container: Container,
         val parent: ContainerController? = null
-) : NamedController() {
+) : Controller {
 
-    override var name: String
-        get() = container.name
-        set(value) {
-            container.name = value
-            onNameChange.fire(value)
-        }
+    val nameProperty = Property(container::name)
+    var name by nameProperty
 
     private var sidebars: List<Sidebar> = emptyList()
 
@@ -116,15 +113,7 @@ class ContainerController(
         val input = InputView().also {
             contentList += it
         }
-        input.value = c.name
-
-        input.onChange {
-            c.name = it.trim()
-        }
-
-        c.onNameChange {
-            input.value = it
-        }
+        input.bind(c.nameProperty)
 
         classMap += clazz to (c to input)
         return c
@@ -163,15 +152,7 @@ class ContainerController(
         val input = InputView().also {
             contentList += it
         }
-        input.value = c.name
-
-        input.onChange {
-            c.name = it.trim()
-        }
-
-        c.onNameChange {
-            input.value = it
-        }
+        input.bind(c.nameProperty)
 
         containerMap += cont to (c to input)
         return c
@@ -260,16 +241,7 @@ class ContainerController(
         val header = InputView().also {
             titleList += it
         }
-        header.value = name
-
-        header.onChange {
-            name = it.trim()
-        }
-        onNameChange {
-            if (header.value != it) {
-                header.value = it
-            }
-        }
+        header.bind(nameProperty)
 
         listView.onContext {
             it.stopPropagation()
@@ -278,13 +250,7 @@ class ContainerController(
 
         sidebar.setup(navigationView, listView, header) {
             title("Container")
-            input("Name", name) {
-                name = it
-            }.also { i ->
-                onNameChange {
-                    i.value = it
-                }
-            }
+            input("Name").bind(nameProperty)
             button("Auto layout") {
                 autoLayout()
             }

@@ -3,6 +3,7 @@ package io.framed.controller
 import io.framed.model.Attribute
 import io.framed.model.Class
 import io.framed.model.Method
+import io.framed.util.Property
 import io.framed.view.*
 
 /**
@@ -11,7 +12,7 @@ import io.framed.view.*
 class ClassController(
         val clazz: Class,
         val parent: ContainerController
-) : NamedController() {
+) : Controller {
 
     override val view: View<*>
         get() = classView
@@ -20,12 +21,8 @@ class ClassController(
 
     fun createSidebar() = parent.createSidebar()
 
-    override var name: String
-        get() = clazz.name
-        set(value) {
-            clazz.name = value
-            onNameChange.fire(value)
-        }
+    val nameProperty = Property(clazz::name)
+    var name by nameProperty
 
     private val classView = ListView()
 
@@ -74,16 +71,7 @@ class ClassController(
         val header = InputView().also {
             titleList += it
         }
-        header.value = name
-
-        header.onChange {
-            name = it.trim()
-        }
-        onNameChange {
-            if (header.value != it) {
-                header.value = it
-            }
-        }
+        header.bind(nameProperty)
 
         clazz.attributes.forEach { addAttribute(it) }
 
@@ -115,13 +103,7 @@ class ClassController(
 
         sidebar.setup(view, header) {
             title("Class")
-            input("Name", name) {
-                name = it
-            }.also { i ->
-                onNameChange {
-                    i.value = it
-                }
-            }
+            input("Name").bind(nameProperty)
         }
     }
 }

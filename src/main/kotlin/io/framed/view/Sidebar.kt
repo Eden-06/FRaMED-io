@@ -45,6 +45,17 @@ class Sidebar() : ViewCollection<View<*>, HTMLDivElement>("div") {
         return i
     }
 
+    fun<T: Any> select(label: String, values: List<T>, selected: T, onchange: (T) -> Unit = {}): SelectView<T> {
+        val i = SelectView(values, selected)
+        i.onChange(onchange)
+
+        append(ListView().also {
+            it += TextView(label)
+            it += i
+        })
+        return i
+    }
+
     fun button(label: String, onClick: () -> Unit = {}): Button {
         val b = Button()
         b.text = label

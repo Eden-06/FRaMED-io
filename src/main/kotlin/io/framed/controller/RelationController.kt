@@ -4,6 +4,7 @@ import io.framed.JsPlumbConnection
 import io.framed.jsPlumbConnect
 import io.framed.jsPlumbPaintStyle
 import io.framed.model.Relation
+import io.framed.util.Property
 import io.framed.view.*
 import org.w3c.dom.events.MouseEvent
 
@@ -13,14 +14,11 @@ import org.w3c.dom.events.MouseEvent
 class RelationController(
         private val relation: Relation,
         val parent: ContainerController
-) : NamedController() {
+) : Controller {
 
-    override var name: String
-        get() = relation.name
-        set(value) {
-            relation.name = value.trim()
-            onNameChange.fire(value.trim())
-        }
+    private val nameProperty = Property(relation::name)
+    private val sourceCardinalityProperty = Property(relation::sourceCardinality)
+    private val targetCardinalityProperty = Property(relation::targetCardinality)
 
     override val view: View<*>
         get() = throw UnsupportedOperationException("A relation does not provide its on view")
@@ -41,12 +39,22 @@ class RelationController(
         connections = emptyList()
     }
 
-    private val nameView = InputView().also {
-        it.value = name
-        it.classes += "front-end-label"
+    private val nameView = InputView().apply {
+        classes += "front-end-label"
+        bind(nameProperty)
     }
 
-    private fun drawInheritance(sourceController: View<*>, targetController: View<*>, sourceCardinality: String, targetCardinality: String) {
+    private val sourceCardinalityView = InputView().apply {
+        classes += "front-end-label"
+        bind(sourceCardinalityProperty)
+    }
+
+    private val targetCardinalityView = InputView().apply {
+        classes += "front-end-label"
+        bind(targetCardinalityProperty)
+    }
+
+    private fun drawInheritance(sourceController: View<*>, targetController: View<*>) {
         connections += jsPlumbInstance.connect(jsPlumbConnect {
             source = sourceController.html
             target = targetController.html
@@ -70,19 +78,23 @@ class RelationController(
                         val cssClass = "front-end-arrow-inheritance"
                     }),
                     arrayOf("Custom", object {
-                        val create = { component: dynamic ->
+                        val create = { _: dynamic ->
                             nameView.html
                         }
                         val cssClass = "front-end-label"
                         val location = 0.5
                     }),
-                    arrayOf("Label", object {
-                        val label = sourceCardinality
+                    arrayOf("Custom", object {
+                        val create = { _: dynamic ->
+                            sourceCardinalityView.html
+                        }
                         val cssClass = "front-end-label"
                         val location = 0.1
                     }),
-                    arrayOf("Label", object {
-                        val label = targetCardinality
+                    arrayOf("Custom", object {
+                        val create = { _: dynamic ->
+                            targetCardinalityView.html
+                        }
                         val cssClass = "front-end-label"
                         val location = 0.9
                     })
@@ -91,7 +103,7 @@ class RelationController(
         })
     }
 
-    private fun drawAssociation(sourceController: View<*>, targetController: View<*>, sourceCardinality: String, targetCardinality: String) {
+    private fun drawAssociation(sourceController: View<*>, targetController: View<*>) {
         connections += jsPlumbInstance.connect(jsPlumbConnect {
             source = sourceController.html
             target = targetController.html
@@ -109,28 +121,31 @@ class RelationController(
 
             overlays = arrayOf(
                     arrayOf("Custom", object {
-                        val create = { component: dynamic ->
+                        val create = { _: dynamic ->
                             nameView.html
                         }
                         val cssClass = "front-end-label"
                         val location = 0.5
                     }),
-                    arrayOf("Label", object {
-                        val label = sourceCardinality
+                    arrayOf("Custom", object {
+                        val create = { _: dynamic ->
+                            sourceCardinalityView.html
+                        }
                         val cssClass = "front-end-label"
                         val location = 0.1
                     }),
-                    arrayOf("Label", object {
-                        val label = targetCardinality
+                    arrayOf("Custom", object {
+                        val create = { _: dynamic ->
+                            targetCardinalityView.html
+                        }
                         val cssClass = "front-end-label"
                         val location = 0.9
                     })
-
             )
         })
     }
 
-    private fun drawAggregation(sourceController: View<*>, targetController: View<*>, sourceCardinality: String, targetCardinality: String) {
+    private fun drawAggregation(sourceController: View<*>, targetController: View<*>) {
         connections += jsPlumbInstance.connect(jsPlumbConnect {
             source = sourceController.html
             target = targetController.html
@@ -154,28 +169,33 @@ class RelationController(
                         val cssClass = "front-end-arrow-aggregation"
                     }),
                     arrayOf("Custom", object {
-                        val create = { component: dynamic ->
+                        val create = { _: dynamic ->
                             nameView.html
                         }
                         val cssClass = "front-end-label"
                         val location = 0.5
                     }),
-                    arrayOf("Label", object {
-                        val label = sourceCardinality
+                    arrayOf("Custom", object {
+                        val create = { _: dynamic ->
+                            sourceCardinalityView.html
+                        }
                         val cssClass = "front-end-label"
                         val location = 0.1
                     }),
-                    arrayOf("Label", object {
-                        val label = targetCardinality
+                    arrayOf("Custom", object {
+                        val create = { _: dynamic ->
+                            targetCardinalityView.html
+                        }
                         val cssClass = "front-end-label"
                         val location = 0.9
                     })
-
             )
         })
     }
 
-    init {
+    fun draw() {
+        remove()
+
         val sourceController = parent.views[relation.source]
         val targetController = parent.views[relation.target]
 
@@ -202,36 +222,17 @@ class RelationController(
 
 
         when (relation.type) {
-            Relation.Type.INHERITANCE -> drawInheritance(sourceController, targetController, relation.sourceCardinality, relation.targetCardinality)
-            Relation.Type.ASSOCIATION -> drawAssociation(sourceController, targetController, relation.sourceCardinality, relation.targetCardinality)
-            Relation.Type.AGGREGATION -> drawAggregation(sourceController, targetController, relation.sourceCardinality, relation.targetCardinality)
-        }
-
-        sidebar.setup {
-            title("Relation")
-
-            input("Name", name) {
-                name = it
-            }.also { i ->
-                onNameChange {
-                    i.value = it
-                }
-            }
-        }
-
-        nameView.onChange {
-            name = it
-        }
-        onNameChange {
-            nameView.value = it
+            Relation.Type.INHERITANCE -> drawInheritance(sourceController, targetController)
+            Relation.Type.ASSOCIATION -> drawAssociation(sourceController, targetController)
+            Relation.Type.AGGREGATION -> drawAggregation(sourceController, targetController)
         }
 
         connections.forEach { c ->
-            c.bind("click") { conn, event ->
+            c.bind("click") { _, event ->
                 event.stopPropagation()
                 sidebar.display()
             }
-            c.bind("contextmenu") { conn, event ->
+            c.bind("contextmenu") { _, event ->
                 (event as? MouseEvent)?.let { e ->
                     e.stopPropagation()
                     e.preventDefault()
@@ -244,5 +245,32 @@ class RelationController(
                 }
             }
         }
+    }
+
+    init {
+        sidebar.setup {
+            title("Relation")
+
+            input("Name").bind(nameProperty)
+            input("Source cardinality").bind(sourceCardinalityProperty)
+            input("Target cardinality").bind(targetCardinalityProperty)
+
+            val types = Relation.Type.values().toList()
+            select("Type", types, relation.type) {
+                println(it)
+                relation.type = it
+                draw()
+            }
+
+            button("Toggle direction") {
+                val source = relation.source
+                relation.source = relation.target
+                relation.target = source
+
+                draw()
+            }
+        }
+
+        draw()
     }
 }
