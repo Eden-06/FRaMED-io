@@ -5,6 +5,7 @@ import io.framed.jsPlumbConnect
 import io.framed.jsPlumbPaintStyle
 import io.framed.model.Relation
 import io.framed.util.Property
+import io.framed.util.point
 import io.framed.view.*
 import org.w3c.dom.events.MouseEvent
 
@@ -242,7 +243,7 @@ class RelationController(
                         addItem(MaterialIcon.DELETE, "Delete") {
                             parent.removeRelation(relation)
                         }
-                    }.open(e.clientX.toDouble(), e.clientY.toDouble())
+                    }.open(e.point())
                 }
             }
         }

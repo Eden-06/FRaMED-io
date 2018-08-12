@@ -1,6 +1,6 @@
 package io.framed.view
 
-import io.framed.toDashCase
+import io.framed.util.toDashCase
 import org.w3c.dom.Element
 import kotlin.reflect.KProperty
 

@@ -92,6 +92,13 @@
     }
   }
 
+  .select-box {
+    background: rgba($uml-text, 0.2);
+    border: solid 2px $toolbar-color;
+    position: absolute;
+    z-index: 2;
+  }
+
   input {
     margin: 0;
     padding: 0.1rem;
@@ -104,5 +111,9 @@
       color: $text-color;
       border-color: $toolbar-color;
     }
+  }
+
+  .selected-view {
+    outline: solid 2px $toolbar-color;
   }
 }

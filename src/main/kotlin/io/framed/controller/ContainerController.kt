@@ -1,12 +1,14 @@
 package io.framed.controller
 
 import io.framed.JsPlumb
-import io.framed.async
 import io.framed.model.Class
 import io.framed.model.Container
 import io.framed.model.Model
 import io.framed.model.Relation
+import io.framed.util.Point
 import io.framed.util.Property
+import io.framed.util.async
+import io.framed.util.point
 import io.framed.view.*
 
 /**
@@ -45,19 +47,12 @@ class ContainerController(
             }
         }
 
-    data class Position(
-            val x: Int,
-            val y: Int
-    ) {
-        operator fun plus(other: Position): Position = Position(x + other.x, y + other.y)
-    }
-
     fun autoLayout() {
         val padding = 20
-        views.values.fold(Position(padding, padding)) { acc, controller ->
-            controller.left = acc.x.toDouble()
-            controller.top = acc.y.toDouble()
-            acc + Position(controller.clientWidth + padding, 0)
+        views.values.fold(Point(padding, padding)) { acc, controller ->
+            controller.left = acc.x
+            controller.top = acc.y
+            acc + Point(controller.clientWidth + padding, 0)
         }
 
         async {
@@ -75,7 +70,7 @@ class ContainerController(
             navigationView.touchpadControl = value
         }
 
-    val listView = ListView()
+    private val listView = ListView()
     private val titleList = ListView().also {
         listView += it
     }
@@ -87,7 +82,7 @@ class ContainerController(
     var childContainer: List<ContainerController> = emptyList()
 
     val jsPlumbInstance = JsPlumb.getInstance().apply {
-        setContainer(navigationView.container)
+        setContainer(navigationView.container.html)
 
         navigationView.onZoom {
             setZoom(it)
@@ -96,19 +91,27 @@ class ContainerController(
     }
 
     private var classMap: Map<Class, Pair<ClassController, InputView>> = emptyMap()
-    fun addClass(clazz: Class, x: Double = 0.0, y: Double = 0.0): ClassController {
+    fun addClass(clazz: Class, position: Point = Point.ZERO): ClassController {
         // As root view
         val c = ClassController(clazz, this)
-        navigationView.container.appendChild(c.view.html)
+        navigationView.container += c.view
         views += clazz to c.view
 
-        c.view.left = x
-        c.view.top = y
+        c.view.left = position.x
+        c.view.top = position.y
 
-        async {
-            c.view.draggable = View.DragType.ABSOLUTE
-            c.view.onDrag {_ ->
-                jsPlumbInstance.revalidate(c.view.html)
+        c.view.onMouseDown {
+            select(c.view, it.ctrlKey)
+        }
+
+        c.view.draggable = View.DragType.ABSOLUTE
+        c.view.onDrag { event ->
+            jsPlumbInstance.revalidate(c.view.html)
+            navigationView.container.toForeground(c.view)
+
+            if (event.direct) {
+                val s = selectedViews() - c.view
+                s.forEach { it.performDrag(event.indirect) }
             }
         }
 
@@ -124,7 +127,7 @@ class ContainerController(
 
     fun removeClass(clazz: Class) {
         classMap[clazz]?.let { (c, input) ->
-            navigationView.container.removeChild(c.view.html)
+            navigationView.container -= c.view
             contentList -= input
             container.classes -= clazz
         }
@@ -136,21 +139,29 @@ class ContainerController(
     }
 
     private var containerMap: Map<Container, Pair<ContainerController, InputView>> = emptyMap()
-    private fun addContainer(cont: Container, x: Double = 0.0, y: Double = 0.0): ContainerController {
+    private fun addContainer(cont: Container, position: Point = Point.ZERO): ContainerController {
         // As root view
         val c = ContainerController(cont, this)
         c.application = application
-        navigationView.container.appendChild(c.listView.html)
+        navigationView.container += c.listView
         views += cont to c.listView
         childContainer += c
 
-        c.view.left = x
-        c.view.top = y
+        c.view.left = position.x
+        c.view.top = position.y
 
-        async {
-            c.listView.draggable = View.DragType.ABSOLUTE
-            c.listView.onDrag {_ ->
-                jsPlumbInstance.revalidate(c.listView.html)
+        c.view.onMouseDown {
+            select(c.view, it.ctrlKey)
+        }
+
+        c.view.draggable = View.DragType.ABSOLUTE
+        c.view.onDrag { event ->
+            jsPlumbInstance.revalidate(c.listView.html)
+            navigationView.container.toForeground(c.view)
+
+            if (event.direct) {
+                val s = selectedViews() - c.view
+                s.forEach { it.performDrag(event.indirect) }
             }
         }
 
@@ -166,7 +177,7 @@ class ContainerController(
 
     private fun removeContainer(cont: Container) {
         containerMap[cont]?.let { (c, input) ->
-            navigationView.container.removeChild(c.listView.html)
+            navigationView.container += c.listView
             contentList -= input
             container.containers -= cont
         }
@@ -188,7 +199,7 @@ class ContainerController(
         sidebar.display()
     }
 
-    private fun openContextMenu(open: Boolean, clientX: Double, clientY: Double) = contextMenu {
+    private fun openContextMenu(open: Boolean, client: Point) = contextMenu {
         title = "Package: $name"
         if (open) {
             addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
@@ -207,8 +218,7 @@ class ContainerController(
 
             container.classes += c
 
-            val (x, y) = navigationView.mouseToCanvas(clientX, clientY)
-            addClass(c, x, y)
+            addClass(c, navigationView.mouseToCanvas(client))
         }
         addItem(MaterialIcon.ADD, "Add package") {
             val c = Container()
@@ -216,8 +226,7 @@ class ContainerController(
 
             container.containers += c
 
-            val (x, y) = navigationView.mouseToCanvas(clientX, clientY)
-            addContainer(c, x, y)
+            addContainer(c, navigationView.mouseToCanvas(client))
         }
         parent?.let {
             addItem(MaterialIcon.DELETE, "Delete") {
@@ -225,9 +234,30 @@ class ContainerController(
                 application?.controller = it
             }
         }
-    }.open(clientX, clientY)
+    }.open(client)
+
+    private fun select(view: View<*>, addToSelection: Boolean) {
+        if (!view.selectedView) {
+            if (!addToSelection) {
+                views.values.forEach { it.selectedView = false }
+            }
+            view.selectedView = true
+        }
+    }
+
+    fun selectedViews(): List<View<*>> = views.values.filter { it.selectedView }
 
     init {
+        navigationView.onSelect { select ->
+            if (select == null) {
+                views.values.forEach { it.selectedView = false }
+            } else {
+                views.values.forEach {
+                    it.selectedView = it.dimension in select
+                }
+            }
+        }
+
         container.classes.forEach { addClass(it) }
 
         container.containers.forEach { addContainer(it) }
@@ -244,7 +274,7 @@ class ContainerController(
 
         navigationView.onContext {
             it.stopPropagation()
-            openContextMenu(false, it.clientX.toDouble(), it.clientY.toDouble())
+            openContextMenu(false, it.point())
         }
 
         // As content view
@@ -256,7 +286,7 @@ class ContainerController(
 
         listView.onContext {
             it.stopPropagation()
-            openContextMenu(true, it.clientX.toDouble(), it.clientY.toDouble())
+            openContextMenu(true, it.point())
         }
 
         sidebar.setup(navigationView, listView, header) {
@@ -269,7 +299,7 @@ class ContainerController(
                 navigationView.zoomTo(1.0)
             }
             button("Reset pan") {
-                navigationView.panTo(0.0, 0.0)
+                navigationView.panTo(Point.ZERO)
             }
         }
     }

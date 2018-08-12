@@ -1,6 +1,7 @@
-package io.framed
+package io.framed.util
 
 import org.w3c.dom.Document
+import kotlin.browser.window
 import kotlin.js.Date
 
 /**
@@ -38,4 +39,13 @@ fun Document.getCookie(name: String): String? =
 fun Document.setCookie(name: String, value: String, validity: Int = 0, path: String = "/") {
     val expires = Date(Date.now() + validity * 1000).toUTCString()
     cookie = "$name=$value; expires=$expires; path=$path"
+}
+
+/**
+ * Apply current dom changes and recalculate all sizes. Executes the given block afterwards.
+ *
+ * @param block Callback
+ */
+fun async(block: () -> Unit) {
+    window.setTimeout(block, 1)
 }

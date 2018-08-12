@@ -25,8 +25,24 @@ abstract class ViewCollection<V : View<*>, T : HTMLElement>(view: T) : View<T>(v
     }
 
     fun remove(view: V) {
-        children -= view
-        html.removeChild(view.html)
+        if (children.contains(view)) {
+            children -= view
+            html.removeChild(view.html)
+        }
+    }
+
+    fun toForeground(view: V) {
+        if (view in children && children.indexOf(view) < children.size - 1) {
+            remove(view)
+            append(view)
+        }
+    }
+
+    fun toBackground(view: V) {
+        if (view in children && children.indexOf(view) > 0) {
+            remove(view)
+            prepand(view)
+        }
     }
 
     operator fun minusAssign(view: V) = remove(view)

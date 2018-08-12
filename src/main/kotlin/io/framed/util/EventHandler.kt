@@ -8,8 +8,8 @@ import org.w3c.dom.events.EventListener
  *
  * @author lars
  */
-class EventHandler<E : Any> {
-    private var listeners: List<(event: E) -> Unit> = emptyList()
+class EventHandler<E> {
+    private var listeners: Set<(event: E) -> Unit> = emptySet()
 
     /**
      * Add a listener to this event.
@@ -42,7 +42,7 @@ class EventHandler<E : Any> {
      * Remove all listener from this event.
      */
     fun clearListeners() {
-        listeners = emptyList()
+        listeners = emptySet()
     }
 
     /**

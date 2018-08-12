@@ -1,9 +1,9 @@
 package io.framed.view
 
 import io.framed.controller.ContainerController
-import io.framed.getCookie
+import io.framed.util.getCookie
 import io.framed.model.Container
-import io.framed.setCookie
+import io.framed.util.setCookie
 import io.framed.util.EventHandler
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.MouseEvent

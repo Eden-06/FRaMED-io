@@ -4,6 +4,7 @@ import io.framed.model.Method
 import io.framed.model.Parameter
 import io.framed.model.param
 import io.framed.util.EventHandler
+import io.framed.util.point
 import io.framed.view.*
 
 /**
@@ -87,7 +88,7 @@ class MethodController(
                 addItem(MaterialIcon.DELETE, "Delete") {
                     parent.removeMethod(method)
                 }
-            }.open(it.clientX.toDouble(), it.clientY.toDouble())
+            }.open(it.point())
         }
 
         sidebar.setup(view, inputView) {

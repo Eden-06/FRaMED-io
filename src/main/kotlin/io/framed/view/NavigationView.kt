@@ -1,12 +1,16 @@
 package io.framed.view
 
+import io.framed.util.Dimension
 import io.framed.util.EventHandler
+import io.framed.util.Point
+import io.framed.util.point
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.events.WheelEvent
 import kotlin.browser.window
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -28,15 +32,15 @@ class NavigationView : View<HTMLDivElement>("div") {
     /**
      * Html container to apply transformations.
      */
-    private val transformBox = createView<HTMLDivElement>().also {
-        html.appendChild(it)
+    private val transformBox = ListView().also {
+        html.appendChild(it.html)
     }
 
     /**
      * Content html container.
      */
-    val container = createView<HTMLDivElement>().also {
-        transformBox.appendChild(it)
+    val container = ListView().also {
+        transformBox += it
     }
 
     /**
@@ -65,29 +69,24 @@ class NavigationView : View<HTMLDivElement>("div") {
      * Zoom by a relative zoom step.
      *
      * @param delta Relative zoom step.
-     * @param x Left zoom center in percent. Defaults to 50%.
-     * @param y Top zoom center in percent. Defaults to 50%.
+     * @param center zoom center in percent. Defaults to 50%.
      */
-    fun zoomBy(delta: Double, x: Double = 0.5, y: Double = 0.5) =
-            zoomTo(zoom + delta, x, y)
+    fun zoomBy(delta: Double, center: Point = Point(0.5, 0.5)) =
+            zoomTo(zoom + delta, center)
 
 
     /**
      * Zoom to a absolute zoom step.
      *
      * @param zoom Absolute zoom step.
-     * @param x Left zoom center in percent. Defaults to 50%.
-     * @param y Top zoom center in percent. Defaults to 50%.
+     * @param center zoom center in percent. Defaults to 50%.
      */
-    fun zoomTo(zoom: Double, x: Double = 0.5, y: Double = 0.5) {
+    fun zoomTo(zoom: Double, center: Point = Point(0.5, 0.5)) {
         val old = this.zoom
         this.zoom = zoom
         val new = this.zoom
 
-        val dx = (clientWidth * (0.5 - x) * (1 / new - 1 / old))
-        val dy = (clientHeight * (0.5 - y) * (1 / new - 1 / old))
-
-        pan = Coordinate(pan.x - dx, pan.y - dy)
+        pan -= (Point(clientWidth, clientHeight) * (-center + 0.5) * (1 / new - 1 / old))
 
         updateTransform()
     }
@@ -95,25 +94,23 @@ class NavigationView : View<HTMLDivElement>("div") {
     /**
      * Current pan.
      */
-    var pan: Coordinate = Coordinate(0.0, 0.0)
+    var pan: Point = Point.ZERO
         private set
 
     /**
-     * Pan by a relative width.
+     * Pan by a relative coordinate.
      *
-     * @param x x delta.
-     * @param y y delta.
+     * @param coordinate Relative coordinate.
      */
-    fun panBy(x: Double, y: Double) = panTo(pan.x + x, pan.y + y)
+    fun panBy(coordinate: Point) = panTo(pan + coordinate)
 
     /**
      * Pan to a absolute coordinate.
      *
-     * @param x x position.
-     * @param y y position.
+     * @param coordinate Absolute coordinate.
      */
-    fun panTo(x: Double, y: Double) {
-        pan = Coordinate(x, y)
+    fun panTo(coordinate: Point) {
+        pan = coordinate
         updateTransform()
     }
 
@@ -121,28 +118,24 @@ class NavigationView : View<HTMLDivElement>("div") {
      * Apply transformation to transformBox.
      */
     private fun updateTransform() {
-        transformBox.style.transform = "scale($zoom) translate($pan)"
+        transformBox.html.style.transform = "scale($zoom) translate(${pan.asPx})"
     }
 
-    fun mouseToCanvas(x: Double, y: Double): Pair<Double, Double> {
-        val cx = (x - offsetLeft) / clientWidth - 0.5
-        val cy = (y - offsetTop) / clientHeight - 0.5
+    fun mouseToCanvas(mouse: Point): Point {
+        val client = Point(clientWidth, clientHeight)
+        val c = (mouse - Point(offsetLeft, offsetTop)) / client - 0.5
 
-        val hx = clientWidth / 2.0 + cx * clientWidth / zoom - pan.x
-        val hy = clientHeight / 2.0 + cy * clientHeight / zoom - pan.y
-
-        return hx to hy
+        return client / 2.0 + c * client / zoom - pan
     }
 
     /**
-     * Move reference x  position for pan.
+     * Move reference position for pan.
      */
-    private var moveStartX: Int = 0
+    private var moveStart: Point = Point.ZERO
 
-    /**
-     * Move reference y position for pan.
-     */
-    private var moveStartY: Int = 0
+    val selectBox = ListView().also {
+        it.classes += "select-box"
+    }
 
     /**
      * Mouse down event listener.
@@ -150,10 +143,22 @@ class NavigationView : View<HTMLDivElement>("div") {
     private val moveStartListener = object : EventListener {
         override fun handleEvent(event: Event) {
             (event as? MouseEvent)?.let { e ->
-                moveStartX = e.clientX
-                moveStartY = e.clientY
 
-                window.addEventListener("mousemove", movePerformListener)
+                if (e.ctrlKey) {
+                    moveStart = mouseToCanvas(e.point())
+
+                    window.addEventListener("mousemove", selectPerformListener)
+
+                    selectBox.width = 0.0
+                    selectBox.height = 0.0
+                    selectBox.top = moveStart.y
+                    selectBox.left = moveStart.x
+                    container += selectBox
+                } else {
+                    moveStart = e.point()
+
+                    window.addEventListener("mousemove", movePerformListener)
+                }
                 window.addEventListener("mouseup", moveEndListener)
                 window.addEventListener("mouseleave", moveEndListener)
             }
@@ -165,10 +170,37 @@ class NavigationView : View<HTMLDivElement>("div") {
      */
     private val movePerformListener = object : EventListener {
         override fun handleEvent(event: Event) {
+            event.preventDefault()
             (event as? MouseEvent)?.let { e ->
-                panBy((e.clientX - moveStartX).toDouble() / zoom, (e.clientY - moveStartY).toDouble() / zoom)
-                moveStartX = e.clientX
-                moveStartY = e.clientY
+                val mouse = e.point()
+                panBy((mouse - moveStart) / zoom)
+                moveStart = mouse
+            }
+        }
+    }
+
+    /**
+     * Mouse select event listener.
+     */
+    private val selectPerformListener = object : EventListener {
+        override fun handleEvent(event: Event) {
+            event.preventDefault()
+            (event as? MouseEvent)?.let { e ->
+                val mouse = mouseToCanvas(e.point())
+
+                val top = min(mouse.y, moveStart.y)
+                val left = min(mouse.x, moveStart.x)
+
+                val width = abs(mouse.x - moveStart.x)
+                val height = abs(mouse.y - moveStart.y)
+
+                selectBox.top = top
+                selectBox.left = left
+
+                selectBox.width = width
+                selectBox.height = height
+
+                onSelect.fire(Dimension(left, top, width, height))
             }
         }
     }
@@ -178,11 +210,16 @@ class NavigationView : View<HTMLDivElement>("div") {
      */
     private val moveEndListener = object : EventListener {
         override fun handleEvent(event: Event) {
+            container -= selectBox
+
             window.removeEventListener("mousemove", movePerformListener)
+            window.removeEventListener("mousemove", selectPerformListener)
             window.removeEventListener("mouseup", this)
             window.removeEventListener("mouseleave", this)
         }
     }
+
+    val onSelect = EventHandler<Dimension?>()
 
     /**
      * Wheel listener.
@@ -192,24 +229,25 @@ class NavigationView : View<HTMLDivElement>("div") {
             (event as? WheelEvent)?.let { e ->
                 e.preventDefault()
 
-                val (deltaX, deltaY) = when (e.deltaMode) {
+                val delta = when (e.deltaMode) {
                     WheelEvent.DOM_DELTA_PIXEL -> {
-                        Pair(e.deltaX / 6, e.deltaY / 6)
+                        Point(e.deltaX / 6, e.deltaY / 6)
                     }
                     WheelEvent.DOM_DELTA_LINE -> {
-                        Pair(
+                        Point(
                                 min(1.0, max(-1.0, e.deltaX)) * 8,
                                 min(1.0, max(-1.0, e.deltaY)) * 8
                         )
                     }
-                    else -> Pair(e.deltaX, e.deltaY)
+                    else -> Point(e.deltaX, e.deltaY)
                 }
 
 
                 if (!touchpadControl || e.ctrlKey) {
-                    zoomBy(deltaY / 150, e.clientX.toDouble() / clientWidth, (e.clientY.toDouble() - offsetTop) / clientHeight)
+                    e.point() - Point(offsetLeft, offsetTop) / Point(clientWidth, clientHeight)
+                    zoomBy(delta.y / 150, (e.point() - Point(offsetLeft, offsetTop)) / Point(clientWidth, clientHeight))
                 } else {
-                    panBy(-1 * deltaX, -1 * deltaY)
+                    panBy(-delta)
                 }
             }
         }
@@ -218,17 +256,9 @@ class NavigationView : View<HTMLDivElement>("div") {
     init {
         html.addEventListener("mousedown", moveStartListener)
         html.addEventListener("wheel", scrollListener)
-    }
 
-    /**
-     * Helper class for coordinates.
-     */
-    data class Coordinate(
-            val x: Double,
-            val y: Double
-    ) {
-        override fun toString(): String {
-            return "${x}px, ${y}px"
+        onClick {
+            onSelect.fire(null)
         }
     }
 }

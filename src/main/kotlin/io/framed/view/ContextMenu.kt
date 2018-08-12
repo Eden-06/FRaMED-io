@@ -1,6 +1,8 @@
 package io.framed.view
 
+import io.framed.util.Point
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.events.KeyboardEvent
 import kotlin.browser.window
 import kotlin.math.min
 
@@ -43,20 +45,27 @@ class ContextMenu : View<HTMLDivElement>("div") {
         listView += l
     }
 
+    val keyListener = { event: KeyboardEvent ->
+        when (event.keyCode) {
+            27 -> close()
+        }
+    }
+
     /**
      * Open the onContext menu at the given position, relative to the body.
      *
-     * @param x Left position in px.
-     * @param y Top position in px.
+     * @param position Position in px.
      */
-    fun open(x: Double, y: Double) {
+    fun open(position: Point) {
         Root += this
 
-        val left = min(window.innerWidth - listView.clientWidth - 8.0, x)
-        val top = min(window.innerHeight - listView.clientHeight - 8.0, y)
+        val left = min(window.innerWidth - listView.clientWidth - 8.0, position.x)
+        val top = min(window.innerHeight - listView.clientHeight - 8.0, position.y)
 
         listView.left = left
         listView.top = top
+
+        Root.onKeyDown += keyListener
     }
 
     /**
@@ -64,6 +73,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
      */
     fun close() {
         Root -= this
+        Root.onKeyDown -= keyListener
     }
 
     init {

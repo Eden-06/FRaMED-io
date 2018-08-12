@@ -2,6 +2,7 @@ package io.framed.controller
 
 import io.framed.model.Attribute
 import io.framed.util.EventHandler
+import io.framed.util.point
 import io.framed.view.*
 
 /**
@@ -48,7 +49,7 @@ class AttributeController(
                 addItem(MaterialIcon.DELETE, "Delete") {
                     parent.removeAttribute(attribute)
                 }
-            }.open(it.clientX.toDouble(), it.clientY.toDouble())
+            }.open(it.point())
         }
 
         sidebar.setup(view, inputView) {

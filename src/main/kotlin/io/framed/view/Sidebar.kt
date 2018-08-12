@@ -11,14 +11,14 @@ class Sidebar() : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     fun setup(vararg initiator: View<*>, init: Sidebar.() -> Unit) {
         clear()
-        initiator.forEach {
-            it.onClick {
+        initiator.forEach { view ->
+            view.onClick {
                 it.stopPropagation()
                 display()
             }
 
-            (it as? InputView)?.let {
-                it.onFocusEnter {
+            (view as? InputView)?.let { input ->
+                input.onFocusEnter {
                     display()
                 }
             }
@@ -45,7 +45,7 @@ class Sidebar() : ViewCollection<View<*>, HTMLDivElement>("div") {
         return i
     }
 
-    fun<T: Any> select(label: String, values: List<T>, selected: T, onchange: (T) -> Unit = {}): SelectView<T> {
+    fun <T : Any> select(label: String, values: List<T>, selected: T, onchange: (T) -> Unit = {}): SelectView<T> {
         val i = SelectView(values, selected)
         i.onChange(onchange)
 

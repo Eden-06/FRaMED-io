@@ -1,7 +1,6 @@
 package io.framed.view
 
-import io.framed.toDashCase
-import io.framed.util.EventHandler
+import io.framed.util.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
@@ -193,6 +192,9 @@ abstract class View<V : HTMLElement>(view: V) {
         html.blur()
     }
 
+    val dimension: Dimension
+        get() = Dimension(left, top, width, height)
+
     val onMouseDown = EventHandler<MouseEvent>()
     val onMouseMove = EventHandler<MouseEvent>()
     val onMouseUp = EventHandler<MouseEvent>()
@@ -204,9 +206,25 @@ abstract class View<V : HTMLElement>(view: V) {
     val onKeyUp = EventHandler<KeyboardEvent>()
 
     var isMouseDown by ClassDelegate("mouse-down")
+    var selectedView by ClassDelegate("selected-view")
 
     var draggable = DragType.NONE
-    val onDrag = EventHandler<Pair<Double, Double>>()
+    val onDrag = EventHandler<DragEvent>()
+
+    fun performDrag(dragEvent: DragEvent) {
+        when (draggable) {
+            View.DragType.NONE -> throw IllegalStateException()
+            View.DragType.ABSOLUTE -> {
+                left += dragEvent.delta.x
+                top += dragEvent.delta.y
+            }
+            View.DragType.MARGIN -> {
+                marginLeft += dragEvent.delta.x
+                marginTop += dragEvent.delta.y
+            }
+        }
+        onDrag.fire(dragEvent)
+    }
 
     init {
         html.addEventListener("click", onClick.eventListener)
@@ -226,28 +244,16 @@ abstract class View<V : HTMLElement>(view: V) {
         html.addEventListener("keyup", onKeyUp.eventListener)
 
         var isCurrentlyDragging = false
-        var lastDragPosition = Pair(0, 0)
+        var lastDragPosition = Point.ZERO
         val dragMove = { event: MouseEvent ->
-            val deltaX = (event.clientX - lastDragPosition.first) / Root.innerZoom
-            val deltaY = (event.clientY - lastDragPosition.second) / Root.innerZoom
-
-            when (draggable) {
-                View.DragType.NONE -> throw IllegalStateException()
-                View.DragType.ABSOLUTE -> {
-                    left += deltaX
-                    top += deltaY
-                }
-                View.DragType.MARGIN -> {
-                    marginLeft += deltaX
-                    marginTop += deltaY
-                }
-            }
-            onDrag.fire(Pair(deltaX, deltaY))
-            lastDragPosition = Pair(event.clientX, event.clientY)
+            val delta = (event.point() - lastDragPosition) / Root.innerZoom
+            performDrag(DragEvent(delta, true))
+            lastDragPosition = event.point()
         }
         var dragEnd: (MouseEvent) -> Unit = {}
         fun removeDrag() {
             isCurrentlyDragging = false
+            isMouseDown = false
 
             Root.onMouseMove -= dragMove
             Root.onMouseUp -= dragEnd
@@ -262,6 +268,9 @@ abstract class View<V : HTMLElement>(view: V) {
 
             if (draggable != DragType.NONE) {
                 it.stopPropagation()
+
+                Root.onMouseUp += dragEnd
+                Root.onMouseLeave += dragEnd
             }
         }
         onMouseUp {
@@ -273,7 +282,7 @@ abstract class View<V : HTMLElement>(view: V) {
                 it.preventDefault()
                 it.stopPropagation()
 
-                lastDragPosition = Pair(it.clientX, it.clientY)
+                lastDragPosition = it.point()
                 Root.onMouseMove += dragMove
                 Root.onMouseUp += dragEnd
                 Root.onMouseLeave += dragEnd
@@ -312,5 +321,13 @@ abstract class View<V : HTMLElement>(view: V) {
         NONE,
         ABSOLUTE,
         MARGIN
+    }
+
+    data class DragEvent(
+            val delta: Point,
+            val direct: Boolean
+    ) {
+        val indirect: DragEvent
+            get() = copy(direct = false)
     }
 }

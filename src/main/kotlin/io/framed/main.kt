@@ -2,6 +2,7 @@ package io.framed
 
 import io.framed.controller.ContainerController
 import io.framed.model.*
+import io.framed.util.async
 import io.framed.view.Application
 import io.framed.view.Root
 import kotlin.browser.window
@@ -68,13 +69,4 @@ fun init() {
     async {
         controller.autoLayout()
     }
-}
-
-/**
- * Apply current dom changes and recalculate all sizes. Executes the given block afterwards.
- *
- * @param block Callback
- */
-fun async(block: () -> Unit) {
-    window.setTimeout(block, 1)
 }

@@ -4,6 +4,7 @@ import io.framed.model.Attribute
 import io.framed.model.Class
 import io.framed.model.Method
 import io.framed.util.Property
+import io.framed.util.point
 import io.framed.view.*
 
 /**
@@ -98,7 +99,7 @@ class ClassController(
                 addItem(MaterialIcon.DELETE, "Delete") {
                     parent.removeClass(clazz)
                 }
-            }.open(it.clientX.toDouble(), it.clientY.toDouble())
+            }.open(it.point())
         }
 
         sidebar.setup(view, header) {

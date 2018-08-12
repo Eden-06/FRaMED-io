@@ -1,9 +1,8 @@
 package io.framed.view
 
-import io.framed.async
+import io.framed.util.async
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.KeyboardEvent
-import kotlin.browser.document
 import kotlin.math.min
 
 /**
