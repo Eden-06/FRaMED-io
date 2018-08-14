@@ -155,6 +155,8 @@ abstract class View<V : HTMLElement>(view: V) {
             return offset
         }
 
+    val id by AttributeDelegate(String::class, "")
+
     /**
      * Show or hide this view. Does only work for view who are visible by default.
      */

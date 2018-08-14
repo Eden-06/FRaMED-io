@@ -81,6 +81,9 @@ class ContainerController(
     var views: Map<Model, View<*>> = emptyMap()
     var childContainer: List<ContainerController> = emptyList()
 
+    fun getControllerById(id: String): Controller? =
+            (classMap.values.map { it.first } + containerMap.values.map { it.first }).find { it.view.id == id }
+    
     val jsPlumbInstance = JsPlumb.getInstance().apply {
         setContainer(navigationView.container.html)
 
