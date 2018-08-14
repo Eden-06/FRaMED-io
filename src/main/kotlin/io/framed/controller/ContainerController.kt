@@ -103,6 +103,10 @@ class ContainerController(
         c.view.onMouseDown {
             select(c.view, it.ctrlKey)
         }
+        c.view.onDblClick { _ ->
+            views.values.forEach { it.selectedView = false }
+            c.view.selectedView = true
+        }
 
         c.view.draggable = View.DragType.ABSOLUTE
         c.view.onDrag { event ->

@@ -204,6 +204,7 @@ abstract class View<V : HTMLElement>(view: V) {
     val onKeyDown = EventHandler<KeyboardEvent>()
     val onKeyPress = EventHandler<KeyboardEvent>()
     val onKeyUp = EventHandler<KeyboardEvent>()
+    val onDblClick = EventHandler<MouseEvent>()
 
     var isMouseDown by ClassDelegate("mouse-down")
     var selectedView by ClassDelegate("selected-view")
@@ -238,7 +239,7 @@ abstract class View<V : HTMLElement>(view: V) {
         html.addEventListener("mouseup", onMouseUp.eventListener)
         html.addEventListener("mouseenter", onMouseEnter.eventListener)
         html.addEventListener("mouseleave", onMouseLeave.eventListener)
-
+        html.addEventListener("dblclick", onDblClick.eventListener)
         html.addEventListener("keydown", onKeyDown.eventListener)
         html.addEventListener("keypress", onKeyPress.eventListener)
         html.addEventListener("keyup", onKeyUp.eventListener)
