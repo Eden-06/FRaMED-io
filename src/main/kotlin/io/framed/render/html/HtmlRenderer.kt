@@ -49,6 +49,17 @@ class HtmlRenderer(
             }
         }
 
+        if (viewModel.container.hasContext) {
+            navigationView.onContext {
+                viewModel.container.onContext.fire(it.point())
+            }
+        }
+        if (viewModel.container.hasSidebar) {
+            navigationView.onMouseDown {
+                viewModel.container.onSidebar.fire(Unit)
+            }
+        }
+
         val jsPlumbInstance = JsPlumb.getInstance().apply {
             setContainer(navigationView.container.html)
 
@@ -198,6 +209,8 @@ class HtmlRenderer(
         return InputView(shape.property).also { view ->
             style(view, shape.style)
             events(view, shape)
+
+            view.autocomplete = shape.autocomplete
 
             view.onMouseDown {
                 view.focus()

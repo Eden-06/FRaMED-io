@@ -34,8 +34,9 @@ class Sidebar(
         }
     }
 
-    fun input(label: String, property: Property<String>): InputView {
+    fun input(label: String, property: Property<String>, autocomplete: List<String> = emptyList()): InputView {
         val i = InputView(property)
+        i.autocomplete = autocomplete
 
         append(ListView().also {
             it += TextView(label)

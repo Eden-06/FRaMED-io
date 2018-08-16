@@ -50,7 +50,10 @@ class ContainerController(
 
     operator fun get(clazz: Class): Shape = classMap[clazz]?.first?.picto ?: throw IllegalArgumentException()
 
-    val viewModel = ViewModel(boxShape { }).apply { layer = Layer() }
+    val viewModel = ViewModel(boxShape {
+        hasSidebar = true
+        hasContext = true
+    }.also(this::initPicto)).apply { layer = Layer() }
 
     private var classMap: Map<Class, Pair<ClassController, TextShape>> = emptyMap()
     fun addClass(clazz: Class, position: Point = Point.ZERO): ClassController {
@@ -121,7 +124,7 @@ class ContainerController(
         return controller
     }
 
-    private fun removeContainer(relation: Relation) {
+    private fun removeRelation(relation: Relation) {
         relationMap[relation]?.let { controller ->
             viewModel -= controller.picto
 

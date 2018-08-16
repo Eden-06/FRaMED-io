@@ -13,30 +13,6 @@
   }
 }
 
-.front-end-label {
-  background-color: rgba($primary-background, .6);
-  text-align: center;
-}
-
-.front-end-label {
-  &:hover, &:focus {
-    padding: .5rem;
-    background-color: rgba($primary-background, .9);
-    border: 2px solid $border-color;
-    border-radius: $border-radius;
-  }
-}
-
-.front-end-arrow-inheritance {
-  fill: $primary-background;
-  border: 2px solid $uml-border;
-}
-
-.front-end-arrow-aggregation {
-  fill: $primary-background;
-  border: 2px solid $uml-border;
-}
-
 .navigation-view {
   position: relative;
   top: 0;
@@ -79,7 +55,29 @@
     }
   }
 
-  .selected-view {
+  div.selected-view {
     outline: solid 2px $toolbar-color;
   }
+}
+
+
+.front-end-label input {
+  background-color: rgba($primary-background, .6);
+  text-align: center;
+  &:hover, &:focus {
+    padding: .5rem;
+    background-color: rgba($primary-background, .9);
+    border: 2px solid $border-color;
+    border-radius: $border-radius;
+  }
+}
+
+.front-end-arrow-inheritance {
+  fill: $primary-background;
+  border: 2px solid $uml-border;
+}
+
+.front-end-arrow-aggregation {
+  fill: $primary-background;
+  border: 2px solid $uml-border;
 }

@@ -1,6 +1,8 @@
 package io.framed.controller
 
 import io.framed.model.Relation
+import io.framed.model.RelationMultiplicity
+import io.framed.model.RelationType
 import io.framed.picto.relation
 import io.framed.picto.textShape
 import io.framed.util.Validator
@@ -37,8 +39,8 @@ class RelationController(
 
     override val picto = relation(sourceShapeProperty, targetShapeProperty, typeProperty) {
         labels += textShape(nameProperty) to 0.5
-        labels += textShape(sourceCardinalityProperty) to 0.1
-        labels += textShape(targetCardinalityProperty) to 0.9
+        labels += textShape(sourceCardinalityProperty, RelationMultiplicity.STRING_VALUES) to 0.1
+        labels += textShape(targetCardinalityProperty, RelationMultiplicity.STRING_VALUES) to 0.9
 
         hasContext = true
         hasSidebar = true
@@ -48,10 +50,10 @@ class RelationController(
         title("Relation")
 
         input("Name", nameProperty)
-        input("Source cardinality", sourceCardinalityProperty)
-        input("Target cardinality", targetCardinalityProperty)
+        input("Source cardinality", sourceCardinalityProperty, RelationMultiplicity.STRING_VALUES)
+        input("Target cardinality", targetCardinalityProperty, RelationMultiplicity.STRING_VALUES)
 
-        val types = Relation.Type.values().toList()
+        val types = RelationType.values().toList()
         select("Type", types, relationType) {
             relationType = it
         }

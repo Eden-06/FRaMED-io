@@ -52,9 +52,9 @@ fun init() {
             relation(book, shelf)
         }
         relation(bank, account, "customers") {
-            type = Relation.Type.AGGREGATION
-            sourceCardinality = "1..*"
-            targetCardinality = "5"
+            type = RelationType.AGGREGATION
+            sourceCardinality = RelationMultiplicity.ONCE_TO_MANY.value
+            targetCardinality = RelationMultiplicity.ONCE.value
         }
     }
 

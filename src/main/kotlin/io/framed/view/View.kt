@@ -183,14 +183,14 @@ abstract class View<V : HTMLElement>(view: V) {
     /**
      * Request focus to this view.
      */
-    fun focus() {
+    open fun focus() {
         html.focus()
     }
 
     /**
      * Revoke focus from this view.
      */
-    fun blur() {
+    open fun blur() {
         html.blur()
     }
 

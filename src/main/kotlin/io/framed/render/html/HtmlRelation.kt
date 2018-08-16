@@ -4,6 +4,7 @@ import io.framed.JsPlumbConnection
 import io.framed.JsPlumbInstance
 import io.framed.jsPlumbConnect
 import io.framed.jsPlumbPaintStyle
+import io.framed.model.RelationType
 import io.framed.picto.Relation
 import io.framed.picto.Shape
 import io.framed.util.point
@@ -31,6 +32,7 @@ class HtmlRelation(
     val views = relation.labels.map { (shape, position) ->
         InputView(shape.property).also {
             it.draggable = View.DragType.MARGIN
+            it.autocomplete = shape.autocomplete
         } to position
     }
 
@@ -63,7 +65,7 @@ class HtmlRelation(
                     val create = { _: dynamic ->
                         view.html
                     }
-                    val cssClass = "front-end-label"
+                    val cssClass = "front-end-label input-view"
                     val location = position
                 })
             }
@@ -91,7 +93,7 @@ class HtmlRelation(
                     val create = { _: dynamic ->
                         view.html
                     }
-                    val cssClass = "front-end-label"
+                    val cssClass = "front-end-label input-view"
                     val location = position
                 })
             }.toTypedArray()
@@ -126,7 +128,7 @@ class HtmlRelation(
                     val create = { _: dynamic ->
                         view.html
                     }
-                    val cssClass = "front-end-label"
+                    val cssClass = "front-end-label input-view"
                     val location = position
                 })
             }
@@ -162,9 +164,9 @@ class HtmlRelation(
 
 
         when (relation.type.get()) {
-            io.framed.model.Relation.Type.INHERITANCE -> drawInheritance(sourceView, targetView)
-            io.framed.model.Relation.Type.ASSOCIATION -> drawAssociation(sourceView, targetView)
-            io.framed.model.Relation.Type.AGGREGATION -> drawAggregation(sourceView, targetView)
+            RelationType.INHERITANCE -> drawInheritance(sourceView, targetView)
+            RelationType.ASSOCIATION -> drawAssociation(sourceView, targetView)
+            RelationType.AGGREGATION -> drawAggregation(sourceView, targetView)
         }
 
         connections.forEach { c ->

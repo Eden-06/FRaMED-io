@@ -36,32 +36,41 @@ class Relation(
     /**
      * Type of this relation
      */
-    var type: Type = Type.ASSOCIATION
+    var type: RelationType = RelationType.ASSOCIATION
 
-    /**
-     * Possible types
-     */
-    enum class Type(val printableName: String) {
-        INHERITANCE("Inheritance"),
-        ASSOCIATION("Association"),
-        AGGREGATION("Aggregation");
+}
 
-        override fun toString() = printableName
-    }
+enum class RelationMultiplicity(val value: String) {
+    NEVER("0"),
+    ONCE("1"),
+    MANY("*"),
+
+    NEVER_TO_NEVER("0..0"),
+    NEVER_TO_ONCE("0..1"),
+    NEVER_TO_MANY("0..*"),
+
+    ONCE_TO_ONCE("1..1"),
+    ONCE_TO_MANY("1..*"),
+
+    MANY_TO_MANY("*..*");
+
+    override fun toString(): String = name.toLowerCase().replace("_", " ")
 
     companion object {
-        val PRESETS = listOf(
-                "0",
-                "1",
-                "*",
-                "0..0",
-                "0..1",
-                "0..*",
-                "1..1",
-                "1..*",
-                "m..n"
-        )
+        val STRING_VALUES = values().map { it.value }
+
+        fun parse(str: String): RelationMultiplicity? = values().find {
+            it.value == str || it.toString() == str
+        }
     }
+}
+
+enum class RelationType {
+    INHERITANCE,
+    ASSOCIATION,
+    AGGREGATION;
+
+    override fun toString() = name.first() + name.drop(1).toLowerCase()
 }
 
 /**
