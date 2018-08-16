@@ -1,28 +1,10 @@
 @import "config";
 
-.class-view {
+.absolute-view {
   display: inline-block;
-  background: $uml-color;
-  border: solid 1px rgba($uml-border, 0.15);
-  border-radius: 0.2rem;
   position: absolute;
   z-index: 1;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .14);
-  & > div {
-    padding: 0.4rem;
-    &:not(:last-child) {
-      border-bottom: solid 1px $uml-border;
-    }
-  }
-}
-
-.container-view {
-  display: inline-block;
-  background: $uml-color;
-  border: solid 1px rgba($uml-border, 0.15);
-  position: absolute;
-  z-index: 1;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .14);
   & > div {
     padding: 0.4rem;
     &:not(:last-child) {
@@ -55,14 +37,6 @@
   border: 2px solid $uml-border;
 }
 
-.attribute-view {
-  display: block;
-}
-
-.method-view {
-  display: block;
-}
-
 .navigation-view {
   position: relative;
   top: 0;
@@ -71,14 +45,6 @@
   height: 100%;
 
   background-color: $primary-background;
-  /*
-  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-  background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
-  background-image: linear-gradient($secondary-background 2px, transparent 2px),
-  linear-gradient(90deg, $secondary-background 2px, transparent 2px),
-  linear-gradient($secondary-background 1px, transparent 1px),
-  linear-gradient(90deg, $secondary-background 1px, transparent 1px);
-*/
   * {
     font-family: "RobotoMono Nerd Font", Roboto, Arial, sans-serif;
   }

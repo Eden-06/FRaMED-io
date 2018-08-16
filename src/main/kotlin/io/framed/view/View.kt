@@ -229,6 +229,8 @@ abstract class View<V : HTMLElement>(view: V) {
         onDrag.fire(dragEvent)
     }
 
+    var dragZoom = 1.0
+
     init {
         html.addEventListener("click", onClick.eventListener)
         html.addEventListener("contextmenu", onContext.eventListener)
@@ -249,7 +251,7 @@ abstract class View<V : HTMLElement>(view: V) {
         var isCurrentlyDragging = false
         var lastDragPosition = Point.ZERO
         val dragMove = { event: MouseEvent ->
-            val delta = (event.point() - lastDragPosition) / Root.innerZoom
+            val delta = (event.point() - lastDragPosition) / dragZoom
             performDrag(DragEvent(delta, true))
             lastDragPosition = event.point()
         }

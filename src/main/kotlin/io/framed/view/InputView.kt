@@ -13,7 +13,11 @@ import org.w3c.dom.events.KeyboardEvent
  *
  * @author lars
  */
-class InputView : View<HTMLInputElement>("input") {
+class InputView() : View<HTMLInputElement>("input") {
+
+    constructor(property: Property<String>) : this() {
+        bind(property)
+    }
 
     /**
      * Inputs value.
@@ -47,17 +51,20 @@ class InputView : View<HTMLInputElement>("input") {
     var invalid by ClassDelegate()
 
     fun bind(property: Property<String>) {
+        var hasFocus = false
         value = property.get()
         onChange {
+            hasFocus = true
             property.set(it)
         }
         onFocusLeave {
+            hasFocus = false
             property.set(value.trim())
         }
 
         property.onChange {
-            if (value != it) {
-                value = it
+            if (!hasFocus) {
+                value =  property.get()
             }
         }
     }

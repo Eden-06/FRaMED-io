@@ -62,8 +62,9 @@ class TextView(
         }
 
         property.onChange {
-            if (text != it) {
-                text = it
+            val new = property.get()
+            if (text != new) {
+                text = new
             }
         }
     }

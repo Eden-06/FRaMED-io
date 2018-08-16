@@ -3,108 +3,114 @@ package io.framed.controller
 import io.framed.model.Attribute
 import io.framed.model.Class
 import io.framed.model.Method
-import io.framed.util.Property
-import io.framed.util.point
-import io.framed.view.*
+import io.framed.picto.*
+import io.framed.util.Point
+import io.framed.util.property
+import io.framed.view.ContextMenu
+import io.framed.view.MaterialIcon
+import io.framed.view.Sidebar
+import io.framed.view.contextMenu
 
 /**
  * @author lars
  */
 class ClassController(
         val clazz: Class,
-        val parent: ContainerController
-) : Controller {
+        override val parent: ContainerController
+) : Controller<BoxShape>(parent) {
 
-    override val view: View<*>
-        get() = classView
-
-    override val sidebar: Sidebar = parent.createSidebar()
-
-    fun createSidebar() = parent.createSidebar()
-
-    val nameProperty = Property(clazz::name)
+    val nameProperty = property(clazz::name)
     var name by nameProperty
 
-    private val classView = ListView()
+    private val nameBox = boxShape {
+        textShape(nameProperty)
+    }
 
-    private val titleList = ListView().also {
-        classView += it
-    }
-    private val attributeList = ListView().also {
-        classView += it
-    }
-    private val methodList = ListView().also {
-        classView += it
-    }
+    private val attributeBox = boxShape { }
+
+    private val methodBox = boxShape { }
+
+    override val picto = boxShape {
+        +nameBox
+        +attributeBox
+        +methodBox
+
+        style {
+            background = linearGradient("to bottom") {
+                add(color("#fffbd9"), 0.0)
+                add(color("#fff7c4"), 2.0)
+            }
+            border = border {
+                style = Border.BorderStyle.SOLID
+                width = 1.0
+                color = color(0, 0, 0, 0.3)
+            }
+        }
+
+        hasSidebar = true
+        hasContext = true
+    }.also(this::initPicto)
+
 
     private var attributeMap: Map<Attribute, AttributeController> = emptyMap()
     private fun addAttribute(attribute: Attribute) = AttributeController(attribute, this).also {
-        attributeList += it.view
+        attributeBox += it.picto
         attributeMap += attribute to it
     }
 
     fun removeAttribute(attribute: Attribute) {
         attributeMap[attribute]?.let {
-            attributeList -= it.view
+            attributeBox -= it.picto
             attributeMap -= attribute
             clazz.attributes -= attribute
         }
-        sidebar.display()
+        showSidebar()
     }
 
     private var methodMap: Map<Method, MethodController> = emptyMap()
     private fun addMethod(method: Method) = MethodController(method, this).also {
-        methodList += it.view
+        methodBox += it.picto
         methodMap += method to it
     }
 
     fun removeMethod(method: Method) {
         methodMap[method]?.let {
-            methodList -= it.view
+            methodBox -= it.picto
             methodMap -= method
             clazz.methods -= method
         }
-        sidebar.display()
+        showSidebar()
+    }
+
+    override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
+        title("Class")
+        input("Name", nameProperty)
+    }
+
+    override fun createContextMenu(position: Point): ContextMenu? = contextMenu {
+        title = "Class: $name"
+        addItem(MaterialIcon.ADD, "Add attribute") {
+            val a = Attribute()
+            a.name = "unnamed"
+            clazz.attributes += a
+
+            addAttribute(a)
+        }
+        addItem(MaterialIcon.ADD, "Add method") {
+            val m = Method()
+            m.name = "unnamed"
+            clazz.methods += m
+
+            addMethod(m)
+        }
+        addItem(MaterialIcon.DELETE, "Delete") {
+            parent.removeClass(clazz)
+        }
     }
 
     init {
-        classView.classes += "class-view"
-        val header = InputView().also {
-            titleList += it
-        }
-        header.bind(nameProperty)
-
         clazz.attributes.forEach { addAttribute(it) }
 
         clazz.methods.forEach { addMethod(it) }
-
-        view.onContext {
-            it.stopPropagation()
-            contextMenu {
-                title = "Class: $name"
-                addItem(MaterialIcon.ADD, "Add attribute") {
-                    val a = Attribute()
-                    a.name = "unnamed"
-                    clazz.attributes += a
-
-                    addAttribute(a)
-                }
-                addItem(MaterialIcon.ADD, "Add method") {
-                    val m = Method()
-                    m.name = "unnamed"
-                    clazz.methods += m
-
-                    addMethod(m)
-                }
-                addItem(MaterialIcon.DELETE, "Delete") {
-                    parent.removeClass(clazz)
-                }
-            }.open(it.point())
-        }
-
-        sidebar.setup(view, header) {
-            title("Class")
-            input("Name").bind(nameProperty)
-        }
     }
 }
