@@ -4,6 +4,8 @@ import io.framed.JsPlumb
 import io.framed.JsPlumbInstance
 import io.framed.picto.*
 import io.framed.render.Renderer
+import io.framed.util.Dimension
+import io.framed.util.Point
 import io.framed.util.point
 import io.framed.view.*
 
@@ -32,12 +34,35 @@ class HtmlRenderer(
     private val selectedViews: List<View<*>>
         get() = draggableViews.filter { it.selectedView }
 
+    var navigationView = NavigationView()
+
+    private fun updateViewBox() {
+        val box = navigationView.viewBox
+        viewModel.container.left = box.left
+        viewModel.container.top = box.top
+        viewModel.container.width = box.width
+        viewModel.container.height = box.height
+    }
+
+    private fun loadViewBox() {
+        val left = viewModel.container.left
+        val top = viewModel.container.top
+        val width = viewModel.container.width
+        val height = viewModel.container.height
+
+        if (left != null && top != null) {
+            navigationView.viewBox = Dimension(left, top, width, height)
+        }
+    }
+
     private fun draw() {
         workspace.clear()
         draggableViews = emptyList()
 
-        val navigationView = NavigationView()
+        navigationView = NavigationView()
         workspace += navigationView
+
+        loadViewBox()
 
         navigationView.onSelect { dimension ->
             if (dimension == null) {
@@ -51,12 +76,12 @@ class HtmlRenderer(
 
         if (viewModel.container.hasContext) {
             navigationView.onContext {
-                viewModel.container.onContext.fire(it.point())
+                viewModel.container.onContext.fire(ContextEvent(it.point(), viewModel.container))
             }
         }
         if (viewModel.container.hasSidebar) {
             navigationView.onMouseDown {
-                viewModel.container.onSidebar.fire(Unit)
+                viewModel.container.onSidebar.fire(SidebarEvent(viewModel.container))
             }
         }
 
@@ -68,6 +93,10 @@ class HtmlRenderer(
         navigationView.onZoom { zoom ->
             jsPlumbInstance.setZoom(zoom)
             draggableViews.forEach { it.dragZoom = zoom }
+            updateViewBox()
+        }
+        navigationView.onPan {
+            updateViewBox()
         }
 
         viewModel.container.shapes.forEach {
@@ -80,7 +109,7 @@ class HtmlRenderer(
         viewModel.onRelationAdd {
             drawRelation(it, jsPlumbInstance)
         }
-        viewModel.onRelationRemove { r->
+        viewModel.onRelationRemove { r ->
             relations[r]?.let { relation ->
                 relations -= r
                 relation.remove()
@@ -139,14 +168,14 @@ class HtmlRenderer(
             view.onContext {
                 it.stopPropagation()
                 it.preventDefault()
-                shape.onContext.fire(it.point())
+                shape.onContext.fire(ContextEvent(it.point(), shape))
             }
         }
         if (shape.hasSidebar) {
             view.onMouseDown {
                 if (!it.defaultPrevented) {
                     it.preventDefault()
-                    shape.onSidebar.fire(Unit)
+                    shape.onSidebar.fire(SidebarEvent(shape))
                 }
             }
             view.onClick { it.stopPropagation() }
@@ -184,6 +213,9 @@ class HtmlRenderer(
                     }
                 }
                 jsPlumbInstance.revalidate(view.html)
+
+                shape.left = event.newPosition.x
+                shape.top = event.newPosition.y
             }
             draggableViews += view
         } else {
@@ -218,5 +250,13 @@ class HtmlRenderer(
 
             parent.append(view)
         }
+    }
+
+    override fun zoomTo(zoom: Double) {
+        navigationView.zoomTo(zoom)
+    }
+
+    override fun panTo(point: Point) {
+        navigationView.panTo(point)
     }
 }

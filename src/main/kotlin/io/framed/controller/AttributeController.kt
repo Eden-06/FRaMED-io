@@ -1,6 +1,8 @@
 package io.framed.controller
 
 import io.framed.model.Attribute
+import io.framed.picto.ContextEvent
+import io.framed.picto.SidebarEvent
 import io.framed.picto.TextShape
 import io.framed.picto.textShape
 import io.framed.util.Point
@@ -84,7 +86,7 @@ class AttributeController(
         input("Type", typeProperty)
     }
 
-    override fun createContextMenu(position: Point): ContextMenu? = contextMenu {
+    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
         title = "Attribute: " + attribute.name
         addItem(MaterialIcon.DELETE, "Delete") {
             parent.removeAttribute(attribute)

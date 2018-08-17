@@ -124,7 +124,7 @@ class ContainerController(
         return controller
     }
 
-    private fun removeRelation(relation: Relation) {
+    fun removeRelation(relation: Relation) {
         relationMap[relation]?.let { controller ->
             viewModel -= controller.picto
 
@@ -135,35 +135,46 @@ class ContainerController(
         showSidebar()
     }
 
+    var sidebarButtonAutoLayout = Button()
+    var sidebarButtonResetZoom = Button()
+    var sidebarButtonResetPan = Button()
+
     override fun createSidebar(sidebar: Sidebar) = sidebar.setup() {
         title("Container")
         input("Name", nameProperty)
-        button("Auto layout") {
+        sidebarButtonAutoLayout = button("Auto layout") {
             //autoLayout()
         }
-        button("Reset zoom") {
-            //navigationView.zoomTo(1.0)
+        sidebarButtonResetZoom = button("Reset zoom") {
+            application.renderer.zoomTo(1.0)
         }
-        button("Reset pan") {
-            //navigationView.panTo(Point.ZERO)
+        sidebarButtonResetPan = button("Reset pan") {
+            application.renderer.panTo(Point.ZERO)
         }
     }
 
-    override fun createContextMenu(position: Point): ContextMenu? = contextMenu {
+    override fun prepareSidebar(sidebar: Sidebar, event: SidebarEvent) {
+        val h = event.target != picto
+        sidebarButtonAutoLayout.visible = h
+        sidebarButtonResetZoom.visible = h
+        sidebarButtonResetPan.visible = h
+    }
+
+    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
         title = "Package: $name"
-        /*
-        if (open) {
+
+        if (event.target == picto) {
+
             addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
-                application?.controller = this@ContainerController
+                application.controller = this@ContainerController
             }
         } else {
             parent?.let {
                 addItem(MaterialIcon.ARROW_BACK, "Step out") {
-                    application?.controller = it
+                    application.controller = it
                 }
             }
         }
-        */
 
         addItem(MaterialIcon.ADD, "Add class") {
             val c = Class()
@@ -171,7 +182,7 @@ class ContainerController(
 
             container.classes += c
 
-            addClass(c, position)
+            addClass(c, event.position)
         }
         addItem(MaterialIcon.ADD, "Add package") {
             val c = Container()
@@ -179,7 +190,7 @@ class ContainerController(
 
             container.containers += c
 
-            addContainer(c, position)
+            addContainer(c, event.position)
         }
         parent?.let {
             addItem(MaterialIcon.DELETE, "Delete") {

@@ -4,7 +4,6 @@ import io.framed.model.Attribute
 import io.framed.model.Class
 import io.framed.model.Method
 import io.framed.picto.*
-import io.framed.util.Point
 import io.framed.util.property
 import io.framed.view.ContextMenu
 import io.framed.view.MaterialIcon
@@ -87,7 +86,7 @@ class ClassController(
         input("Name", nameProperty)
     }
 
-    override fun createContextMenu(position: Point): ContextMenu? = contextMenu {
+    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
         title = "Class: $name"
         addItem(MaterialIcon.ADD, "Add attribute") {
             val a = Attribute()

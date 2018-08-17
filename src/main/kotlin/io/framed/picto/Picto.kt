@@ -17,6 +17,6 @@ abstract class Picto {
     var hasSidebar: Boolean = false
     var hasContext: Boolean = false
 
-    val onSidebar = EventHandler<Unit>()
-    val onContext = EventHandler<Point>()
+    val onSidebar = EventHandler<SidebarEvent>()
+    val onContext = EventHandler<ContextEvent>()
 }

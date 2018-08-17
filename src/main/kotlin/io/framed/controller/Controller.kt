@@ -1,15 +1,15 @@
 package io.framed.controller
 
+import io.framed.picto.ContextEvent
 import io.framed.picto.Picto
-import io.framed.picto.Shape
-import io.framed.util.Point
+import io.framed.picto.SidebarEvent
 import io.framed.view.ContextMenu
 import io.framed.view.Sidebar
 
 /**
  * @author lars
  */
-abstract class Controller<T:Picto>(
+abstract class Controller<T : Picto>(
         open val parent: Controller<*>?
 ) {
     abstract val picto: T
@@ -19,18 +19,21 @@ abstract class Controller<T:Picto>(
 
     protected open fun createSidebar(sidebar: Sidebar) {}
 
-    protected open fun createContextMenu(position: Point): ContextMenu? = null
+    protected open fun createContextMenu(event: ContextEvent): ContextMenu? = null
 
-    fun showSidebar() {
+    protected open fun prepareSidebar(sidebar: Sidebar, event: SidebarEvent) {}
+
+    fun showSidebar(event: SidebarEvent = SidebarEvent.NONE) {
+        prepareSidebar(sidebar, event)
         sidebar.display()
     }
 
     fun initPicto(picto: Picto) {
         picto.onSidebar {
-            showSidebar()
+            showSidebar(it)
         }
         picto.onContext {
-            createContextMenu(it)?.open(it)
+            createContextMenu(it)?.open(it.position)
         }
     }
 }

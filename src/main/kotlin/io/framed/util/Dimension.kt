@@ -13,6 +13,14 @@ data class Dimension(
         val height: Double? = null
 ) {
 
+    constructor(position: Point, size: Point? = null) : this(position.x, position.y, size?.x, size?.y)
+
+    val position: Point
+        get() = Point(left, top)
+
+    val size: Point?
+        get() = if (width != null && height != null) Point(width, height) else null
+
     val widthNotNull: Double
         get() = width ?: 0.0
     val heightNotNull: Double

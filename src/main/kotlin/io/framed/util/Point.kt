@@ -1,6 +1,8 @@
 package io.framed.util
 
 import org.w3c.dom.events.MouseEvent
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * @author lars
@@ -28,6 +30,9 @@ data class Point(
     operator fun div(point: Point) = Point(x / point.x, y / point.y)
 
     operator fun unaryMinus(): Point = Point(-x, -y)
+
+    fun min(): Double = min(x, y)
+    fun max(): Double = max(x, y)
 
     companion object {
         val ZERO = Point(0.0, 0.0)

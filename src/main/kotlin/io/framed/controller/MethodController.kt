@@ -3,6 +3,7 @@ package io.framed.controller
 import io.framed.model.Method
 import io.framed.model.Parameter
 import io.framed.model.param
+import io.framed.picto.ContextEvent
 import io.framed.picto.TextShape
 import io.framed.picto.textShape
 import io.framed.util.Point
@@ -138,7 +139,7 @@ class MethodController(
         hasContext = true
     }.also(this::initPicto)
 
-    override fun createContextMenu(position: Point): ContextMenu? = contextMenu {
+    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
         title = "Method: " + method.name
         addItem(MaterialIcon.DELETE, "Delete") {
             parent.removeMethod(method)

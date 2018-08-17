@@ -5,8 +5,10 @@ import io.framed.JsPlumbInstance
 import io.framed.jsPlumbConnect
 import io.framed.jsPlumbPaintStyle
 import io.framed.model.RelationType
+import io.framed.picto.ContextEvent
 import io.framed.picto.Relation
 import io.framed.picto.Shape
+import io.framed.picto.SidebarEvent
 import io.framed.util.point
 import io.framed.view.InputView
 import io.framed.view.View
@@ -173,7 +175,7 @@ class HtmlRelation(
             if (relation.hasSidebar) {
                 c.bind("click") { _, event ->
                     event.stopPropagation()
-                    relation.onSidebar.fire(Unit)
+                    relation.onSidebar.fire(SidebarEvent(relation))
                 }
             }
 
@@ -182,7 +184,7 @@ class HtmlRelation(
                     (event as? MouseEvent)?.let { e ->
                         e.stopPropagation()
                         e.preventDefault()
-                        relation.onContext.fire(e.point())
+                        relation.onContext.fire(ContextEvent(e.point(), relation))
                     }
                 }
             }

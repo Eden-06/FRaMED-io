@@ -215,18 +215,20 @@ abstract class View<V : HTMLElement>(view: V) {
     val onDrag = EventHandler<DragEvent>()
 
     fun performDrag(dragEvent: DragEvent) {
-        when (draggable) {
+        val newPosition = when (draggable) {
             View.DragType.NONE -> throw IllegalStateException()
             View.DragType.ABSOLUTE -> {
                 left += dragEvent.delta.x
                 top += dragEvent.delta.y
+                Point(left, top)
             }
             View.DragType.MARGIN -> {
                 marginLeft += dragEvent.delta.x
                 marginTop += dragEvent.delta.y
+                Point(marginLeft, marginTop)
             }
         }
-        onDrag.fire(dragEvent)
+        onDrag.fire(dragEvent.copy(newPosition = newPosition))
     }
 
     var dragZoom = 1.0
@@ -330,7 +332,8 @@ abstract class View<V : HTMLElement>(view: V) {
 
     data class DragEvent(
             val delta: Point,
-            val direct: Boolean
+            val direct: Boolean,
+            val newPosition: Point = Point.ZERO
     ) {
         val indirect: DragEvent
             get() = copy(direct = false)

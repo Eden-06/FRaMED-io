@@ -3,11 +3,15 @@ package io.framed.controller
 import io.framed.model.Relation
 import io.framed.model.RelationMultiplicity
 import io.framed.model.RelationType
+import io.framed.picto.ContextEvent
 import io.framed.picto.relation
 import io.framed.picto.textShape
 import io.framed.util.Validator
 import io.framed.util.property
+import io.framed.view.ContextMenu
+import io.framed.view.MaterialIcon
 import io.framed.view.Sidebar
+import io.framed.view.contextMenu
 
 /**
  * @author lars
@@ -62,8 +66,13 @@ class RelationController(
             val h = source
             source = target
             target = h
+        }
+    }
 
-
+    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
+        title = "Relation"
+        addItem(MaterialIcon.DELETE, "Delete") {
+            parent.removeRelation(relation)
         }
     }
 }
