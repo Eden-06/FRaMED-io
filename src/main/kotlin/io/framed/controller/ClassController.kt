@@ -37,7 +37,7 @@ class ClassController(
         style {
             background = linearGradient("to bottom") {
                 add(color("#fffbd9"), 0.0)
-                add(color("#fff7c4"), 2.0)
+                add(color("#fff7c4"), 1.0)
             }
             border = border {
                 style = Border.BorderStyle.SOLID

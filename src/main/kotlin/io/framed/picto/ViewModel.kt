@@ -20,6 +20,8 @@ class ViewModel(
     val onRelationAdd = EventHandler<Relation>()
     val onRelationRemove = EventHandler<Relation>()
 
+    val onRelationDraw = EventHandler<Pair<Shape, Shape>>()
+
     operator fun plusAssign(relation: Relation) {
         relations += relation
         onRelationAdd.fire(relation)

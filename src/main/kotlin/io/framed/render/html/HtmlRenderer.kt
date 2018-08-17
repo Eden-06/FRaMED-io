@@ -89,6 +89,14 @@ class HtmlRenderer(
             setContainer(navigationView.container.html)
 
             setZoom(1.0)
+            bind("create") { info: dynamic ->
+                val source = getShapeById(info.source)
+                val target = getShapeById(info.target)
+
+                if (source != null && target != null) {
+                    viewModel.onRelationDraw.fire(source to target)
+                }
+            }
         }
         navigationView.onZoom { zoom ->
             jsPlumbInstance.setZoom(zoom)
@@ -118,6 +126,10 @@ class HtmlRenderer(
     }
 
     operator fun get(shape: Shape): View<*> = shapeMap[shape] ?: throw IllegalArgumentException()
+
+    fun getShapeById(id: String): Shape? = shapeMap.entries.find { (_, view) ->
+        view.id == id
+    }?.key
 
     private var shapeMap: Map<Shape, View<*>> = emptyMap()
 

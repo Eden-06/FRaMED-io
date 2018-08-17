@@ -35,7 +35,7 @@ class ContainerController(
         style {
             background = linearGradient("to bottom") {
                 add(color("#fffbd9"), 0.0)
-                add(color("#fff7c4"), 2.0)
+                add(color("#fff7c4"), 1.0)
             }
             border = border {
                 style = Border.BorderStyle.SOLID
@@ -206,5 +206,21 @@ class ContainerController(
         container.containers.forEach { addContainer(it) }
 
         container.relations.forEach { addRelation(it) }
+
+        viewModel.onRelationDraw { (sourceShape, targetShape) ->
+            val source = classMap.entries.find { (_, pair) ->
+                pair.first.picto == sourceShape
+            }?.key
+            val target = classMap.entries.find { (_, pair) ->
+                pair.first.picto == targetShape
+            }?.key
+
+            if (source != null && target != null) {
+                val relation = Relation(source, target)
+                container.relations += relation
+
+                addRelation(relation)
+            }
+        }
     }
 }
