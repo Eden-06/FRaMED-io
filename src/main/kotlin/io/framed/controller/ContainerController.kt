@@ -1,6 +1,9 @@
 package io.framed.controller
 
 import io.framed.JsPlumb
+import io.framed.jsPlumbDragOptionsInit
+import io.framed.jsPlumbDropOptionsInit
+import io.framed.jsPlumbEndpointOptions
 import io.framed.model.Class
 import io.framed.model.Container
 import io.framed.model.Model
@@ -10,6 +13,7 @@ import io.framed.util.Property
 import io.framed.util.async
 import io.framed.util.point
 import io.framed.view.*
+import org.w3c.dom.Element
 
 /**
  * @author lars
@@ -83,7 +87,19 @@ class ContainerController(
 
     fun getControllerById(id: String): Controller? =
             (classMap.values.map { it.first } + containerMap.values.map { it.first }).find { it.view.id == id }
-    
+
+    fun getClassById(id: String): Class? {
+        val controller = getControllerById(id)
+        if(controller != null){
+            classMap.entries.forEach {
+                if(it.value.first.equals(controller)){
+                    return it.key
+                }
+            }
+        }
+        return null;
+    }
+
     val jsPlumbInstance = JsPlumb.getInstance().apply {
         setContainer(navigationView.container.html)
 
@@ -91,6 +107,14 @@ class ContainerController(
             setZoom(it)
         }
         setZoom(1.0)
+        bind("beforeDrop", {
+            val sourceClass = getClassById(it.sourceId)
+            val targetClass = getClassById(it.targetId)
+            if(sourceClass is Class && targetClass is Class) {
+                val newRelation = Relation(sourceClass, targetClass)
+                val c = addRelation(newRelation)
+            }
+        })
     }
 
     private var classMap: Map<Class, Pair<ClassController, InputView>> = emptyMap()
@@ -121,7 +145,23 @@ class ContainerController(
                 s.forEach { it.performDrag(event.indirect) }
             }
         }
+        jsPlumbInstance.addEndpoint(c.view.html, jsPlumbEndpointOptions {
+            anchors = arrayOf("Bottom", "Left", "Top", "Right")
+            isSource = true
+            isTarget = true
 
+            dropOptions = jsPlumbDropOptionsInit {
+                drop = {
+                    // NOT WORKING
+                }
+            }
+
+            dragOptions = jsPlumbDragOptionsInit() {
+                drag = { e, ui ->
+                    // WORKING
+                }
+            }
+        })
         // As content view
         val input = InputView().also {
             contentList += it
@@ -272,6 +312,9 @@ class ContainerController(
         navigationView.onZoom {
             Root.innerZoom = it
         }
+
+        //console.log(JsPlumb.bind("beforeDrop"))
+
         Root.innerZoom = 1.0
 
         // As root view

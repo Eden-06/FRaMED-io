@@ -33,6 +33,11 @@ external class JsPlumb {
  */
 external interface JsPlumbInstance {
     /**
+     * Bind an event on the instance.
+     */
+    fun bind(event: String, function: (JsPlumbDropInfoInit) -> Unit): JsPlumbDropInfoInit
+
+    /**
      * Set the container for drawing.
      *
      * @param element Container for drawing.
@@ -80,6 +85,13 @@ external interface JsPlumbInstance {
      * Redraw all connections.
      */
     fun repaintEverything()
+
+    /**
+     *
+     */
+    fun addEndpoint(target: HTMLElement, options: JsPlumbEndpointOptionsInit)
+
+
 }
 
 /**
@@ -177,4 +189,60 @@ external interface JsPlumbConnection {
     val canvas: SVGSVGElement
 
     fun bind(event: String, listener: (JsPlumbConnection, Event) -> Unit)
+}
+/**
+ *
+ */
+external interface JsPlumbDropInfoInit {
+    var sourceId: String
+    var targetId: String
+    var connection: JsPlumbConnection
+}
+
+/**
+ *
+ */
+external interface JsPlumbEndpointOptionsInit {
+    var isSource: Boolean
+    var isTarget: Boolean
+    var anchors: Array<String>
+    var dropOptions: JsPlumbDropOptionsInit
+    var dragOptions: JsPlumbDragOptionsInit
+}
+/**
+ *
+ */
+fun jsPlumbEndpointOptions(init: JsPlumbEndpointOptionsInit.() -> Unit = {}): JsPlumbEndpointOptionsInit {
+    val h = js("{}")
+    init(h)
+    return h
+}
+/**
+ *
+ */
+fun jsPlumbDropOptionsInit(init: JsPlumbDropOptionsInit.() -> Unit = {}):JsPlumbDropOptionsInit {
+    val h = js("{}")
+    init(h)
+    return h
+}
+
+/**
+ *
+ */
+fun jsPlumbDragOptionsInit(init: JsPlumbDragOptionsInit.() -> Unit = {}):JsPlumbDragOptionsInit {
+    val h = js("{}")
+    init(h)
+    return h
+}
+/**
+ *
+ */
+external interface JsPlumbDropOptionsInit {
+    var drop: () -> Unit
+}
+/**
+ *
+ */
+external interface JsPlumbDragOptionsInit {
+    var drag: (dynamic, dynamic) -> Unit
 }
