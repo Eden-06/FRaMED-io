@@ -206,6 +206,7 @@ external interface JsPlumbEndpointOptionsInit {
     var isSource: Boolean
     var isTarget: Boolean
     var anchors: Array<String>
+    var endpoint: String
     var dropOptions: JsPlumbDropOptionsInit
     var dragOptions: JsPlumbDragOptionsInit
 }

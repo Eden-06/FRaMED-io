@@ -113,6 +113,7 @@ class ContainerController(
             if(sourceClass is Class && targetClass is Class) {
                 val newRelation = Relation(sourceClass, targetClass)
                 val c = addRelation(newRelation)
+                this.deleteConnection(it.connection)
             }
         })
     }
@@ -146,9 +147,10 @@ class ContainerController(
             }
         }
         jsPlumbInstance.addEndpoint(c.view.html, jsPlumbEndpointOptions {
-            anchors = arrayOf("Bottom", "Left", "Top", "Right")
+            anchors = arrayOf("Bottom")
             isSource = true
             isTarget = true
+            endpoint = "Dot"
 
             dropOptions = jsPlumbDropOptionsInit {
                 drop = {
