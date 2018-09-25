@@ -7,5 +7,4 @@ import kotlin.browser.document
  * @author lars
  */
 object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
-    var innerZoom = 1.0
 }

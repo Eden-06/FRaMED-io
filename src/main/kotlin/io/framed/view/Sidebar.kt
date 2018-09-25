@@ -1,13 +1,14 @@
 package io.framed.view
 
+import io.framed.util.Property
 import org.w3c.dom.HTMLDivElement
 
 /**
  * @author lars
  */
-class Sidebar() : ViewCollection<View<*>, HTMLDivElement>("div") {
-
-    var application: Application? = null
+class Sidebar(
+        val application: Application
+) : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     fun setup(vararg initiator: View<*>, init: Sidebar.() -> Unit) {
         clear()
@@ -27,16 +28,15 @@ class Sidebar() : ViewCollection<View<*>, HTMLDivElement>("div") {
     }
 
     fun display() {
-        application?.let { a ->
+        application.let { a ->
             a.propertyBar.clear()
             a.propertyBar += this
         }
     }
 
-    fun input(label: String, default: String = "", onchange: (String) -> Unit = {}): InputView {
-        val i = InputView()
-        i.value = default
-        i.onChange(onchange)
+    fun input(label: String, property: Property<String>, autocomplete: List<String> = emptyList()): InputView {
+        val i = InputView(property)
+        i.autocomplete = autocomplete
 
         append(ListView().also {
             it += TextView(label)

@@ -22,10 +22,6 @@ class Method:Model {
      */
     var parameters: List<Parameter> = emptyList()
 
-    override fun toString(): String =
-            "$name(" + parameters.joinToString(", ") { it.toString() } + ")" + type.let {
-                if (type.isBlank()) "" else ": $it"
-            }.trim()
 }
 
 /**

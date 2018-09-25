@@ -1,6 +1,5 @@
 package io.framed.view
 
-import org.w3c.dom.HTMLTableCellElement
 import org.w3c.dom.HTMLTableRowElement
 
 /**

@@ -2,7 +2,6 @@ package io.framed
 
 import io.framed.controller.ContainerController
 import io.framed.model.*
-import io.framed.util.async
 import io.framed.view.Application
 import io.framed.view.Root
 import kotlin.browser.window
@@ -53,20 +52,15 @@ fun init() {
             relation(book, shelf)
         }
         relation(bank, account, "customers") {
-            type = Relation.Type.AGGREGATION
-            sourceCardinality = "1..*"
-            targetCardinality = "5"
+            type = RelationType.AGGREGATION
+            sourceCardinality = RelationMultiplicity.ONCE_TO_MANY.value
+            targetCardinality = RelationMultiplicity.ONCE.value
         }
     }
 
-    val controller = ContainerController(container)
+    val controller = ContainerController(container, app)
 
     Root += app
 
     app.controller = controller
-
-    // Wait for the sizes to be calculated and perform simple auto layouting
-    async {
-        controller.autoLayout()
-    }
 }

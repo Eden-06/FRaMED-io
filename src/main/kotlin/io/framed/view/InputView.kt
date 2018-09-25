@@ -1,85 +1,151 @@
 package io.framed.view
 
-import io.framed.util.EventHandler
 import io.framed.util.Property
-import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.events.Event
-import org.w3c.dom.events.EventListener
-import org.w3c.dom.events.FocusEvent
-import org.w3c.dom.events.KeyboardEvent
+import io.framed.util.property
+import org.w3c.dom.HTMLDivElement
 
 /**
  * Represents html input element.
  *
  * @author lars
  */
-class InputView : View<HTMLInputElement>("input") {
+class InputView() : View<HTMLDivElement>("div") {
+
+    constructor(property: Property<String>) : this() {
+        bind(property)
+    }
+
+    private val input = RawInputView().also {
+        html.appendChild(it.html)
+    }
+
+    private val valueProperty = property(input::value)
 
     /**
      * Inputs value.
      */
-    var value: String
-        get() = html.value
-        set(value) {
-            html.value = value
-        }
+    var value by valueProperty
 
     /**
      * Set input to readonly.
      */
-    var readOnly: Boolean by AttributeDelegate(Boolean::class, false)
+    var readOnly by property(input::readOnly)
 
     /**
      * Fires on every user change to the content
      */
-    val onChange = EventHandler<String>()
+    val onChange = input.onChange
 
     /**
      * Fires on focus leave.
      */
-    val onFocusLeave = EventHandler<FocusEvent>()
+    val onFocusLeave = input.onFocusLeave
 
     /**
      * Fires on focus gain.
      */
-    val onFocusEnter = EventHandler<FocusEvent>()
+    val onFocusEnter = input.onFocusEnter
 
-    var invalid by ClassDelegate()
+    var invalid by property(input::invalid)
 
-    fun bind(property: Property<String>) {
-        value = property.get()
-        onChange {
-            property.set(it)
-        }
-        onFocusLeave {
-            property.set(value.trim())
-        }
+    private var autocompleteListView: ListView = ListView().also {
+        html.appendChild(it.html)
+        it.classes += "autocomplete"
+        it.visible = false
+    }
+    private var autocompleteMap: List<Pair<String, TextView>> = emptyList()
+    val autocompleteVisible: List<TextView>
+        get() = autocompleteMap.map { it.second }.filter { it.visible }
 
-        property.onChange {
-            if (value != it) {
-                value = it
+    var autocomplete: List<String> = emptyList()
+        set(value) {
+            autocompleteListView.clear()
+
+            value.forEach { txt ->
+                val textView = TextView(txt)
+                textView.onMouseDown { _ ->
+                    this.value = txt
+                }
+
+                autocompleteMap += txt to textView
+                autocompleteListView.append(textView)
             }
+            field = value
+
+            updateAutocomplete()
+        }
+
+
+    fun bind(property: Property<String>) = input.bind(property)
+
+    private fun updateAutocomplete() {
+        autocompleteMap.forEach { (auto, view) ->
+            view.selectedView = false
+            view.visible = auto.contains(value, ignoreCase = true)
         }
     }
 
-    init {
-        val changeListener = object : EventListener {
-            override fun handleEvent(event: Event) {
-                onChange.fire(value)
+    override fun focus() = input.focus()
+    override fun blur() = input.blur()
 
-                (event as? KeyboardEvent)?.let { e ->
-                    when (e.keyCode) {
-                        13, 27 -> blur()
+    init {
+        updateAutocomplete()
+        valueProperty.onChange {
+            updateAutocomplete()
+        }
+        onChange {
+            updateAutocomplete()
+        }
+
+        onFocusEnter {
+            if (autocomplete.isNotEmpty()) {
+                autocompleteListView.visible = true
+            }
+        }
+        onFocusLeave { _ ->
+            autocompleteListView.visible = false
+            autocompleteMap.forEach { it.second.selectedView = false }
+        }
+
+        onKeyPress { event ->
+            val list = autocompleteVisible
+            val index = list.indexOfFirst { it.selectedView }
+            if (list.isNotEmpty()) {
+                when (event.keyCode) {
+                    38 -> { // key up
+                        if (index != -1) {
+                            list[index].selectedView = false
+                        }
+                        if (index > 0) {
+                            list[index - 1].selectedView = true
+                        } else {
+                            list[list.lastIndex].selectedView = true
+                        }
+                    }
+                    40 -> { // key down
+                        if (index != -1) {
+                            list[index].selectedView = false
+                        }
+                        if (index < list.lastIndex) {
+                            list[index + 1].selectedView = true
+                        } else {
+                            list[0].selectedView = true
+                        }
+                    }
+                    13 -> { // submit
+                        if (index != -1) {
+                            list[index].onMouseDown.fire(js("{}"))
+                        }
+                    }
+                    27 -> { // exit
+                        if (index != -1) {
+                            list[index].selectedView = false
+                        }
+                        autocompleteListView.visible = false
                     }
                 }
             }
         }
-
-        html.addEventListener("onchange", changeListener)
-        html.addEventListener("keyup", changeListener)
-
-        html.addEventListener("focus", onFocusEnter.eventListener)
-        html.addEventListener("blur", onFocusLeave.eventListener)
     }
 }
 

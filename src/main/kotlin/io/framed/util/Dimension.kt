@@ -9,32 +9,58 @@ import kotlin.math.min
 data class Dimension(
         val left: Double,
         val top: Double,
-        val width: Double,
-        val height: Double
+        val width: Double? = null,
+        val height: Double? = null
 ) {
+
+    constructor(position: Point, size: Point? = null) : this(position.x, position.y, size?.x, size?.y)
+
+    val position: Point
+        get() = Point(left, top)
+
+    val size: Point?
+        get() = if (width != null && height != null) Point(width, height) else null
+
+    val widthNotNull: Double
+        get() = width ?: 0.0
+    val heightNotNull: Double
+        get() = height ?: 0.0
+
+    val right: Double
+        get() = left + widthNotNull
+
+    val bottom: Double
+        get() = top + heightNotNull
 
     val edges: Set<Point>
         get() = setOf(
                 Point(left, top),
-                Point(left + width, top),
-                Point(left, top + height),
-                Point(left + width, top + height)
+                Point(right, top),
+                Point(left, bottom),
+                Point(right, bottom)
         )
 
     val normalized: Dimension
         get() {
-            val l = min(left, left + width)
-            val t = min(top, top + height)
-            return Dimension(l, t, abs(width), abs(height))
+            val l = min(left, right)
+            val t = min(top, bottom)
+            return Dimension(l, t, abs(widthNotNull), abs(heightNotNull))
         }
 
+    /*
     operator fun contains(other: Dimension): Boolean =
             other.edges.any { contains(it) }
+            */
+
+    operator fun contains(other: Dimension): Boolean = !(other.left > right ||
+            other.right < left ||
+            other.top > bottom ||
+            other.bottom < top)
 
 
     operator fun contains(other: Point): Boolean {
         val n = normalized
-        return (n.left <= other.x && (n.left + width) >= other.x)
-                && (n.top <= other.y && (n.top + height) >= other.y)
+        return (n.left <= other.x && (n.left + widthNotNull) >= other.x)
+                && (n.top <= other.y && (n.top + heightNotNull) >= other.y)
     }
 }

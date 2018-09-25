@@ -55,15 +55,34 @@ class NavigationView : View<HTMLDivElement>("div") {
         set(value) {
             val old = field
             field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, value))
-            if (field != old) {
-                onZoom.fire(field)
-            }
         }
 
     /**
      * Listener for zoom changes.
      */
     val onZoom = EventHandler<Double>()
+    val onPan = EventHandler<Point>()
+
+    var viewBox: Dimension
+        get() {
+            val client = Point(clientWidth, clientHeight)
+
+            val size = client / zoom
+            val p = pan - (client / 2.0 - (size / 2.0))
+
+            return Dimension(p, size)
+        }
+        set(value) {
+            val client = Point(clientWidth, clientHeight)
+
+            val size = value.size ?: client
+            val p = value.position
+
+            zoom = (client / size).min()
+            pan = p + (client / 2.0 - (size / 2.0))
+
+            updateTransform()
+        }
 
     /**
      * Zoom by a relative zoom step.
@@ -88,6 +107,9 @@ class NavigationView : View<HTMLDivElement>("div") {
 
         pan -= (Point(clientWidth, clientHeight) * (-center + 0.5) * (1 / new - 1 / old))
 
+        if (old != new) {
+            onZoom.fire(new)
+        }
         updateTransform()
     }
 
@@ -111,6 +133,7 @@ class NavigationView : View<HTMLDivElement>("div") {
      */
     fun panTo(coordinate: Point) {
         pan = coordinate
+        onPan.fire(coordinate)
         updateTransform()
     }
 

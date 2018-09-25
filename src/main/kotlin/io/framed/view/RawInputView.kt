@@ -2,39 +2,33 @@ package io.framed.view
 
 import io.framed.util.EventHandler
 import io.framed.util.Property
-import org.w3c.dom.HTMLSpanElement
+import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.FocusEvent
 import org.w3c.dom.events.KeyboardEvent
 
 /**
- * Represents a html span element.
+ * Represents html input element.
  *
  * @author lars
  */
-class TextView(
-        value: String = ""
-) : View<HTMLSpanElement>("span") {
+class RawInputView() : View<HTMLInputElement>("input") {
 
     /**
-     * Text to display.
+     * Inputs value.
      */
-    var text: String
-        get() = html.textContent ?: ""
+    var value: String
+        get() = html.value
         set(value) {
-            html.textContent = value
+            html.value = value
+            lastValue = value
         }
 
     /**
-     * Sets the content to editable.
+     * Set input to readonly.
      */
-    var contentEditable: Boolean by AttributeDelegate(Boolean::class, false)
-
-    /**
-     * If the content is editable, prevents the insertion of line breaks.
-     */
-    var singleLine: Boolean by ClassDelegate()
+    var readOnly: Boolean by AttributeDelegate(Boolean::class, false)
 
     /**
      * Fires on every user change to the content
@@ -51,30 +45,36 @@ class TextView(
      */
     val onFocusEnter = EventHandler<FocusEvent>()
 
+    var invalid by ClassDelegate()
 
     fun bind(property: Property<String>) {
-        text = property.get()
+        var hasFocus = false
+        value = property.get()
         onChange {
+            hasFocus = true
             property.set(it)
         }
         onFocusLeave {
-            property.set(text.trim())
+            hasFocus = false
+            property.set(value.trim())
         }
 
         property.onChange {
-            val new = property.get()
-            if (text != new) {
-                text = new
+            if (!hasFocus) {
+                value =  property.get()
             }
         }
     }
 
-    init {
-        text = value
+    private var lastValue: String = value
 
+    init {
         val changeListener = object : EventListener {
             override fun handleEvent(event: Event) {
-                onChange.fire(text)
+                if (value != lastValue) {
+                    onChange.fire(value)
+                    lastValue = value
+                }
 
                 (event as? KeyboardEvent)?.let { e ->
                     when (e.keyCode) {
@@ -83,22 +83,11 @@ class TextView(
                 }
             }
         }
+
         html.addEventListener("onchange", changeListener)
-        html.addEventListener("keypress", changeListener)
+        html.addEventListener("keyup", changeListener)
 
         html.addEventListener("focus", onFocusEnter.eventListener)
         html.addEventListener("blur", onFocusLeave.eventListener)
     }
-}
-
-fun ListView.textView(init: TextView.() -> Unit): TextView {
-    val view = TextView()
-    append(view)
-    init(view)
-    return view
-}
-
-fun ListView.textView(text: String, init: TextView.() -> Unit = {}) = textView {
-    this.text = text
-    init(this)
 }

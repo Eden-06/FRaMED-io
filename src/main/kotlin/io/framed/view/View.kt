@@ -183,14 +183,14 @@ abstract class View<V : HTMLElement>(view: V) {
     /**
      * Request focus to this view.
      */
-    fun focus() {
+    open fun focus() {
         html.focus()
     }
 
     /**
      * Revoke focus from this view.
      */
-    fun blur() {
+    open fun blur() {
         html.blur()
     }
 
@@ -215,19 +215,23 @@ abstract class View<V : HTMLElement>(view: V) {
     val onDrag = EventHandler<DragEvent>()
 
     fun performDrag(dragEvent: DragEvent) {
-        when (draggable) {
+        val newPosition = when (draggable) {
             View.DragType.NONE -> throw IllegalStateException()
             View.DragType.ABSOLUTE -> {
                 left += dragEvent.delta.x
                 top += dragEvent.delta.y
+                Point(left, top)
             }
             View.DragType.MARGIN -> {
                 marginLeft += dragEvent.delta.x
                 marginTop += dragEvent.delta.y
+                Point(marginLeft, marginTop)
             }
         }
-        onDrag.fire(dragEvent)
+        onDrag.fire(dragEvent.copy(newPosition = newPosition))
     }
+
+    var dragZoom = 1.0
 
     init {
         html.addEventListener("click", onClick.eventListener)
@@ -249,7 +253,7 @@ abstract class View<V : HTMLElement>(view: V) {
         var isCurrentlyDragging = false
         var lastDragPosition = Point.ZERO
         val dragMove = { event: MouseEvent ->
-            val delta = (event.point() - lastDragPosition) / Root.innerZoom
+            val delta = (event.point() - lastDragPosition) / dragZoom
             performDrag(DragEvent(delta, true))
             lastDragPosition = event.point()
         }
@@ -328,7 +332,8 @@ abstract class View<V : HTMLElement>(view: V) {
 
     data class DragEvent(
             val delta: Point,
-            val direct: Boolean
+            val direct: Boolean,
+            val newPosition: Point = Point.ZERO
     ) {
         val indirect: DragEvent
             get() = copy(direct = false)

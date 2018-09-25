@@ -37,6 +37,30 @@ input {
   }
 }
 
+.input-view {
+  position: relative;
+  .autocomplete {
+    background: $primary-background;
+    border: solid 1px $border-color;
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+    &:empty {
+      display: none;
+    }
+    .text-view {
+      display: block;
+      padding: 0.2rem 0.5rem;
+      &:hover {
+        background: rgba($text-color, 0.1);
+      }
+      &.selected-view {
+        background: rgba($toolbar-color, 0.1);
+      }
+    }
+  }
+}
+
 select {
   padding: 0.2rem;
   background: $primary-background;

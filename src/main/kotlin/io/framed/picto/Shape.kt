@@ -3,14 +3,17 @@ package io.framed.picto
 /**
  * @author lars
  */
-abstract class Shape {
-    var x: Double? = null
-    var y: Double? = null
+abstract class Shape : Picto() {
 
-    var width: Double? = null
-    var height: Double? = null
+    var left: Double? by layer
+    var top: Double? by layer
+    var width: Double? by layer
+    var height: Double? by layer
 
-    var border: Border = Border.NONE
+    var style: Style = Style()
+    var acceptRelation: Boolean = false;
 
-    var background: Color = Color.TRANSPARENT
+    fun style(init: Style.() -> Unit) {
+        init(style)
+    }
 }

@@ -1,273 +1,189 @@
 package io.framed.controller
 
-import io.framed.JsPlumb
-import io.framed.jsPlumbDragOptionsInit
-import io.framed.jsPlumbDropOptionsInit
-import io.framed.jsPlumbEndpointOptions
 import io.framed.model.Class
 import io.framed.model.Container
-import io.framed.model.Model
 import io.framed.model.Relation
+import io.framed.picto.*
+import io.framed.util.Dimension
 import io.framed.util.Point
-import io.framed.util.Property
-import io.framed.util.async
-import io.framed.util.point
+import io.framed.util.property
 import io.framed.view.*
-import org.w3c.dom.Element
 
 /**
  * @author lars
  */
 class ContainerController(
         val container: Container,
-        val parent: ContainerController? = null
-) : Controller {
+        val application: Application,
+        override val parent: ContainerController? = null
+) : Controller<BoxShape>(parent) {
 
-    val nameProperty = Property(container::name)
+    val nameProperty = property(container::name)
     var name by nameProperty
 
-    private var sidebars: List<Sidebar> = emptyList()
+    override fun internalCreateSidebar(): Sidebar = Sidebar(application)
 
-    fun createSidebar() = Sidebar().also {
-        it.application = application
-        sidebars += it
+    private val titleBox = boxShape {
+        textShape(nameProperty)
     }
+    private val contentBox = boxShape { }
 
-    override val sidebar = createSidebar()
+    override val picto = boxShape {
+        +titleBox
+        +contentBox
 
-    var application: Application? = null
-        set(value) {
-            field = value
-            childContainer.forEach {
-                it.application = value
+        style {
+            background = linearGradient("to bottom") {
+                add(color("#fffbd9"), 0.0)
+                add(color("#fff7c4"), 1.0)
             }
-
-            sidebars.forEach {
-                it.application = value
-            }
-
-            async {
-                jsPlumbInstance.repaintEverything()
+            border = border {
+                style = Border.BorderStyle.SOLID
+                width = 1.0
+                color = color(0, 0, 0, 0.3)
             }
         }
 
-    fun autoLayout() {
-        val padding = 20
-        views.values.fold(Point(padding, padding)) { acc, controller ->
-            controller.left = acc.x
-            controller.top = acc.y
-            acc + Point(controller.clientWidth + padding, 0)
-        }
+        hasSidebar = true
+        hasContext = true
+    }.also(this::initPicto)
 
-        async {
-            jsPlumbInstance.repaintEverything()
-        }
-    }
+    operator fun get(clazz: Class): Shape = classMap[clazz]?.first?.picto ?: throw IllegalArgumentException()
 
-    override val view: View<*>
-        get() = listView
+    val viewModel = ViewModel(boxShape {
+        hasSidebar = true
+        hasContext = true
+    }.also(this::initPicto)).apply { layer = Layer() }
 
-    val navigationView = NavigationView()
-    var touchpadControl: Boolean
-        get() = navigationView.touchpadControl
-        set(value) {
-            navigationView.touchpadControl = value
-        }
+    private var classMap: Map<Class, Pair<ClassController, TextShape>> = emptyMap()
 
-    private val listView = ListView()
-    private val titleList = ListView().also {
-        listView += it
-    }
-    private val contentList = ListView().also {
-        listView += it
-    }
-
-    var views: Map<Model, View<*>> = emptyMap()
-    var childContainer: List<ContainerController> = emptyList()
-
-    fun getControllerById(id: String): Controller? =
-            (classMap.values.map { it.first } + containerMap.values.map { it.first }).find { it.view.id == id }
-
-    fun getClassById(id: String): Class? {
-        val controller = getControllerById(id)
-        if(controller != null){
-            classMap.entries.forEach {
-                if(it.value.first.equals(controller)){
-                    return it.key
-                }
-            }
-        }
-        return null;
-    }
-
-    val jsPlumbInstance = JsPlumb.getInstance().apply {
-        setContainer(navigationView.container.html)
-
-        navigationView.onZoom {
-            setZoom(it)
-        }
-        setZoom(1.0)
-        bind("beforeDrop", {
-            val sourceClass = getClassById(it.sourceId)
-            val targetClass = getClassById(it.targetId)
-            if(sourceClass is Class && targetClass is Class) {
-                val newRelation = Relation(sourceClass, targetClass)
-                val c = addRelation(newRelation)
-                this.deleteConnection(it.connection)
-            }
-        })
-    }
-
-    private var classMap: Map<Class, Pair<ClassController, InputView>> = emptyMap()
     fun addClass(clazz: Class, position: Point = Point.ZERO): ClassController {
-        // As root view
-        val c = ClassController(clazz, this)
-        navigationView.container += c.view
-        views += clazz to c.view
+        // As normal view
+        val controller = ClassController(clazz, this)
+        viewModel.container += controller.picto
+        viewModel.layer[controller.picto] = Dimension(position.x, position.y)
 
-        c.view.left = position.x
-        c.view.top = position.y
+        // As list entry
+        val input = contentBox.textShape(controller.nameProperty)
 
-        c.view.onMouseDown {
-            select(c.view, it.ctrlKey)
-        }
-        c.view.onDblClick { _ ->
-            views.values.forEach { it.selectedView = false }
-            c.view.selectedView = true
-        }
-
-        c.view.draggable = View.DragType.ABSOLUTE
-        c.view.onDrag { event ->
-            jsPlumbInstance.revalidate(c.view.html)
-            navigationView.container.toForeground(c.view)
-
-            if (event.direct) {
-                val s = selectedViews() - c.view
-                s.forEach { it.performDrag(event.indirect) }
-            }
-        }
-        jsPlumbInstance.addEndpoint(c.view.html, jsPlumbEndpointOptions {
-            anchors = arrayOf("Bottom")
-            isSource = true
-            isTarget = true
-            endpoint = "Dot"
-
-            dropOptions = jsPlumbDropOptionsInit {
-                drop = {
-                    // NOT WORKING
-                }
-            }
-
-            dragOptions = jsPlumbDragOptionsInit() {
-                drag = { e, ui ->
-                    // WORKING
-                }
-            }
-        })
-        // As content view
-        val input = InputView().also {
-            contentList += it
-        }
-        input.bind(c.nameProperty)
-
-        classMap += clazz to (c to input)
-        return c
+        classMap += clazz to (controller to input)
+        return controller
     }
 
     fun removeClass(clazz: Class) {
-        classMap[clazz]?.let { (c, input) ->
-            navigationView.container -= c.view
-            contentList -= input
+        classMap[clazz]?.let { (controller, input) ->
+            // As normal view
+            viewModel.container -= controller.picto
+            viewModel.layer[controller.picto] = null
+
+            // As list entry
+            contentBox -= input
+
+            classMap -= clazz
             container.classes -= clazz
         }
 
-        container.relations.filter { it.source == clazz || it.target == clazz }.forEach {
-            removeRelation(it)
-        }
-        sidebar.display()
+        showSidebar()
     }
 
-    private var containerMap: Map<Container, Pair<ContainerController, InputView>> = emptyMap()
+    private var containerMap: Map<Container, Pair<ContainerController, TextShape>> = emptyMap()
     private fun addContainer(cont: Container, position: Point = Point.ZERO): ContainerController {
-        // As root view
-        val c = ContainerController(cont, this)
-        c.application = application
-        navigationView.container += c.listView
-        views += cont to c.listView
-        childContainer += c
+        // As normal view
+        val controller = ContainerController(cont, application, this)
+        viewModel.container += controller.picto
+        viewModel.layer[controller.picto] = Dimension(position.x, position.y)
 
-        c.view.left = position.x
-        c.view.top = position.y
+        // As list entry
+        val input = contentBox.textShape(controller.nameProperty)
 
-        c.view.onMouseDown {
-            select(c.view, it.ctrlKey)
-        }
-
-        c.view.draggable = View.DragType.ABSOLUTE
-        c.view.onDrag { event ->
-            jsPlumbInstance.revalidate(c.listView.html)
-            navigationView.container.toForeground(c.view)
-
-            if (event.direct) {
-                val s = selectedViews() - c.view
-                s.forEach { it.performDrag(event.indirect) }
-            }
-        }
-
-        // As content view
-        val input = InputView().also {
-            contentList += it
-        }
-        input.bind(c.nameProperty)
-
-        containerMap += cont to (c to input)
-        return c
+        containerMap += cont to (controller to input)
+        return controller
     }
 
     private fun removeContainer(cont: Container) {
-        containerMap[cont]?.let { (c, input) ->
-            navigationView.container += c.listView
-            contentList -= input
+        containerMap[cont]?.let { (controller, input) ->
+            // As normal view
+            viewModel.container -= controller.picto
+            viewModel.layer[controller.picto] = null
+
+            // As list entry
+            contentBox -= input
+
+            containerMap -= cont
             container.containers -= cont
         }
-        sidebar.display()
+
+        showSidebar()
     }
 
     private var relationMap: Map<Relation, RelationController> = emptyMap()
     private fun addRelation(relation: Relation): RelationController {
-        val c = RelationController(relation, this)
-        relationMap += relation to c
-        return c
+        val controller = RelationController(relation, this)
+        viewModel += controller.picto
+
+        relationMap += relation to controller
+        return controller
     }
 
     fun removeRelation(relation: Relation) {
-        relationMap[relation]?.let {
+        relationMap[relation]?.let { controller ->
+            viewModel -= controller.picto
+
+            relationMap -= relation
             container.relations -= relation
-            it.remove()
         }
-        sidebar.display()
+
+        showSidebar()
     }
 
-    private fun openContextMenu(open: Boolean, client: Point) = contextMenu {
+    private var sidebarButtonAutoLayout = Button()
+    private var sidebarButtonResetZoom = Button()
+    private var sidebarButtonResetPan = Button()
+
+    override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
+        title("Container")
+        input("Name", nameProperty)
+        sidebarButtonAutoLayout = button("Auto layout") {
+            //autoLayout()
+        }
+        sidebarButtonResetZoom = button("Reset zoom") {
+            application.renderer.zoomTo(1.0)
+        }
+        sidebarButtonResetPan = button("Reset pan") {
+            application.renderer.panTo(Point.ZERO)
+        }
+    }
+
+    override fun prepareSidebar(sidebar: Sidebar, event: SidebarEvent) {
+        val h = event.target != picto
+        sidebarButtonAutoLayout.visible = h
+        sidebarButtonResetZoom.visible = h
+        sidebarButtonResetPan.visible = h
+    }
+
+    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
         title = "Package: $name"
-        if (open) {
+
+        if (event.target == picto) {
+
             addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
-                application?.controller = this@ContainerController
+                application.controller = this@ContainerController
             }
         } else {
             parent?.let {
                 addItem(MaterialIcon.ARROW_BACK, "Step out") {
-                    application?.controller = it
+                    application.controller = it
                 }
             }
         }
+
         addItem(MaterialIcon.ADD, "Add class") {
             val c = Class()
             c.name = "Unnamed class"
 
             container.classes += c
 
-            addClass(c, navigationView.mouseToCanvas(client))
+            addClass(c, event.position)
         }
         addItem(MaterialIcon.ADD, "Add package") {
             val c = Container()
@@ -275,83 +191,36 @@ class ContainerController(
 
             container.containers += c
 
-            addContainer(c, navigationView.mouseToCanvas(client))
+            addContainer(c, event.position)
         }
         parent?.let {
             addItem(MaterialIcon.DELETE, "Delete") {
                 it.removeContainer(container)
-                application?.controller = it
+                application.controller = it
             }
-        }
-    }.open(client)
-
-    private fun select(view: View<*>, addToSelection: Boolean) {
-        if (!view.selectedView) {
-            if (!addToSelection) {
-                views.values.forEach { it.selectedView = false }
-            }
-            view.selectedView = true
         }
     }
 
-    fun selectedViews(): List<View<*>> = views.values.filter { it.selectedView }
-
     init {
-        navigationView.onSelect { select ->
-            if (select == null) {
-                views.values.forEach { it.selectedView = false }
-            } else {
-                views.values.forEach {
-                    it.selectedView = it.dimension in select
-                }
-            }
-        }
-
         container.classes.forEach { addClass(it) }
 
         container.containers.forEach { addContainer(it) }
 
-        navigationView.onZoom {
-            Root.innerZoom = it
-        }
+        container.relations.forEach { addRelation(it) }
 
-        //console.log(JsPlumb.bind("beforeDrop"))
+        viewModel.onRelationDraw { (sourceShape, targetShape) ->
+            val source = classMap.entries.find { (_, pair) ->
+                pair.first.picto == sourceShape
+            }?.key
+            val target = classMap.entries.find { (_, pair) ->
+                pair.first.picto == targetShape
+            }?.key
 
-        Root.innerZoom = 1.0
+            if (source != null && target != null) {
+                val relation = Relation(source, target)
+                container.relations += relation
 
-        // As root view
-        async {
-            container.relations.forEach { addRelation(it) }
-        }
-
-        navigationView.onContext {
-            it.stopPropagation()
-            openContextMenu(false, it.point())
-        }
-
-        // As content view
-        listView.classes += "container-view"
-        val header = InputView().also {
-            titleList += it
-        }
-        header.bind(nameProperty)
-
-        listView.onContext {
-            it.stopPropagation()
-            openContextMenu(true, it.point())
-        }
-
-        sidebar.setup(navigationView, listView, header) {
-            title("Container")
-            input("Name").bind(nameProperty)
-            button("Auto layout") {
-                autoLayout()
-            }
-            button("Reset zoom") {
-                navigationView.zoomTo(1.0)
-            }
-            button("Reset pan") {
-                navigationView.panTo(Point.ZERO)
+                addRelation(relation)
             }
         }
     }

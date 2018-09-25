@@ -5,7 +5,7 @@ package io.framed.model
  *
  * @author lars
  */
-class Parameter:Model {
+class Parameter : Model {
 
     /**
      * Name of this parameter.
@@ -22,6 +22,21 @@ class Parameter:Model {
                 if (type.isBlank()) "" else ": $it"
             }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Parameter) return false
+
+        if (name != other.name) return false
+        if (type != other.type) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + type.hashCode()
+        return result
+    }
 }
 
 /**

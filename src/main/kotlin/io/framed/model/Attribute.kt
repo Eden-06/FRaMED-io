@@ -16,11 +16,6 @@ class Attribute: Model {
      * Type of this attribute.
      */
     var type: String = ""
-
-    override fun toString(): String =
-            name + type.let {
-                if (type.isBlank()) "" else ": $it"
-            }.trim()
 }
 
 /**

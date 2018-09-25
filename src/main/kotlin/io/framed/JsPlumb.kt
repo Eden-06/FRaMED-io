@@ -35,7 +35,7 @@ external interface JsPlumbInstance {
     /**
      * Bind an event on the instance.
      */
-    fun bind(event: String, function: (JsPlumbDropInfoInit) -> Unit): JsPlumbDropInfoInit
+    fun bind(event: String, function: (JsPlumbDropInfoInit) -> dynamic): JsPlumbDropInfoInit
 
     /**
      * Set the container for drawing.
