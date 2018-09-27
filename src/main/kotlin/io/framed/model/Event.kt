@@ -1,12 +1,13 @@
 package io.framed.model
 
+import io.framed.view.Icon
 import io.framed.view.MaterialIcon
 
 class Event : Model() {
     var type: EventType = EventType.NONE
 }
 
-enum class EventType(val printableName: String, val symbol: MaterialIcon) {
+enum class EventType(val printableName: String, val symbol: Icon) {
     RETURN("Return", MaterialIcon.BACKSPACE),
     MESSAGE("Message", MaterialIcon.MESSAGE),
     ERROR("Error", MaterialIcon.ERROR),

@@ -155,6 +155,7 @@ class HtmlRenderer(
         return when (shape) {
             is BoxShape -> drawBoxShape(shape, parent, position, jsPlumbInstance)
             is TextShape -> drawTextShape(shape, parent)
+            is IconShape -> drawIconShape(shape, parent)
             else -> throw UnsupportedOperationException()
         }.also { view ->
             shapeMap += shape to view
@@ -279,6 +280,19 @@ class HtmlRenderer(
             events(view, shape)
 
             view.autocomplete = shape.autocomplete
+
+            view.onMouseDown {
+                view.focus()
+            }
+
+            parent.append(view)
+        }
+    }
+
+    private fun drawIconShape(shape: IconShape, parent: ViewCollection<View<*>, *>): View<*> {
+        return IconView(shape.property).also { view ->
+            style(view, shape.style)
+            events(view, shape)
 
             view.onMouseDown {
                 view.focus()

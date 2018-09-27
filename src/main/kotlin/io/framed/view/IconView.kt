@@ -1,5 +1,6 @@
 package io.framed.view
 
+import io.framed.util.Property
 import org.w3c.dom.HTMLSpanElement
 import kotlin.dom.clear
 
@@ -9,6 +10,16 @@ import kotlin.dom.clear
  * @author lars
  */
 class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
+
+    constructor(property: Property<out Icon>) : this(property.get()) {
+        property.onChange {
+            icon = property.get()
+        }
+    }
+
+    fun bind(property: Property<Icon>) {
+
+    }
 
     /**
      * The icon to display.
