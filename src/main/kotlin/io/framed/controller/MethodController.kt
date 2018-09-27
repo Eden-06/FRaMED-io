@@ -16,7 +16,7 @@ import io.framed.view.*
 class MethodController(
         val method: Method,
         override val parent: ClassController
-) : Controller<TextShape>(parent) {
+) : Controller<TextShape>(method, parent) {
 
     val nameProperty = property(method::name)
 
@@ -147,19 +147,21 @@ class MethodController(
 
     override fun createSidebar(sidebar: Sidebar) = sidebar.setup() {
         title("Method")
-        input("Name", nameProperty)
-        input("Type", typeProperty)
+        group("General") {
+            input("Name", nameProperty)
+            input("Type", typeProperty)
 
-        custom {
-            textView("Parameters")
-            append(parameterTable)
-            listView {
-                iconView(MaterialIcon.ADD)
-                textView("Add parameter")
-                onClick {
-                    method.param("")
-                    redraw = true
-                    parameterProperty.fire()
+            custom {
+                textView("Parameters")
+                append(parameterTable)
+                listView {
+                    iconView(MaterialIcon.ADD)
+                    textView("Add parameter")
+                    onClick {
+                        method.param("")
+                        redraw = true
+                        parameterProperty.fire()
+                    }
                 }
             }
         }

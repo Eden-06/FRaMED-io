@@ -17,7 +17,7 @@ import io.framed.view.contextMenu
 class AttributeController(
         val attribute: Attribute,
         override val parent: ClassController
-) : Controller<TextShape>(parent) {
+) : Controller<TextShape>(attribute, parent) {
 
     private val nameProperty = property(attribute::name)
 
@@ -80,8 +80,11 @@ class AttributeController(
 
     override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
         title("Attribute")
-        input("Name", nameProperty)
-        input("Type", typeProperty)
+
+        group("General") {
+            input("Name", nameProperty)
+            input("Type", typeProperty)
+        }
     }
 
     override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {

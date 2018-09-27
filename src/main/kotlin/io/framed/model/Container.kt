@@ -7,7 +7,7 @@ package io.framed.model
  *
  * @author lars
  */
-class Container : Model {
+class Container : Model() {
 
     /**
      * Name of this package.

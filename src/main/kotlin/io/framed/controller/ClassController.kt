@@ -16,7 +16,7 @@ import io.framed.view.contextMenu
 class ClassController(
         val clazz: Class,
         override val parent: ContainerController
-) : Controller<BoxShape>(parent) {
+) : Controller<BoxShape>(clazz, parent) {
 
     val nameProperty = property(clazz::name)
     var name by nameProperty
@@ -85,7 +85,9 @@ class ClassController(
 
     override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
         title("Class")
-        input("Name", nameProperty)
+        group("General") {
+            input("Name", nameProperty)
+        }
     }
 
     override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {

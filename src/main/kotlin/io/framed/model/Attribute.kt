@@ -5,7 +5,7 @@ package io.framed.model
  *
  * @author lars
  */
-class Attribute: Model {
+class Attribute: Model() {
 
     /**
      * Name of this attribute.

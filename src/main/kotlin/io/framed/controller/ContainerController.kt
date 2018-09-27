@@ -16,7 +16,7 @@ class ContainerController(
         val container: Container,
         val application: Application,
         override val parent: ContainerController? = null
-) : Controller<BoxShape>(parent) {
+) : Controller<BoxShape>(container, parent) {
 
     val nameProperty = property(container::name)
     var name by nameProperty
@@ -142,15 +142,19 @@ class ContainerController(
 
     override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
         title("Container")
-        input("Name", nameProperty)
-        sidebarButtonAutoLayout = button("Auto layout") {
-            //autoLayout()
+        group("General") {
+            input("Name", nameProperty)
         }
-        sidebarButtonResetZoom = button("Reset zoom") {
-            application.renderer.zoomTo(1.0)
-        }
-        sidebarButtonResetPan = button("Reset pan") {
-            application.renderer.panTo(Point.ZERO)
+        group("Actions") {
+            sidebarButtonAutoLayout = button("Auto layout") {
+                //autoLayout()
+            }
+            sidebarButtonResetZoom = button("Reset zoom") {
+                application.renderer.zoomTo(1.0)
+            }
+            sidebarButtonResetPan = button("Reset pan") {
+                application.renderer.panTo(Point.ZERO)
+            }
         }
     }
 

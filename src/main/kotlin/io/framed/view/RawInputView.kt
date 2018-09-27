@@ -61,8 +61,12 @@ class RawInputView() : View<HTMLInputElement>("input") {
 
         property.onChange {
             if (!hasFocus) {
-                value =  property.get()
+                value = property.get()
             }
+        }
+
+        if (!property.editable) {
+            readOnly = true
         }
     }
 

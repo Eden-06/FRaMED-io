@@ -235,23 +235,51 @@ table {
 }
 
 .sidebar {
-  padding: 1rem 0.5rem 0.5rem;
+  padding-top: 1rem;
 
   & > div {
-    margin-bottom: 0.5rem;
-    span {
-      padding: 0.2rem;
+    border-bottom: solid 1px $border-color-light;
+  }
+
+  .header {
+    font-size: 1.3rem;
+    padding: 0.5rem;
+    display: block;
+  }
+
+  .sidebar-group {
+    padding: 0.5rem;
+
+    & > div {
+      margin-bottom: 0.5rem;
+      span {
+        padding: 0.2rem;
+      }
+      input, select {
+        width: 100%;
+      }
+      .group-header {
+        font-size: 1.1rem;
+        @include no-select;
+      }
+      .collapse-icon {
+        margin-top: -0.1rem;
+        font-size: 1.2rem;
+        float: right;
+
+        @include no-select;
+      }
+      .button {
+        width: 100%;
+      }
     }
-    input, select {
-      width: 100%;
-    }
-    .header {
-      font-size: 1.3rem;
-    }
-    .button {
-      width: 100%;
+    &.collapsed {
+      & > div:not(:first-child) {
+        display: none;
+      }
     }
   }
+
   table {
     padding: 0;
     margin: 0;

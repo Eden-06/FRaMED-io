@@ -5,7 +5,7 @@ package io.framed.model
  *
  * @author lars
  */
-class Method:Model {
+class Method:Model() {
 
     /**
      * Name of this method.

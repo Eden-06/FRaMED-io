@@ -5,7 +5,7 @@ package io.framed.model
  *
  * @author lars
  */
-class Parameter : Model {
+class Parameter : Model() {
 
     /**
      * Name of this parameter.

@@ -1,6 +1,5 @@
 package io.framed.view
 
-import io.framed.util.Property
 import org.w3c.dom.HTMLDivElement
 
 /**
@@ -34,43 +33,9 @@ class Sidebar(
         }
     }
 
-    fun input(label: String, property: Property<String>, autocomplete: List<String> = emptyList()): InputView {
-        val i = InputView(property)
-        i.autocomplete = autocomplete
-
-        append(ListView().also {
-            it += TextView(label)
-            it += i
-        })
-        return i
-    }
-
-    fun <T : Any> select(label: String, values: List<T>, selected: T, onchange: (T) -> Unit = {}): SelectView<T> {
-        val i = SelectView(values, selected)
-        i.onChange(onchange)
-
-        append(ListView().also {
-            it += TextView(label)
-            it += i
-        })
-        return i
-    }
-
-    fun button(label: String, onClick: () -> Unit = {}): Button {
-        val b = Button()
-        b.text = label
-        b.onClick { onClick() }
-
-        append(ListView().also {
-            it += b
-        })
-        return b
-    }
-
-    fun custom(init: ListView.() -> Unit): ListView {
-        val view = ListView()
+    fun group(name: String, init: SidebarGroup.() -> Unit): SidebarGroup {
+        val view = SidebarGroup(name).also(init)
         append(view)
-        init(view)
         return view
     }
 

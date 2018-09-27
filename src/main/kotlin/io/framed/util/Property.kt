@@ -13,6 +13,7 @@ interface Property<T : Any> {
     fun get(): T
     fun set(value: T): Validator.Result
 
+    val editable: Boolean
     val onChange: EventHandler<Unit>
     fun fire() {
         onChange.fire(Unit)
@@ -22,8 +23,8 @@ interface Property<T : Any> {
 
 class ObjectProperty<T : Any>(
         private val kProperty: KMutableProperty0<T>,
-        private val validator: Validator<T>
-
+        private val validator: Validator<T>,
+        override val editable: Boolean
 ) : Property<T> {
 
     override fun get(): T = kProperty.get()
@@ -41,7 +42,8 @@ class ObjectProperty<T : Any>(
 class ComplexProperty<T : Any>(
         val properties: List<Property<*>>,
         val getter: () -> T,
-        val setter: (T) -> Validator.Result
+        val setter: (T) -> Validator.Result,
+        override val editable: Boolean
 ) : Property<T> {
     override fun get(): T = getter()
 
@@ -63,11 +65,12 @@ class ComplexProperty<T : Any>(
     var propagate = true
 
     init {
-        val emitChange = { _: Unit -> if (listen) {
-            propagate = false
-            onChange.fire(Unit)
-            propagate = true
-        }
+        val emitChange = { _: Unit ->
+            if (listen) {
+                propagate = false
+                onChange.fire(Unit)
+                propagate = true
+            }
         }
         properties.forEach { property ->
             property.onChange += emitChange
@@ -83,8 +86,18 @@ class ComplexProperty<T : Any>(
     }
 }
 
-fun <T : Any> property(kProperty: KMutableProperty0<T>, validator: Validator<T> =
-        TrueValidator()) = ObjectProperty(kProperty, validator)
+fun <T : Any> property(
+        kProperty: KMutableProperty0<T>,
+        validator: Validator<T> = TrueValidator(),
+        editable: Boolean = true
+) = ObjectProperty(kProperty, validator, editable)
 
-fun <T : Any> property(vararg properties: Property<*>, getter: () -> T, setter: (T) -> Validator.Result) =
-        ComplexProperty(properties.toList(), getter, setter)
+fun <T : Any> property(
+        vararg properties: Property<*>,
+        getter: () -> T,
+        setter: ((T) -> Validator.Result)? = null
+) = if (setter == null) {
+    ComplexProperty(properties.toList(), getter, { throw NotImplementedError() }, false)
+} else {
+    ComplexProperty(properties.toList(), getter, setter, true)
+}

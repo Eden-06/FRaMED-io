@@ -16,7 +16,7 @@ class Relation(
          * The relations target class.
          */
         var target: Class
-) {
+): Model() {
 
     /**
      * Name of this relation.

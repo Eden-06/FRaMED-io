@@ -5,4 +5,6 @@ package io.framed.model
  *
  * @author lars
  */
-interface Model
+abstract class Model {
+    val metadata: Metadata = Metadata()
+}

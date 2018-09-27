@@ -53,7 +53,7 @@ class NavigationView : View<HTMLDivElement>("div") {
      */
     var zoom: Double = 1.0
         set(value) {
-            val old = field
+            //val old = field
             field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, value))
         }
 

@@ -20,7 +20,7 @@ import io.framed.view.contextMenu
 class RelationController(
         private val relation: Relation,
         override val parent: ContainerController
-) : Controller<io.framed.picto.Relation>(parent) {
+) : Controller<io.framed.picto.Relation>(relation, parent) {
 
     private val nameProperty = property(relation::name)
     private val sourceCardinalityProperty = property(relation::sourceCardinality)
@@ -53,19 +53,21 @@ class RelationController(
     override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
         title("Relation")
 
-        input("Name", nameProperty)
-        input("Source cardinality", sourceCardinalityProperty, RelationMultiplicity.STRING_VALUES)
-        input("Target cardinality", targetCardinalityProperty, RelationMultiplicity.STRING_VALUES)
+        group("General") {
+            input("Name", nameProperty)
+            input("Source cardinality", sourceCardinalityProperty, RelationMultiplicity.STRING_VALUES)
+            input("Target cardinality", targetCardinalityProperty, RelationMultiplicity.STRING_VALUES)
 
-        val types = RelationType.values().toList()
-        select("Type", types, relationType) {
-            relationType = it
-        }
+            val types = RelationType.values().toList()
+            select("Type", types, relationType) {
+                relationType = it
+            }
 
-        button("Toggle direction") {
-            val h = source
-            source = target
-            target = h
+            button("Toggle direction") {
+                val h = source
+                source = target
+                target = h
+            }
         }
     }
 
