@@ -136,23 +136,22 @@ class ContainerController(
         showSidebar()
     }
 
-    private var sidebarButtonAutoLayout = Button()
-    private var sidebarButtonResetZoom = Button()
-    private var sidebarButtonResetPan = Button()
+
+    private var sidebarActionsGroup = SidebarGroup("")
 
     override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
         title("Container")
         group("General") {
             input("Name", nameProperty)
         }
-        group("Actions") {
-            sidebarButtonAutoLayout = button("Auto layout") {
+        sidebarActionsGroup = group("Actions") {
+            button("Auto layout") {
                 //autoLayout()
             }
-            sidebarButtonResetZoom = button("Reset zoom") {
+            button("Reset zoom") {
                 application.renderer.zoomTo(1.0)
             }
-            sidebarButtonResetPan = button("Reset pan") {
+            button("Reset pan") {
                 application.renderer.panTo(Point.ZERO)
             }
         }
@@ -160,9 +159,7 @@ class ContainerController(
 
     override fun prepareSidebar(sidebar: Sidebar, event: SidebarEvent) {
         val h = event.target != picto
-        sidebarButtonAutoLayout.visible = h
-        sidebarButtonResetZoom.visible = h
-        sidebarButtonResetPan.visible = h
+        sidebarActionsGroup.visible = h
     }
 
     override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {

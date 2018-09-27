@@ -63,7 +63,7 @@ class SidebarGroup(
         it.classes += "collapse-icon"
         it.onClick { event ->
             collapse(!collapsed)
-            event.stopPropagation();
+            event.stopPropagation()
         }
     }
 

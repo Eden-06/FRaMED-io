@@ -150,9 +150,9 @@ class MethodController(
         group("General") {
             input("Name", nameProperty)
             input("Type", typeProperty)
-
+        }
+        group("Parameters") {
             custom {
-                textView("Parameters")
                 append(parameterTable)
                 listView {
                     iconView(MaterialIcon.ADD)
