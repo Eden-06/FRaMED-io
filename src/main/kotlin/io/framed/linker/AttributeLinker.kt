@@ -1,4 +1,4 @@
-package io.framed.controller
+package io.framed.linker
 
 import io.framed.model.Attribute
 import io.framed.picto.ContextEvent
@@ -15,10 +15,10 @@ import io.framed.view.contextMenu
 /**
  * @author lars
  */
-class AttributeController(
+class AttributeLinker(
         val attribute: Attribute,
-        override val parent: ClassController
-) : Controller<TextShape>(attribute, parent) {
+        override val parent: ClassLinker
+) : Linker<TextShape>(attribute, parent) {
 
     private val nameProperty = property(attribute::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
     private val typeProperty = property(attribute::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))

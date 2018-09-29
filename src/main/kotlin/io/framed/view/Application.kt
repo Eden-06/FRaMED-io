@@ -1,6 +1,6 @@
 package io.framed.view
 
-import io.framed.controller.ContainerController
+import io.framed.linker.ContainerLinker
 import io.framed.model.Container
 import io.framed.render.html.HtmlRenderer
 import io.framed.util.EventHandler
@@ -28,12 +28,12 @@ class Application : View<HTMLDivElement>("div") {
         }
         toolbarListeners = emptyMap()
 
-        var c: ContainerController? = controller
+        var c: ContainerLinker? = linker
         while (c != null) {
             c = c.let { cont ->
                 leftBar.prepand(TextView().apply {
                     onClick {
-                        controller = cont
+                        linker = cont
                     }
 
                     bind(cont.nameProperty)
@@ -69,7 +69,7 @@ class Application : View<HTMLDivElement>("div") {
                 MaterialIcon.TOUCH_APP
             }
 
-            controller.touchpadControl = touchpadControl
+            linker.touchpadControl = touchpadControl
         }
     }
     */
@@ -154,7 +154,7 @@ class Application : View<HTMLDivElement>("div") {
         it.classList.add("color-box")
     }
 
-    var controller: ContainerController = ContainerController(Container(), this, null)
+    var linker: ContainerLinker = ContainerLinker(Container(), this, null)
         set(value) {
             field = value
             value.showSidebar()

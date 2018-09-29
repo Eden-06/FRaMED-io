@@ -1,13 +1,9 @@
 package io.framed
 
-import io.framed.controller.ContainerController
+import io.framed.linker.ContainerLinker
 import io.framed.model.*
-import io.framed.picto.Layer
-import io.framed.picto.TextShape
-import io.framed.util.property
 import io.framed.view.Application
 import io.framed.view.Root
-import io.framed.view.TextView
 import kotlin.browser.window
 
 /**
@@ -64,9 +60,9 @@ fun init() {
         }
     }
 
-    val controller = ContainerController(container, app)
+    val linker = ContainerLinker(container, app)
 
     Root += app
 
-    app.controller = controller
+    app.linker = linker
 }

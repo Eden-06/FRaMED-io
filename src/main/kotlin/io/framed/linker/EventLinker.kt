@@ -1,14 +1,14 @@
-package io.framed.controller
+package io.framed.linker
 
 import io.framed.model.Event
 import io.framed.picto.IconShape
 import io.framed.picto.iconShape
 import io.framed.util.property
 
-class EventController(
+class EventLinker(
         val event: Event,
-        override val parent: ContainerController
-) : Controller<IconShape>(event, parent) {
+        override val parent: ContainerLinker
+) : Linker<IconShape>(event, parent) {
 
     private val typeProperty = property(event::type)
     private val symbolProperty = property(typeProperty,

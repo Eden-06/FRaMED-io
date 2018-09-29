@@ -1,4 +1,4 @@
-package io.framed.controller
+package io.framed.linker
 
 import io.framed.model.Model
 import io.framed.picto.ContextEvent
@@ -11,9 +11,9 @@ import io.framed.view.Sidebar
 /**
  * @author lars
  */
-abstract class Controller<T : Picto>(
+abstract class Linker<T : Picto>(
         model: Model,
-        open val parent: Controller<*>?
+        open val parent: Linker<*>?
 ) {
 
     private val creationProperty = property(model.metadata::creationDate)

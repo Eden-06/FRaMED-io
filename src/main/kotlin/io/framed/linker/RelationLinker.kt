@@ -1,4 +1,4 @@
-package io.framed.controller
+package io.framed.linker
 
 import io.framed.model.Relation
 import io.framed.model.RelationMultiplicity
@@ -18,10 +18,10 @@ import io.framed.view.contextMenu
  * @author lars
  */
 
-class RelationController(
+class RelationLinker(
         private val relation: Relation,
-        override val parent: ContainerController
-) : Controller<io.framed.picto.Relation>(relation, parent) {
+        override val parent: ContainerLinker
+) : Linker<io.framed.picto.Relation>(relation, parent) {
 
     private val nameProperty = property(relation::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
     private val sourceCardinalityProperty = property(relation::sourceCardinality)

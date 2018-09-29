@@ -1,4 +1,4 @@
-package io.framed.controller
+package io.framed.linker
 
 import io.framed.model.Class
 import io.framed.model.Container
@@ -13,11 +13,11 @@ import io.framed.view.*
 /**
  * @author lars
  */
-class ContainerController(
+class ContainerLinker(
         val container: Container,
         val application: Application,
-        override val parent: ContainerController? = null
-) : Controller<BoxShape>(container, parent) {
+        override val parent: ContainerLinker? = null
+) : Linker<BoxShape>(container, parent) {
 
     val nameProperty = property(container::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
     var name by nameProperty
@@ -57,26 +57,26 @@ class ContainerController(
         layer = Layer()
     }.also(this::initPicto))
 
-    private var classMap: Map<Class, Pair<ClassController, TextShape>> = emptyMap()
+    private var classMap: Map<Class, Pair<ClassLinker, TextShape>> = emptyMap()
 
-    fun addClass(clazz: Class, position: Point = Point.ZERO): ClassController {
+    fun addClass(clazz: Class, position: Point = Point.ZERO): ClassLinker {
         // As normal view
-        val controller = ClassController(clazz, this)
-        viewModel.container += controller.picto
-        viewModel.layer[controller.picto] = Dimension(position.x, position.y)
+        val  linker = ClassLinker(clazz, this)
+        viewModel.container +=  linker.picto
+        viewModel.layer[ linker.picto] = Dimension(position.x, position.y)
 
         // As list entry
-        val input = contentBox.textShape(controller.nameProperty)
+        val input = contentBox.textShape( linker.nameProperty)
 
-        classMap += clazz to (controller to input)
-        return controller
+        classMap += clazz to ( linker to input)
+        return  linker
     }
 
     fun removeClass(clazz: Class) {
-        classMap[clazz]?.let { (controller, input) ->
+        classMap[clazz]?.let { ( linker, input) ->
             // As normal view
-            viewModel.container -= controller.picto
-            viewModel.layer[controller.picto] = null
+            viewModel.container -=  linker.picto
+            viewModel.layer[ linker.picto] = null
 
             // As list entry
             contentBox -= input
@@ -88,25 +88,25 @@ class ContainerController(
         showSidebar()
     }
 
-    private var containerMap: Map<Container, Pair<ContainerController, TextShape>> = emptyMap()
-    private fun addContainer(cont: Container, position: Point = Point.ZERO): ContainerController {
+    private var containerMap: Map<Container, Pair<ContainerLinker, TextShape>> = emptyMap()
+    private fun addContainer(cont: Container, position: Point = Point.ZERO): ContainerLinker {
         // As normal view
-        val controller = ContainerController(cont, application, this)
-        viewModel.container += controller.picto
-        viewModel.layer[controller.picto] = Dimension(position.x, position.y)
+        val  linker = ContainerLinker(cont, application, this)
+        viewModel.container +=  linker.picto
+        viewModel.layer[ linker.picto] = Dimension(position.x, position.y)
 
         // As list entry
-        val input = contentBox.textShape(controller.nameProperty)
+        val input = contentBox.textShape( linker.nameProperty)
 
-        containerMap += cont to (controller to input)
-        return controller
+        containerMap += cont to ( linker to input)
+        return  linker
     }
 
     private fun removeContainer(cont: Container) {
-        containerMap[cont]?.let { (controller, input) ->
+        containerMap[cont]?.let { ( linker, input) ->
             // As normal view
-            viewModel.container -= controller.picto
-            viewModel.layer[controller.picto] = null
+            viewModel.container -=  linker.picto
+            viewModel.layer[ linker.picto] = null
 
             // As list entry
             contentBox -= input
@@ -118,18 +118,18 @@ class ContainerController(
         showSidebar()
     }
 
-    private var relationMap: Map<Relation, RelationController> = emptyMap()
-    private fun addRelation(relation: Relation): RelationController {
-        val controller = RelationController(relation, this)
-        viewModel += controller.picto
+    private var relationMap: Map<Relation, RelationLinker> = emptyMap()
+    private fun addRelation(relation: Relation): RelationLinker {
+        val  linker = RelationLinker(relation, this)
+        viewModel +=  linker.picto
 
-        relationMap += relation to controller
-        return controller
+        relationMap += relation to  linker
+        return  linker
     }
 
     fun removeRelation(relation: Relation) {
-        relationMap[relation]?.let { controller ->
-            viewModel -= controller.picto
+        relationMap[relation]?.let {  linker ->
+            viewModel -=  linker.picto
 
             relationMap -= relation
             container.relations -= relation
@@ -170,12 +170,12 @@ class ContainerController(
         if (event.target == picto) {
 
             addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
-                application.controller = this@ContainerController
+                application.linker = this@ContainerLinker
             }
         } else {
             parent?.let {
                 addItem(MaterialIcon.ARROW_BACK, "Step out") {
-                    application.controller = it
+                    application.linker = it
                 }
             }
         }
@@ -199,7 +199,7 @@ class ContainerController(
         parent?.let {
             addItem(MaterialIcon.DELETE, "Delete") {
                 it.removeContainer(container)
-                application.controller = it
+                application.linker = it
             }
         }
     }

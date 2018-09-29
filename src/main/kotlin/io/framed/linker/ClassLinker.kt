@@ -1,4 +1,4 @@
-package io.framed.controller
+package io.framed.linker
 
 import io.framed.model.Attribute
 import io.framed.model.Class
@@ -14,10 +14,10 @@ import io.framed.view.contextMenu
 /**
  * @author lars
  */
-class ClassController(
+class ClassLinker(
         val clazz: Class,
-        override val parent: ContainerController
-) : Controller<BoxShape>(clazz, parent) {
+        override val parent: ContainerLinker
+) : Linker<BoxShape>(clazz, parent) {
 
     val nameProperty = property(clazz::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
     var name by nameProperty
@@ -51,8 +51,8 @@ class ClassController(
     }.also(this::initPicto)
 
 
-    private var attributeMap: Map<Attribute, AttributeController> = emptyMap()
-    private fun addAttribute(attribute: Attribute) = AttributeController(attribute, this).also {
+    private var attributeMap: Map<Attribute, AttributeLinker> = emptyMap()
+    private fun addAttribute(attribute: Attribute) = AttributeLinker(attribute, this).also {
         attributeBox += it.picto
         attributeMap += attribute to it
     }
@@ -66,8 +66,8 @@ class ClassController(
         showSidebar()
     }
 
-    private var methodMap: Map<Method, MethodController> = emptyMap()
-    private fun addMethod(method: Method) = MethodController(method, this).also {
+    private var methodMap: Map<Method, MethodLinker> = emptyMap()
+    private fun addMethod(method: Method) = MethodLinker(method, this).also {
         methodBox += it.picto
         methodMap += method to it
     }

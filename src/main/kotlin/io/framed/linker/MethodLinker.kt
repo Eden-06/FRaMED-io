@@ -1,4 +1,4 @@
-package io.framed.controller
+package io.framed.linker
 
 import io.framed.model.Method
 import io.framed.model.Parameter
@@ -14,10 +14,10 @@ import io.framed.view.*
 /**
  * @author lars
  */
-class MethodController(
+class MethodLinker(
         val method: Method,
-        override val parent: ClassController
-) : Controller<TextShape>(method, parent) {
+        override val parent: ClassLinker
+) : Linker<TextShape>(method, parent) {
 
     private val nameProperty = property(method::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
 
