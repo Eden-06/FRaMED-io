@@ -12,10 +12,11 @@ class Border(
     enum class BorderStyle {
         SOLID, DASHED, NONE;
 
-        override fun toString(): String =name.toLowerCase()
+        override fun toString(): String = name.toLowerCase()
     }
 
     fun toCss(): String = "$style ${width}px ${color.toCss()}"
 }
 
-fun border(init: Border.() -> Unit):Border = Border().also(init)
+//fun border(init: Border.() -> Unit):Border = Border().also(init)
+fun Style.border(init: Border.() -> Unit): Border = Border().also(init).also { border = it }

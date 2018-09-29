@@ -4,6 +4,7 @@ import io.framed.model.Attribute
 import io.framed.picto.ContextEvent
 import io.framed.picto.TextShape
 import io.framed.picto.textShape
+import io.framed.util.RegexValidator
 import io.framed.util.Validator
 import io.framed.util.property
 import io.framed.view.ContextMenu
@@ -19,9 +20,8 @@ class AttributeController(
         override val parent: ClassController
 ) : Controller<TextShape>(attribute, parent) {
 
-    private val nameProperty = property(attribute::name)
-
-    private val typeProperty = property(attribute::type)
+    private val nameProperty = property(attribute::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val typeProperty = property(attribute::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
 
     private val lineProperty = property(nameProperty, typeProperty,
             getter = {

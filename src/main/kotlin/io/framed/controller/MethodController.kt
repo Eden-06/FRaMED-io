@@ -6,6 +6,7 @@ import io.framed.model.param
 import io.framed.picto.ContextEvent
 import io.framed.picto.TextShape
 import io.framed.picto.textShape
+import io.framed.util.RegexValidator
 import io.framed.util.Validator
 import io.framed.util.property
 import io.framed.view.*
@@ -18,13 +19,13 @@ class MethodController(
         override val parent: ClassController
 ) : Controller<TextShape>(method, parent) {
 
-    val nameProperty = property(method::name)
+    private val nameProperty = property(method::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
 
-    val typeProperty = property(method::type)
+    private val typeProperty = property(method::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
 
-    val parameterProperty = property(method::parameters)
+    private val parameterProperty = property(method::parameters)
 
-    val lineProperty = property(nameProperty, typeProperty, parameterProperty,
+    private val lineProperty = property(nameProperty, typeProperty, parameterProperty,
             getter = {
                 "${method.name}(" + method.parameters.joinToString(", ") { it.toString() } + ")" + method.type.let {
                     if (it.isBlank()) "" else ": $it"

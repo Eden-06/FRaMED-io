@@ -5,7 +5,7 @@ import io.framed.util.EventHandler
 /**
  * @author lars
  */
-class BoxShape() : Shape() {
+class BoxShape : Shape() {
 
     enum class Position {
         ABSOLUTE, HORIZONTAL, VERTICAL
@@ -19,15 +19,10 @@ class BoxShape() : Shape() {
     val onAdd = EventHandler<Shape>()
     val onRemove = EventHandler<Shape>()
 
-    override fun setLayer(layer: Layer) {
-        super.setLayer(layer)
-        shapes.forEach { it.setLayer(layer) }
-    }
-
     operator fun plusAssign(shape: Shape) = add(shape)
     fun add(shape: Shape) {
+        shape.layer = layer
         shapes += shape
-        shape.setLayer(layer)
         onAdd.fire(shape)
     }
 
@@ -38,6 +33,15 @@ class BoxShape() : Shape() {
     }
 
     operator fun Shape.unaryPlus() = add(this)
+
+    init {
+        onLayerChange { _ ->
+            shapes.forEach { shape ->
+                shape.layer = layer
+            }
+        }
+    }
 }
 
 fun boxShape(init: BoxShape.() -> Unit) = BoxShape().also(init)
+fun BoxShape.boxShape(init: BoxShape.() -> Unit) = BoxShape().also(init).also { this.add(it) }

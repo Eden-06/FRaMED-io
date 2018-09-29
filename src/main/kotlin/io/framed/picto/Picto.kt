@@ -6,16 +6,22 @@ import io.framed.util.EventHandler
  * @author lars
  */
 abstract class Picto {
-    var layer: Layer = Layer()
-        private set
+    var layer: Layer = NoneLayer
+        set(value) {
+            field = value
+            onLayerChange.fire(Unit)
+        }
 
-    open fun setLayer(layer: Layer) {
-        this.layer = layer
-    }
+    val id = lastId++
 
     var hasSidebar: Boolean = false
     var hasContext: Boolean = false
 
     val onSidebar = EventHandler<SidebarEvent>()
     val onContext = EventHandler<ContextEvent>()
+    val onLayerChange = EventHandler<Unit>()
+
+    companion object {
+        private var lastId = 0
+    }
 }

@@ -12,13 +12,13 @@ import kotlin.dom.clear
 class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
 
     constructor(property: Property<out Icon>) : this(property.get()) {
+        bind(property)
+    }
+
+    fun bind(property: Property<out Icon>) {
         property.onChange {
             icon = property.get()
         }
-    }
-
-    fun bind(property: Property<Icon>) {
-
     }
 
     /**

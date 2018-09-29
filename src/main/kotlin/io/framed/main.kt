@@ -2,13 +2,19 @@ package io.framed
 
 import io.framed.controller.ContainerController
 import io.framed.model.*
+import io.framed.picto.Layer
+import io.framed.picto.TextShape
+import io.framed.util.property
 import io.framed.view.Application
 import io.framed.view.Root
+import io.framed.view.TextView
 import kotlin.browser.window
 
 /**
  * Entry point.
  */
+var name = ""
+
 @Suppress("UNUSED")
 fun main(args: Array<String>) {
     // Wait for the body to load.

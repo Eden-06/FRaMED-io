@@ -4,6 +4,7 @@ import io.framed.model.Attribute
 import io.framed.model.Class
 import io.framed.model.Method
 import io.framed.picto.*
+import io.framed.util.RegexValidator
 import io.framed.util.property
 import io.framed.view.ContextMenu
 import io.framed.view.MaterialIcon
@@ -18,28 +19,25 @@ class ClassController(
         override val parent: ContainerController
 ) : Controller<BoxShape>(clazz, parent) {
 
-    val nameProperty = property(clazz::name)
+    val nameProperty = property(clazz::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
     var name by nameProperty
 
-    private val nameBox = boxShape {
-        textShape(nameProperty)
-    }
-
-    private val attributeBox = boxShape { }
-
-    private val methodBox = boxShape { }
+    private lateinit var attributeBox:BoxShape
+    private lateinit var methodBox: BoxShape
 
     override val picto = boxShape {
-        +nameBox
-        +attributeBox
-        +methodBox
+        boxShape {
+            textShape(nameProperty)
+        }
+        attributeBox = boxShape {  }
+        methodBox = boxShape {  }
 
         style {
             background = linearGradient("to bottom") {
                 add(color("#fffbd9"), 0.0)
                 add(color("#fff7c4"), 1.0)
             }
-            border = border {
+            border {
                 style = Border.BorderStyle.SOLID
                 width = 1.0
                 color = color(0, 0, 0, 0.3)
@@ -113,7 +111,6 @@ class ClassController(
 
     init {
         clazz.attributes.forEach { addAttribute(it) }
-
         clazz.methods.forEach { addMethod(it) }
     }
 }

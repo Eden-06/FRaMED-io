@@ -229,6 +229,13 @@ class HtmlRenderer(
             view.top = shape.top ?: 0.0
             view.classes += "absolute-view"
 
+            shape.onPositionChange { force ->
+                if (force) {
+                    view.left = shape.left ?: 0.0
+                    view.top = shape.top ?: 0.0
+                }
+            }
+
             view.draggable = View.DragType.ABSOLUTE
             view.onMouseDown { event ->
                 event.stopPropagation()
@@ -262,11 +269,9 @@ class HtmlRenderer(
         }.toMap()
 
         shape.onAdd {
-            println("add")
             map += it to drawShape(it, view, shape.position, jsPlumbInstance)
         }
         shape.onRemove {
-            println("remove")
             map[it]?.let { v ->
                 view.remove(v)
             }

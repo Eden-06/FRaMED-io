@@ -11,7 +11,7 @@ class ViewModel(
     var layer: Layer
         get() = container.layer
         set(value) {
-            container.setLayer(value)
+            container.layer = value
             onLayerChange.fire(Unit)
         }
 
@@ -21,15 +21,15 @@ class ViewModel(
     val onRelationRemove = EventHandler<Relation>()
 
     val onRelationDraw = EventHandler<Pair<Shape, Shape>>()
+    val onLayerChange = EventHandler<Unit>()
 
     operator fun plusAssign(relation: Relation) {
         relations += relation
         onRelationAdd.fire(relation)
     }
+
     operator fun minusAssign(relation: Relation) {
         relations -= relation
         onRelationRemove.fire(relation)
     }
-
-    val onLayerChange = EventHandler<Unit>()
 }

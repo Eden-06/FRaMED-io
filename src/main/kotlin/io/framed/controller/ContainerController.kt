@@ -6,6 +6,7 @@ import io.framed.model.Relation
 import io.framed.picto.*
 import io.framed.util.Dimension
 import io.framed.util.Point
+import io.framed.util.RegexValidator
 import io.framed.util.property
 import io.framed.view.*
 
@@ -18,26 +19,25 @@ class ContainerController(
         override val parent: ContainerController? = null
 ) : Controller<BoxShape>(container, parent) {
 
-    val nameProperty = property(container::name)
+    val nameProperty = property(container::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
     var name by nameProperty
 
     override fun internalCreateSidebar(): Sidebar = Sidebar(application)
 
-    private val titleBox = boxShape {
-        textShape(nameProperty)
-    }
-    private val contentBox = boxShape { }
+    private lateinit var contentBox: BoxShape
 
     override val picto = boxShape {
-        +titleBox
-        +contentBox
+        boxShape {
+            textShape(nameProperty)
+        }
+        contentBox = boxShape { }
 
         style {
             background = linearGradient("to bottom") {
                 add(color("#fffbd9"), 0.0)
                 add(color("#fff7c4"), 1.0)
             }
-            border = border {
+            border {
                 style = Border.BorderStyle.SOLID
                 width = 1.0
                 color = color(0, 0, 0, 0.3)
@@ -53,7 +53,9 @@ class ContainerController(
     val viewModel = ViewModel(boxShape {
         hasSidebar = true
         hasContext = true
-    }.also(this::initPicto)).apply { layer = Layer() }
+
+        layer = Layer()
+    }.also(this::initPicto))
 
     private var classMap: Map<Class, Pair<ClassController, TextShape>> = emptyMap()
 
@@ -137,7 +139,7 @@ class ContainerController(
     }
 
 
-    private var sidebarActionsGroup = SidebarGroup("")
+    private lateinit var sidebarActionsGroup: SidebarGroup
 
     override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
         title("Container")

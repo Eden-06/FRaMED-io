@@ -6,6 +6,7 @@ import io.framed.model.RelationType
 import io.framed.picto.ContextEvent
 import io.framed.picto.relation
 import io.framed.picto.textShape
+import io.framed.util.RegexValidator
 import io.framed.util.Validator
 import io.framed.util.property
 import io.framed.view.ContextMenu
@@ -22,7 +23,7 @@ class RelationController(
         override val parent: ContainerController
 ) : Controller<io.framed.picto.Relation>(relation, parent) {
 
-    private val nameProperty = property(relation::name)
+    private val nameProperty = property(relation::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
     private val sourceCardinalityProperty = property(relation::sourceCardinality)
     private val targetCardinalityProperty = property(relation::targetCardinality)
 

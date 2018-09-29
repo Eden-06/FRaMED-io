@@ -2,6 +2,7 @@ package io.framed.view
 
 import io.framed.util.EventHandler
 import io.framed.util.Property
+import io.framed.util.Validator
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -52,11 +53,11 @@ class RawInputView() : View<HTMLInputElement>("input") {
         value = property.get()
         onChange {
             hasFocus = true
-            property.set(it)
+            invalid = property.set(it) != Validator.Result.VALID
         }
         onFocusLeave {
             hasFocus = false
-            property.set(value.trim())
+            invalid = property.set(value.trim()) != Validator.Result.VALID
         }
 
         property.onChange {
