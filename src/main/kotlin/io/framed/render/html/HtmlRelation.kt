@@ -1,14 +1,8 @@
 package io.framed.render.html
 
-import io.framed.JsPlumbConnection
-import io.framed.JsPlumbInstance
-import io.framed.jsPlumbConnect
-import io.framed.jsPlumbPaintStyle
+import io.framed.*
 import io.framed.model.RelationType
-import io.framed.picto.ContextEvent
-import io.framed.picto.Relation
-import io.framed.picto.Shape
-import io.framed.picto.SidebarEvent
+import io.framed.picto.*
 import io.framed.util.point
 import io.framed.view.InputView
 import io.framed.view.View
@@ -18,7 +12,7 @@ import org.w3c.dom.events.MouseEvent
  * @author lars
  */
 class HtmlRelation(
-        val relation: Relation,
+        val connection: Connection,
         val jsPlumbInstance: JsPlumbInstance,
         val renderer: HtmlRenderer
 ) {
@@ -31,114 +25,80 @@ class HtmlRelation(
         connections = emptyList()
     }
 
-    val views = relation.labels.map { (shape, position) ->
+    private val views = connection.labels.map { (shape, position) ->
         InputView(shape.property).also {
             it.draggable = View.DragType.MARGIN
             it.autocomplete = shape.autocomplete
         } to position
     }
 
-    private fun drawInheritance(sourceView: View<*>, targetView: View<*>) {
-        connections += jsPlumbInstance.connect(jsPlumbConnect {
-            source = sourceView.html
-            target = targetView.html
-
-            anchor = arrayOf("Top", "Left", "Bottom", "Right")
-            connector = arrayOf("Flowchart", object {
-                val cornerRadius = 5
-            })
-            endpoint = "Blank"
-
-            paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
-                strokeWidth = 1
-            }
-
-            overlays = arrayOf(
-                    arrayOf("Arrow", object {
-                        val width = 20
-                        val length = 20
-                        val location = 1
-                        val cssClass = "front-end-arrow-inheritance"
-                        val foldback = 1.0
-                    })
-            ) + views.map { (view, position) ->
-                arrayOf("Custom", object {
-                    val create = { _: dynamic ->
-                        view.html
-                    }
-                    val cssClass = "front-end-label input-view"
-                    val location = position
-                })
-            }
-        })
-    }
-
-    private fun drawAssociation(sourceView: View<*>, targetView: View<*>) {
-        connections += jsPlumbInstance.connect(jsPlumbConnect {
-            source = sourceView.html
-            target = targetView.html
-
-            anchor = arrayOf("Top", "Left", "Bottom", "Right")
-            connector = arrayOf("Flowchart", object {
-                val cornerRadius = 5
-            })
-            endpoint = "Blank"
-
-            paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
-                strokeWidth = 1
-            }
-
-            overlays = views.map { (view, position) ->
-                arrayOf("Custom", object {
-                    val create = { _: dynamic ->
-                        view.html
-                    }
-                    val cssClass = "front-end-label input-view"
-                    val location = position
-                })
-            }.toTypedArray()
-        })
-    }
-
-    private fun drawAggregation(sourceView: View<*>, targetView: View<*>) {
-        connections += jsPlumbInstance.connect(jsPlumbConnect {
-            source = sourceView.html
-            target = targetView.html
-
-            anchor = arrayOf("Top", "Left", "Bottom", "Right")
-            connector = arrayOf("Flowchart", object {
-                val cornerRadius = 5
-            })
-            endpoint = "Blank"
-
-            paintStyle = jsPlumbPaintStyle {
-                stroke = "black"
-                strokeWidth = 1
-            }
-
-            overlays = arrayOf(
-                    arrayOf("Diamond", object {
-                        val width = 15
-                        val length = 25
-                        val location = 1
-                        val cssClass = "front-end-arrow-aggregation"
-                    })
-            ) + views.map { (view, position) ->
-                arrayOf("Custom", object {
-                    val create = { _: dynamic ->
-                        view.html
-                    }
-                    val cssClass = "front-end-label input-view"
-                    val location = position
-                })
-            }
-        })
-    }
-
     fun draw() {
-        draw(relation.source.get(), relation.target.get())
+        draw(connection.source.get(), connection.target.get())
+    }
+
+    private fun createJsPlumbConnection(line: ConnectionLine, sourceView: View<*>, targetView: View<*>) = jsPlumbConnect {
+        source = sourceView.html
+        target = targetView.html
+
+        anchor = arrayOf("Top", "Left", "Bottom", "Right")
+
+        when (line.type) {
+            ConnectionLine.Type.STRAIGHT -> {
+                connector = arrayOf("Straight")
+            }
+            ConnectionLine.Type.RECTANGLE -> {
+                connector = arrayOf("Flowchart", object {
+                    val cornerRadius = 5
+                })
+            }
+        }
+        endpoint = "Blank"
+
+        paintStyle = jsPlumbPaintStyle {
+            stroke = line.paintStyle.stroke.toCss()
+            strokeWidth = line.paintStyle.strokeWidth
+        }
+    }
+
+    fun createEndStyle(connectInit: JsPlumbConnectInit) {
+        var overlays = views.map { (view, position) ->
+            arrayOf("Custom", object {
+                val create = { _: dynamic ->
+                    view.html
+                }
+                val cssClass = "front-end-label input-view"
+                val location = position
+            })
+        }
+
+        connection.sourceStyle?.let { style ->
+            overlays += listOf(arrayOf("Arrow", object {
+                val width = style.width
+                val length = style.length
+                val foldback = style.foldback
+                val paintStyle = jsPlumbPaintStyle {
+                    stroke = style.paintStyle.stroke.toCss()
+                    strokeWidth = style.paintStyle.strokeWidth
+                    fill = style.paintStyle.fill.toCss()
+                }
+                val location = 0
+            }))
+        }
+        connection.targetStyle?.let { style ->
+            overlays += listOf(arrayOf("Arrow", object {
+                val width = style.width
+                val length = style.length
+                val foldback = style.foldback
+                val paintStyle = jsPlumbPaintStyle {
+                    stroke = style.paintStyle.stroke.toCss()
+                    strokeWidth = style.paintStyle.strokeWidth
+                    fill = style.paintStyle.fill.toCss()
+                }
+                val location = 1
+            }))
+        }
+
+        connectInit.overlays = overlays.toTypedArray()
     }
 
     fun draw(sourceShape: Shape, targetShape: Shape) {
@@ -164,27 +124,29 @@ class HtmlRelation(
             }
         })
 
-
-        when (relation.type.get()) {
-            RelationType.INHERITANCE -> drawInheritance(sourceView, targetView)
-            RelationType.ASSOCIATION -> drawAssociation(sourceView, targetView)
-            RelationType.AGGREGATION -> drawAggregation(sourceView, targetView)
+        connection.lines.dropLast(1).forEach { line ->
+            connections += jsPlumbInstance.connect(createJsPlumbConnection(line, sourceView, targetView))
+        }
+        connection.lines.lastOrNull()?.let { line ->
+            val init = createJsPlumbConnection(line, sourceView, targetView)
+            createEndStyle(init)
+            connections += jsPlumbInstance.connect(init)
         }
 
         connections.forEach { c ->
-            if (relation.hasSidebar) {
+            if (connection.hasSidebar) {
                 c.bind("click") { _, event ->
                     event.stopPropagation()
-                    relation.onSidebar.fire(SidebarEvent(relation))
+                    connection.onSidebar.fire(SidebarEvent(connection))
                 }
             }
 
-            if (relation.hasContext) {
+            if (connection.hasContext) {
                 c.bind("contextmenu") { _, event ->
                     (event as? MouseEvent)?.let { e ->
                         e.stopPropagation()
                         e.preventDefault()
-                        relation.onContext.fire(ContextEvent(e.point(), relation))
+                        connection.onContext.fire(ContextEvent(e.point(), connection))
                     }
                 }
             }
@@ -194,13 +156,13 @@ class HtmlRelation(
     init {
         draw()
 
-        relation.source.onChange {
+        connection.source.onChange {
             draw()
         }
-        relation.target.onChange {
+        connection.target.onChange {
             draw()
         }
-        relation.type.onChange {
+        connection.onStyleChange {
             draw()
         }
     }

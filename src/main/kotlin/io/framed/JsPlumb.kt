@@ -167,6 +167,8 @@ external interface JsPlumbPaintStyle {
      * Dash style.
      */
     var dashstyle: String
+
+    var fill: String
 }
 
 /**

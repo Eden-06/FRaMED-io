@@ -4,6 +4,7 @@ import io.framed.linker.ContainerLinker
 import io.framed.model.*
 import io.framed.view.Application
 import io.framed.view.Root
+import kotlinx.serialization.json.JSON
 import kotlin.browser.window
 
 /**
@@ -26,7 +27,7 @@ fun init() {
     val app = Application()
 
     // Create a dummy diagram
-    val container = container {
+    val model = container {
         name = "Economy"
         val account = clazz("Account") {
             attr("amount", "Money")
@@ -59,6 +60,9 @@ fun init() {
             targetCardinality = RelationMultiplicity.ONCE.value
         }
     }
+
+    val json = JSON.indented.stringify(model)
+    val container = JSON.parse<Container>(json)
 
     val linker = ContainerLinker(container, app)
 

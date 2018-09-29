@@ -49,6 +49,8 @@ class ContainerLinker(
     }.also(this::initPicto)
 
     operator fun get(clazz: Class): Shape = classMap[clazz]?.first?.picto ?: throw IllegalArgumentException()
+    operator fun get(clazzId: Long): Shape = classMap.entries.find { it.key.id == clazzId }?.value?.first?.picto
+            ?: throw IllegalArgumentException()
 
     val viewModel = ViewModel(boxShape {
         hasSidebar = true
@@ -61,22 +63,22 @@ class ContainerLinker(
 
     fun addClass(clazz: Class, position: Point = Point.ZERO): ClassLinker {
         // As normal view
-        val  linker = ClassLinker(clazz, this)
-        viewModel.container +=  linker.picto
-        viewModel.layer[ linker.picto] = Dimension(position.x, position.y)
+        val linker = ClassLinker(clazz, this)
+        viewModel.container += linker.picto
+        viewModel.layer[linker.picto] = Dimension(position.x, position.y)
 
         // As list entry
-        val input = contentBox.textShape( linker.nameProperty)
+        val input = contentBox.textShape(linker.nameProperty)
 
-        classMap += clazz to ( linker to input)
-        return  linker
+        classMap += clazz to (linker to input)
+        return linker
     }
 
     fun removeClass(clazz: Class) {
-        classMap[clazz]?.let { ( linker, input) ->
+        classMap[clazz]?.let { (linker, input) ->
             // As normal view
-            viewModel.container -=  linker.picto
-            viewModel.layer[ linker.picto] = null
+            viewModel.container -= linker.picto
+            viewModel.layer[linker.picto] = null
 
             // As list entry
             contentBox -= input
@@ -91,22 +93,22 @@ class ContainerLinker(
     private var containerMap: Map<Container, Pair<ContainerLinker, TextShape>> = emptyMap()
     private fun addContainer(cont: Container, position: Point = Point.ZERO): ContainerLinker {
         // As normal view
-        val  linker = ContainerLinker(cont, application, this)
-        viewModel.container +=  linker.picto
-        viewModel.layer[ linker.picto] = Dimension(position.x, position.y)
+        val linker = ContainerLinker(cont, application, this)
+        viewModel.container += linker.picto
+        viewModel.layer[linker.picto] = Dimension(position.x, position.y)
 
         // As list entry
-        val input = contentBox.textShape( linker.nameProperty)
+        val input = contentBox.textShape(linker.nameProperty)
 
-        containerMap += cont to ( linker to input)
-        return  linker
+        containerMap += cont to (linker to input)
+        return linker
     }
 
     private fun removeContainer(cont: Container) {
-        containerMap[cont]?.let { ( linker, input) ->
+        containerMap[cont]?.let { (linker, input) ->
             // As normal view
-            viewModel.container -=  linker.picto
-            viewModel.layer[ linker.picto] = null
+            viewModel.container -= linker.picto
+            viewModel.layer[linker.picto] = null
 
             // As list entry
             contentBox -= input
@@ -120,16 +122,16 @@ class ContainerLinker(
 
     private var relationMap: Map<Relation, RelationLinker> = emptyMap()
     private fun addRelation(relation: Relation): RelationLinker {
-        val  linker = RelationLinker(relation, this)
-        viewModel +=  linker.picto
+        val linker = RelationLinker(relation, this)
+        viewModel += linker.picto
 
-        relationMap += relation to  linker
-        return  linker
+        relationMap += relation to linker
+        return linker
     }
 
     fun removeRelation(relation: Relation) {
-        relationMap[relation]?.let {  linker ->
-            viewModel -=  linker.picto
+        relationMap[relation]?.let { linker ->
+            viewModel -= linker.picto
 
             relationMap -= relation
             container.relations -= relation
@@ -220,7 +222,7 @@ class ContainerLinker(
             }?.key
 
             if (source != null && target != null) {
-                val relation = Relation(source, target)
+                val relation = Relation(source.id, target.id)
                 container.relations += relation
 
                 addRelation(relation)

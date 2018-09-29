@@ -5,6 +5,11 @@ package io.framed.model
  *
  * @author lars
  */
-abstract class Model {
-    val metadata: Metadata = Metadata()
+interface Model {
+    val metadata: Metadata
+    val id: Long
+
+    companion object {
+        var lastId: Long = 0
+    }
 }

@@ -60,7 +60,6 @@
   }
 }
 
-
 .front-end-label input {
   background-color: rgba($primary-background, .6);
   text-align: center;
@@ -70,14 +69,4 @@
     border: 2px solid $border-color;
     border-radius: $border-radius;
   }
-}
-
-.front-end-arrow-inheritance {
-  fill: $primary-background;
-  border: 2px solid $uml-border;
-}
-
-.front-end-arrow-aggregation {
-  fill: $primary-background;
-  border: 2px solid $uml-border;
 }

@@ -248,10 +248,20 @@ table {
   }
 
   .sidebar-group {
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 0.3rem;
 
     & > div {
       margin-bottom: 0.5rem;
+      height: 100%;
+      opacity: 1;
+      max-height: 100px;
+      clear: both;
+      transition: margin-bottom 200ms, max-height 200ms, opacity 200ms;
+
+      &:last-child {
+        margin-bottom: 0.65rem;
+      }
+
       span {
         padding: 0.2rem;
       }
@@ -275,7 +285,14 @@ table {
     }
     &.collapsed {
       & > div:not(:first-child) {
-        display: none;
+        //display: none;
+        margin-bottom: 0;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+      }
+      & > div:first-child {
+        margin-bottom: 0;
       }
     }
   }

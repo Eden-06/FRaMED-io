@@ -15,21 +15,21 @@ class ViewModel(
             onLayerChange.fire(Unit)
         }
 
-    var relations: List<Relation> = emptyList()
+    var connections: List<Connection> = emptyList()
 
-    val onRelationAdd = EventHandler<Relation>()
-    val onRelationRemove = EventHandler<Relation>()
+    val onRelationAdd = EventHandler<Connection>()
+    val onRelationRemove = EventHandler<Connection>()
 
     val onRelationDraw = EventHandler<Pair<Shape, Shape>>()
     val onLayerChange = EventHandler<Unit>()
 
-    operator fun plusAssign(relation: Relation) {
-        relations += relation
-        onRelationAdd.fire(relation)
+    operator fun plusAssign(connection: Connection) {
+        connections += connection
+        onRelationAdd.fire(connection)
     }
 
-    operator fun minusAssign(relation: Relation) {
-        relations -= relation
-        onRelationRemove.fire(relation)
+    operator fun minusAssign(connection: Connection) {
+        connections -= connection
+        onRelationRemove.fire(connection)
     }
 }

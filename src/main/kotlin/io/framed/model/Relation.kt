@@ -1,42 +1,49 @@
 package io.framed.model
 
+import kotlinx.serialization.Serializable
+
 /**
- * Model class for an uml relation.
+ * Model class for an uml connection.
  *
  * @author lars
  */
+@Serializable
 class Relation(
 
         /**
-         * The relations source class.
+         * The connections source class.
          */
-        var source: Class,
+        var sourceId: Long,
 
         /**
-         * The relations target class.
+         * The connections target class.
          */
-        var target: Class
-): Model() {
+        var targetId: Long
+) : Model {
+
+    override val id: Long = Model.lastId++
 
     /**
-     * Name of this relation.
+     * Name of this connection.
      */
     var name: String = ""
 
     /**
-     * Cardinality for the source side of this relation.
+     * Cardinality for the source side of this connection.
      */
     var sourceCardinality: String = ""
 
     /**
-     * Cardinality for the target side of this relation.
+     * Cardinality for the target side of this connection.
      */
     var targetCardinality: String = ""
 
     /**
-     * Type of this relation
+     * Type of this connection
      */
     var type: RelationType = RelationType.ASSOCIATION
+
+    override val metadata = Metadata()
 
 }
 
@@ -70,21 +77,21 @@ enum class RelationType {
     ASSOCIATION,
     AGGREGATION;
 
-    override fun toString() = name.first() + name.drop(1).toLowerCase()
+    val value: String = name.first() + name.drop(1).toLowerCase()
 }
 
 /**
- * Creates a new relation within the current container.
+ * Creates a new connection within the current container.
  *
  * @param source Relations source.
  * @param target Relations target.
- * @param name Optional name for this relation.
- * @param init Optional builder callback for the new relation.
+ * @param name Optional name for this connection.
+ * @param init Optional builder callback for the new connection.
  *
- * @return The new relation.
+ * @return The new connection.
  */
 fun Container.relation(source: Class, target: Class, name: String = "", init: Relation.() -> Unit = {}): Relation {
-    val relation = Relation(source, target)
+    val relation = Relation(source.id, target.id)
     relation.name = name
     relations += relation
     init(relation)

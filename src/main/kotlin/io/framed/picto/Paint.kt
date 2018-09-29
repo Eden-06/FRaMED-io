@@ -13,7 +13,7 @@ data class Color(
         val red: Int,
         val green: Int,
         val blue: Int,
-        val alpha: Double
+        val alpha: Double = 1.0
 ) : Paint {
     companion object {
         val TRANSPARENT = Color(0, 0, 0, 0.0)

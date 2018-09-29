@@ -1,11 +1,16 @@
 package io.framed.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * Model class for an uml attribute.
  *
  * @author lars
  */
-class Attribute: Model() {
+@Serializable
+class Attribute : Model {
+
+    override val id: Long = Model.lastId++
 
     /**
      * Name of this attribute.
@@ -16,6 +21,8 @@ class Attribute: Model() {
      * Type of this attribute.
      */
     var type: String = ""
+
+    override val metadata = Metadata()
 }
 
 /**

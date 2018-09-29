@@ -61,10 +61,6 @@ class SidebarGroup(
     private val collapseView = IconView().also {
         it.icon = MaterialIcon.EXPAND_LESS
         it.classes += "collapse-icon"
-        it.onClick { event ->
-            collapse(!collapsed)
-            event.stopPropagation()
-        }
     }
 
     init {
@@ -75,12 +71,11 @@ class SidebarGroup(
         append(ListView().also {
             it += nameView
             it += collapseView
-        })
 
-        onClick {
-            if (collapsed) {
-                collapse(false)
+            it.onClick { event ->
+                collapse(!collapsed)
+                event.stopPropagation()
             }
-        }
+        })
     }
 }

@@ -1,13 +1,18 @@
 package io.framed.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * Model class for an uml package (package is a reserved keyword).
  *
- * It can contains classes, relations and nested containers.
+ * It can contains classes, connections and nested containers.
  *
  * @author lars
  */
-class Container : Model() {
+@Serializable
+class Container : Model {
+
+    override val id: Long = Model.lastId++
 
     /**
      * Name of this package.
@@ -21,7 +26,7 @@ class Container : Model() {
     var classes: List<Class> = emptyList()
 
     /**
-     * List of relations within this container.
+     * List of connections within this container.
      * Should this be a set?
      */
     var relations: List<Relation> = emptyList()
@@ -31,6 +36,8 @@ class Container : Model() {
      * Should this be a set?
      */
     var containers: List<Container> = emptyList()
+
+    override val metadata = Metadata()
 }
 
 /**

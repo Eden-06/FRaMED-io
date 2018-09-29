@@ -1,11 +1,16 @@
 package io.framed.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * Model class for an uml parameter.
  *
  * @author lars
  */
-class Parameter : Model() {
+@Serializable
+class Parameter : Model {
+
+    override val id: Long = Model.lastId++
 
     /**
      * Name of this parameter.
@@ -37,6 +42,8 @@ class Parameter : Model() {
         result = 31 * result + type.hashCode()
         return result
     }
+
+    override val metadata = Metadata()
 }
 
 /**

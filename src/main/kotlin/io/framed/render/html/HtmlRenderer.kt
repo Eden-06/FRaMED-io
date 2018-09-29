@@ -124,7 +124,7 @@ class HtmlRenderer(
             }
         }
 
-        viewModel.relations.forEach {
+        viewModel.connections.forEach {
             drawRelation(it, jsPlumbInstance)
         }
         viewModel.onRelationAdd {
@@ -146,8 +146,8 @@ class HtmlRenderer(
 
     private var shapeMap: Map<Shape, View<*>> = emptyMap()
 
-    private var relations: Map<Relation, HtmlRelation> = emptyMap()
-    private fun drawRelation(relation: Relation, jsPlumbInstance: JsPlumbInstance) {
+    private var relations: Map<Connection, HtmlRelation> = emptyMap()
+    private fun drawRelation(relation: Connection, jsPlumbInstance: JsPlumbInstance) {
         relations += relation to HtmlRelation(relation, jsPlumbInstance, this)
     }
 
