@@ -155,3 +155,9 @@ fun ListView.inputView(init: InputView.() -> Unit): InputView {
     init(view)
     return view
 }
+fun ListView.inputView(property: Property<String>, init: InputView.() -> Unit): InputView {
+    val view = InputView(property)
+    append(view)
+    init(view)
+    return view
+}

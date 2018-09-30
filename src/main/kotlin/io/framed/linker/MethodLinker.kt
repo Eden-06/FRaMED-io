@@ -132,8 +132,6 @@ class MethodLinker(
             }
     )
 
-    private val parameterTable = TableView()
-
     override val picto = textShape(lineProperty) {
         hasSidebar = true
         hasContext = true
@@ -146,14 +144,16 @@ class MethodLinker(
         }
     }
 
+    private lateinit var sidebarParameters: SidebarGroup
+
     override fun createSidebar(sidebar: Sidebar) = sidebar.setup() {
         title("Method")
         group("General") {
             input("Name", nameProperty)
             input("Type", typeProperty)
         }
-        group("Parameters") {
-            custom {
+        sidebarParameters = group("Parameters") {
+            /*custom {
                 append(parameterTable)
                 listView {
                     iconView(MaterialIcon.ADD)
@@ -164,23 +164,23 @@ class MethodLinker(
                         parameterProperty.fire()
                     }
                 }
-            }
+            }*/
         }
+
+        updateSidebar()
     }
 
     private enum class State {
         NAME, TYPE, PARAM_NAME, PARAM_TYPE, AFTER_PARAM
     }
 
-    var redraw = true
+    private fun updateSidebar() = sidebarParameters.apply {
+        clearContent()
 
-    init {
-        parameterProperty.onChange { _ ->
-            if (redraw) {
-                parameterTable.clear()
-
-                method.parameters.forEach { param ->
-                    parameterTable.row {
+        method.parameters.forEach { param ->
+            custom {
+                tableView {
+                    row {
                         cellBox {
                             inputView {
                                 value = param.name
@@ -226,6 +226,24 @@ class MethodLinker(
             }
         }
 
-        parameterProperty.fire()
+        custom {
+            iconView(MaterialIcon.ADD)
+            textView("Add parameter")
+            onClick {
+                method.param("")
+                redraw = true
+                parameterProperty.fire()
+            }
+        }
+    }
+
+    var redraw = true
+
+    init {
+        parameterProperty.onChange { _ ->
+            if (redraw) {
+                updateSidebar()
+            }
+        }
     }
 }

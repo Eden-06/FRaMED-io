@@ -49,6 +49,7 @@ class SidebarGroup(
         return view
     }
 
+
     fun collapse(state: Boolean = true) {
         collapsed = state
         if (state) {
@@ -61,6 +62,10 @@ class SidebarGroup(
     private val collapseView = IconView().also {
         it.icon = MaterialIcon.EXPAND_LESS
         it.classes += "collapse-icon"
+    }
+
+    fun clearContent() {
+        children.drop(1).forEach(this::remove)
     }
 
     init {
