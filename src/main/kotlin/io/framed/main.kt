@@ -42,11 +42,7 @@ fun init() {
             method("insolvency", "void")
         }
 
-        val rtype = roleType("RoleType"){
-
-        }
-
-        val stop = even
+        roleType("RoleType") {}
 
         container {
             name = "Library"

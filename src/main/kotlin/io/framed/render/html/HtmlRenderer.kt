@@ -143,10 +143,7 @@ class HtmlRenderer(
      * The method removes the endpoint for the given shape
      */
     fun deleteEndpoint(shape: Shape, instance: JsPlumbInstance){
-        val ep = this.endpointMap[shape]
-        if(ep != null) {
-            instance.deleteEndpoint(ep)
-        }
+        this.endpointMap[shape]?.let(instance::deleteEndpoint)
     }
 
     /**
@@ -177,13 +174,12 @@ class HtmlRenderer(
             shapeMap += shape to view
 
             if (shape.acceptRelation) {
-                val ep = jsPlumbInstance.addEndpoint(view.html, jsPlumbEndpointOptions {
+                this.endpointMap[shape] = jsPlumbInstance.addEndpoint(view.html, jsPlumbEndpointOptions {
                     anchors = arrayOf("Bottom")
                     isSource = true
                     isTarget = true
                     endpoint = "Dot"
                 })
-                this.endpointMap[shape] = ep
             }
         }
     }

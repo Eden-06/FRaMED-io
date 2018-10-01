@@ -2,7 +2,6 @@ package io.framed.linker
 
 import io.framed.model.*
 import io.framed.picto.*
-import io.framed.render.html.HtmlRenderer
 import io.framed.util.*
 import io.framed.view.*
 
@@ -90,6 +89,8 @@ class ContainerLinker(
 
             classMap -= clazz
             container.classes -= clazz
+
+            container.relations.filter { it.sourceId == clazz.id || it.targetId == clazz.id }.forEach(this::removeRelation)
         }
         showSidebar()
     }
@@ -188,7 +189,7 @@ class ContainerLinker(
         viewModel.layer[linker.picto] = Dimension(position.x, position.y)
 
         // As list entry
-        val input = contentBox.iconShape( ??? )
+        val input = contentBox.iconShape(linker.symbolProperty)
 
         eventMap += evt to (linker to input)
         return linker

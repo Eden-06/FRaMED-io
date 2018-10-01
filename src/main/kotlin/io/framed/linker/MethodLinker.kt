@@ -152,20 +152,7 @@ class MethodLinker(
             input("Name", nameProperty)
             input("Type", typeProperty)
         }
-        sidebarParameters = group("Parameters") {
-            /*custom {
-                append(parameterTable)
-                listView {
-                    iconView(MaterialIcon.ADD)
-                    textView("Add parameter")
-                    onClick {
-                        method.param("")
-                        redraw = true
-                        parameterProperty.fire()
-                    }
-                }
-            }*/
-        }
+        sidebarParameters = group("Parameters") {}
 
         updateSidebar()
     }

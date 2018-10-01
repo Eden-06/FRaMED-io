@@ -11,7 +11,7 @@ class EventLinker(
 ) : Linker<IconShape>(event, parent) {
 
     private val typeProperty = property(event::type)
-    private val symbolProperty = property(typeProperty,
+    val symbolProperty = property(typeProperty,
             getter = {
                 typeProperty.get().symbol
             }
