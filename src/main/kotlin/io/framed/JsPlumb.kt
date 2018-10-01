@@ -2,6 +2,7 @@
 
 package io.framed
 
+import io.framed.render.html.HtmlRenderer
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
@@ -89,9 +90,12 @@ external interface JsPlumbInstance {
     /**
      *
      */
-    fun addEndpoint(target: HTMLElement, options: JsPlumbEndpointOptionsInit)
+    fun addEndpoint(target: HTMLElement, options: JsPlumbEndpointOptionsInit): HTMLElement
 
-
+    /**
+     *
+     */
+    fun deleteEndpoint(target: HTMLElement)
 }
 
 /**
@@ -212,6 +216,7 @@ external interface JsPlumbEndpointOptionsInit {
     var dropOptions: JsPlumbDropOptionsInit
     var dragOptions: JsPlumbDragOptionsInit
 }
+
 /**
  *
  */

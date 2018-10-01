@@ -9,6 +9,7 @@ import io.framed.util.Dimension
 import io.framed.util.Point
 import io.framed.util.point
 import io.framed.view.*
+import org.w3c.dom.HTMLElement
 
 /**
  * @author lars
@@ -20,6 +21,21 @@ class HtmlRenderer(
 
     private val layerChangeListener = { _: Unit ->
         draw()
+    }
+
+    /**
+     * The map stores the endpoints for all shape
+     */
+    val endpointMap = mutableMapOf<Shape, HTMLElement>()
+
+    /**
+     * The method removes the endpoint for the given shape
+     */
+    fun deleteEndpoint(shape: Shape, instance: JsPlumbInstance){
+        val ep = this.endpointMap[shape]
+        if(ep != null) {
+            instance.deleteEndpoint(ep)
+        }
     }
 
     override fun render(viewModel: ViewModel) {
@@ -161,12 +177,13 @@ class HtmlRenderer(
             shapeMap += shape to view
 
             if (shape.acceptRelation) {
-                jsPlumbInstance.addEndpoint(view.html, jsPlumbEndpointOptions {
+                val ep = jsPlumbInstance.addEndpoint(view.html, jsPlumbEndpointOptions {
                     anchors = arrayOf("Bottom")
                     isSource = true
                     isTarget = true
                     endpoint = "Dot"
                 })
+                this.endpointMap[shape] = ep
             }
         }
     }
