@@ -44,6 +44,8 @@ fun init() {
 
         roleType("RoleType") {}
 
+        val evt = event(EventType.MESSAGE){}
+
         container {
             name = "Library"
             val book = clazz("Book") {

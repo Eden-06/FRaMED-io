@@ -196,6 +196,25 @@ class ContainerLinker(
     }
 
     /**
+     * The method removes an event of the linker
+     */
+    private fun removeEvent(evt: Event) {
+        eventMap[evt]?.let { (linker, input) ->
+            // As normal view
+            viewModel.container -= linker.picto
+            viewModel.layer[linker.picto] = null
+
+            // As list entry
+            contentBox -= input
+
+            eventMap -= evt
+            container.events -= evt
+        }
+
+        showSidebar()
+    }
+
+    /**
      * The map stores all relations and their related linkers
      */
     private var relationMap: Map<Relation, RelationLinker> = emptyMap()

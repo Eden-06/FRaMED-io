@@ -24,13 +24,25 @@ class Event : Model {
 }
 
 /**
+ * The method initalizes a new event
+ * @param type type of the event
+ */
+fun Container.event(type: EventType, init: Event.() -> Unit): Event {
+    val evt = Event()
+    evt.type = type
+    evt.init()
+    events += evt
+    return evt
+}
+
+/**
  * The enum defines the type and their specifications
  */
 enum class EventType(val printableName: String, val symbol: Icon) {
-    RETURN("Return", MaterialIcon.BACKSPACE),
-    MESSAGE("Message", MaterialIcon.MESSAGE),
-    ERROR("Error", MaterialIcon.ERROR),
-    NONE("", MaterialIcon.ACCESSIBILITY);
+    RETURN("RETURN", MaterialIcon.BACKSPACE),
+    MESSAGE("MESSAGE", MaterialIcon.MESSAGE),
+    ERROR("ERROR", MaterialIcon.ERROR),
+    NONE("NONE", MaterialIcon.ACCESSIBILITY);
 
     override fun toString() = printableName
 }
