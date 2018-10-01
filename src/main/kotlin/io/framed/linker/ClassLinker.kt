@@ -50,13 +50,23 @@ class ClassLinker(
         acceptRelation = true
     }.also(this::initPicto)
 
-
+    /**
+     * The map stores all attriubtes of the related class
+     */
     private var attributeMap: Map<Attribute, AttributeLinker> = emptyMap()
+
+    /**
+     * The method adds a new attribute to the class
+     * @param attribute new attribute to add
+     */
     private fun addAttribute(attribute: Attribute) = AttributeLinker(attribute, this).also {
         attributeBox += it.picto
         attributeMap += attribute to it
     }
 
+    /**
+     * The method removes an attribute of the class
+     */
     fun removeAttribute(attribute: Attribute) {
         attributeMap[attribute]?.let {
             attributeBox -= it.picto
@@ -67,6 +77,7 @@ class ClassLinker(
     }
 
     private var methodMap: Map<Method, MethodLinker> = emptyMap()
+
     private fun addMethod(method: Method) = MethodLinker(method, this).also {
         methodBox += it.picto
         methodMap += method to it

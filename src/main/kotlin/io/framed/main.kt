@@ -42,6 +42,10 @@ fun init() {
             method("insolvency", "void")
         }
 
+        val rtype = roleType("RoleType"){
+
+        }
+
         container {
             name = "Library"
             val book = clazz("Book") {

@@ -1,8 +1,6 @@
 package io.framed.linker
 
-import io.framed.model.Class
-import io.framed.model.Container
-import io.framed.model.Relation
+import io.framed.model.*
 import io.framed.picto.*
 import io.framed.render.html.HtmlRenderer
 import io.framed.util.Dimension
@@ -60,8 +58,14 @@ class ContainerLinker(
         layer = Layer()
     }.also(this::initPicto))
 
+    /**
+     * The map stores all classes and their related linkers and textshapes
+     */
     private var classMap: Map<Class, Pair<ClassLinker, TextShape>> = emptyMap()
 
+    /**
+     * The method adds a new class to the current container
+     */
     fun addClass(clazz: Class, position: Point = Point.ZERO): ClassLinker {
         // As normal view
         val linker = ClassLinker(clazz, this)
@@ -75,6 +79,9 @@ class ContainerLinker(
         return linker
     }
 
+    /**
+     * The method removes a class of the current container
+     */
     fun removeClass(clazz: Class) {
         classMap[clazz]?.let { (linker, input) ->
             // As normal view
@@ -86,6 +93,45 @@ class ContainerLinker(
 
             classMap -= clazz
             container.classes -= clazz
+        }
+        showSidebar()
+    }
+
+    /**
+     * The map stores all role types and their related linkers and textshapes
+     */
+    private var roleTypeMap: Map<RoleType, Pair<RoleTypeLinker, TextShape>> = emptyMap()
+
+    /**
+     * The method adds a new class to the current container
+     */
+    fun addRoleType(type: RoleType, position: Point = Point.ZERO): RoleTypeLinker {
+        // As normal view
+        val linker = RoleTypeLinker(type, this)
+        viewModel.container += linker.picto
+        viewModel.layer[linker.picto] = Dimension(position.x, position.y)
+
+        // As list entry
+        val input = contentBox.textShape(linker.nameProperty)
+
+        roleTypeMap += type to (linker to input)
+        return linker
+    }
+
+    /**
+     * The method removes a class of the current container
+     */
+    fun removeRoleType(type: RoleType) {
+        roleTypeMap[type]?.let { (linker, input) ->
+            // As normal view
+            viewModel.container -= linker.picto
+            viewModel.layer[linker.picto] = null
+
+            // As list entry
+            contentBox -= input
+
+            roleTypeMap -= type
+            container.roletypes -= type
         }
         showSidebar()
     }

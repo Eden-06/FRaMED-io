@@ -37,6 +37,11 @@ class Container : Model {
      */
     var containers: List<Container> = emptyList()
 
+    /**
+     * List of related role types
+     */
+    var roletypes: List<RoleType> = emptyList()
+
     override val metadata = Metadata()
 }
 
