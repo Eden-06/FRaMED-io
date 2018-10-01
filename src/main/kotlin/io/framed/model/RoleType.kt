@@ -3,25 +3,26 @@ package io.framed.model
 import kotlinx.serialization.Serializable
 
 /**
- * Model class for an uml class.
- *
- * @author lars
+ * Model role type
  */
 @Serializable
 class RoleType : Model {
-
-    override val id: Long = Model.lastId++
-
     /**
-     * Name of this class
+     * Identification of the instance
+     */
+    override val id: Long = Model.lastId++
+    /**
+     * Name of the instance
      */
     var name: String = ""
-
+    /**
+     * Metadata of the instance
+     */
     override val metadata = Metadata()
 }
 
 /**
- * Create a new roletype within the current container
+ * Create a new role type within the current container
  *
  * @param name Name of the new roletype
  * @param init Builder callback for this roletype
@@ -32,6 +33,6 @@ fun Container.roleType(name: String, init: RoleType.() -> Unit): RoleType {
     val type = RoleType()
     type.name = name
     type.init()
-    roletypes += type
+    roleTypes += type
     return type
 }

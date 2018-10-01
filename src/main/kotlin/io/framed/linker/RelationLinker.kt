@@ -54,6 +54,9 @@ class RelationLinker(
         hasSidebar = true
     }.also(this::initPicto)
 
+    /**
+     * The method styles the relation based on their type
+     */
     private fun updateEndStyle() {
         when (relationType) {
             RelationType.INHERITANCE -> {

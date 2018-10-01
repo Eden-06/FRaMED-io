@@ -5,13 +5,14 @@ import kotlinx.serialization.Serializable
 /**
  * Model class for an uml package (package is a reserved keyword).
  *
- * It can contains classes, connections and nested containers.
- *
- * @author lars
+ * It contains classes, connections, role types and nested containers.
  */
 @Serializable
 class Container : Model {
 
+    /**
+     * Identification of the instance
+     */
     override val id: Long = Model.lastId++
 
     /**
@@ -40,8 +41,16 @@ class Container : Model {
     /**
      * List of related role types
      */
-    var roletypes: List<RoleType> = emptyList()
+    var roleTypes: List<RoleType> = emptyList()
 
+    /**
+     * List of all events of the current application
+     */
+    var events: List<Event> = emptyList()
+
+    /**
+     * Stores the metadata of the current model
+     */
     override val metadata = Metadata()
 }
 

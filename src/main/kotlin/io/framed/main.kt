@@ -8,7 +8,7 @@ import kotlinx.serialization.json.JSON
 import kotlin.browser.window
 
 /**
- * Entry point.
+ * Entry point of the application.
  */
 var name = ""
 
@@ -45,6 +45,8 @@ fun init() {
         val rtype = roleType("RoleType"){
 
         }
+
+        val stop = even
 
         container {
             name = "Library"

@@ -39,6 +39,7 @@ class RoleTypeLinker (
                 style = Border.BorderStyle.SOLID
                 width = 1.0
                 color = color(0, 0, 0, 0.3)
+                radius = 10.0
             }
         }
 

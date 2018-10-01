@@ -3,10 +3,7 @@ package io.framed.linker
 import io.framed.model.*
 import io.framed.picto.*
 import io.framed.render.html.HtmlRenderer
-import io.framed.util.Dimension
-import io.framed.util.Point
-import io.framed.util.RegexValidator
-import io.framed.util.property
+import io.framed.util.*
 import io.framed.view.*
 
 /**
@@ -131,12 +128,19 @@ class ContainerLinker(
             contentBox -= input
 
             roleTypeMap -= type
-            container.roletypes -= type
+            container.roleTypes -= type
         }
         showSidebar()
     }
 
+    /**
+     * The map stores all containers
+     */
     private var containerMap: Map<Container, Pair<ContainerLinker, TextShape>> = emptyMap()
+
+    /**
+     * The method adds a new container to the linker
+     */
     private fun addContainer(cont: Container, position: Point = Point.ZERO): ContainerLinker {
         // As normal view
         val linker = ContainerLinker(cont, application, this)
@@ -150,6 +154,9 @@ class ContainerLinker(
         return linker
     }
 
+    /**
+     * The method removes a container of the linker
+     */
     private fun removeContainer(cont: Container) {
         containerMap[cont]?.let { (linker, input) ->
             // As normal view
@@ -166,7 +173,37 @@ class ContainerLinker(
         showSidebar()
     }
 
+    /**
+     * The map contains all events of the current model and their related controllers and shapes.
+     */
+    private var eventMap: Map<Event, Pair<EventLinker, IconShape>> = emptyMap()
+
+    /**
+     * The method adds a new event to the linker
+     */
+    private fun addEvent(evt: Event, position: Point = Point.ZERO): EventLinker {
+        // As normal view
+        val linker = EventLinker(evt, this)
+        viewModel.container += linker.picto
+        viewModel.layer[linker.picto] = Dimension(position.x, position.y)
+
+        // As list entry
+        val input = contentBox.iconShape( ??? )
+
+        eventMap += evt to (linker to input)
+        return linker
+    }
+
+    /**
+     * The map stores all relations and their related linkers
+     */
     private var relationMap: Map<Relation, RelationLinker> = emptyMap()
+
+    /**
+     * The method adds a new relation and returns a new controller
+     * @param relation new relation
+     * @return new linker to manage the relation
+     */
     private fun addRelation(relation: Relation): RelationLinker {
         val linker = RelationLinker(relation, this)
         viewModel += linker.picto
@@ -175,6 +212,10 @@ class ContainerLinker(
         return linker
     }
 
+    /**
+     * The method deletes a relation
+     * @param relation relation to delete
+     */
     fun removeRelation(relation: Relation) {
         relationMap[relation]?.let { linker ->
             viewModel -= linker.picto
@@ -185,7 +226,6 @@ class ContainerLinker(
 
         showSidebar()
     }
-
 
     private lateinit var sidebarActionsGroup: SidebarGroup
 
@@ -252,12 +292,19 @@ class ContainerLinker(
         }
     }
 
+    /**
+     * The method initializes a new instance of the linker
+     */
     init {
         container.classes.forEach { addClass(it) }
 
         container.containers.forEach { addContainer(it) }
 
         container.relations.forEach { addRelation(it) }
+
+        container.roleTypes.forEach { addRoleType(it) }
+
+        container.events.forEach { addEvent(it) }
 
         viewModel.onRelationDraw { (sourceShape, targetShape) ->
             val source = classMap.entries.find { (_, pair) ->
