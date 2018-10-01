@@ -22,22 +22,6 @@ class HtmlRenderer(
     private val layerChangeListener = { _: Unit ->
         draw()
     }
-
-    /**
-     * The map stores the endpoints for all shape
-     */
-    val endpointMap = mutableMapOf<Shape, HTMLElement>()
-
-    /**
-     * The method removes the endpoint for the given shape
-     */
-    fun deleteEndpoint(shape: Shape, instance: JsPlumbInstance){
-        val ep = this.endpointMap[shape]
-        if(ep != null) {
-            instance.deleteEndpoint(ep)
-        }
-    }
-
     override fun render(viewModel: ViewModel) {
         this.viewModel.onLayerChange -= layerChangeListener
 
@@ -138,6 +122,7 @@ class HtmlRenderer(
             map[it]?.let { v ->
                 navigationView.container.remove(v)
             }
+            this.deleteEndpoint(it, jsPlumbInstance)
         }
 
         viewModel.connections.forEach {
@@ -153,6 +138,21 @@ class HtmlRenderer(
             }
         }
     }
+
+    /**
+     * The method removes the endpoint for the given shape
+     */
+    fun deleteEndpoint(shape: Shape, instance: JsPlumbInstance){
+        val ep = this.endpointMap[shape]
+        if(ep != null) {
+            instance.deleteEndpoint(ep)
+        }
+    }
+
+    /**
+     * The map stores the endpoints for all shape
+     */
+    private val endpointMap = mutableMapOf<Shape, HTMLElement>()
 
     operator fun get(shape: Shape): View<*> = shapeMap[shape] ?: throw IllegalArgumentException()
 

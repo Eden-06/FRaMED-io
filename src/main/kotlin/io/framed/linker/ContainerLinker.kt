@@ -4,6 +4,7 @@ import io.framed.model.Class
 import io.framed.model.Container
 import io.framed.model.Relation
 import io.framed.picto.*
+import io.framed.render.html.HtmlRenderer
 import io.framed.util.Dimension
 import io.framed.util.Point
 import io.framed.util.RegexValidator
@@ -86,7 +87,6 @@ class ContainerLinker(
             classMap -= clazz
             container.classes -= clazz
         }
-
         showSidebar()
     }
 
