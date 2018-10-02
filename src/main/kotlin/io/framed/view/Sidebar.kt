@@ -28,8 +28,8 @@ class Sidebar(
 
     fun display() {
         application.let { a ->
-            a.propertyBar.clear()
-            a.propertyBar += this
+            a.propertyBar.content.clear()
+            a.propertyBar.content += this
         }
     }
 

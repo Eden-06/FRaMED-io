@@ -44,7 +44,7 @@ fun init() {
 
         roleType("RoleType") {}
 
-        val evt = event(EventType.MESSAGE){}
+        event(EventType.MESSAGE){}
 
         container {
             name = "Library"

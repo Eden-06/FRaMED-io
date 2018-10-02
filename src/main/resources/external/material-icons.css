@@ -7,7 +7,7 @@
 }
 
 .material-icons {
-    font-family: 'Material Icons';
+    font-family: 'Material Icons' !important;
     font-weight: normal;
     font-style: normal;
     letter-spacing: normal;

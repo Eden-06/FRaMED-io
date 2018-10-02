@@ -8,9 +8,6 @@ import org.w3c.dom.HTMLDivElement
  * @author lars
  */
 class ListView : ViewCollection<View<*>, HTMLDivElement>("div") {}
-fun ListView.listView(init: ListView.() -> Unit): ListView {
-    val view = ListView()
-    append(view)
-    init(view)
-    return view
-}
+
+fun ViewCollection<in ListView, *>.listView(init: ListView.() -> Unit) =
+        ListView().also(this::append).also(init)

@@ -53,9 +53,11 @@ class SidebarGroup(
     fun collapse(state: Boolean = true) {
         collapsed = state
         if (state) {
-            collapseView.icon = MaterialIcon.EXPAND_MORE
+            collapseView.classes += "rotate-180"
+            //collapseView.icon = MaterialIcon.EXPAND_MORE
         } else {
-            collapseView.icon = MaterialIcon.EXPAND_LESS
+            collapseView.classes -= "rotate-180"
+            //collapseView.icon = MaterialIcon.EXPAND_LESS
         }
     }
 

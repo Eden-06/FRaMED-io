@@ -42,7 +42,7 @@ enum class EventType(val printableName: String, val symbol: Icon) {
     RETURN("RETURN", MaterialIcon.BACKSPACE),
     MESSAGE("MESSAGE", MaterialIcon.MESSAGE),
     ERROR("ERROR", MaterialIcon.ERROR),
-    NONE("NONE", MaterialIcon.ACCESSIBILITY);
+    NONE("NONE", MaterialIcon.STOP);
 
     override fun toString() = printableName
 }

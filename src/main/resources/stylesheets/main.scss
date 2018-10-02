@@ -95,11 +95,93 @@ select {
   height: 100%;
 }
 
-.toolbar {
-  background: linear-gradient(to bottom, $toolbar-color 0%, darken($toolbar-color, 2%) 100%);
-  color: $toolbar-text;
+.menu-bar {
   position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
+  height: $menu-bar-height;
+  line-height: $menu-bar-height;
+  background: $primary-background;
+  z-index: 3;
+  border-bottom: solid 1px $border-color-light;
+  padding-left: 0.5rem;
+  & > div {
+    float: left;
+    & > .icon-view {
+      display: none;
+    }
+
+    & > span {
+      position: relative;
+      top: -1px;
+    }
+
+    &:hover >  div {
+      display: none;
+    }
+    &.show >  div {
+      display: block;
+    }
+  }
+  @include no-select();
+}
+
+.position-bar {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  font-size: 1.2rem;
+  span {
+    padding: 0.3rem 0.6rem;
+    &:hover {
+      background: rgba($text-color, 0.08);
+    }
+  }
+}
+
+.menu {
+  position: relative;
+  span:not(.icon-view) {
+    display: block;
+    padding: 0 0.8rem;
+    &:hover {
+      background: rgba($text-color, 0.1);
+    }
+  }
+  .icon-view {
+    position: absolute;
+    top: 0;
+    right: 0.2rem;
+  }
+  & > div {
+    background: $primary-background;
+    min-width: 10rem;
+    position: absolute;
+    z-index: 5;
+    display: none;
+    border: solid 1px $border-color;
+
+    padding: 0.4rem 0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+  }
+  &:hover > div {
+    display: block;
+  }
+  .menu > div {
+    left: 100%;
+    top: 0;
+    margin-left: -1rem;
+    margin-top: -1px;
+  }
+}
+
+.tool-bar {
+  //background: linear-gradient(to bottom, $toolbar-color 0%, darken($toolbar-color, 1%) 100%);
+  background: $secondary-background;
+  color: $icon-color;
+  position: absolute;
+  top: $menu-bar-height;
   left: 0;
   width: 100%;
   height: $toolbar-height;
@@ -107,7 +189,10 @@ select {
   z-index: 2;
   font-size: 1.1rem;
 
+  padding: 0 0.5rem;
+
   box-shadow: 0 0 4px rgba(0, 0, 0, .14), 0 4px 8px rgba(0, 0, 0, .28);
+  @include no-select();
 }
 
 .left-bar {
@@ -141,7 +226,7 @@ select {
 
 .workspace {
   position: absolute;
-  top: $toolbar-height;
+  top: $top-height;
   left: 0;
   bottom: 0;
   right: $sidebar-width;
@@ -150,7 +235,7 @@ select {
 
 .property-bar {
   position: absolute;
-  top: $toolbar-height;
+  top: $top-height;
   right: 0;
   bottom: 0;
   width: $sidebar-width;
@@ -160,25 +245,22 @@ select {
   z-index: 1;
   box-shadow: 0 0 4px rgba(0, 0, 0, .14);
   border-left: solid 1px $border-color;
+  &.hide {
+    overflow-y: hidden;
+  }
 }
 
 .property-bar-resizer {
   position: absolute;
-  top: $toolbar-height;
-  right: $sidebar-width;
+  top: 0;
+  left: 0;
   bottom: 0;
   width: 0.4rem;
-  margin-right: -0.3rem;
   z-index: 2;
   background: transparent;
   cursor: ew-resize;
   &:hover, &.mouse-down {
     background: rgba($text-color, .1);
-  }
-  &.side {
-    margin-right: 0;
-    width: 0.6rem;
-    background: rgba($text-color, .2);
   }
 }
 
@@ -191,8 +273,8 @@ select {
   z-index: 100;
   & > div {
     position: absolute;
-    background: $dialog-background;
-    color: $dialog-text;
+    background: $primary-background;
+    color: $text-color;
     border: solid 1px $border-color;
     box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
     border-radius: $border-radius;
@@ -257,6 +339,7 @@ table {
       max-height: 100px;
       clear: both;
       transition: margin-bottom 200ms, max-height 200ms, opacity 200ms;
+      position: relative;
 
       &:last-child {
         margin-bottom: 0.65rem;
@@ -270,14 +353,28 @@ table {
       }
       .group-header {
         font-size: 1.1rem;
+        overflow: hidden;
+        display: block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-right: 1rem;
         @include no-select;
       }
       .collapse-icon {
         margin-top: -0.1rem;
         font-size: 1.2rem;
-        float: right;
+        position: absolute;
+        right: 0;
+        top: 0.2rem;
+        transform: rotate(0);
+        transition: transform 0.2s, top 0.2s;
 
         @include no-select;
+
+        &.rotate-180 {
+          transform: rotate(-180deg);
+          top: 0.03rem
+        }
       }
       .button {
         width: 100%;
@@ -326,8 +423,8 @@ table {
 
 .dialog-window {
   position: absolute;
-  background: $dialog-background;
-  color: $dialog-text;
+  background: $primary-background;
+  color: $text-color;
   border: solid 1px $border-color;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
   border-radius: $border-radius;
@@ -364,7 +461,7 @@ table {
   border: solid 1px $border-color;
   outline: none;
 
-  background: $primary-background;
+  background: $secondary-background;
   color: $text-color;
 
   box-shadow: 0 1px 4px rgba(0, 0, 0, .14);
@@ -380,5 +477,13 @@ table {
   &.error {
     background: $error-primary;
     color: $error-text;
+  }
+}
+
+.icon-view {
+  color: $icon-color;
+
+  &:hover {
+    color: $icon-color-focus;
   }
 }

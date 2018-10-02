@@ -38,14 +38,5 @@ class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
     }
 }
 
-fun ListView.iconView(init: IconView.() -> Unit): IconView {
-    val view = IconView()
-    append(view)
-    init(view)
-    return view
-}
-
-fun ListView.iconView(icon: Icon?, init: IconView.() -> Unit = {}): IconView = iconView {
-    this.icon = icon
-    init(this)
-}
+fun ViewCollection<in IconView, *>.iconView(icon: Icon? = null, init: IconView.() -> Unit = {})=
+        IconView(icon).also(this::append).also(init)

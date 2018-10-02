@@ -52,9 +52,14 @@ $theme: "light" !default;
   $dialog-button: $secondary-background;
 }
 
+$icon-color: rgba($text-color, 0.54);
+$icon-color-focus: rgba($text-color, 0.87);
+
 // Common
 $input-border-size: 1px;
-$toolbar-height: 3.5rem;
+$menu-bar-height: 2.2rem;
+$toolbar-height: 2.8rem;
+$top-height: $menu-bar-height + $toolbar-height;
 $sidebar-width: 16rem;
 $border-radius: 0.2rem;
 
