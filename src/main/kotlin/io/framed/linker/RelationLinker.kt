@@ -19,9 +19,9 @@ import io.framed.view.contextMenu
 class RelationLinker(
         private val relation: Relation,
         override val parent: ContainerLinker
-) : Linker<io.framed.picto.Connection>(relation, parent) {
+) : Linker<Connection>(relation, parent) {
 
-    private val nameProperty = property(relation::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val nameProperty = property(relation::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex()))
     private val sourceCardinalityProperty = property(relation::sourceCardinality)
     private val targetCardinalityProperty = property(relation::targetCardinality)
 
@@ -100,10 +100,7 @@ class RelationLinker(
             input("Source cardinality", sourceCardinalityProperty, RelationMultiplicity.STRING_VALUES)
             input("Target cardinality", targetCardinalityProperty, RelationMultiplicity.STRING_VALUES)
 
-            val types = RelationType.values().toList()
-            select("Type", types, relationType) {
-                relationType = it
-            }
+            select("Type", RelationType.values().toList(), typeProperty)
 
             button("Toggle direction") {
                 val h = source

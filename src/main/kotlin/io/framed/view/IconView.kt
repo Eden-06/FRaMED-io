@@ -40,3 +40,5 @@ class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
 
 fun ViewCollection<in IconView, *>.iconView(icon: Icon? = null, init: IconView.() -> Unit = {})=
         IconView(icon).also(this::append).also(init)
+fun ViewCollection<in IconView, *>.iconView(property: Property<out Icon>, init: IconView.() -> Unit = {})=
+        IconView(property).also(this::append).also(init)

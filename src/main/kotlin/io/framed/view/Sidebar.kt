@@ -27,17 +27,11 @@ class Sidebar(
     }
 
     fun display() {
-        application.let { a ->
-            a.propertyBar.content.clear()
-            a.propertyBar.content += this
-        }
+        application.propertyBar.content.clear()
+        application.propertyBar.content += this
     }
 
-    fun group(name: String, init: SidebarGroup.() -> Unit): SidebarGroup {
-        val view = SidebarGroup(name).also(init)
-        append(view)
-        return view
-    }
+    fun group(name: String, init: SidebarGroup.() -> Unit) = SidebarGroup(name).also(init).also(this::append)
 
     fun title(text: String): TextView {
         val view = TextView().also {

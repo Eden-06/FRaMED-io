@@ -198,7 +198,7 @@ class ContainerLinker(
     /**
      * The method removes an event of the linker
      */
-    private fun removeEvent(evt: Event) {
+    fun removeEvent(evt: Event) {
         eventMap[evt]?.let { (linker, input) ->
             // As normal view
             viewModel.container -= linker.picto

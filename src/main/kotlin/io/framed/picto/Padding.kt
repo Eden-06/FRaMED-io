@@ -32,4 +32,11 @@ class Padding(
     fun toCss(): String = "${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px"
 }
 // The function initializes a new instance
-fun Style.padding(init: Padding.() -> Unit): Padding = Padding().also(init)
+fun Style.padding(init: Padding.() -> Unit): Padding = Padding().also(init).also { padding = it }
+fun Style.padding(padding: Double): Padding = Padding().also {
+    it.paddingTop = padding
+    it.paddingLeft = padding
+    it.paddingBottom = padding
+    it.paddingRight = padding
+    this.padding = it
+}

@@ -1,6 +1,7 @@
 package io.framed.view
 
 import io.framed.util.EventHandler
+import io.framed.util.Property
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -14,6 +15,20 @@ class SelectView<T : Any>(
         initValues: List<T>,
         initSelected: T
 ) : View<HTMLSelectElement>("select") {
+
+    constructor(initValues: List<T>, property: Property<T>) : this(initValues, property.get()) {
+        bind(property)
+    }
+
+    fun bind(property: Property<T>) {
+        onChange {
+            property.set(it);
+        }
+
+        property.onChange {
+            selected = property.get()
+        }
+    }
 
     var values: List<T> = emptyList()
         set(value) {

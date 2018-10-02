@@ -22,6 +22,7 @@ class HtmlRenderer(
     private val layerChangeListener = { _: Unit ->
         draw()
     }
+
     override fun render(viewModel: ViewModel) {
         this.viewModel.onLayerChange -= layerChangeListener
 
@@ -142,7 +143,7 @@ class HtmlRenderer(
     /**
      * The method removes the endpoint for the given shape
      */
-    fun deleteEndpoint(shape: Shape, instance: JsPlumbInstance){
+    fun deleteEndpoint(shape: Shape, instance: JsPlumbInstance) {
         this.endpointMap[shape]?.let(instance::deleteEndpoint)
     }
 
@@ -235,95 +236,121 @@ class HtmlRenderer(
         }
     }
 
-    private fun drawBoxShape(shape: BoxShape, parent: ViewCollection<View<*>, *>, position: BoxShape.Position, jsPlumbInstance: JsPlumbInstance): View<*> {
-        val view = ListView()
-        parent += view
-
-        style(view, shape.style)
-        events(view, shape)
+    private fun drawBoxShape(
+            shape: BoxShape,
+            parent: ViewCollection<View<*>, *>,
+            position: BoxShape.Position,
+            jsPlumbInstance: JsPlumbInstance
+    ): View<*> = parent.listView {
+        style(this, shape.style)
+        events(this, shape)
 
         if (position == BoxShape.Position.ABSOLUTE) {
-            view.left = shape.left ?: 0.0
-            view.top = shape.top ?: 0.0
-            view.classes += "absolute-view"
+            left = shape.left ?: 0.0
+            top = shape.top ?: 0.0
+            classes += "absolute-view"
 
             shape.onPositionChange { force ->
                 if (force) {
-                    view.left = shape.left ?: 0.0
-                    view.top = shape.top ?: 0.0
+                    left = shape.left ?: 0.0
+                    top = shape.top ?: 0.0
                 }
             }
 
-            view.draggable = View.DragType.ABSOLUTE
-            view.onMouseDown { event ->
+            draggable = View.DragType.ABSOLUTE
+            onMouseDown { event ->
                 event.stopPropagation()
-                selectView(view, event.ctrlKey, false)
+                selectView(this, event.ctrlKey, false)
             }
-            view.onClick { event ->
+            onClick { event ->
                 event.stopPropagation()
             }
-            view.onDblClick { event ->
+            onDblClick { event ->
                 event.stopPropagation()
-                selectView(view, event.ctrlKey, true)
+                selectView(this, event.ctrlKey, true)
             }
-            view.onDrag { event ->
+            onDrag { event ->
                 if (event.direct) {
-                    (selectedViews - view).forEach {
+                    (selectedViews - this).forEach {
                         it.performDrag(event.indirect)
                     }
                 }
-                jsPlumbInstance.revalidate(view.html)
+                jsPlumbInstance.revalidate(html)
 
                 shape.left = event.newPosition.x
                 shape.top = event.newPosition.y
             }
-            draggableViews += view
+            draggableViews += this
         } else {
-            view.classes += "content-view"
+            classes += "content-view"
         }
 
         var map = shape.shapes.map {
-            it to drawShape(it, view, shape.position, jsPlumbInstance)
+            it to drawShape(it, this, shape.position, jsPlumbInstance)
         }.toMap()
 
         shape.onAdd {
-            map += it to drawShape(it, view, shape.position, jsPlumbInstance)
+            map += it to drawShape(it, this, shape.position, jsPlumbInstance)
         }
         shape.onRemove {
             map[it]?.let { v ->
-                view.remove(v)
+                remove(v)
             }
-        }
-        return view
-    }
-
-    private fun drawTextShape(shape: TextShape, parent: ViewCollection<View<*>, *>): View<*> {
-        return InputView(shape.property).also { view ->
-            style(view, shape.style)
-            events(view, shape)
-
-            view.autocomplete = shape.autocomplete
-
-            view.onMouseDown {
-                view.focus()
-            }
-
-            parent.append(view)
         }
     }
 
-    private fun drawIconShape(shape: IconShape, parent: ViewCollection<View<*>, *>): View<*> {
-        return IconView(shape.property).also { view ->
-            style(view, shape.style)
-            events(view, shape)
+    private fun drawTextShape(shape: TextShape, parent: ViewCollection<View<*>, *>): View<*> =
+            parent.inputView(shape.property) {
+                style(this, shape.style)
+                events(this, shape)
 
-            view.onMouseDown {
-                view.focus()
+                autocomplete = shape.autocomplete
+
+                onMouseDown {
+                    focus()
+                }
             }
 
-            parent.append(view)
-        }
-    }
+    private fun drawIconShape(shape: IconShape, parent: ViewCollection<View<*>, *>): View<*> =
+            parent.iconView(shape.property) {
+                style(this, shape.style)
+                events(this, shape)
+
+                left = shape.left ?: 0.0
+                top = shape.top ?: 0.0
+                classes += "absolute-view"
+
+                shape.onPositionChange { force ->
+                    if (force) {
+                        left = shape.left ?: 0.0
+                        top = shape.top ?: 0.0
+                    }
+                }
+
+                draggable = View.DragType.ABSOLUTE
+                onMouseDown { event ->
+                    event.stopPropagation()
+                    selectView(this, event.ctrlKey, false)
+                }
+                onClick { event ->
+                    event.stopPropagation()
+                }
+                onDblClick { event ->
+                    event.stopPropagation()
+                    selectView(this, event.ctrlKey, true)
+                }
+                onDrag { event ->
+                    if (event.direct) {
+                        (selectedViews - this).forEach {
+                            it.performDrag(event.indirect)
+                        }
+                    }
+                    shape.left = event.newPosition.x
+                    shape.top = event.newPosition.y
+                }
+                draggableViews += this
+            }
+
 
     override fun zoomTo(zoom: Double) {
         navigationView.zoomTo(zoom)

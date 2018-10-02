@@ -20,14 +20,13 @@ class SidebarGroup(
         return i
     }
 
-    fun <T : Any> select(label: String, values: List<T>, selected: T, onchange: (T) -> Unit = {}): SelectView<T> {
-        val i = SelectView(values, selected)
-        i.onChange(onchange)
+    fun <T : Any> select(label: String, values: List<T>, property: Property<T>): SelectView<T> {
+        val i = SelectView(values, property)
 
-        append(ListView().also {
-            it += TextView(label)
-            it += i
-        })
+        listView {
+            textView(label)
+            append(i)
+        }
         return i
     }
 

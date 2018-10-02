@@ -44,4 +44,4 @@ class BoxShape : Shape() {
 }
 
 fun boxShape(init: BoxShape.() -> Unit) = BoxShape().also(init)
-fun BoxShape.boxShape(init: BoxShape.() -> Unit) = BoxShape().also(init).also { this.add(it) }
+fun BoxShape.boxShape(init: BoxShape.() -> Unit) = BoxShape().also(init).also(this::add)

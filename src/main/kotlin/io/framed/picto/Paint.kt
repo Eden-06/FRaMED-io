@@ -33,7 +33,7 @@ data class Color(
     override fun toCss(): String = "rgba($red, $green, $blue, $alpha)"
 }
 
-fun color(red: Int, green: Int, blue: Int, alpha: Double) = Color(red, green, blue, alpha)
+fun color(red: Int, green: Int, blue: Int, alpha: Double = 1.0) = Color(red, green, blue, alpha)
 fun color(color: String): Color = Color.parse(color)
 
 class LinearGradient(

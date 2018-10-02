@@ -19,7 +19,7 @@ class ClassLinker(
         override val parent: ContainerLinker
 ) : Linker<BoxShape>(clazz, parent) {
 
-    val nameProperty = property(clazz::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    val nameProperty = property(clazz::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex()))
     var name by nameProperty
 
     private lateinit var attributeBox:BoxShape
