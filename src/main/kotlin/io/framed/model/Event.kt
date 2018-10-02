@@ -18,6 +18,10 @@ class Event : Model {
      */
     var type: EventType = EventType.NONE
     /**
+     * Description of the Event
+     */
+    var desc: String = ""
+    /**
      * Metadata of the event
      */
     override val metadata = Metadata()
@@ -27,9 +31,10 @@ class Event : Model {
  * The method initalizes a new event
  * @param type type of the event
  */
-fun Container.event(type: EventType, init: Event.() -> Unit): Event {
+fun Container.event(type: EventType, desc: String, init: Event.() -> Unit): Event {
     val evt = Event()
     evt.type = type
+    evt.desc = desc
     evt.init()
     events += evt
     return evt

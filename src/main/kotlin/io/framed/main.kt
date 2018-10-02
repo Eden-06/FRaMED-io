@@ -29,6 +29,7 @@ fun init() {
     // Create a dummy diagram
     val model = container {
         name = "Economy"
+        /*
         val account = clazz("Account") {
             attr("amount", "Money")
             attr("id", "String")
@@ -42,10 +43,11 @@ fun init() {
             method("insolvency", "void")
         }
 
-        roleType("RoleType") {}
+        roleType("RoleType") {} */
 
-        event(EventType.MESSAGE){}
+        event(EventType.MESSAGE, "terminate contract"){}
 
+        /*
         container {
             name = "Library"
             val book = clazz("Book") {
@@ -63,6 +65,7 @@ fun init() {
             sourceCardinality = RelationMultiplicity.ONCE_TO_MANY.value
             targetCardinality = RelationMultiplicity.ONCE.value
         }
+        */
     }
 
     val json = JSON.indented.stringify(model)

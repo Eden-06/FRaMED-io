@@ -185,6 +185,7 @@ class HtmlRenderer(
     }
 
     private fun style(view: View<*>, style: Style) {
+        console.log(style)
         style.background?.let {
             view.html.style.background = it.toCss()
         }
@@ -193,6 +194,10 @@ class HtmlRenderer(
             if (it.radius > 0) {
                 view.html.style.borderRadius = "${it.radius}px"
             }
+        }
+        style.padding?.let {
+            view.html.style.padding = it.toCss()
+            console.log(it.toCss())
         }
     }
 

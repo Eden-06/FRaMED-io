@@ -6,5 +6,5 @@ package io.framed.picto
 class Style {
     var border: Border? = null
     var background: Paint? = null
-
+    var padding: Padding? = null
 }
