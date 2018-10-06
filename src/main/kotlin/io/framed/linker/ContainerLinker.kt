@@ -37,6 +37,7 @@ class ContainerLinker(
                 width = 1.0
                 color = color(0, 0, 0, 0.3)
             }
+            acceptRelation = true
         }
 
         hasSidebar = true
@@ -327,17 +328,37 @@ class ContainerLinker(
         container.events.forEach { addEvent(it) }
 
         viewModel.onRelationDraw { (sourceShape, targetShape) ->
-            val source = classMap.entries.find { (_, pair) ->
-                pair.first.picto == sourceShape
-            }?.key
-            val target = classMap.entries.find { (_, pair) ->
-                pair.first.picto == targetShape
-            }?.key
-
+            var source:Long? = null
+            var target:Long? = null
+            if(classMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape}) != null){
+                // the source is a class
+                source = classMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape})?.key?.id
+            } else if(eventMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape}) != null){
+                // the source is an event
+                source = eventMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape})?.key?.id
+            } else if(containerMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape}) != null){
+                // the source is a container
+                source = containerMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape})?.key?.id
+            } else if(roleTypeMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape}) != null){
+                // the source is a role type
+                source = roleTypeMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape})?.key?.id
+            }
+            if(classMap.entries.find({ (_, pair) -> pair.first.picto == targetShape}) != null){
+                // the target is a class
+                target = classMap.entries.find({ (_, pair) -> pair.first.picto == targetShape})?.key?.id
+            } else if(eventMap.entries.find({ (_, pair) -> pair.first.picto == targetShape}) != null){
+                // the target is an event
+                target = eventMap.entries.find({ (_, pair) -> pair.first.picto == targetShape})?.key?.id
+            } else if(containerMap.entries.find({ (_, pair) -> pair.first.picto == targetShape}) != null){
+                // the target is a container
+                target = containerMap.entries.find({ (_, pair) -> pair.first.picto == targetShape})?.key?.id
+            } else if(roleTypeMap.entries.find({ (_, pair) -> pair.first.picto == targetShape}) != null){
+                // the target is a role type
+                target = roleTypeMap.entries.find({ (_, pair) -> pair.first.picto == targetShape})?.key?.id
+            }
             if (source != null && target != null) {
-                val relation = Relation(source.id, target.id)
+                val relation = Relation(source, target)
                 container.relations += relation
-
                 addRelation(relation)
             }
         }

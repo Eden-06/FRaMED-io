@@ -35,6 +35,7 @@ class EventLinker(
 
         hasContext = true
         hasSidebar = true
+        acceptRelation = true
     }.also(this::initPicto)
 
 

@@ -148,7 +148,7 @@ class HtmlRenderer(
     }
 
     /**
-     * The map stores the endpoints for all shape
+     * The map stores the endpoints for all shapes
      */
     private val endpointMap = mutableMapOf<Shape, HTMLElement>()
 
@@ -186,7 +186,6 @@ class HtmlRenderer(
     }
 
     private fun style(view: View<*>, style: Style) {
-        console.log(style)
         style.background?.let {
             view.html.style.background = it.toCss()
         }
@@ -198,7 +197,6 @@ class HtmlRenderer(
         }
         style.padding?.let {
             view.html.style.padding = it.toCss()
-            console.log(it.toCss())
         }
     }
 
