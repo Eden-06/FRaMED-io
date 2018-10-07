@@ -127,18 +127,59 @@ select {
   @include no-select();
 }
 
-.position-bar {
+.tab-bar {
   position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-  font-size: 1.2rem;
-  span {
-    padding: 0.3rem 0.6rem;
-    &:hover {
-      background: rgba($text-color, 0.08);
-    }
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: $tab-bar-height;
+  background: $secondary-background;
+  clear: both;
+  border-top: solid 1px $border-color-light;
+  padding: 0 0.4rem;
+}
+.tab {
+  height: $tab-bar-height;
+  line-height: $tab-bar-height;
+  float: left;
+  padding: 0 0.6rem;
+  background: $tertiary-background;
+  border-right: solid 1px $border-color-light;
+  &:first-child {
+    border-left: solid 1px $border-color-light;
+  }
+  .text-view {
+    padding-right: 0.4rem;
+    float: left;
+    margin-top: -0.05rem;
+  }
+  .icon-view {
+    font-size: 0.8rem;
+    float: left;
+    margin-top: -0.02rem;
+  }
+  &.selected {
+    background: $primary-background;
   }
 }
+
+.workspace-container {
+  position: absolute;
+  top: $top-height;
+  left: 0;
+  bottom: 0;
+  right: $sidebar-width;
+  z-index: 0;
+}
+
+.workspace {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: $tab-bar-height;
+}
+
 
 .menu {
   position: relative;
@@ -188,6 +229,7 @@ select {
   line-height: $toolbar-height;
   z-index: 2;
   font-size: 1.1rem;
+  border-bottom: solid 1px $border-color-light;
 
   padding: 0 0.5rem;
 
@@ -224,15 +266,6 @@ select {
   }
 }
 
-.workspace {
-  position: absolute;
-  top: $top-height;
-  left: 0;
-  bottom: 0;
-  right: $sidebar-width;
-  z-index: 0;
-}
-
 .property-bar {
   position: absolute;
   top: $top-height;
@@ -244,7 +277,7 @@ select {
   background: $secondary-background;
   z-index: 1;
   box-shadow: 0 0 4px rgba(0, 0, 0, .14);
-  border-left: solid 1px $border-color;
+  border-left: solid 1px $border-color-light;
   &.hide {
     overflow-y: hidden;
   }

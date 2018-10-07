@@ -1,10 +1,14 @@
 package io.framed
 
-import io.framed.linker.ContainerLinker
+import io.framed.framework.Controller
+import io.framed.framework.LinkerManager
+import io.framed.framework.pictogram.Layer
+import io.framed.framework.view.Application
+import io.framed.framework.view.Root
+import io.framed.linker.*
 import io.framed.model.*
-import io.framed.view.Application
-import io.framed.view.Root
 import kotlinx.serialization.json.JSON
+import org.w3c.xhr.XMLHttpRequest
 import kotlin.browser.window
 
 /**
@@ -24,11 +28,23 @@ fun main(args: Array<String>) {
  * Startup the application
  */
 fun init() {
-    val app = Application()
 
+    LinkerManager.register(AttributeLinker)
+    LinkerManager.register(ClassLinker)
+    LinkerManager.register(ContainerLinker)
+    LinkerManager.register(EventLinker)
+    LinkerManager.register(MethodLinker)
+    LinkerManager.register(RoleTypeLinker)
+
+    LinkerManager.register(RelationLinker)
+
+
+
+    /*
     // Create a dummy diagram
     val model = container {
         name = "Economy"
+
         val account = clazz("Account") {
             attr("amount", "Money")
             attr("id", "String")
@@ -65,12 +81,34 @@ fun init() {
         }
     }
 
+
     val json = JSON.indented.stringify(model)
     val container = JSON.parse<Container>(json)
+    */
 
-    val linker = ContainerLinker(container, app)
+    Application.init()
 
-    Root += app
+    loadFile("demo.json") {
+        val file = JSON.parse<File>(it)
 
-    app.linker = linker
+        val linker = ContainerLinker(file.root)
+        val controller = Controller(linker, file.layer)
+
+        Application.loadController(controller)
+    }
+}
+
+fun loadFile(url: String, onError: (Int) -> Unit = {}, onSuccess: (String) -> Unit) {
+    val xhttp = XMLHttpRequest();
+    xhttp.open("GET", url, true);
+    xhttp.onreadystatechange = {
+        if (xhttp.readyState == 4.toShort()) {
+            if (xhttp.status == 200.toShort() || xhttp.status == 304.toShort()) {
+                onSuccess(xhttp.responseText)
+            } else {
+                onError(xhttp.status.toInt())
+            }
+        }
+    }
+    xhttp.send();
 }

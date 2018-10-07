@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
@@ -19,9 +20,9 @@ class Relation(
          * The connections target class.
          */
         var targetId: Long
-) : Model {
+) : ModelElement {
 
-    override val id: Long = Model.lastId++
+    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this connection.
@@ -42,9 +43,6 @@ class Relation(
      * Type of this connection
      */
     var type: RelationType = RelationType.ASSOCIATION
-
-    override val metadata = Metadata()
-
 }
 
 enum class RelationMultiplicity(val value: String) {
@@ -81,7 +79,7 @@ enum class RelationType {
 }
 
 /**
- * Creates a new connection within the current container.
+ * Creates a new connection within the current model.
  *
  * @param source Relations source.
  * @param target Relations target.

@@ -1,33 +1,30 @@
 package io.framed.model
 
+import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
- * Model role type
+ * Model role model
  */
 @Serializable
-class RoleType : Model {
+class RoleType : ModelElement {
     /**
      * Identification of the instance
      */
-    override val id: Long = Model.lastId++
+    override val id: Long = ModelElement.lastId++
     /**
      * Name of the instance
      */
-    var name: String = ""
-    /**
-     * Metadata of the instance
-     */
-    override val metadata = Metadata()
+    var name: String = "Unnamed role"
 }
 
 /**
- * Create a new role type within the current container
+ * Create a new role model within the current model
  *
  * @param name Name of the new roletype
  * @param init Builder callback for this roletype
  *
- * @return The new role type
+ * @return The new role model
  */
 fun Container.roleType(name: String, init: RoleType.() -> Unit): RoleType {
     val type = RoleType()

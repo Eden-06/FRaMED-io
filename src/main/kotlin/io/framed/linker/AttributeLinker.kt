@@ -1,31 +1,30 @@
 package io.framed.linker
 
+import io.framed.framework.Linker
+import io.framed.framework.LinkerInfoItem
+import io.framed.framework.LinkerManager
+import io.framed.framework.pictogram.TextShape
+import io.framed.framework.pictogram.textShape
+import io.framed.framework.util.*
+import io.framed.framework.view.contextMenu
+import io.framed.framework.view.MaterialIcon
+import io.framed.framework.view.sidebar
 import io.framed.model.Attribute
-import io.framed.picto.ContextEvent
-import io.framed.picto.TextShape
-import io.framed.picto.textShape
-import io.framed.util.RegexValidator
-import io.framed.util.Validator
-import io.framed.util.property
-import io.framed.view.ContextMenu
-import io.framed.view.MaterialIcon
-import io.framed.view.Sidebar
-import io.framed.view.contextMenu
 
 /**
  * @author lars
  */
 class AttributeLinker(
-        val attribute: Attribute,
+        override val model: Attribute,
         override val parent: ClassLinker
-) : Linker<TextShape>(attribute, parent) {
+) : Linker<Attribute, TextShape> {
 
-    private val nameProperty = property(attribute::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
-    private val typeProperty = property(attribute::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val typeProperty = property(model::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
 
     private val lineProperty = property(nameProperty, typeProperty,
             getter = {
-                attribute.name + attribute.type.let {
+                model.name + model.type.let {
                     if (it.isBlank()) "" else ": $it"
                 }.trim()
             },
@@ -61,8 +60,8 @@ class AttributeLinker(
                     }
                 }
 
-                attribute.name = name.trim()
-                attribute.type = type.trim()
+                model.name = name.trim()
+                model.type = type.trim()
 
                 Validator.Result.VALID
             }
@@ -72,13 +71,9 @@ class AttributeLinker(
         NAME, TYPE
     }
 
-    override val picto = textShape(lineProperty) {
-        hasSidebar = true
-        hasContext = true
-    }.also(this::initPicto)
+    override val pictogram = textShape(lineProperty)
 
-
-    override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
+    override val sidebar = sidebar {
         title("Attribute")
 
         group("General") {
@@ -87,10 +82,19 @@ class AttributeLinker(
         }
     }
 
-    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
-        title = "Attribute: " + attribute.name
+    override val contextMenu = contextMenu {
+        title = "Attribute: " + model.name
         addItem(MaterialIcon.DELETE, "Delete") {
-            parent.removeAttribute(attribute)
+            parent.attributes -= this@AttributeLinker
         }
+    }
+
+    init {
+        LinkerManager.setup(this)
+    }
+
+    companion object : LinkerInfoItem {
+        override fun canCreate(container: Linker<*, *>): Boolean = container is ClassLinker
+        override val name: String = "Attribute"
     }
 }

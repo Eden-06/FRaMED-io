@@ -12,9 +12,7 @@ app.use(require('node-sass-middleware')({
     sourceMap: false
 }));
 
-app.use('/public', express.static(path.join(__dirname, 'website')));
-
-app.use(function (req, res) {
+app.get('/', function (req, res) {
     fs.readFile(path.join(__dirname, 'website/index.html'), 'utf8', function (err, data) {
         if (err) {
             res.status(404);
@@ -36,6 +34,9 @@ app.use(function (req, res) {
     });
     //res.sendFile(path.join(__dirname, 'website/index.html'));
 });
+
+app.use('', express.static(path.join(__dirname, 'website')));
+app.use('/public', express.static(path.join(__dirname, 'website')));
 
 app.listen(3000, function () {
     console.log('FRaMED-io is available on http://localhost:3000!');

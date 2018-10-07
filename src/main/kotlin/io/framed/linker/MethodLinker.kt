@@ -1,33 +1,36 @@
 package io.framed.linker
 
+import io.framed.framework.Linker
+import io.framed.framework.LinkerInfoItem
+import io.framed.framework.LinkerManager
+import io.framed.framework.pictogram.ContextEvent
+import io.framed.framework.pictogram.TextShape
+import io.framed.framework.pictogram.textShape
+import io.framed.framework.util.RegexValidator
+import io.framed.framework.util.Validator
+import io.framed.framework.util.property
+import io.framed.framework.view.*
 import io.framed.model.Method
 import io.framed.model.Parameter
 import io.framed.model.param
-import io.framed.picto.ContextEvent
-import io.framed.picto.TextShape
-import io.framed.picto.textShape
-import io.framed.util.RegexValidator
-import io.framed.util.Validator
-import io.framed.util.property
-import io.framed.view.*
 
 /**
  * @author lars
  */
 class MethodLinker(
-        val method: Method,
+        override val model: Method,
         override val parent: ClassLinker
-) : Linker<TextShape>(method, parent) {
+) : Linker<Method, TextShape> {
 
-    private val nameProperty = property(method::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
 
-    private val typeProperty = property(method::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val typeProperty = property(model::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
 
-    private val parameterProperty = property(method::parameters)
+    private val parameterProperty = property(model::parameters)
 
     private val lineProperty = property(nameProperty, typeProperty, parameterProperty,
             getter = {
-                "${method.name}(" + method.parameters.joinToString(", ") { it.toString() } + ")" + method.type.let {
+                "${model.name}(" + model.parameters.joinToString(", ") { it.toString() } + ")" + model.type.let {
                     if (it.isBlank()) "" else ": $it"
                 }.trim()
             },
@@ -119,34 +122,22 @@ class MethodLinker(
                     }
                 }
 
-                method.name = name.trim()
-                method.type = type.trim()
-                method.parameters = param.filter { it.first.isNotBlank() || it.first.isNotBlank() }.map {
+                model.name = name.trim()
+                model.type = type.trim()
+                model.parameters = param.asSequence().filter { it.first.isNotBlank() || it.first.isNotBlank() }.map {
                     Parameter().apply {
                         this.name = it.first.trim()
                         this.type = it.second.trim()
                     }
-                }
+                }.toList()
 
                 Validator.Result.VALID
             }
     )
 
-    override val picto = textShape(lineProperty) {
-        hasSidebar = true
-        hasContext = true
-    }.also(this::initPicto)
+    override val pictogram = textShape(lineProperty)
 
-    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
-        title = "Method: " + method.name
-        addItem(MaterialIcon.DELETE, "Delete") {
-            parent.removeMethod(method)
-        }
-    }
-
-    private lateinit var sidebarParameters: SidebarGroup
-
-    override fun createSidebar(sidebar: Sidebar) = sidebar.setup() {
+    override val sidebar = sidebar {
         title("Method")
         group("General") {
             input("Name", nameProperty)
@@ -157,6 +148,15 @@ class MethodLinker(
         updateSidebar()
     }
 
+    override val contextMenu = contextMenu {
+        title = "Method: " + model.name
+        addItem(MaterialIcon.DELETE, "Delete") {
+            parent.methods -= this@MethodLinker
+        }
+    }
+
+    private lateinit var sidebarParameters: SidebarGroup
+
     private enum class State {
         NAME, TYPE, PARAM_NAME, PARAM_TYPE, AFTER_PARAM
     }
@@ -164,7 +164,7 @@ class MethodLinker(
     private fun updateSidebar() = sidebarParameters.apply {
         clearContent()
 
-        method.parameters.forEach { param ->
+        model.parameters.forEach { param ->
             custom {
                 tableView {
                     row {
@@ -202,7 +202,7 @@ class MethodLinker(
                         cellBox {
                             iconView(MaterialIcon.CLEAR) {
                                 onClick {
-                                    method.parameters -= param
+                                    model.parameters -= param
                                     redraw = true
                                     parameterProperty.fire()
                                 }
@@ -217,7 +217,7 @@ class MethodLinker(
             iconView(MaterialIcon.ADD)
             textView("Add parameter")
             onClick {
-                method.param("")
+                model.param("")
                 redraw = true
                 parameterProperty.fire()
             }
@@ -232,5 +232,12 @@ class MethodLinker(
                 updateSidebar()
             }
         }
+
+        LinkerManager.setup(this)
+    }
+
+    companion object: LinkerInfoItem {
+        override fun canCreate(container: Linker<*, *>): Boolean = container is ClassLinker
+        override val name: String = "Method"
     }
 }

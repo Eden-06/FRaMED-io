@@ -1,31 +1,56 @@
 package io.framed.linker
 
+import io.framed.framework.*
+import io.framed.framework.pictogram.*
+import io.framed.framework.util.EventHandler
+import io.framed.framework.util.LinkerBox
+import io.framed.framework.util.RegexValidator
+import io.framed.framework.util.property
+import io.framed.framework.view.*
 import io.framed.model.*
-import io.framed.picto.*
-import io.framed.util.*
-import io.framed.view.*
 
 /**
  * @author lars
  */
 class ContainerLinker(
-        val container: Container,
-        val application: Application,
+        override val model: Container,
         override val parent: ContainerLinker? = null
-) : Linker<BoxShape>(container, parent) {
+) : ModelLinker<Container, BoxShape, TextShape> {
 
-    val nameProperty = property(container::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
-    var name by nameProperty
+    override val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex()))
+    override var name by nameProperty
 
-    override fun internalCreateSidebar(): Sidebar = Sidebar(application)
+    override val container: BoxShape = boxShape { }
 
-    private lateinit var contentBox: BoxShape
+    val classes = LinkerBox<Class, ClassLinker>(model::classes).also { box ->
+        box.view = container
+    }
+    val containers = LinkerBox<Container, ContainerLinker>(model::containers).also { box ->
+        box.view = container
+    }
+    val roleTypes = LinkerBox<RoleType, RoleTypeLinker>(model::roleTypes).also { box ->
+        box.view = container
+    }
+    val events = LinkerBox<Event, EventLinker>(model::events).also { box ->
+        box.view = container
+    }
 
-    override val picto = boxShape {
+    override val content: List<PreviewLinker<*, *, *>>
+        get() = classes.linkers + containers.linkers + roleTypes.linkers
+
+    override val connectable: List<Linker<*, *>>
+        get() = classes.linkers + containers.linkers + roleTypes.linkers + events.linkers
+
+    override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
         }
-        contentBox = boxShape { }
+
+        val box = boxShape { }
+        classes.previewBox = box
+        containers.previewBox = box
+        roleTypes.previewBox = box
+        //events.previewBox = box
 
         style {
             background = linearGradient("to bottom") {
@@ -39,218 +64,13 @@ class ContainerLinker(
             }
             acceptRelation = true
         }
-
-        hasSidebar = true
-        hasContext = true
-    }.also(this::initPicto)
-
-    operator fun get(clazz: Class): Shape = classMap[clazz]?.first?.picto ?: throw IllegalArgumentException()
-    operator fun get(clazzId: Long): Shape = classMap.entries.find { it.key.id == clazzId }?.value?.first?.picto
-            ?: throw IllegalArgumentException()
-
-    val viewModel = ViewModel(boxShape {
-        hasSidebar = true
-        hasContext = true
-
-        layer = Layer()
-    }.also(this::initPicto))
-
-    /**
-     * The map stores all classes and their related linkers and textshapes
-     */
-    private var classMap: Map<Class, Pair<ClassLinker, TextShape>> = emptyMap()
-
-    /**
-     * The method adds a new class to the current container
-     */
-    fun addClass(clazz: Class, position: Point = Point.ZERO): ClassLinker {
-        // As normal view
-        val linker = ClassLinker(clazz, this)
-        viewModel.container += linker.picto
-        viewModel.layer[linker.picto] = Dimension(position.x, position.y)
-
-        // As list entry
-        val input = contentBox.textShape(linker.nameProperty)
-
-        classMap += clazz to (linker to input)
-        return linker
     }
 
-    /**
-     * The method removes a class of the current container
-     */
-    fun removeClass(clazz: Class) {
-        classMap[clazz]?.let { (linker, input) ->
-            // As normal view
-            viewModel.container -= linker.picto
-            viewModel.layer[linker.picto] = null
-
-            // As list entry
-            contentBox -= input
-
-            classMap -= clazz
-            container.classes -= clazz
-
-            container.relations.filter { it.sourceId == clazz.id || it.targetId == clazz.id }.forEach(this::removeRelation)
-        }
-        showSidebar()
-    }
-
-    /**
-     * The map stores all role types and their related linkers and textshapes
-     */
-    private var roleTypeMap: Map<RoleType, Pair<RoleTypeLinker, TextShape>> = emptyMap()
-
-    /**
-     * The method adds a new class to the current container
-     */
-    fun addRoleType(type: RoleType, position: Point = Point.ZERO): RoleTypeLinker {
-        // As normal view
-        val linker = RoleTypeLinker(type, this)
-        viewModel.container += linker.picto
-        viewModel.layer[linker.picto] = Dimension(position.x, position.y)
-
-        // As list entry
-        val input = contentBox.textShape(linker.nameProperty)
-
-        roleTypeMap += type to (linker to input)
-        return linker
-    }
-
-    /**
-     * The method removes a class of the current container
-     */
-    fun removeRoleType(type: RoleType) {
-        roleTypeMap[type]?.let { (linker, input) ->
-            // As normal view
-            viewModel.container -= linker.picto
-            viewModel.layer[linker.picto] = null
-
-            // As list entry
-            contentBox -= input
-
-            roleTypeMap -= type
-            container.roleTypes -= type
-        }
-        showSidebar()
-    }
-
-    /**
-     * The map stores all containers
-     */
-    private var containerMap: Map<Container, Pair<ContainerLinker, TextShape>> = emptyMap()
-
-    /**
-     * The method adds a new container to the linker
-     */
-    private fun addContainer(cont: Container, position: Point = Point.ZERO): ContainerLinker {
-        // As normal view
-        val linker = ContainerLinker(cont, application, this)
-        viewModel.container += linker.picto
-        viewModel.layer[linker.picto] = Dimension(position.x, position.y)
-
-        // As list entry
-        val input = contentBox.textShape(linker.nameProperty)
-
-        containerMap += cont to (linker to input)
-        return linker
-    }
-
-    /**
-     * The method removes a container of the linker
-     */
-    private fun removeContainer(cont: Container) {
-        containerMap[cont]?.let { (linker, input) ->
-            // As normal view
-            viewModel.container -= linker.picto
-            viewModel.layer[linker.picto] = null
-
-            // As list entry
-            contentBox -= input
-
-            containerMap -= cont
-            container.containers -= cont
-        }
-
-        showSidebar()
-    }
-
-    /**
-     * The map contains all events of the current model and their related controllers and shapes.
-     */
-    private var eventMap: Map<Event, Pair<EventLinker, IconShape>> = emptyMap()
-
-    /**
-     * The method adds a new event to the linker
-     */
-    private fun addEvent(evt: Event, position: Point = Point.ZERO): EventLinker {
-        // As normal view
-        val linker = EventLinker(evt, this)
-        viewModel.container += linker.picto
-        viewModel.layer[linker.picto] = Dimension(position.x, position.y)
-
-        // As list entry
-        val input = contentBox.iconShape(linker.symbolProperty)
-
-        eventMap += evt to (linker to input)
-        return linker
-    }
-
-    /**
-     * The method removes an event of the linker
-     */
-    fun removeEvent(evt: Event) {
-        eventMap[evt]?.let { (linker, input) ->
-            // As normal view
-            viewModel.container -= linker.picto
-            viewModel.layer[linker.picto] = null
-
-            // As list entry
-            contentBox -= input
-
-            eventMap -= evt
-            container.events -= evt
-        }
-
-        showSidebar()
-    }
-
-    /**
-     * The map stores all relations and their related linkers
-     */
-    private var relationMap: Map<Relation, RelationLinker> = emptyMap()
-
-    /**
-     * The method adds a new relation and returns a new controller
-     * @param relation new relation
-     * @return new linker to manage the relation
-     */
-    private fun addRelation(relation: Relation): RelationLinker {
-        val linker = RelationLinker(relation, this)
-        viewModel += linker.picto
-
-        relationMap += relation to linker
-        return linker
-    }
-
-    /**
-     * The method deletes a relation
-     * @param relation relation to delete
-     */
-    fun removeRelation(relation: Relation) {
-        relationMap[relation]?.let { linker ->
-            viewModel -= linker.picto
-
-            relationMap -= relation
-            container.relations -= relation
-        }
-
-        showSidebar()
-    }
+    override val preview: TextShape = textShape(nameProperty)
 
     private lateinit var sidebarActionsGroup: SidebarGroup
 
-    override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
+    override val sidebar = sidebar {
         title("Container")
         group("General") {
             input("Name", nameProperty)
@@ -260,107 +80,109 @@ class ContainerLinker(
                 //autoLayout()
             }
             button("Reset zoom") {
-                application.renderer.zoomTo(1.0)
+                //application.renderer.zoomTo(1.0)
             }
             button("Reset pan") {
-                application.renderer.panTo(Point.ZERO)
+                //application.renderer.panTo(Point.ZERO)
             }
         }
     }
 
-    override fun prepareSidebar(sidebar: Sidebar, event: SidebarEvent) {
-        val h = event.target != picto
+    override fun Sidebar.onOpen(event: SidebarEvent) {
+        val h = event.target != pictogram
         sidebarActionsGroup.visible = h
     }
 
-    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
+    private lateinit var contextStepIn: ListView
+    private lateinit var contextStepOut: ListView
+    private lateinit var contextDelete: ListView
+
+    override val contextMenu = contextMenu {
         title = "Package: $name"
 
-        if (event.target == picto) {
+        contextStepIn = addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
+            //val controller = Application.getController(this@ContainerLinker)
+        }
+        contextStepOut = addItem(MaterialIcon.ARROW_BACK, "Step out") {
+            //val controller = Application.getController(parent!!)
+        }
 
-            addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
-                application.linker = this@ContainerLinker
+        addItem(MaterialIcon.ADD, "Add class") { event ->
+            this@ContainerLinker.classes += ClassLinker(Class(), this@ContainerLinker).also {
+                setPosition.fire(SetPosition(it, event.position))
+                it.focus()
             }
-        } else {
+        }
+        addItem(MaterialIcon.ADD, "Add package") { event ->
+            containers += ContainerLinker(Container()).also {
+                setPosition.fire(SetPosition(it, event.position))
+                it.focus()
+            }
+        }
+
+        contextDelete = addItem(MaterialIcon.DELETE, "Delete") { event ->
             parent?.let {
-                addItem(MaterialIcon.ARROW_BACK, "Step out") {
-                    application.linker = it
-                }
+                it.containers -= this@ContainerLinker
+                //application.linker = it
             }
         }
+    }
 
-        addItem(MaterialIcon.ADD, "Add class") {
-            val c = Class()
-            c.name = "Unnamed class"
+    override fun ContextMenu.onOpen(event: ContextEvent) {
+        contextStepIn.visible = event.target == pictogram
+        contextStepOut.visible = event.target != pictogram && parent != null
+        contextDelete.visible = parent != null
+    }
 
-            container.classes += c
+    var relations: List<RelationLinker> = emptyList()
 
-            addClass(c, event.position)
+    override val connections: List<ConnectionLinker<*, *>>
+        get() = relations
+
+    override val onConnectionAdd = EventHandler<ConnectionLinker<*, *>>()
+    override val onConnectionRemove = EventHandler<ConnectionLinker<*, *>>()
+    override val setPosition = EventHandler<SetPosition>()
+
+    private fun addRelation(linker: RelationLinker) {
+        if (!model.relations.contains(linker.model)) {
+            model.relations += linker.model
         }
-        addItem(MaterialIcon.ADD, "Add package") {
-            val c = Container()
-            c.name = "Unnamed package"
 
-            container.containers += c
+        relations += linker
+        onConnectionAdd.fire(linker)
+    }
 
-            addContainer(c, event.position)
-        }
-        parent?.let {
-            addItem(MaterialIcon.DELETE, "Delete") {
-                it.removeContainer(container)
-                application.linker = it
-            }
+    fun removeRelation(linker: RelationLinker) {
+        model.relations -= linker.model
+        relations -= linker
+        onConnectionRemove.fire(linker)
+    }
+
+    override fun createConnection(source: Shape, target: Shape) {
+        val sourceId = getIdByShape(source)
+        val targetId = getIdByShape(target)
+
+        if (sourceId != null && targetId != null) {
+            addRelation(RelationLinker(Relation(sourceId, targetId), this))
         }
     }
 
     /**
-     * The method initializes a new instance of the linker
+     * The model initializes a new instance of the linker
      */
     init {
-        container.classes.forEach { addClass(it) }
+        model.classes.forEach { classes += ClassLinker(it, this) }
+        model.containers.forEach { containers += ContainerLinker(it, this) }
+        model.roleTypes.forEach { roleTypes += RoleTypeLinker(it, this) }
+        model.events.forEach { events += EventLinker(it, this) }
 
-        container.containers.forEach { addContainer(it) }
+        model.relations.forEach { addRelation(RelationLinker(it, this)) }
 
-        container.relations.forEach { addRelation(it) }
+        LinkerManager.setup(this)
+    }
 
-        container.roleTypes.forEach { addRoleType(it) }
-
-        container.events.forEach { addEvent(it) }
-
-        viewModel.onRelationDraw { (sourceShape, targetShape) ->
-            var source:Long? = null
-            var target:Long? = null
-            if(classMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape}) != null){
-                // the source is a class
-                source = classMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape})?.key?.id
-            } else if(eventMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape}) != null){
-                // the source is an event
-                source = eventMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape})?.key?.id
-            } else if(containerMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape}) != null){
-                // the source is a container
-                source = containerMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape})?.key?.id
-            } else if(roleTypeMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape}) != null){
-                // the source is a role type
-                source = roleTypeMap.entries.find({ (_, pair) -> pair.first.picto == sourceShape})?.key?.id
-            }
-            if(classMap.entries.find({ (_, pair) -> pair.first.picto == targetShape}) != null){
-                // the target is a class
-                target = classMap.entries.find({ (_, pair) -> pair.first.picto == targetShape})?.key?.id
-            } else if(eventMap.entries.find({ (_, pair) -> pair.first.picto == targetShape}) != null){
-                // the target is an event
-                target = eventMap.entries.find({ (_, pair) -> pair.first.picto == targetShape})?.key?.id
-            } else if(containerMap.entries.find({ (_, pair) -> pair.first.picto == targetShape}) != null){
-                // the target is a container
-                target = containerMap.entries.find({ (_, pair) -> pair.first.picto == targetShape})?.key?.id
-            } else if(roleTypeMap.entries.find({ (_, pair) -> pair.first.picto == targetShape}) != null){
-                // the target is a role type
-                target = roleTypeMap.entries.find({ (_, pair) -> pair.first.picto == targetShape})?.key?.id
-            }
-            if (source != null && target != null) {
-                val relation = Relation(source, target)
-                container.relations += relation
-                addRelation(relation)
-            }
-        }
+    companion object : LinkerInfoItem {
+        override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override val name: String = "Container"
     }
 }

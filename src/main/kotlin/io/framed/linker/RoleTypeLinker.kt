@@ -1,34 +1,33 @@
 package io.framed.linker
 
-import io.framed.model.Attribute
-import io.framed.model.Method
+import io.framed.framework.Linker
+import io.framed.framework.LinkerInfoItem
+import io.framed.framework.LinkerManager
+import io.framed.framework.PreviewLinker
+import io.framed.framework.pictogram.*
+import io.framed.framework.util.RegexValidator
+import io.framed.framework.util.property
+import io.framed.framework.view.*
 import io.framed.model.RoleType
-import io.framed.picto.*
-import io.framed.util.RegexValidator
-import io.framed.util.property
-import io.framed.view.ContextMenu
-import io.framed.view.MaterialIcon
-import io.framed.view.Sidebar
-import io.framed.view.contextMenu
 
 /**
- * The linker manages a related role type
+ * The linker manages a related role model
  */
-class RoleTypeLinker (
-    val type: RoleType,
-    override val parent: ContainerLinker
-    ) : Linker<BoxShape>(type, parent){
+class RoleTypeLinker(
+        override val model: RoleType,
+        override val parent: ContainerLinker
+) : PreviewLinker<RoleType, BoxShape, TextShape> {
 
-    val nameProperty = property(type::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
     var name by nameProperty
 
     private lateinit var bodyBox: BoxShape
 
-    override val picto = boxShape {
+    override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
         }
-        bodyBox = boxShape {  }
+        bodyBox = boxShape { }
 
         style {
             background = linearGradient("to bottom") {
@@ -42,26 +41,30 @@ class RoleTypeLinker (
                 radius = 10.0
             }
         }
+    }
 
-        hasSidebar = true
-        hasContext = true
+    override val preview: TextShape = textShape(nameProperty)
 
-        acceptRelation = true
-    }.also(this::initPicto)
-
-    override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
+    override val sidebar = sidebar {
         title("Class")
         group("General") {
             input("Name", nameProperty)
         }
     }
 
-    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
+    override val contextMenu = contextMenu {
         title = "Class: $name"
         addItem(MaterialIcon.DELETE, "Delete") {
-            parent.removeRoleType(type)
+            parent.roleTypes -= this@RoleTypeLinker
         }
     }
 
-    init { }
+    init {
+        LinkerManager.setup(this)
+    }
+
+    companion object : LinkerInfoItem {
+        override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override val name: String = "Role type"
+    }
 }

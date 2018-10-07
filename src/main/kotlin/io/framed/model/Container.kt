@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
@@ -8,17 +9,17 @@ import kotlinx.serialization.Serializable
  * It contains classes, connections, role types and nested containers.
  */
 @Serializable
-class Container : Model {
+class Container : ModelElementMetadata {
 
     /**
      * Identification of the instance
      */
-    override val id: Long = Model.lastId++
+    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this package.
      */
-    var name: String = ""
+    var name: String = "Unnamed container"
 
     /**
      * List of nested classes.
@@ -27,7 +28,7 @@ class Container : Model {
     var classes: List<Class> = emptyList()
 
     /**
-     * List of connections within this container.
+     * List of connections within this model.
      * Should this be a set?
      */
     var relations: List<Relation> = emptyList()
@@ -55,11 +56,11 @@ class Container : Model {
 }
 
 /**
- * Create a new nested container within current container.
+ * Create a new nested model within current model.
  *
- * @param init Builder callback for this container.
+ * @param init Builder callback for this model.
  *
- * @return The new container.
+ * @return The new model.
  */
 fun Container.container(init: Container.() -> Unit): Container {
     val c = Container()
@@ -69,11 +70,11 @@ fun Container.container(init: Container.() -> Unit): Container {
 }
 
 /**
- * Create a new standalone container.
+ * Create a new standalone model.
  *
- * @param init Builder callback for this container.
+ * @param init Builder callback for this model.
  *
- * @return The new container.
+ * @return The new model.
  */
 fun container(init: Container.() -> Unit): Container {
     val c = Container()

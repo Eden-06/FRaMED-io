@@ -312,8 +312,8 @@
     };
 
     /**
-     * finds the point that is 'distance' along the path from 'location'.  this method returns both the x,y location of the point and also
-     * its 'location' (proportion of travel along the path); the method below - _pointAlongPathFrom - calls this method and just returns the
+     * finds the point that is 'distance' along the path from 'location'.  this model returns both the x,y location of the point and also
+     * its 'location' (proportion of travel along the path); the model below - _pointAlongPathFrom - calls this model and just returns the
      * point.
      */
     var _pointAlongPath = function(curve, location, distance) {
@@ -657,7 +657,7 @@
             return e.srcElement || e.target;
         },
     //
-    // gets path info for the given event - the path from target to obj, in the event's bubble chain. if doCompute
+    // gets path info for the given model - the path from target to obj, in the model's bubble chain. if doCompute
     // is false we just return target for the path.
     //
         _pi = function(e, target, obj, doCompute) {
@@ -687,8 +687,8 @@
         guid = 1,
     //
     // this function generates a guid for every handler, sets it on the handler, then adds
-    // it to the associated object's map of handlers for the given event. this is what enables us
-    // to unbind all events of some type, or all events (the second of which can be requested by the user,
+    // it to the associated object's map of handlers for the given model. this is what enables us
+    // to unbind all events of some model, or all events (the second of which can be requested by the user,
     // but it also used by Mottle when an element is removed.)
         _store = function (obj, event, fn) {
             var g = guid++;
@@ -718,7 +718,7 @@
                 var c = children.split(","),
                     _fn = function (e) {
                         _fn.__tauid = fn.__tauid;
-                        var t = _t(e), target = t;  // t is the target element on which the event occurred. it is the
+                        var t = _t(e), target = t;  // t is the target element on which the model occurred. it is the
                         // element we will wish to pass to any callbacks.
                         var pathInfo = _pi(e, t, obj, children != null)
                         if (pathInfo.end != -1) {
@@ -737,7 +737,7 @@
             }
         },
     //
-    // registers an 'extra' function on some event listener function we were given - a function that we
+    // registers an 'extra' function on some model listener function we were given - a function that we
     // created and bound to the element as part of our housekeeping, and which we want to unbind and remove
     // whenever the given function is unbound.
         registerExtraFunction = function (fn, evt, newFn) {
@@ -776,7 +776,7 @@
 
             // store in the list of callbacks
             obj.__taSmartClicks.push(fn);
-            // the unstore function removes this function from the object's listener list for this type.
+            // the unstore function removes this function from the object's listener list for this model.
             fn.__taUnstore = function () {
                 _d(obj.__taSmartClicks, fn);
             };
@@ -788,7 +788,7 @@
         },
         TapHandler = function (clickThreshold, dblClickThreshold) {
             return function (obj, evt, fn, children) {
-                // if event is contextmenu, for devices which are mouse only, we want to
+                // if model is contextmenu, for devices which are mouse only, we want to
                 // use the default bind.
                 if (evt == "contextmenu" && isMouseDevice)
                     DefaultHandler(obj, evt, fn, children);
@@ -836,7 +836,7 @@
                                                     pathInfo = _pi(e, target, obj, tt[eventId][i][1] != null);
                                                     for (var pLoop = 0; pLoop < pathInfo.end; pLoop++) {
                                                         currentTarget = pathInfo.path[pLoop];
-                                                        // this is a single event registration handler.
+                                                        // this is a single model registration handler.
                                                         if (tt[eventId][i][1] == null || matchesSelector(currentTarget, tt[eventId][i][1], obj)) {
                                                             tt[eventId][i][0].apply(currentTarget, [ e ]);
                                                             break;
@@ -862,7 +862,7 @@
                     obj.__taTapHandler.downSelectors.push(children);
 
                     obj.__taTapHandler[evt].push([fn, children]);
-                    // the unstore function removes this function from the object's listener list for this type.
+                    // the unstore function removes this function from the object's listener list for this model.
                     fn.__taUnstore = function () {
                         _d(obj.__taTapHandler[evt], fn);
                     };
@@ -1000,7 +1000,7 @@
                     }
                 }
 
-                // if a touch event was also registered, deregister now.
+                // if a touch model was also registered, deregister now.
                 if (fn.__taTouchProxy) {
                     _unbind(obj, fn.__taTouchProxy[1], fn.__taTouchProxy[0]);
                 }
@@ -1032,7 +1032,7 @@
      * @param {Number} [params.clickThreshold=250] Threshold, in milliseconds beyond which a touchstart followed by a touchend is not considered to be a onClick.
      * @param {Number} [params.dblClickThreshold=450] Threshold, in milliseconds beyond which two successive tap events are not considered to be a onClick.
      * @param {Boolean} [params.smartClicks=false] If true, won't fire onClick events if the mouse has moved between mousedown and mouseup. Note that this functionality
-     * requires that Mottle consume the mousedown event, and so may not be viable in all use cases.
+     * requires that Mottle consume the mousedown model, and so may not be viable in all use cases.
      */
     root.Mottle = function (params) {
         params = params || {};
@@ -1058,11 +1058,11 @@
             };
 
         /**
-         * Removes an element from the DOM, and deregisters all event handlers for it. You should use this
+         * Removes an element from the DOM, and deregisters all model handlers for it. You should use this
          * to ensure you don't leak memory.
-         * @method remove
+         * @model remove
          * @param {String|Element} el Element, or id of the element, to remove.
-         * @return {Mottle} The current Mottle instance; you can chain this method.
+         * @return {Mottle} The current Mottle instance; you can chain this model.
          */
         this.remove = function (el) {
             _each(el, function () {
@@ -1083,15 +1083,15 @@
         };
 
         /**
-         * Register an event handler, optionally as a delegate for some set of descendant elements. Note
-         * that this method takes either 3 or 4 arguments - if you supply 3 arguments it is assumed you have
-         * omitted the `children` parameter, and that the event handler should be bound directly to the given element.
-         * @method on
+         * Register an model handler, optionally as a delegate for some set of descendant elements. Note
+         * that this model takes either 3 or 4 arguments - if you supply 3 arguments it is assumed you have
+         * omitted the `children` parameter, and that the model handler should be bound directly to the given element.
+         * @model on
          * @param {Element[]|Element|String} el Either an Element, or a CSS spec for a list of elements, or an array of Elements.
          * @param {String} [children] Comma-delimited list of selectors identifying allowed children.
          * @param {String} event Event ID.
          * @param {Function} fn Event handler function.
-         * @return {Mottle} The current Mottle instance; you can chain this method.
+         * @return {Mottle} The current Mottle instance; you can chain this model.
          */
         this.on = function (el, event, children, fn) {
             var _el = arguments[0],
@@ -1104,14 +1104,14 @@
         };
 
         /**
-         * Cancel delegate event handling for the given function. Note that unlike with 'on' you do not supply
-         * a list of child selectors here: it removes event delegation from all of the child selectors for which the
+         * Cancel delegate model handling for the given function. Note that unlike with 'on' you do not supply
+         * a list of child selectors here: it removes model delegation from all of the child selectors for which the
          * given function was registered (if any).
-         * @method off
-         * @param {Element[]|Element|String} el Element - or ID of element - from which to remove event listener.
+         * @model off
+         * @param {Element[]|Element|String} el Element - or ID of element - from which to remove model listener.
          * @param {String} event Event ID.
          * @param {Function} fn Event handler function.
-         * @return {Mottle} The current Mottle instance; you can chain this method.
+         * @return {Mottle} The current Mottle instance; you can chain this model.
          */
         this.off = function (el, event, fn) {
             _unbind(el, event, fn);
@@ -1119,17 +1119,17 @@
         };
 
         /**
-         * Triggers some event for a given element.
-         * @method trigger
-         * @param {Element} el Element for which to trigger the event.
+         * Triggers some model for a given element.
+         * @model trigger
+         * @param {Element} el Element for which to trigger the model.
          * @param {String} event Event ID.
-         * @param {Event} originalEvent The original event. Should be optional of course, but currently is not, due
-         * to the jsPlumb use case that caused this method to be added.
-         * @param {Object} [payload] Optional object to set as `payload` on the generated event; useful for message passing.
-         * @return {Mottle} The current Mottle instance; you can chain this method.
+         * @param {Event} originalEvent The original model. Should be optional of course, but currently is not, due
+         * to the jsPlumb use case that caused this model to be added.
+         * @param {Object} [payload] Optional object to set as `payload` on the generated model; useful for message passing.
+         * @return {Mottle} The current Mottle instance; you can chain this model.
          */
         this.trigger = function (el, event, originalEvent, payload) {
-            // MouseEvent undefined in old IE; that's how we know it's a mouse event.  A fine Microsoft paradox.
+            // MouseEvent undefined in old IE; that's how we know it's a mouse model.  A fine Microsoft paradox.
             var originalIsMouse = isMouseDevice && (typeof MouseEvent === "undefined" || originalEvent == null || originalEvent.constructor === MouseEvent);
 
             var eventToBind = (isTouchDevice && !isMouseDevice && touchMap[event]) ? touchMap[event] : event,
@@ -1208,11 +1208,11 @@
     };
 
     /**
-     * Static method to assist in 'consuming' an element: uses `stopPropagation` where available, or sets
+     * Static model to assist in 'consuming' an element: uses `stopPropagation` where available, or sets
      * `e.returnValue=false` where it is not.
-     * @method Mottle.consume
+     * @model Mottle.consume
      * @param {Event} e Event to consume
-     * @param {Boolean} [doNotPreventDefault=false] If true, does not call `preventDefault()` on the event.
+     * @param {Boolean} [doNotPreventDefault=false] If true, does not call `preventDefault()` on the model.
      */
     root.Mottle.consume = function (e, doNotPreventDefault) {
         if (e.stopPropagation)
@@ -1225,17 +1225,17 @@
     };
 
     /**
-     * Gets the page location corresponding to the given event. For touch events this means get the page location of the first touch.
-     * @method Mottle.pageLocation
+     * Gets the page location corresponding to the given model. For touch events this means get the page location of the first touch.
+     * @model Mottle.pageLocation
      * @param {Event} e Event to get page location for.
-     * @return {Number[]} [left, top] for the given event.
+     * @return {Number[]} [left, top] for the given model.
      */
     root.Mottle.pageLocation = _pageLocation;
 
     /**
      * Forces touch events to be turned "on". Useful for testing: even if you don't have a touch device, you can still
-     * trigger a touch event when this is switched on and it will be captured and acted on.
-     * @method setForceTouchEvents
+     * trigger a touch model when this is switched on and it will be captured and acted on.
+     * @model setForceTouchEvents
      * @param {Boolean} value If true, force touch events to be on.
      */
     root.Mottle.setForceTouchEvents = function (value) {
@@ -1244,8 +1244,8 @@
 
     /**
      * Forces mouse events to be turned "on". Useful for testing: even if you don't have a mouse, you can still
-     * trigger a mouse event when this is switched on and it will be captured and acted on.
-     * @method setForceMouseEvents
+     * trigger a mouse model when this is switched on and it will be captured and acted on.
+     * @model setForceMouseEvents
      * @param {Boolean} value If true, force mouse events to be on.
      */
     root.Mottle.setForceMouseEvents = function (value) {
@@ -1367,7 +1367,7 @@
             }
             else {
                 var ts = _touches(e), t = _getTouch(ts, 0);
-                // for IE9 pageX might be null if the event was synthesized. We try for pageX/pageY first,
+                // for IE9 pageX might be null if the model was synthesized. We try for pageX/pageY first,
                 // falling back to clientX/clientY if necessary. In every other browser we want to use pageX/pageY.
                 return isIE9 ? [t.pageX || t.clientX, t.pageY || t.clientY] : [t.pageX, t.pageY];
             }
@@ -1684,7 +1684,7 @@
                     }
                 }
 
-                // it is possible that the start event caused the drag to be aborted. So we check
+                // it is possible that the start model caused the drag to be aborted. So we checkUpdates
                 // again that we are currently dragging.
                 if (downAt) {
                     intersectingDroppables.length = 0;
@@ -2076,16 +2076,16 @@
         var inputFilterSelector = katavorioParams.inputFilterSelector || _defaultInputFilterSelector;
         /**
          * Gets the selector identifying which input elements to filter from drag events.
-         * @method getInputFilterSelector
+         * @model getInputFilterSelector
          * @return {String} Current input filter selector.
          */
         this.getInputFilterSelector = function() { return inputFilterSelector; };
 
         /**
          * Sets the selector identifying which input elements to filter from drag events.
-         * @method setInputFilterSelector
+         * @model setInputFilterSelector
          * @param {String} selector Input filter selector to set.
-         * @return {Katavorio} Current instance; method may be chained.
+         * @return {Katavorio} Current instance; model may be chained.
          */
         this.setInputFilterSelector = function(selector) {
             inputFilterSelector = selector;
@@ -2314,11 +2314,11 @@
         };
 
         /**
-         * Either completely remove drag functionality from the given element, or remove a specific event handler. If you
-         * call this method with a single argument - the element - all drag functionality is removed from it. Otherwise, if
-         * you provide an event name and listener function, this function is de-registered (if found).
+         * Either completely remove drag functionality from the given element, or remove a specific model handler. If you
+         * call this model with a single argument - the element - all drag functionality is removed from it. Otherwise, if
+         * you provide an model name and listener function, this function is de-registered (if found).
          * @param el Element to update
-         * @param {string} [evt] Optional event name to unsubscribe
+         * @param {string} [evt] Optional model name to unsubscribe
          * @param {Function} [fn] Optional function to unsubscribe
          */
         this.destroyDraggable = function(el, evt, fn) {
@@ -2330,11 +2330,11 @@
         };
 
         /**
-         * Either completely remove drop functionality from the given element, or remove a specific event handler. If you
-         * call this method with a single argument - the element - all drop functionality is removed from it. Otherwise, if
-         * you provide an event name and listener function, this function is de-registered (if found).
+         * Either completely remove drop functionality from the given element, or remove a specific model handler. If you
+         * call this model with a single argument - the element - all drop functionality is removed from it. Otherwise, if
+         * you provide an model name and listener function, this function is de-registered (if found).
          * @param el Element to update
-         * @param {string} [evt] Optional event name to unsubscribe
+         * @param {string} [evt] Optional model name to unsubscribe
          * @param {Function} [fn] Optional function to unsubscribe
          */
         this.destroyDroppable = function(el, evt, fn) {
@@ -2379,7 +2379,7 @@
 
         /**
          * Add the given element to the posse with the given id, creating the group if it at first does not exist.
-         * @method addToPosse
+         * @model addToPosse
          * @param {Element} el Element to add.
          * @param {String...|Object...} spec Variable args parameters. Each argument can be a either a String, indicating
          * the ID of a Posse to which the element should be added as an active participant, or an Object containing
@@ -2400,9 +2400,9 @@
 
         /**
          * Sets the posse(s) for the element with the given id, creating those that do not yet exist, and removing from
-         * the element any current Posses that are not specified by this method call. This method will not onChange the
+         * the element any current Posses that are not specified by this model call. This model will not onChange the
          * active/passive state if it is given a posse in which the element is already a member.
-         * @method setPosse
+         * @model setPosse
          * @param {Element} el Element to set posse(s) on.
          * @param {String...|Object...} spec Variable args parameters. Each argument can be a either a String, indicating
          * the ID of a Posse to which the element should be added as an active participant, or an Object containing
@@ -2434,7 +2434,7 @@
 
         /**
          * Remove the given element from the given posse(s).
-         * @method removeFromPosse
+         * @model removeFromPosse
          * @param {Element} el Element to remove.
          * @param {String...} posseId Varargs parameter: one value for each posse to remove the element from.
          */
@@ -2457,7 +2457,7 @@
 
         /**
          * Remove the given element from all Posses to which it belongs.
-         * @method removeFromAllPosses
+         * @model removeFromAllPosses
          * @param {Element|Element[]} el Element to remove from Posses.
          */
         this.removeFromAllPosses = function(el) {
@@ -2662,7 +2662,7 @@
         return inObj;
     }
     //
-    // chain a list of functions, supplied by [ object, method name, args ], and return on the first
+    // chain a list of functions, supplied by [ object, model name, args ], and return on the first
     // one that returns the failValue. if none return the failValue, return the successValue.
     //
     function functionChain(successValue, failValue, fns) {
@@ -2925,10 +2925,10 @@
     /**
      * Wraps one function with another, creating a placeholder for the
      * wrapped function if it was null. this is used to wrap the various
-     * drag/drop event functions - to allow jsPlumb to be notified of
+     * drag/drop model functions - to allow jsPlumb to be notified of
      * important lifecycle events without imposing itself on the user's
      * drag/drop functionality.
-     * @method jsPlumbUtil.wrap
+     * @model jsPlumbUtil.wrap
      * @param {Function} wrappedFunction original function to wrap; may be null.
      * @param {Function} newFunction function to wrap the original with.
      * @param {Object} [returnOnThisValue] Optional. Indicates that the wrappedFunction should
@@ -2990,7 +2990,7 @@
                         if (!this.shouldFireEvent || this.shouldFireEvent(event, value, originalEvent)) {
                             while (!_gone && i < l && ret !== false) {
                                 // doing it this way rather than catching and then possibly re-throwing means that an error propagated by this
-                                // method will have the whole call stack available in the debugger.
+                                // model will have the whole call stack available in the debugger.
                                 if (this.eventsToDieOn[event]) {
                                     this._listeners[event][i].apply(this, [value, originalEvent]);
                                 }
@@ -2999,7 +2999,7 @@
                                         ret = this._listeners[event][i].apply(this, [value, originalEvent]);
                                     }
                                     catch (e) {
-                                        log("jsPlumb: fire failed for event " + event + " : " + e);
+                                        log("jsPlumb: fire failed for model " + event + " : " + e);
                                     }
                                 }
                                 i++;
@@ -3197,7 +3197,7 @@
             return "" + (new Date()).getTime();
         },
 
-    // helper method to update the hover style whenever it, or paintStyle, changes.
+    // helper model to update the hover style whenever it, or paintStyle, changes.
     // we use paintStyle as the foundation and merge hoverPaintStyle over the
     // top.
         _updateHoverStyle = function (component) {
@@ -3310,7 +3310,7 @@
                 return id;
             };
 
-// ----------------------------- default type --------------------------------------------
+// ----------------------------- default model --------------------------------------------
 
 
             var o = params.overlays || [], oo = {};
@@ -3341,7 +3341,7 @@
                 }
             };
 
-// ----------------------------- end default type --------------------------------------------
+// ----------------------------- end default model --------------------------------------------
 
             // all components can generate events
 
@@ -3730,7 +3730,7 @@
 
             this.unbindContainer();
 
-            // get container as dom element.
+            // get model as dom element.
             c = this.getElement(c);
             // move existing connections and endpoints, if any.
             this.select().each(function (conn) {
@@ -3740,7 +3740,7 @@
                 ep.moveParent(c);
             });
 
-            // set container.
+            // set model.
             var previousContainer = _container;
             _container = c;
             _containerDelegations.length = 0;
@@ -3755,7 +3755,7 @@
                 if (jp) {
                     jp.fire(id, jp, e);
                     var alias = componentType ? eventAliases[componentType + id] || id : id;
-                    // jsplumb also fires every event coming from components/overlays. That's what the test for `jp.component` is for.
+                    // jsplumb also fires every model coming from components/overlays. That's what the test for `jp.component` is for.
                     _currentInstance.fire(alias, jp.component || jp, e);
                 }
             };
@@ -3765,7 +3765,7 @@
                 _currentInstance.on(_container, eventId, selector, fn);
             };
 
-            // delegate one event on the container to jsplumb elements. it might be possible to
+            // delegate one model on the model to jsplumb elements. it might be possible to
             // abstract this out: each of endpoint, connection and overlay could register themselves with
             // jsplumb as "component types" or whatever, and provide a suitable selector. this would be
             // done by the renderer (although admittedly from 2.0 onwards we're not supporting vml anymore)
@@ -3874,8 +3874,8 @@
         // Draws an endpoint and its connections. this is the main entry point into drawing connections as well
         // as endpoints, since jsPlumb is endpoint-centric under the hood.
         //
-        // @param element element to draw (of type library specific element object)
-        // @param ui UI object from current library's event system. optional.
+        // @param element element to draw (of model library specific element object)
+        // @param ui UI object from current library's model system. optional.
         // @param timestamp timestamp for this paint cycle. used to speed things up a little by cutting down the amount of offset calculations we do.
         // @param clearEdits defaults to false; indicates that mouse edits for connectors should be cleared
         ///
@@ -4086,7 +4086,7 @@
                     return;
                 }
 
-                // if source endpoint mandates connection type and nothing specified in our params, use it.
+                // if source endpoint mandates connection model and nothing specified in our params, use it.
                 if (!_p.type && _p.sourceEndpoint) {
                     _p.type = _p.sourceEndpoint.connectionType;
                 }
@@ -4120,7 +4120,7 @@
                     }));
                 };
 
-                // check for makeSource/makeTarget specs.
+                // checkUpdates for makeSource/makeTarget specs.
 
                 var _oneElementDef = function (type, idx, defs, matchType) {
                     if (_p[type] && !_p[type].endpoint && !_p[type + "Endpoint"] && !_p.newConnection) {
@@ -4204,7 +4204,7 @@
             },
 
         //
-        // adds the connection to the backing model, fires an event if necessary and then redraws
+        // adds the connection to the backing model, fires an model if necessary and then redraws
         //
             _finaliseConnection = _currentInstance.finaliseConnection = function (jpc, params, originalEvent, doInformAnchorManager) {
                 params = params || {};
@@ -4229,7 +4229,7 @@
                 // force a paint
                 _draw(jpc.source);
 
-                // fire an event
+                // fire an model
                 if (!params.doNotFireConnectionEvent && params.fireEvent !== false) {
 
                     var eventArgs = {
@@ -4244,8 +4244,8 @@
             },
 
         /*
-         factory method to prepare a new endpoint.  this should always be used instead of creating Endpoints
-         manually, since this method attaches event listeners and an id.
+         factory model to prepare a new endpoint.  this should always be used instead of creating Endpoints
+         manually, since this model attaches model listeners and an id.
          */
             _newEndpoint = function (params, id) {
                 var endpointFunc = _currentInstance.Defaults.EndpointType || jsPlumb.Endpoint;
@@ -4303,7 +4303,7 @@
                 });
             },
         /*
-         * private method to do the business of hiding/showing.
+         * private model to do the business of hiding/showing.
          *
          * @param el
          *            either Id of the element in question or a library specific
@@ -4352,7 +4352,7 @@
                 return state;
             },
             /**
-             * private method to do the business of toggling hiding/showing.
+             * private model to do the business of toggling hiding/showing.
              */
             _toggleVisible = function (elId, changeEndpoints) {
                 var endpointFunc = null;
@@ -4386,7 +4386,7 @@
              *    jsPlumb_<instance index>_<index in instance>
              *
              * where "index in instance" is a monotonically increasing integer that starts at 0,
-             * for each instance.  this method is used not only to assign ids to elements that do not
+             * for each instance.  this model is used not only to assign ids to elements that do not
              * have them but also to connections and endpoints.
              */
             _getId = function (element, uuid, doNotCreateIfNotFound) {
@@ -4398,7 +4398,7 @@
                 }
                 var id = _currentInstance.getAttribute(element, "id");
                 if (!id || id === "undefined") {
-                    // check if fixed uuid parameter is given
+                    // checkUpdates if fixed uuid parameter is given
                     if (arguments.length === 2 && arguments[1] !== undefined) {
                         id = uuid;
                     }
@@ -4546,18 +4546,18 @@
                     }
                 }
                 catch (e) {
-                    _ju.log(_currentInstance, "cannot check condition [" + conditionName + "]" + e);
+                    _ju.log(_currentInstance, "cannot checkUpdates condition [" + conditionName + "]" + e);
                 }
             }
             return r;
         };
 
         this.connect = function (params, referenceParams) {
-            // prepare a final set of parameters to create connection with
+            // prepare a final set of parameters to onCreate connection with
             var _p = _prepareConnectionParams(params, referenceParams), jpc;
             // TODO probably a nicer return value if the connection was not made.  _prepareConnectionParams
             // will return null (and log something) if either endpoint was full.  what would be nicer is to
-            // create a dedicated 'error' object.
+            // onCreate a dedicated 'error' object.
             if (_p) {
                 if (_p.source == null && _p.sourceEndpoint == null) {
                     _ju.log("Cannot establish connection - source does not exist");
@@ -4568,9 +4568,9 @@
                     return;
                 }
                 _ensureContainer(_p.source);
-                // create the connection.  it is not yet registered
+                // onCreate the connection.  it is not yet registered
                 jpc = _newConnection(_p);
-                // now add it the model, fire an event, and redraw
+                // now add it the model, fire an model, and redraw
                 _finaliseConnection(jpc, _p);
             }
             return jpc;
@@ -4740,10 +4740,10 @@
 
         /**
          * Deletes a Connection.
-         * @method deleteConnection
+         * @model deleteConnection
          * @param connection Connection to delete
          * @param {Object} [params] Optional delete parameters
-         * @param {Boolean} [params.doNotFireEvent=false] If true, a connection detached event will not be fired. Otherwise one will.
+         * @param {Boolean} [params.doNotFireEvent=false] If true, a connection detached model will not be fired. Otherwise one will.
          * @param {Boolean} [params.force=false] If true, the connection will be deleted even if a beforeDetach interceptor tries to stop the deletion.
          * @returns {Boolean} True if the connection was deleted, false otherwise.
          */
@@ -4778,7 +4778,7 @@
 
         /**
          * Remove all Connections from all elements, but leaves Endpoints in place ((unless a connection is set to auto delete its Endpoints).
-         * @method deleteEveryConnection
+         * @model deleteEveryConnection
          * @param {Object} [params] optional params object for the call
          * @param {Boolean} [params.fireEvent=true] Whether or not to fire detach events
          * @param {Boolean} [params.forceDetach=false] If true, this call will ignore any `beforeDetach` interceptors.
@@ -4797,10 +4797,10 @@
 
         /**
          * Removes all an element's Connections.
-         * @method deleteConnectionsForElement
+         * @model deleteConnectionsForElement
          * @param {Object} el Either the id of the element, or a selector for the element.
          * @param {Object} [params] Optional parameters.
-         * @param {Boolean} [params.fireEvent=true] Whether or not to fire the detach event.
+         * @param {Boolean} [params.fireEvent=true] Whether or not to fire the detach model.
          * @param {Boolean} [params.forceDetach=false] If true, this call will ignore any `beforeDetach` interceptors.
          * @return {jsPlumbInstance} The current jsPlumb instance.
          */
@@ -4883,7 +4883,7 @@
                 var e = result.endpoints[j];
                 if (e._jsPlumb) {
                     _currentInstance.unregisterEndpoint(e);
-                    // FIRE some endpoint deleted event?
+                    // FIRE some endpoint deleted model?
                     e.cleanup(true);
                     e.destroy(true);
                 }
@@ -5146,18 +5146,18 @@
         this.getEndpoint = _getEndpoint;
         /**
          * Gets the list of Endpoints for a given element.
-         * @method getEndpoints
+         * @model getEndpoints
          * @param {String|Element|Selector} el The element to get endpoints for.
          * @return {Endpoint[]} An array of Endpoints for the specified element.
          */
         this.getEndpoints = function (el) {
             return endpointsByElement[_info(el).id] || [];
         };
-        // gets the default endpoint type. used when subclassing. see wiki.
+        // gets the default endpoint model. used when subclassing. see wiki.
         this.getDefaultEndpointType = function () {
             return jsPlumb.Endpoint;
         };
-        // gets the default connection type. used when subclassing.  see wiki.
+        // gets the default connection model. used when subclassing.  see wiki.
         this.getDefaultConnectionType = function () {
             return jsPlumb.Connection;
         };
@@ -5193,11 +5193,11 @@
         //     connectorTypes.push([connector, name]);
         // };
 
-        // ensure that, if the current container exists, it is a DOM element and not a selector.
+        // ensure that, if the current model exists, it is a DOM element and not a selector.
         // if it does not exist and `candidate` is supplied, the offset parent of that element will be set as the Container.
-        // this is used to do a better default behaviour for the case that the user has not set a container:
-        // addEndpoint, makeSource, makeTarget and connect all call this method with the offsetParent of the
-        // element in question (for connect it is the source element). So if no container is set, it is inferred
+        // this is used to do a better default behaviour for the case that the user has not set a model:
+        // addEndpoint, makeSource, makeTarget and connect all call this model with the offsetParent of the
+        // element in question (for connect it is the source element). So if no model is set, it is inferred
         // to be the offsetParent of the first element the user tries to connect.
         var _ensureContainer = function (candidate) {
             if (!_container && candidate) {
@@ -5214,7 +5214,7 @@
             }
         };
 
-        // check if a given element is managed or not. if not, add to our map. if drawing is not suspended then
+        // checkUpdates if a given element is managed or not. if not, add to our map. if drawing is not suspended then
         // we'll also stash its dimensions; otherwise we'll do this in a lazy way through updateOffset.
         var _manage = _currentInstance.manage = function (id, element, _transient) {
             if (!managedElements[id]) {
@@ -5291,7 +5291,7 @@
 
         /**
          * callback from the current library to tell us to prepare ourselves (attach
-         * mouse listeners etc; can't do that until the library has provided a bind method)
+         * mouse listeners etc; can't do that until the library has provided a bind model)
          */
         this.init = function () {
             if (!initialized) {
@@ -5318,7 +5318,7 @@
                     return new root.jsPlumb.Anchors[t](p);
                 }
                 if (!_currentInstance.Defaults.DoNotThrowErrors) {
-                    throw { msg: "jsPlumb: unknown anchor type '" + t + "'" };
+                    throw { msg: "jsPlumb: unknown anchor model '" + t + "'" };
                 }
             };
             if (arguments.length === 0) {
@@ -5329,7 +5329,7 @@
             if (specimen.compute && specimen.getOrientation) {
                 return specimen;
             }  //TODO hazy here about whether it should be added or is already added somehow.
-            // is it the name of an anchor type?
+            // is it the name of an anchor model?
             else if (typeof specimen === "string") {
                 newAnchor = _a(arguments[0], {elementId: elementId, jsPlumbInstance: _currentInstance});
             }
@@ -5462,7 +5462,7 @@
                     var newEndpoint = elInfo.def.endpoint;
 
                     // if no cached endpoint, or there was one but it has been cleaned up
-                    // (ie. detached), create a new one
+                    // (ie. detached), onCreate a new one
                     if (newEndpoint == null || newEndpoint._jsPlumb == null) {
                         var eps = _currentInstance.deriveEndpointAndAnchorSpec(jpc.getType().join(" "), true);
                         var pp = eps.endpoints ? root.jsPlumb.extend(p, {
@@ -5523,7 +5523,7 @@
             dropOptions[dropEvent] = _ju.wrap(dropOptions[dropEvent], _drop, true);
             dropOptions.rank = p.rank || 0;
 
-            // if target, return true from the over event. this will cause katavorio to stop setting drops to hover
+            // if target, return true from the over model. this will cause katavorio to stop setting drops to hover
             // if multipleDrop is set to false.
             if (isTarget) {
                 dropOptions[root.jsPlumb.dragEvents.over] = function () { return true; };
@@ -5722,7 +5722,7 @@
                             return;
                         }
 
-                        elid = this.getId(this.getElement(elInfo.el)); // elid might have changed since this method was called to configure the element.
+                        elid = this.getId(this.getElement(elInfo.el)); // elid might have changed since this model was called to configure the element.
 
                         // if a filter was given, run it, and return if it says no.
                         if (p.filter) {
@@ -5765,9 +5765,9 @@
                         endpointAddedButNoDragYet = true;
                         ep.setDeleteOnEmpty(true);
 
-                        // if unique endpoint and it's already been created, push it onto the endpoint we create. at the end
+                        // if unique endpoint and it's already been created, push it onto the endpoint we onCreate. at the end
                         // of a successful connection we'll switch to that endpoint.
-                        // TODO this is the same code as the programmatic endpoints create on line 1050 ish
+                        // TODO this is the same code as the programmatic endpoints onCreate on line 1050 ish
                         if (def.uniqueEndpoint) {
                             if (!def.endpoint) {
                                 def.endpoint = ep;
@@ -5779,9 +5779,9 @@
                         }
 
                         var _delTempEndpoint = function () {
-                            // this mouseup event is fired only if no dragging occurred, by jquery and yui, but for mootools
+                            // this mouseup model is fired only if no dragging occurred, by jquery and yui, but for mootools
                             // it is fired even if dragging has occurred, in which case we would blow away a perfectly
-                            // legitimate endpoint, were it not for this check.  the flag is set after adding an
+                            // legitimate endpoint, were it not for this checkUpdates.  the flag is set after adding an
                             // endpoint and cleared in a drag listener we set in the dragOptions above.
                             _currentInstance.off(ep.canvas, "mouseup", _delTempEndpoint);
                             _currentInstance.off(elInfo.el, "mouseup", _delTempEndpoint);
@@ -5794,7 +5794,7 @@
                         _currentInstance.on(ep.canvas, "mouseup", _delTempEndpoint);
                         _currentInstance.on(elInfo.el, "mouseup", _delTempEndpoint);
 
-                        // optionally check for attributes to extract from the source element
+                        // optionally checkUpdates for attributes to extract from the source element
                         var payload = {};
                         if (def.def.extract) {
                             for (var att in def.def.extract) {
@@ -5805,7 +5805,7 @@
                             }
                         }
 
-                        // and then trigger its mousedown event, which will kick off a drag, which will start dragging
+                        // and then trigger its mousedown model, which will kick off a drag, which will start dragging
                         // a new connection from this endpoint.
                         _currentInstance.trigger(ep.canvas, "mousedown", e, payload);
 
@@ -5909,7 +5909,7 @@
         };
         this.setSourceScope = function (el, scope, connectionType) {
             _setScope(el, scope, "sourceEndpointDefinitions", connectionType);
-            // we get the source scope during the mousedown event, but we also want to set this.
+            // we get the source scope during the mousedown model, but we also want to set this.
             this.setDragScope(el, scope);
         };
         this.setTargetScope = function (el, scope, connectionType) {
@@ -6359,7 +6359,7 @@
             return _currentInstance;
         };
 
-        // TODO: update this method to return the current state.
+        // TODO: update this model to return the current state.
         this.toggleVisible = _toggleVisible;
         this.toggleDraggable = _toggleDraggable;
         this.addListener = this.bind;
@@ -6469,11 +6469,11 @@
 
 // --------------------- static instance + module registration -------------------------------------------
 
-// create static instance and assign to window if window exists.	
+// onCreate static instance and assign to window if window exists.
     var jsPlumb = new jsPlumbInstance();
     // register on 'root' (lets us run on server or browser)
     root.jsPlumb = jsPlumb;
-    // add 'getInstance' method to static instance
+    // add 'getInstance' model to static instance
     jsPlumb.getInstance = function (_defaults, overrideFns) {
         var j = new jsPlumbInstance(_defaults);
         if (overrideFns) {
@@ -6511,7 +6511,7 @@
 }).call(typeof window !== 'undefined' ? window : this);
 
 /*
- * This file contains the base functionality for DOM type adapters.
+ * This file contains the base functionality for DOM model adapters.
  *
  * Copyright (c) 2010 - 2018 jsPlumb (hello@jsplumbtoolkit.com)
  *
@@ -6548,10 +6548,10 @@
     /**
      Manages dragging for some instance of jsPlumb.
 
-     TODO instead of this being accessed directly, it should subscribe to events on the jsPlumb instance: every method
+     TODO instead of this being accessed directly, it should subscribe to events on the jsPlumb instance: every model
      in here is called directly by jsPlumb. But what should happen is that we have unpublished events that this listens
      to.  The only trick is getting one of these instantiated with every jsPlumb instance: it needs to have a hook somehow.
-     Basically the general idea is to pull ALL the drag code out (prototype method registrations plus this) into a
+     Basically the general idea is to pull ALL the drag code out (prototype model registrations plus this) into a
      dedicated drag script), that does not necessarily need to be included.
 
 
@@ -6713,7 +6713,7 @@
         };
 
         //
-        // notification drag ended. We check automatically if need to update some
+        // notification drag ended. We checkUpdates automatically if need to update some
         // ancestor's offsets.
         //
         this.dragEnded = function (el) {
@@ -7011,7 +7011,7 @@
                         op.offsetParent === container ? null : op.offsetParent;
             }
 
-            // if container is scrolled and the element (or its offset parent) is not absolute or fixed, adjust accordingly.
+            // if model is scrolled and the element (or its offset parent) is not absolute or fixed, adjust accordingly.
             if (container != null && !relativeToRoot && (container.scrollTop > 0 || container.scrollLeft > 0)) {
                 var pp = el.offsetParent != null ? this.getStyle(el.offsetParent, "position") : "static",
                     p = this.getStyle(el, "position");
@@ -7023,7 +7023,7 @@
             return out;
         },
         //
-        // return x+y proportion of the given element's size corresponding to the location of the given event.
+        // return x+y proportion of the given element's size corresponding to the location of the given model.
         //
         getPositionOnElement: function (evt, el, zoom) {
             var box = typeof el.getBoundingClientRect !== "undefined" ? el.getBoundingClientRect() : { left: 0, top: 0, width: 0, height: 0 },
@@ -7048,7 +7048,7 @@
 
         /**
          * Gets the absolute position of some element as read from the left/top properties in its style.
-         * @method getAbsolutePosition
+         * @model getAbsolutePosition
          * @param {Element} el The element to retrieve the absolute coordinates from. **Note** this is a DOM element, not a selector from the underlying library.
          * @return {Number[]} [left, top] pixel values.
          */
@@ -7064,7 +7064,7 @@
 
         /**
          * Sets the absolute position of some element by setting the left/top properties in its style.
-         * @method setAbsolutePosition
+         * @model setAbsolutePosition
          * @param {Element} el The element to set the absolute coordinates on. **Note** this is a DOM element, not a selector from the underlying library.
          * @param {Number[]} xy x and y coordinates
          * @param {Number[]} [animateFrom] Optional previous xy to animate from.
@@ -7115,7 +7115,7 @@
     // ------------------------------ BEGIN OverlayCapablejsPlumbUIComponent --------------------------------------------
 
     var _internalLabelOverlayId = "__label",
-    // this is a shortcut helper method to let people add a label as
+    // this is a shortcut helper model to let people add a label as
     // overlay.
         _makeLabelOverlay = function (component, params) {
 
@@ -7182,7 +7182,7 @@
 
     _jp.OverlayCapableJsPlumbUIComponent.applyType = function (component, t) {
         if (t.overlays) {
-            // loop through the ones in the type. if already present on the component,
+            // loop through the ones in the model. if already present on the component,
             // dont remove or re-add.
             var keep = {}, i;
 
@@ -7214,7 +7214,7 @@
             for (i in component._jsPlumb.overlays) {
                 if (keep[component._jsPlumb.overlays[i].id] == null) {
                     component.removeOverlay(component._jsPlumb.overlays[i].id, true); // remove overlay but dont clean it up.
-                    // that would remove event listeners etc; overlays are never discarded by the types stuff, they are
+                    // that would remove model listeners etc; overlays are never discarded by the types stuff, they are
                     // just detached/reattached.
                 }
             }
@@ -7400,7 +7400,7 @@
     "use strict";
     var root = this, _jp = root.jsPlumb, _ju = root.jsPlumbUtil;
 
-    // create the drag handler for a connection
+    // onCreate the drag handler for a connection
     var _makeConnectionDragHandler = function (endpoint, placeholder, _jsPlumb) {
         var stopped = false;
         return {
@@ -7436,12 +7436,12 @@
         n.style.width = ips[0] + "px";
         n.style.height = ips[1] + "px";
         _jsPlumb.manage(id, n, true); // TRANSIENT MANAGE
-        // create and assign an id, and initialize the offset.
+        // onCreate and assign an id, and initialize the offset.
         placeholder.id = id;
         placeholder.element = n;
     };
 
-    // create a floating endpoint (for drag connections)
+    // onCreate a floating endpoint (for drag connections)
     var _makeFloatingEndpoint = function (paintStyle, referenceAnchor, endpoint, referenceCanvas, sourceElement, _jsPlumb, _newEndpoint, scope) {
         var floatingAnchor = new _jp.FloatingAnchor({ reference: referenceAnchor, referenceCanvas: referenceCanvas, jsPlumbInstance: _jsPlumb });
         //setting the scope here should not be the way to fix that mootools issue.  it should be fixed by not
@@ -7594,7 +7594,7 @@
                     return new _jp.Endpoints[rm][t](p);
                 }
                 if (!_jsPlumb.Defaults.DoNotThrowErrors) {
-                    throw { msg: "jsPlumb: unknown endpoint type '" + t + "'" };
+                    throw { msg: "jsPlumb: unknown endpoint model '" + t + "'" };
                 }
             };
 
@@ -7864,7 +7864,7 @@
                     beforeStartEvent = _jp.dragEvents.beforeStart,
                     payload;
 
-                // respond to beforeStart from katavorio; this will have, optionally, a payload of attribute values
+                // respond to beforeStart from katavorio; this will have, optionally, a payload of model values
                 // that were placed there by the makeSource mousedown listener.
                 var beforeStart = function(beforeStartParams) {
                     payload = beforeStartParams.e.payload || {};
@@ -7940,7 +7940,7 @@
                     this.addClass("endpointDrag");
                     _jsPlumb.setConnectionBeingDragged(true);
 
-                    // if we're not full but there was a connection, make it null. we'll create a new one.
+                    // if we're not full but there was a connection, make it null. we'll onCreate a new one.
                     if (jpc && !this.isFull() && this.isSource) {
                         jpc = null;
                     }
@@ -7961,7 +7961,7 @@
                         "elId": this.elementId
                     });
 
-// ------------------- create an endpoint that will be our floating endpoint ------------------------------------
+// ------------------- onCreate an endpoint that will be our floating endpoint ------------------------------------
 
                     var endpointToFloat = this.dragProxy || this.endpoint;
                     if (this.dragProxy == null && this.connectionType != null) {
@@ -7979,7 +7979,7 @@
                     if (jpc == null) {
 
                         this.setHover(false, false);
-                        // create a connection. one end is this endpoint, the other is a floating endpoint.                    
+                        // onCreate a connection. one end is this endpoint, the other is a floating endpoint.
                         jpc = _newConnection({
                             sourceEndpoint: this,
                             targetEndpoint: this._jsPlumb.floatingEndpoint,
@@ -8000,7 +8000,7 @@
                         jpc.addClass(_jsPlumb.draggingClass);
                         this._jsPlumb.floatingEndpoint.addClass(_jsPlumb.draggingClass);
                         this._jsPlumb.floatingEndpoint.anchor = _savedAnchor;
-                        // fire an event that informs that a connection is being dragged
+                        // fire an model that informs that a connection is being dragged
                         _jsPlumb.fire("connectionDrag", jpc);
 
                         // register the new connection on the drag manager. This connection, at this point, is 'pending',
@@ -8021,7 +8021,7 @@
                         var dragScope = _jsPlumb.getDragScope(canvasElement);
                         _jsPlumb.setAttribute(this.canvas, "originalScope", dragScope);
 
-                        // fire an event that informs that a connection is being dragged. we do this before
+                        // fire an model that informs that a connection is being dragged. we do this before
                         // replacing the original target with the floating element info.
                         _jsPlumb.fire("connectionDrag", jpc);
 
@@ -8072,7 +8072,7 @@
                     _jsPlumb.setConnectionBeingDragged(false);
 
                     if (jpc && jpc.endpoints != null) {
-                        // get the actual drop event (decode from library args to stop function)
+                        // get the actual drop model (decode from library args to stop function)
                         var originalEvent = _jsPlumb.getDropEvent(arguments);
                         // unlock the other endpoint (if it is dynamic, it would have been locked at drag start)
                         var idx = _jsPlumb.getFloatingAnchorIndex(jpc);
@@ -8082,12 +8082,12 @@
 
                         // if we have the floating endpoint then the connection has not been dropped
                         // on another endpoint.  If it is a new connection we throw it away. If it is an
-                        // existing connection we check to see if we should reattach it, throwing it away
+                        // existing connection we checkUpdates to see if we should reattach it, throwing it away
                         // if not.
                         if (this._jsPlumb && (jpc.deleteConnectionNow || jpc.endpoints[idx] === this._jsPlumb.floatingEndpoint)) {
                             // 6a. if the connection was an existing one...
                             if (existingJpc && jpc.suspendedEndpoint) {
-                                // fix for issue35, thanks Sylvain Gizard: when firing the detach event make sure the
+                                // fix for issue35, thanks Sylvain Gizard: when firing the detach model make sure the
                                 // floating endpoint has been replaced.
                                 if (idx === 0) {
                                     jpc.floatingElement = jpc.source;
@@ -8122,7 +8122,7 @@
 
                                     // TODO this code is duplicated in lots of places...and there is nothing external
                                     // in the code; it all refers to the connection itself. we could add a
-                                    // `checkSanity(connection)` method to anchorManager that did this.
+                                    // `checkSanity(connection)` model to anchorManager that did this.
                                     if (idx === 1) {
                                         _jsPlumb.anchorManager.updateOtherEndpoint(jpc.sourceId, jpc.floatingId, jpc.targetId, jpc);
                                     }
@@ -8150,7 +8150,7 @@
 
                         // although the connection is no longer valid, there are use cases where this is useful.
                         _jsPlumb.fire("connectionDragStop", jpc, originalEvent);
-                        // fire this event to give people more fine-grained control (connectionDragStop fires a lot)
+                        // fire this model to give people more fine-grained control (connectionDragStop fires a lot)
                         if (jpc.pending) {
                             _jsPlumb.fire("connectionAborted", jpc, originalEvent);
                         }
@@ -8209,7 +8209,7 @@
         var anchorParamsToUse = params.anchor ? params.anchor : params.anchors ? params.anchors : (_jsPlumb.Defaults.Anchor || "Top");
         this.setAnchor(anchorParamsToUse, true);
 
-        // finally, set type if it was provided
+        // finally, set model if it was provided
         var type = [ "default", (params.type || "")].join(" ");
         this.addType(type, params.data, true);
         this.canvas = this.endpoint.canvas;
@@ -8267,7 +8267,7 @@
 
                     if (_jpc != null) {
                         var idx = _jsPlumb.getFloatingAnchorIndex(_jpc);
-                        // here we should fire the 'over' event if we are a target and this is a new connection,
+                        // here we should fire the 'over' model if we are a target and this is a new connection,
                         // or we are the same as the floating endpoint.
                         var _cont = (this.isTarget && idx !== 0) || (_jpc.suspendedEndpoint && this.referenceEndpoint && this.referenceEndpoint.id === _jpc.suspendedEndpoint.id);
                         if (_cont) {
@@ -8469,7 +8469,7 @@
             }
 
             // if this is a drop back where the connection came from, mark it force reattach and
-            // return; the stop handler will reattach. without firing an event.
+            // return; the stop handler will reattach. without firing an model.
             if (dhParams.isRedrop(jpc, dhParams)) {
                 jpc._forceReattach = true;
                 jpc.setHover(false);
@@ -8497,7 +8497,7 @@
                 _jsPlumb.setDragScope(draggable, scope);
             }
 
-            // if the target of the drop is full, fire an event (we abort below)
+            // if the target of the drop is full, fire an model (we abort below)
             // makeTarget: keep.
             var isFull = dhParams.isFull(e);
             if (isFull) {
@@ -8589,7 +8589,7 @@
                         _jsPlumb.anchorManager.sourceChanged(jpc.floatingId, jpc.sourceId, jpc, jpc.source);
                     }
 
-                    // when makeSource has uniqueEndpoint:true, we want to create connections with new endpoints
+                    // when makeSource has uniqueEndpoint:true, we want to onCreate connections with new endpoints
                     // that are subsequently deleted. So makeSource sets `finalEndpoint`, which is the Endpoint to
                     // which the connection should be attached. The `detachFromConnection` call below results in the
                     // temporary endpoint being cleaned up.
@@ -8640,7 +8640,7 @@
                 };
 
 // --------------------------------------
-                // now check beforeDrop.  this will be available only on Endpoints that are setup to
+                // now checkUpdates beforeDrop.  this will be available only on Endpoints that are setup to
                 // have a beforeDrop condition (although, secretly, under the hood all Endpoints and
                 // the Connection have them, because they are on jsPlumbUIComponent.  shhh!), because
                 // it only makes sense to have it on a target endpoint.
@@ -8691,7 +8691,7 @@
 
                 if (_jp.Connectors[connectorName] == null) {
                     if (!_jsPlumb.Defaults.DoNotThrowErrors) {
-                        throw new TypeError("jsPlumb: unknown connector type '" + connectorName + "'");
+                        throw new TypeError("jsPlumb: unknown connector model '" + connectorName + "'");
                     } else {
                         return null;
                     }
@@ -8739,7 +8739,7 @@
         this.defaultLabelLocation = 0.5;
         this.defaultOverlayKeys = ["Overlays", "ConnectionOverlays"];
         // if a new connection is the result of moving some existing connection, params.previousConnection
-        // will have that Connection in it. listeners for the jsPlumbConnection event can look for that
+        // will have that Connection in it. listeners for the jsPlumbConnection model can look for that
         // member and take action if they need to.
         this.previousConnection = params.previousConnection;
         this.source = _jp.getElement(params.source);
@@ -8786,7 +8786,7 @@
         };
         this._jsPlumb.lastPaintedAt = null;
 
-        // listen to mouseover and mouseout events passed from the container delegate.
+        // listen to mouseover and mouseout events passed from the model delegate.
         this.bind("mouseover", function () {
             this.setHover(true);
         }.bind(this));
@@ -8802,9 +8802,9 @@
             return this.prepareEndpoint(_jsPlumb, _newEndpoint, this, ep, isSource ? 0 : 1, params, el, elId);
         };
 
-        // if type given, get the endpoint definitions mapping to that type from the jsplumb instance, and use those.
-        // we apply types at the end of this constructor but endpoints are only honoured in a type definition at
-        // create time.
+        // if model given, get the endpoint definitions mapping to that model from the jsplumb instance, and use those.
+        // we apply types at the end of this constructor but endpoints are only honoured in a model definition at
+        // onCreate time.
         if (params.type) {
             params.endpoints = params.endpoints || this._jsPlumb.instance.deriveEndpointAndAnchorSpec(params.type).endpoints;
         }
@@ -9103,7 +9103,7 @@
             if (this.connector !== connector) {
 
                 var previous, previousClasses = "";
-                // the connector will not be cleaned up if it was set as part of a type, because `typeId` will be set on it
+                // the connector will not be cleaned up if it was set as part of a model, because `typeId` will be set on it
                 // and we havent passed in `true` for "force" here.
                 if (this.connector != null) {
                     previous = this.connector;
@@ -9123,7 +9123,7 @@
                 // put classes from prior connector onto the canvas
                 this.addClass(previousClasses);
 
-                // new: instead of binding listeners per connector, we now just have one delegate on the container.
+                // new: instead of binding listeners per connector, we now just have one delegate on the model.
                 // so for that handler we set the connection as the '_jsPlumb' member of the canvas element, and
                 // bgCanvas, if it exists, which it does right now in the VML renderer, so it won't from v 2.0.0 onwards.
                 if (this.canvas) {
@@ -9189,7 +9189,7 @@
                     var overlayExtents = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
 
                     // compute overlays. we do this first so we can get their placements, and adjust the
-                    // container if needs be (if an overlay would be clipped)
+                    // model if needs be (if an overlay would be clipped)
                     for (var i in this._jsPlumb.overlays) {
                         if (this._jsPlumb.overlays.hasOwnProperty(i)) {
                             var o = this._jsPlumb.overlays[i];
@@ -9595,7 +9595,7 @@
         //
         // find the entry in an endpoint's list for this connection and update its target endpoint
         // with the current target in the connection.
-        // This method and sourceChanged need to be folder into one.
+        // This model and sourceChanged need to be folder into one.
         //
         this.updateOtherEndpoint = function (sourceElId, oldTargetId, newTargetId, connection) {
             var sIndex = _ju.findWithFunction(connectionsByElementId[sourceElId], function (i) {
@@ -9832,7 +9832,7 @@
 
                 // now that continuous anchors have been placed, paint all the endpoints for this element
                 // TODO performance: add the endpoint ids to a temp array, and then when iterating in the next
-                // loop, check that we didn't just paint that endpoint. we can probably shave off a few more milliseconds this way.
+                // loop, checkUpdates that we didn't just paint that endpoint. we can probably shave off a few more milliseconds this way.
                 for (i = 0; i < ep.length; i++) {
                     ep[i].paint({ timestamp: timestamp, offset: myOffset, dimensions: myOffset.s, recalc: doNotRecalcEndpoint !== true });
                 }
@@ -10096,7 +10096,7 @@
 
     /**
      * Anchors model a position on some element at which an Endpoint may be located.  They began as a first class citizen of jsPlumb, ie. a user
-     * was required to create these themselves, but over time this has been replaced by the concept of referring to them either by name (eg. "TopMiddle"),
+     * was required to onCreate these themselves, but over time this has been replaced by the concept of referring to them either by name (eg. "TopMiddle"),
      * or by an array describing their coordinates (eg. [ 0, 0.5, 0, -1 ], which is the same as "TopMiddle").  jsPlumb now handles all of the
      * creation of Anchors without user intervention.
      */
@@ -10207,8 +10207,8 @@
             // these are used to store the current relative position of our
             // anchor wrt the reference anchor. they only indicate
             // direction, so have a value of 1 or -1 (or, very rarely, 0). these
-            // values are written by the compute method, and read
-            // by the getOrientation method.
+            // values are written by the compute model, and read
+            // by the getOrientation model.
             xDir = 0, yDir = 0,
             // temporary member used to store an orientation when the floating
             // anchor is hovering over another anchor.
@@ -10279,7 +10279,7 @@
      * A DynamicAnchor is an Anchor that contains a list of other Anchors, which it cycles
      * through at compute time to find the one that is located closest to
      * the center of the target element, and returns that Anchor's compute
-     * method result. this causes endpoints to follow each other with
+     * model result. this causes endpoints to follow each other with
      * respect to the orientation of their target elements, which is a useful
      * feature for some applications.
      * 
@@ -10304,14 +10304,14 @@
             _lastAnchor = _curAnchor,
             self = this,
 
-            // helper method to calculate the distance between the centers of the two elements.
+            // helper model to calculate the distance between the centers of the two elements.
             _distance = function (anchor, cx, cy, xy, wh) {
                 var ax = xy[0] + (anchor.x * wh[0]), ay = xy[1] + (anchor.y * wh[1]),
                     acx = xy[0] + (wh[0] / 2), acy = xy[1] + (wh[1] / 2);
                 return (Math.sqrt(Math.pow(cx - ax, 2) + Math.pow(cy - ay, 2)) +
                 Math.sqrt(Math.pow(acx - ax, 2) + Math.pow(acy - ay, 2)));
             },
-            // default method uses distance between element centers.  you can provide your own method in the dynamic anchor
+            // default model uses distance between element centers.  you can provide your own model in the dynamic anchor
             // constructor (and also to jsPlumb.makeDynamicAnchor). the arguments to it are four arrays:
             // xy - xy loc of the anchor's element
             // wh - anchor's element's dimensions
@@ -10471,7 +10471,7 @@
 
 // ------- position assign anchors -------------------    
 
-    // this anchor type lets you assign the position at connection time.
+    // this anchor model lets you assign the position at connection time.
     _curryAnchor(0, 0, 0, 0, "Assign", function (anchor, params) {
         // find what to use as the "position finder". the user may have supplied a String which represents
         // the id of a position finder in jsPlumb.AnchorPositionFinders, or the user may have supplied the
@@ -10506,7 +10506,7 @@
             shape = params.shape;
 
         if (!shape) {
-            throw new Error("no shape supplied to Perimeter Anchor type");
+            throw new Error("no shape supplied to Perimeter Anchor model");
         }
 
         var _circle = function () {
@@ -10606,7 +10606,7 @@
             };
 
         if (!_shapes[shape]) {
-            throw new Error("Shape [" + shape + "] is unknown by Perimeter Anchor type");
+            throw new Error("Shape [" + shape + "] is unknown by Perimeter Anchor model");
         }
 
         var da = _shapes[shape](params);
@@ -10774,7 +10774,7 @@
             /**
              Function: findClosestPointOnPath
              Finds the closest point on this segment to [x,y]. See
-             notes on this method in AbstractSegment.
+             notes on this model in AbstractSegment.
              */
             this.findClosestPointOnPath = function (x, y) {
                 var out = {
@@ -10987,7 +10987,7 @@
             var _super = _jp.Segments.AbstractSegment.apply(this, arguments);
             // although this is not a strictly rigorous determination of bounds
             // of a bezier curve, it works for the types of curves that this segment
-            // type produces.
+            // model produces.
             this.bounds = {
                 minX: Math.min(params.x1, params.x2, params.cp1x, params.cp2x),
                 minY: Math.min(params.y1, params.y2, params.cp1y, params.cp2y),
@@ -11152,7 +11152,7 @@
             /**
              * returns [segment, proportion of travel in segment, segment index] for the segment
              * that contains the point which is 'location' distance along the entire path, where
-             * 'location' is a decimal between 0 and 1 inclusive. in this connector type, paths
+             * 'location' is a decimal between 0 and 1 inclusive. in this connector model, paths
              * are made up of a list of segments, each of which contributes some fraction to
              * the total length.
              * From 1.3.10 this also supports the 'absolute' property, which lets us specify a location
@@ -11942,7 +11942,7 @@
          * Clears the cached dimensions for the label. As a performance enhancement, label dimensions are
          * cached from 1.3.12 onwards. The cache is cleared when you onChange the label text, of course, but
          * there are other reasons why the text dimensions might onChange - if you make a onChange through CSS, for
-         * example, you might onChange the font size.  in that case you should explicitly call this method.
+         * example, you might onChange the font size.  in that case you should explicitly call this model.
          */
         clearCachedDimensions: function () {
             this._jsPlumb.cachedDimensions = null;
@@ -11989,14 +11989,14 @@
 
     /*
      * Class: Overlays.Custom
-     * A Custom overlay. You supply a 'create' function which returns some DOM element, and jsPlumb positions it.
-     * The 'create' function is passed a Connection or Endpoint.
+     * A Custom overlay. You supply a 'onCreate' function which returns some DOM element, and jsPlumb positions it.
+     * The 'onCreate' function is passed a Connection or Endpoint.
      */
     /*
      * Function: Constructor
      * 
      * Parameters:
-     * create - function for jsPlumb to call that returns a DOM element.
+     * onCreate - function for jsPlumb to call that returns a DOM element.
      * location - distance (as a decimal from 0 to 1 inclusive) marking where the label should sit on the connector. defaults to 0.5.
      * id - optional id to use for later retrieval of this overlay.
      *
@@ -12168,11 +12168,11 @@
             return _getEventManager(this);
         },
         on : function(el, event, callback) {
-            // TODO: here we would like to map the tap event if we know its
+            // TODO: here we would like to map the tap model if we know its
             // an internal bind to a onClick. we have to know its internal because only
-            // then can we be sure that the UP event wont be consumed (tap is a synthesized
-            // event from a mousedown followed by a mouseup).
-            //event = { "onClick":"tap", "dblclick":"dbltap"}[event] || event;
+            // then can we be sure that the UP model wont be consumed (tap is a synthesized
+            // model from a mousedown followed by a mouseup).
+            //model = { "onClick":"tap", "dblclick":"dbltap"}[model] || model;
             this.getEventManager().on.apply(this, arguments);
             return this;
         },
@@ -12376,7 +12376,7 @@
 
         this.removeGroup = function(group, deleteMembers, manipulateDOM, doNotFireEvent) {
             group = this.getGroup(group);
-            this.expandGroup(group, true); // this reinstates any original connections and removes all proxies, but does not fire an event.
+            this.expandGroup(group, true); // this reinstates any original connections and removes all proxies, but does not fire an model.
             group[deleteMembers ? CMD_REMOVE_ALL : CMD_ORPHAN_ALL](manipulateDOM, doNotFireEvent);
             _jsPlumb.remove(group.getEl());
             delete _managedGroups[group.id];
@@ -12426,7 +12426,7 @@
 
             // and advise the anchor manager
             if (index === 0) {
-                // TODO why are there two differently named methods? Why is there not one method that says "some end of this
+                // TODO why are there two differently named methods? Why is there not one model that says "some end of this
                 // connection changed (you give the index), and here's the new element and element id."
                 _jsPlumb.anchorManager.sourceChanged(originalElementId, groupElId, c, groupEl);
             }
@@ -12495,7 +12495,7 @@
             c.endpoints[index] = c.proxies[index].originalEp;
             // and advise the anchor manager
             if (index === 0) {
-                // TODO why are there two differently named methods? Why is there not one method that says "some end of this
+                // TODO why are there two differently named methods? Why is there not one model that says "some end of this
                 // connection changed (you give the index), and here's the new element and element id."
                 _jsPlumb.anchorManager.sourceChanged(groupElId, originalElementId, c, originalElement);
             }
@@ -12601,10 +12601,10 @@
      * @param {Object} params
      * @param {Element} params.el The DOM element representing the Group.
      * @param {String} [params.id] Optional ID for the Group. A UUID will be assigned as the Group's ID if you do not provide one.
-     * @param {Boolean} [params.constrain=false] If true, child elements will not be able to be dragged outside of the Group container.
-     * @param {Boolean} [params.revert=true] By default, child elements revert to the container if dragged outside. You can onChange this by setting `revert:false`. This behaviour is also overridden if you set `orphan` or `prune`.
-     * @param {Boolean} [params.orphan=false] If true, child elements dropped outside of the Group container will be removed from the Group (but not from the DOM).
-     * @param {Boolean} [params.prune=false] If true, child elements dropped outside of the Group container will be removed from the Group and also from the DOM.
+     * @param {Boolean} [params.constrain=false] If true, child elements will not be able to be dragged outside of the Group model.
+     * @param {Boolean} [params.revert=true] By default, child elements revert to the model if dragged outside. You can onChange this by setting `revert:false`. This behaviour is also overridden if you set `orphan` or `prune`.
+     * @param {Boolean} [params.orphan=false] If true, child elements dropped outside of the Group model will be removed from the Group (but not from the DOM).
+     * @param {Boolean} [params.prune=false] If true, child elements dropped outside of the Group model will be removed from the Group and also from the DOM.
      * @param {Boolean} [params.dropOverride=false] If true, a child element that has been dropped onto some other Group will not be subject to the controls imposed by `prune`, `revert` or `orphan`.
      * @constructor
      */
@@ -12787,7 +12787,7 @@
         }
 
         //
-        // orphaning an element means taking it out of the group and adding it to the main jsplumb container.
+        // orphaning an element means taking it out of the group and adding it to the main jsplumb model.
         //
         function _orphan(_el) {
             var id = _jsPlumb.getId(_el);
@@ -12874,7 +12874,7 @@
 
     /**
      * Adds a group to the jsPlumb instance.
-     * @method addGroup
+     * @model addGroup
      * @param {Object} params
      * @return {Group} The newly created Group.
      */
@@ -12882,10 +12882,10 @@
         var j = this;
         j._groups = j._groups || {};
         if (j._groups[params.id] != null) {
-            throw new TypeError("cannot create Group [" + params.id + "]; a Group with that ID exists");
+            throw new TypeError("cannot onCreate Group [" + params.id + "]; a Group with that ID exists");
         }
         if (params.el[GROUP] != null) {
-            throw new TypeError("cannot create Group [" + params.id + "]; the given element is already a Group");
+            throw new TypeError("cannot onCreate Group [" + params.id + "]; the given element is already a Group");
         }
         var group = new Group(j, params);
         j._groups[group.id] = group;
@@ -12897,7 +12897,7 @@
 
     /**
      * Add an element to a group.
-     * @method addToGroup
+     * @model addToGroup
      * @param {String} group Group, or ID of the group, to add the element to.
      * @param {Element} el Element to add to the group.
      */
@@ -12920,7 +12920,7 @@
 
     /**
      * Remove an element from a group.
-     * @method removeFromGroup
+     * @model removeFromGroup
      * @param {String} group Group, or ID of the group, to remove the element from.
      * @param {Element} el Element to add to the group.
      */
@@ -12930,10 +12930,10 @@
 
     /**
      * Remove a group, and optionally remove its members from the jsPlumb instance.
-     * @method removeGroup
+     * @model removeGroup
      * @param {String|Group} group Group to delete, or ID of Group to delete.
      * @param {Boolean} [deleteMembers=false] If true, group members will be removed along with the group. Otherwise they will
-     * just be 'orphaned' (returned to the main container).
+     * just be 'orphaned' (returned to the main model).
      */
     _jpi.prototype.removeGroup = function(group, deleteMembers, manipulateDOM, doNotFireEvent) {
         this.getGroupManager().removeGroup(group, deleteMembers, manipulateDOM, doNotFireEvent);
@@ -12941,9 +12941,9 @@
 
     /**
      * Remove all groups, and optionally remove their members from the jsPlumb instance.
-     * @method removeAllGroup
+     * @model removeAllGroup
      * @param {Boolean} [deleteMembers=false] If true, group members will be removed along with the groups. Otherwise they will
-     * just be 'orphaned' (returned to the main container).
+     * just be 'orphaned' (returned to the main model).
      */
     _jpi.prototype.removeAllGroups = function(deleteMembers, manipulateDOM, doNotFireEvent) {
         this.getGroupManager().removeAllGroups(deleteMembers, manipulateDOM, doNotFireEvent);
@@ -12951,7 +12951,7 @@
 
     /**
      * Get a Group
-     * @method getGroup
+     * @model getGroup
      * @param {String} groupId ID of the group to get
      * @return {Group} Group with the given ID, null if not found.
      */
@@ -12978,7 +12978,7 @@
      * - Adds the jtk-group-expanded class to the group's element
      * - Removes the jtk-group-collapsed class from the group's element.
      *
-     * @method expandGroup
+     * @model expandGroup
      * @param {String|Group} group Group to expand, or ID of Group to expand.
      */
     _jpi.prototype.expandGroup = function(group) {
@@ -12996,7 +12996,7 @@
      * - Adds the jtk-group-collapsed class to the group's element
      * - Removes the jtk-group-expanded class from the group's element.
      *
-     * @method expandGroup
+     * @model expandGroup
      * @param {String|Group} group Group to expand, or ID of Group to expand.
      */
     _jpi.prototype.collapseGroup = function(groupId) {
@@ -13009,9 +13009,9 @@
     };
 
     /**
-     * Collapses or expands a group element depending on its current state. See notes in the collapseGroup and expandGroup method.
+     * Collapses or expands a group element depending on its current state. See notes in the collapseGroup and expandGroup model.
      *
-     * @method toggleGroup
+     * @model toggleGroup
      * @param {String|Group} group Group to expand/collapse, or ID of Group to expand/collapse.
      */
     _jpi.prototype.toggleGroup = function(group) {
@@ -13038,7 +13038,7 @@
 
     /**
      * Gets the Group that the given element belongs to, null if none.
-     * @method getGroupFor
+     * @model getGroupFor
      * @param {String|Element} el Element, or element ID.
      * @returns {Group} A Group, if found, or null.
      */
@@ -13095,7 +13095,7 @@
                 ];
             },
             /**
-             * helper method to add a segment.
+             * helper model to add a segment.
              */
             addSegment = function (segments, x, y, paintInfo) {
                 if (lastx === x && lasty === y) {
@@ -13418,7 +13418,7 @@
 
 }).call(typeof window !== 'undefined' ? window : this);
 /*
- * This file contains the code for the Bezier connector type.
+ * This file contains the code for the Bezier connector model.
  *
  * Copyright (c) 2010 - 2018 jsPlumb (hello@jsplumbtoolkit.com)
  *
@@ -13603,7 +13603,7 @@
     // two faces are parallel or perpendicular.  if they are parallel then the control point lies on the midpoint of the axis in which they
     // are parellel and varies only in the other axis; this variation is proportional to the distance that the anchor points lie from the
     // center of that face.  if the two faces are perpendicular then the control point is at some distance from both the midpoints; the amount and
-    // direction are dependent on the orientation of the two elements. 'seg', passed in to this method, tells you which segment the target element
+    // direction are dependent on the orientation of the two elements. 'seg', passed in to this model, tells you which segment the target element
     // lies in with respect to the source: 1 is top right, 2 is bottom right, 3 is bottom left, 4 is top left.
     //
     // sourcePos and targetPos are arrays of info about where on the source and target each anchor is located.  their contents are:
@@ -13861,11 +13861,11 @@
             // first clear out any existing gradient
             _clearGradient(parent);
             // this checks for an 'offset' property in the gradient, and in the absence of it, assumes
-            // we want a linear gradient. if it's there, we create a radial gradient.
-            // it is possible that a more explicit means of defining the gradient type would be
+            // we want a linear gradient. if it's there, we onCreate a radial gradient.
+            // it is possible that a more explicit means of defining the gradient model would be
             // better. relying on 'offset' means that we can never have a radial gradient that uses
             // some default offset, for instance.
-            // issue 244 suggested the 'gradientUnits' attribute; without this, straight/flowchart connectors with gradients would
+            // issue 244 suggested the 'gradientUnits' model; without this, straight/flowchart connectors with gradients would
             // not show gradients when the line was perfectly horizontal or vertical.
             var g;
             if (!style.gradient.offset) {
@@ -13910,13 +13910,13 @@
                 node.setAttribute(STROKE_WIDTH, style.strokeWidth);
             }
 
-            // in SVG there is a stroke-dasharray attribute we can set, and its syntax looks like
+            // in SVG there is a stroke-dasharray model we can set, and its syntax looks like
             // the syntax in VML but is actually kind of nasty: values are given in the pixel
             // coordinate space, whereas in VML they are multiples of the width of the stroked
             // line, which makes a lot more sense.  for that reason, jsPlumb is supporting both
-            // the native svg 'stroke-dasharray' attribute, and also the 'dashstyle' concept from
-            // VML, which will be the preferred method.  the code below this converts a dashstyle
-            // attribute given in terms of stroke width into a pixel representation, by using the
+            // the native svg 'stroke-dasharray' model, and also the 'dashstyle' concept from
+            // VML, which will be the preferred model.  the code below this converts a dashstyle
+            // model given in terms of stroke width into a pixel representation, by using the
             // stroke's lineWidth.
             if (style[DASHSTYLE] && style[LINE_WIDTH] && !style[STROKE_DASHARRAY]) {
                 var sep = style[DASHSTYLE].indexOf(",") === -1 ? " " : ",",
@@ -13931,7 +13931,7 @@
                 node.setAttribute(STROKE_DASHARRAY, style[STROKE_DASHARRAY]);
             }
 
-            // extra attributes such as join type, dash offset.
+            // extra attributes such as join model, dash offset.
             for (var i in svgAttributeMap) {
                 if (style[i]) {
                     node.setAttribute(svgAttributeMap[i], style[i]);
@@ -14454,7 +14454,7 @@
                 },
                 getPosition: function (el, relativeToRoot) {
                     // if this is a nested draggable then compute the offset against its own offsetParent, otherwise
-                    // compute against the Container's origin. see also the getUIPosition method below.
+                    // compute against the Container's origin. see also the getUIPosition model below.
                     var o = instance.getOffset(el, relativeToRoot, el._katavorioDrag ? el.offsetParent : null);
                     return [o.left, o.top];
                 },
@@ -14604,7 +14604,7 @@
         getUIPosition: function (eventArgs, zoom) {
             // here the position reported to us by Katavorio is relative to the element's offsetParent. For top
             // level nodes that is fine, but if we have a nested draggable then its offsetParent is actually
-            // not going to be the jsplumb container; it's going to be some child of that element. In that case
+            // not going to be the jsplumb model; it's going to be some child of that element. In that case
             // we want to adjust the UI position to account for the offsetParent's position relative to the Container
             // origin.
             var el = eventArgs[0].el;

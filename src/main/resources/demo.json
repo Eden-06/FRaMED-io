@@ -1,0 +1,184 @@
+{
+  "root": {
+    "id": 0,
+    "name": "Economy",
+    "classes": [
+      {
+        "id": 1,
+        "name": "Account",
+        "attributes": [
+          {
+            "id": 2,
+            "name": "amount",
+            "type": "Money"
+          },
+          {
+            "id": 3,
+            "name": "id",
+            "type": "String"
+          }
+        ],
+        "methods": [
+          {
+            "id": 4,
+            "name": "doSomething",
+            "type": "void",
+            "parameters": [
+              {
+                "id": 5,
+                "name": "foo",
+                "type": "bar"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "name": "Bank",
+        "attributes": [
+          {
+            "id": 7,
+            "name": "name",
+            "type": "String"
+          }
+        ],
+        "methods": [
+          {
+            "id": 8,
+            "name": "insolvency",
+            "type": "void",
+            "parameters": [
+            ]
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "sourceId": 6,
+        "targetId": 1,
+        "id": 18,
+        "name": "customers",
+        "sourceCardinality": "1..*",
+        "targetCardinality": "1",
+        "type": "AGGREGATION"
+      }
+    ],
+    "containers": [
+      {
+        "id": 11,
+        "name": "Library",
+        "classes": [
+          {
+            "id": 12,
+            "name": "Book",
+            "attributes": [
+              {
+                "id": 13,
+                "name": "isbn",
+                "type": "String"
+              }
+            ],
+            "methods": [
+            ]
+          },
+          {
+            "id": 14,
+            "name": "Shelf",
+            "attributes": [
+            ],
+            "methods": [
+              {
+                "id": 15,
+                "name": "add",
+                "type": "void",
+                "parameters": [
+                  {
+                    "id": 16,
+                    "name": "book",
+                    "type": "Book"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "relations": [
+          {
+            "sourceId": 12,
+            "targetId": 14,
+            "id": 17,
+            "name": "",
+            "sourceCardinality": "",
+            "targetCardinality": "",
+            "type": "ASSOCIATION"
+          }
+        ],
+        "containers": [
+        ],
+        "roleTypes": [
+        ],
+        "events": [
+        ],
+        "metadata": {
+          "creationDate": "Sun, 07 Oct 2018 21:35:15 GMT",
+          "modifiedDate": "Sun, 07 Oct 2018 21:35:15 GMT",
+          "author": ""
+        }
+      }
+    ],
+    "roleTypes": [
+      {
+        "id": 9,
+        "name": "RoleType"
+      }
+    ],
+    "events": [
+      {
+        "id": 10,
+        "type": "MESSAGE",
+        "desc": "terminate contract"
+      }
+    ],
+    "metadata": {
+      "creationDate": "Sun, 07 Oct 2018 21:35:15 GMT",
+      "modifiedDate": "Sun, 07 Oct 2018 21:35:15 GMT",
+      "author": ""
+    }
+  },
+  "layer": {
+    "position": {
+      "9": {
+        "left": 606,
+        "top": 334,
+        "width": null,
+        "height": null
+      },
+      "11": {
+        "left": 212,
+        "top": 331,
+        "width": null,
+        "height": null
+      },
+      "6": {
+        "left": 192,
+        "top": 145,
+        "width": null,
+        "height": null
+      },
+      "1": {
+        "left": 604,
+        "top": 150,
+        "width": null,
+        "height": null
+      },
+      "10": {
+        "left": 476,
+        "top": 339,
+        "width": null,
+        "height": null
+      }
+    }
+  }
+}

@@ -1,8 +1,6 @@
 group = 'de.framed-io.kotlin'
 version = '1.0.0'
 
-version '1.0-SNAPSHOT'
-
 buildscript {
     ext.kotlin_version = '1.2.71'
     ext.serialization_version = '0.6.2'

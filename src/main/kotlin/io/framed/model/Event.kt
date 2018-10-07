@@ -1,35 +1,32 @@
 package io.framed.model
 
-import io.framed.view.Icon
-import io.framed.view.MaterialIcon
+import io.framed.framework.ModelElement
+import io.framed.framework.view.Icon
+import io.framed.framework.view.MaterialIcon
 import kotlinx.serialization.Serializable
 
 /**
- * The model defines an event of the modeling language
+ * The model defines an model of the modeling language
  */
 @Serializable
-class Event : Model {
+class Event : ModelElement {
     /**
      * Identifier of the Instance
      */
-    override val id: Long = Model.lastId++
+    override val id: Long = ModelElement.lastId++
     /**
-     * Type of the event
+     * Type of the model
      */
     var type: EventType = EventType.NONE
     /**
      * Description of the Event
      */
     var desc: String = ""
-    /**
-     * Metadata of the event
-     */
-    override val metadata = Metadata()
 }
 
 /**
- * The method initalizes a new event
- * @param type type of the event
+ * The model initalizes a new model
+ * @param type model of the model
  */
 fun Container.event(type: EventType, desc: String, init: Event.() -> Unit): Event {
     val evt = Event()
@@ -41,13 +38,13 @@ fun Container.event(type: EventType, desc: String, init: Event.() -> Unit): Even
 }
 
 /**
- * The enum defines the type and their specifications
+ * The enum defines the model and their specifications
  */
-enum class EventType(val printableName: String, val symbol: Icon) {
+enum class EventType(val printableName: String, val symbol: Icon?) {
     RETURN("RETURN", MaterialIcon.BACKSPACE),
     MESSAGE("MESSAGE", MaterialIcon.MESSAGE),
     ERROR("ERROR", MaterialIcon.ERROR),
-    NONE("NONE", MaterialIcon.STOP);
+    NONE("NONE", null);
 
     override fun toString() = printableName
 }

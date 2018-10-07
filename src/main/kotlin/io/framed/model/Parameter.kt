@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
@@ -8,14 +9,14 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Parameter : Model {
+class Parameter : ModelElement {
 
-    override val id: Long = Model.lastId++
+    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this parameter.
      */
-    var name: String = ""
+    var name: String = "unnamed"
 
     /**
      * Type of this parameter.
@@ -42,15 +43,13 @@ class Parameter : Model {
         result = 31 * result + type.hashCode()
         return result
     }
-
-    override val metadata = Metadata()
 }
 
 /**
- * Create a new parameter within the current method.
+ * Create a new parameter within the current model.
  *
  * @param name Name of the new parameter.
- * @param type Optional type of the new parameter.
+ * @param type Optional model of the new parameter.
  *
  * @return The new parameter.
  */

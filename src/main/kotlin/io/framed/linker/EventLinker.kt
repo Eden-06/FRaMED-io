@@ -1,27 +1,28 @@
 package io.framed.linker
 
+import io.framed.framework.Linker
+import io.framed.framework.LinkerInfoItem
+import io.framed.framework.LinkerManager
+import io.framed.framework.PreviewLinker
+import io.framed.framework.pictogram.*
+import io.framed.framework.util.property
+import io.framed.framework.view.*
 import io.framed.model.Event
 import io.framed.model.EventType
-import io.framed.picto.*
-import io.framed.util.property
-import io.framed.view.ContextMenu
-import io.framed.view.MaterialIcon
-import io.framed.view.Sidebar
-import io.framed.view.contextMenu
 
 class EventLinker(
-        val event: Event,
+        override val model: Event,
         override val parent: ContainerLinker
-) : Linker<IconShape>(event, parent) {
+) : PreviewLinker<Event, IconShape, IconShape> {
 
-    private val typeProperty = property(event::type)
-    val symbolProperty = property(typeProperty,
+    private val typeProperty = property(model::type)
+    private val symbolProperty = property(typeProperty,
             getter = {
                 typeProperty.get().symbol
             }
     )
 
-    override val picto: IconShape = iconShape(symbolProperty) {
+    override val pictogram: IconShape = iconShape(symbolProperty) {
         style {
             background = color(255, 255, 255)
             border {
@@ -32,14 +33,22 @@ class EventLinker(
             }
             padding(10.0)
         }
+    }
 
-        hasContext = true
-        hasSidebar = true
-        acceptRelation = true
-    }.also(this::initPicto)
+    override val preview: IconShape = iconShape(symbolProperty) {
+        style {
+            background = color(255, 255, 255)
+            border {
+                style = Border.BorderStyle.SOLID
+                width = 1.0
+                color = color(0, 0, 0, 0.3)
+                radius = 20.0
+            }
+            padding(10.0)
+        }
+    }
 
-
-    override fun createSidebar(sidebar: Sidebar) = sidebar.setup {
+    override val sidebar = sidebar {
         title("Event")
 
         group("General") {
@@ -47,10 +56,19 @@ class EventLinker(
         }
     }
 
-    override fun createContextMenu(event: ContextEvent): ContextMenu? = contextMenu {
+    override val contextMenu = contextMenu {
         title = "Event"
         addItem(MaterialIcon.DELETE, "Delete") {
-            parent.removeEvent(this@EventLinker.event)
+            parent.events -= this@EventLinker
         }
+    }
+
+    init {
+        LinkerManager.setup(this)
+    }
+
+    companion object: LinkerInfoItem {
+        override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override val name: String = "Event"
     }
 }

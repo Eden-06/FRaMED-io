@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
@@ -8,14 +9,14 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Class : Model {
+class Class : ModelElement {
 
-    override val id: Long = Model.lastId++
+    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this class
      */
-    var name: String = ""
+    var name: String = "Unnamed class"
 
     /**
      * List of class attributes
@@ -26,12 +27,10 @@ class Class : Model {
      * List of class methods
      */
     var methods: List<Method> = emptyList()
-
-    override val metadata = Metadata()
 }
 
 /**
- * Create a new class within the current container
+ * Create a new class within the current model
  *
  * @param name Name of the new class
  * @param init Builder callback for this class
