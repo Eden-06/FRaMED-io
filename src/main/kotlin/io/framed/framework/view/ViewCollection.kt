@@ -45,6 +45,9 @@ abstract class ViewCollection<V : View<*>, T : HTMLElement>(view: T) : View<T>(v
         }
     }
 
+    fun first(): V = children.first()
+    fun last(): V = children.last()
+
     operator fun minusAssign(view: V) = remove(view)
 
     val isEmpty: Boolean

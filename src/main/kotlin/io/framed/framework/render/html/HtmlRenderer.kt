@@ -1,11 +1,11 @@
 package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumb
-import io.framed.framework.JsPlumbInstance
 import io.framed.framework.jsPlumbEndpointOptions
 import io.framed.framework.pictogram.*
 import io.framed.framework.render.Renderer
 import io.framed.framework.util.Dimension
+import io.framed.framework.util.EventHandler
 import io.framed.framework.util.Point
 import io.framed.framework.util.point
 import io.framed.framework.view.*
@@ -38,10 +38,48 @@ class HtmlRenderer(
     private val selectedViews: List<View<*>>
         get() = draggableViews.filter { it.selectedView }
 
-    private var navigationView = NavigationView()
+    private val navigationView = NavigationView().also { navigationView ->
+        workspace += navigationView
+
+        navigationView.onSelect { dimension ->
+            if (dimension == null) {
+                selectedViews.forEach { it.selectedView = false }
+            } else {
+                draggableViews.forEach {
+                    it.selectedView = (it.dimension in dimension)
+                }
+            }
+        }
+    }
+
+    private val jsPlumbInstance = JsPlumb.getInstance().apply {
+        setContainer(navigationView.container.html)
+
+        setZoom(1.0)
+        bind("beforeDrop") { info: dynamic ->
+            val source = getShapeById(info.sourceId as String)
+            val target = getShapeById(info.targetId as String)
+
+            if (source != null && target != null) {
+                viewModel.onRelationDraw.fire(source to target)
+            }
+
+            return@bind false
+        }
+
+        navigationView.onZoom { zoom ->
+            setZoom(zoom)
+            draggableViews.forEach { it.dragZoom = zoom }
+            updateViewBox()
+        }
+        navigationView.onPan {
+            updateViewBox()
+        }
+    }
 
     private fun updateViewBox() {
         val box = navigationView.viewBox
+        println("update view box $box")
         viewModel.container.left = box.left
         viewModel.container.top = box.top
         viewModel.container.width = box.width
@@ -55,84 +93,50 @@ class HtmlRenderer(
         val height = viewModel.container.height
 
         if (left != null && top != null) {
+            println("load view box ${Dimension(left, top, width, height)}")
             navigationView.viewBox = Dimension(left, top, width, height)
         }
     }
 
     private fun draw() {
-        workspace.clear()
         draggableViews = emptyList()
 
-        navigationView = NavigationView()
-        workspace += navigationView
-
         loadViewBox()
+        navigationView.container.clear()
 
-        navigationView.onSelect { dimension ->
-            if (dimension == null) {
-                selectedViews.forEach { it.selectedView = false }
-            } else {
-                draggableViews.forEach {
-                    it.selectedView = (it.dimension in dimension)
-                }
-            }
-        }
-
+        navigationView.onContext.clearListeners()
         if (viewModel.container.hasContextMenu) {
             navigationView.onContext {
                 viewModel.container.onContextMenu.fire(ContextEvent(it.point(), viewModel.container))
             }
         }
+        navigationView.onMouseDown.clearListeners()
         if (viewModel.container.hasSidebar) {
             navigationView.onMouseDown {
                 viewModel.container.onSidebar.fire(SidebarEvent(viewModel.container))
             }
         }
 
-        val jsPlumbInstance = JsPlumb.getInstance().apply {
-            setContainer(navigationView.container.html)
-
-            setZoom(1.0)
-            bind("beforeDrop") { info: dynamic ->
-                val source = getShapeById(info.sourceId as String)
-                val target = getShapeById(info.targetId as String)
-
-                if (source != null && target != null) {
-                    viewModel.onRelationDraw.fire(source to target)
-                }
-
-                return@bind false
-            }
-        }
-        navigationView.onZoom { zoom ->
-            jsPlumbInstance.setZoom(zoom)
-            draggableViews.forEach { it.dragZoom = zoom }
-            updateViewBox()
-        }
-        navigationView.onPan {
-            updateViewBox()
-        }
-
         // Draw children
         var map = viewModel.container.shapes.map {
-            it to drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE, jsPlumbInstance)
+            it to drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE)
         }.toMap()
 
         viewModel.container.onAdd {
-            map += it to drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE, jsPlumbInstance)
+            map += it to drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE)
         }
         viewModel.container.onRemove {
             map[it]?.let { v ->
                 navigationView.container.remove(v)
             }
-            this.deleteEndpoint(it, jsPlumbInstance)
+            this.deleteEndpoint(it)
         }
 
         viewModel.connections.forEach {
-            drawRelation(it, jsPlumbInstance)
+            drawRelation(it)
         }
         viewModel.onRelationAdd {
-            drawRelation(it, jsPlumbInstance)
+            drawRelation(it)
         }
         viewModel.onRelationRemove { r ->
             relations[r]?.let { relation ->
@@ -145,8 +149,8 @@ class HtmlRenderer(
     /**
      * The model removes the endpoint for the given shape
      */
-    fun deleteEndpoint(shape: Shape, instance: JsPlumbInstance) {
-        this.endpointMap[shape]?.let(instance::deleteEndpoint)
+    fun deleteEndpoint(shape: Shape) {
+        this.endpointMap[shape]?.let(jsPlumbInstance::deleteEndpoint)
     }
 
     /**
@@ -163,15 +167,15 @@ class HtmlRenderer(
     private var shapeMap: Map<Shape, View<*>> = emptyMap()
 
     private var relations: Map<Connection, HtmlRelation> = emptyMap()
-    private fun drawRelation(relation: Connection, jsPlumbInstance: JsPlumbInstance) {
+    private fun drawRelation(relation: Connection) {
         relations += relation to HtmlRelation(relation, jsPlumbInstance, this)
     }
 
-    private fun drawShape(shape: Shape, parent: ViewCollection<View<*>, *>, position: BoxShape.Position, jsPlumbInstance: JsPlumbInstance): View<*> {
+    private fun drawShape(shape: Shape, parent: ViewCollection<View<*>, *>, position: BoxShape.Position): View<*> {
         return when (shape) {
-            is BoxShape -> drawBoxShape(shape, parent, position, jsPlumbInstance)
+            is BoxShape -> drawBoxShape(shape, parent, position)
             is TextShape -> drawTextShape(shape, parent)
-            is IconShape -> drawIconShape(shape, parent, jsPlumbInstance)
+            is IconShape -> drawIconShape(shape, parent)
             else -> throw UnsupportedOperationException()
         }.also { view ->
             shapeMap += shape to view
@@ -239,8 +243,7 @@ class HtmlRenderer(
     private fun drawBoxShape(
             shape: BoxShape,
             parent: ViewCollection<View<*>, *>,
-            position: BoxShape.Position,
-            jsPlumbInstance: JsPlumbInstance
+            position: BoxShape.Position
     ): View<*> = parent.listView {
         style(this, shape.style)
         events(this, shape)
@@ -288,11 +291,11 @@ class HtmlRenderer(
         }
 
         var map = shape.shapes.map {
-            it to drawShape(it, this, shape.position, jsPlumbInstance)
+            it to drawShape(it, this, shape.position)
         }.toMap()
 
         shape.onAdd {
-            map += it to drawShape(it, this, shape.position, jsPlumbInstance)
+            map += it to drawShape(it, this, shape.position)
         }
         shape.onRemove {
             map[it]?.let { v ->
@@ -315,8 +318,7 @@ class HtmlRenderer(
 
     private fun drawIconShape(
             shape: IconShape,
-            parent: ViewCollection<View<*>, *>,
-            jsPlumbInstance: JsPlumbInstance
+            parent: ViewCollection<View<*>, *>
     ): View<*> = parent.iconView(shape.property) {
         style(this, shape.style)
         events(this, shape)
@@ -360,10 +362,13 @@ class HtmlRenderer(
         draggableViews += this
     }
 
+    override var zoom: Double
+        get() = navigationView.zoom
+        set(value) {
+            navigationView.zoomTo(value)
+        }
 
-    override fun zoomTo(zoom: Double) {
-        navigationView.zoomTo(zoom)
-    }
+    override val onZoom: EventHandler<Double> = navigationView.onZoom
 
     override fun panTo(point: Point) {
         navigationView.panTo(point)

@@ -1,6 +1,7 @@
 package io.framed.framework.render
 
 import io.framed.framework.pictogram.ViewModel
+import io.framed.framework.util.EventHandler
 import io.framed.framework.util.Point
 
 /**
@@ -8,6 +9,8 @@ import io.framed.framework.util.Point
  */
 interface Renderer {
     fun render(viewModel: ViewModel)
-    fun zoomTo(zoom: Double)
     fun panTo(point: Point)
+
+    var zoom: Double
+    val onZoom: EventHandler<Double>
 }

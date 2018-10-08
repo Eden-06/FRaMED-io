@@ -239,30 +239,33 @@ select {
 
 .left-bar {
   float: left;
-  span {
-    height: $toolbar-height;
-    line-height: $toolbar-height;
-    padding: 0 .6rem;
-    display: inline-block;
-    &:hover {
-      background: $toolbar-hover
-    }
-  }
 }
 
 .right-bar {
   float: right;
-  font-size: 1.3rem;
+}
 
-  span {
+.left-bar, .right-bar {
+  & > .separator {
+    border-right: solid 1px $border-color-light
+  }
+  & > * {
+    float: left;
+  }
+  & > .icon-view {
+    font-size: 1.25rem;
+  }
+  & > span {
     height: $toolbar-height;
     line-height: $toolbar-height;
-    width: 3rem;
-    text-align: center;
-    display: inline-block;
+    padding: 0 .6rem;
+    display: block;
     &:hover {
       background: $toolbar-hover
     }
+  }
+  & > select {
+    margin: 0.5rem;
   }
 }
 

@@ -44,17 +44,17 @@ class NavigationView : View<HTMLDivElement>("div") {
     }
 
     /**
-     * List of zoom steps for stepped zooming.
-     */
-    val zoomSteps = listOf(0.1, 0.3, 0.5, 0.67, 0.8, 0.9, 1.0, 1.1, 1.2, 1.33, 1.5, 1.7, 2.0, 2.4, 3.0, 4.0)
-
-    /**
      * Current zoom depth. Zoom step lies between 0.1 and 4.0.
      */
     var zoom: Double = 1.0
-        set(value) {
-            //val old = field
+        private set(value) {
+            val old = field
             field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, value))
+
+            if (old != field) {
+                onZoom.fire(field)
+                updateTransform()
+            }
         }
 
     /**
@@ -109,8 +109,8 @@ class NavigationView : View<HTMLDivElement>("div") {
 
         if (old != new) {
             onZoom.fire(new)
+            updateTransform()
         }
-        updateTransform()
     }
 
     /**
@@ -283,5 +283,13 @@ class NavigationView : View<HTMLDivElement>("div") {
         onClick {
             onSelect.fire(null)
         }
+    }
+
+    companion object {
+
+        /**
+         * List of zoom steps for stepped zooming.
+         */
+        val zoomSteps = listOf(0.1, 0.3, 0.5, 0.67, 0.8, 0.9, 1.0, 1.1, 1.2, 1.33, 1.5, 1.7, 2.0, 2.4, 3.0, 4.0)
     }
 }

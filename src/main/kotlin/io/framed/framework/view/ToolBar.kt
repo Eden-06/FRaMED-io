@@ -18,8 +18,17 @@ class ToolBar : ViewCollection<View<*>, HTMLDivElement>("div") {
         onClick { onAction(this) }
     }
 
-    fun separator() {
-        //TODO
+    fun custom(side: Side, init: ListView.() -> Unit) = when (side) {
+        Side.LEFT -> leftBar
+        Side.RIGHT -> rightBar
+    }.also(init)
+
+
+    fun separator(side: Side) = when (side) {
+        Side.LEFT -> leftBar
+        Side.RIGHT -> rightBar
+    }.let { bar ->
+        bar.last().classes += "separator"
     }
 
     enum class Side {

@@ -70,3 +70,15 @@ class SelectView<T : Any>(
         })
     }
 }
+
+fun <T : Any> ViewCollection<in SelectView<*>, *>.selectView(
+        initValues: List<T>,
+        initSelected: T,
+        transform: (T) -> String
+) = SelectView(initValues, initSelected, transform).also(this::append)
+
+fun <T : Any> ViewCollection<in SelectView<*>, *>.selectView(
+        initValues: List<T>,
+        property: Property<T>,
+        transform: (T) -> String
+) = SelectView(initValues, property, transform).also(this::append)
