@@ -148,36 +148,54 @@
     }
   },
   "layer": {
-    "position": {
-      "9": {
-        "left": 606,
-        "top": 334,
-        "width": null,
-        "height": null
-      },
-      "11": {
-        "left": 212,
-        "top": 331,
-        "width": null,
-        "height": null
-      },
-      "6": {
-        "left": 192,
-        "top": 145,
-        "width": null,
-        "height": null
-      },
-      "1": {
-        "left": 604,
-        "top": 150,
-        "width": null,
-        "height": null
-      },
-      "10": {
-        "left": 476,
-        "top": 339,
-        "width": null,
-        "height": null
+    "0": {
+      "position": {
+        "9": {
+          "left": 545,
+          "top": 307,
+          "width": null,
+          "height": null
+        },
+        "11": {
+          "left": 95,
+          "top": 297,
+          "width": null,
+          "height": null
+        },
+        "6": {
+          "left": 76,
+          "top": 90,
+          "width": null,
+          "height": null
+        },
+        "1": {
+          "left": 542,
+          "top": 104,
+          "width": null,
+          "height": null
+        },
+        "10": {
+          "left": 440,
+          "top": 312,
+          "width": null,
+          "height": null
+        }
+      }
+    },
+    "11": {
+      "position": {
+        "14": {
+          "left": 87,
+          "top": 100,
+          "width": null,
+          "height": null
+        },
+        "12": {
+          "left": 516,
+          "top": 161,
+          "width": null,
+          "height": null
+        }
       }
     }
   }

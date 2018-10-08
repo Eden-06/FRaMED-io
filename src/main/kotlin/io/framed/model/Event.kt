@@ -41,10 +41,8 @@ fun Container.event(type: EventType, desc: String, init: Event.() -> Unit): Even
  * The enum defines the model and their specifications
  */
 enum class EventType(val printableName: String, val symbol: Icon?) {
-    RETURN("RETURN", MaterialIcon.BACKSPACE),
-    MESSAGE("MESSAGE", MaterialIcon.MESSAGE),
-    ERROR("ERROR", MaterialIcon.ERROR),
-    NONE("NONE", null);
-
-    override fun toString() = printableName
+    RETURN("Return", MaterialIcon.BACKSPACE),
+    MESSAGE("Message", MaterialIcon.MESSAGE),
+    ERROR("Error", MaterialIcon.ERROR),
+    NONE("None", null);
 }

@@ -13,10 +13,11 @@ import kotlin.dom.clear
 
 class SelectView<T : Any>(
         initValues: List<T>,
-        initSelected: T
+        initSelected: T,
+        val transform: (T) -> String
 ) : View<HTMLSelectElement>("select") {
 
-    constructor(initValues: List<T>, property: Property<T>) : this(initValues, property.get()) {
+    constructor(initValues: List<T>, property: Property<T>, transform: (T) -> String) : this(initValues, property.get(), transform) {
         bind(property)
     }
 
@@ -37,7 +38,7 @@ class SelectView<T : Any>(
 
             value.forEach {
                 html.appendChild(OptionView().also { option ->
-                    option.text = it.toString()
+                    option.text = transform(it)
                     option.value = it.toString()
                 }.html)
             }

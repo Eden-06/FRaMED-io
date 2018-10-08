@@ -70,10 +70,10 @@ enum class RelationMultiplicity(val value: String) {
     }
 }
 
-enum class RelationType {
-    INHERITANCE,
-    ASSOCIATION,
-    AGGREGATION;
+enum class RelationType(val printableName: String) {
+    INHERITANCE("Inheritance"),
+    ASSOCIATION("Association"),
+    AGGREGATION("Aggregation");
 
     val value: String = name.first() + name.drop(1).toLowerCase()
 }

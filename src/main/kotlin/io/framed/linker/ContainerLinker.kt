@@ -70,6 +70,22 @@ class ContainerLinker(
 
     private lateinit var sidebarActionsGroup: SidebarGroup
 
+    private val creationProperty = property(model.metadata::creationDate)
+    private val creationStringProperty = property(creationProperty,
+            getter = {
+                creationProperty.get().toUTCString()
+            }
+    )
+
+    private val modifiedProperty = property(model.metadata::modifiedDate)
+    private val modifiedStringProperty = property(modifiedProperty,
+            getter = {
+                modifiedProperty.get().toUTCString()
+            }
+    )
+
+    private val authorProperty = property(model.metadata::author)
+
     override val sidebar = sidebar {
         title("Container")
         group("General") {
@@ -86,6 +102,14 @@ class ContainerLinker(
                 //application.renderer.panTo(Point.ZERO)
             }
         }
+
+        group("Metadata") {
+            input("Creation date", creationStringProperty)
+            input("Modified date", modifiedStringProperty)
+            input("Author", authorProperty)
+
+            collapse()
+        }
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
@@ -101,10 +125,10 @@ class ContainerLinker(
         title = "Package: $name"
 
         contextStepIn = addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
-            //val controller = Application.getController(this@ContainerLinker)
+            ControllerManager.display(this@ContainerLinker)
         }
         contextStepOut = addItem(MaterialIcon.ARROW_BACK, "Step out") {
-            //val controller = Application.getController(parent!!)
+            parent?.let(ControllerManager::display)
         }
 
         addItem(MaterialIcon.ADD, "Add class") { event ->
@@ -179,6 +203,7 @@ class ContainerLinker(
         model.relations.forEach { addRelation(RelationLinker(it, this)) }
 
         LinkerManager.setup(this)
+        ControllerManager.register(this)
     }
 
     companion object : LinkerInfoItem {

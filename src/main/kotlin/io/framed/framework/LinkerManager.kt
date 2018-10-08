@@ -3,9 +3,7 @@ package io.framed.framework
 import io.framed.framework.pictogram.Pictogram
 
 object LinkerManager {
-
     private fun setupPictogram(linker: Linker<*, *>, pictogram: Pictogram) {
-
         if (!linker.sidebar.isEmpty) {
             pictogram.hasSidebar = true
             pictogram.onSidebar { event ->
@@ -37,6 +35,7 @@ object LinkerManager {
         }
         if (linker is ModelLinker<*, *, *>) {
             setupPictogram(linker, linker.container)
+            //ControllerManager.register(linker)
         }
     }
 

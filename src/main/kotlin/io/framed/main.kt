@@ -1,6 +1,7 @@
 package io.framed
 
 import io.framed.framework.Controller
+import io.framed.framework.ControllerManager
 import io.framed.framework.LinkerManager
 import io.framed.framework.pictogram.Layer
 import io.framed.framework.view.Application
@@ -37,7 +38,6 @@ fun init() {
     LinkerManager.register(RoleTypeLinker)
 
     LinkerManager.register(RelationLinker)
-
 
 
     /*
@@ -91,10 +91,9 @@ fun init() {
     loadFile("demo.json") {
         val file = JSON.parse<File>(it)
 
-        val linker = ContainerLinker(file.root)
-        val controller = Controller(linker, file.layer)
+        ControllerManager.layers = file.layer
 
-        Application.loadController(controller)
+        ControllerManager.display(ContainerLinker(file.root))
     }
 }
 

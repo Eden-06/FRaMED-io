@@ -2,6 +2,7 @@ package io.framed.framework.view
 
 import io.framed.File
 import io.framed.framework.Controller
+import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
 import io.framed.framework.util.getCookie
 import io.framed.framework.util.setCookie
@@ -61,11 +62,13 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
             }
             item("Save") {
-                val container = (controller.linker as ContainerLinker).model
+                ControllerManager.root?.let { root ->
+                    val container = (root.linker as ContainerLinker).model
 
-                val file = File(container, controller.layer)
+                    val file = File(container, ControllerManager.layers)
 
-                println(JSON.indented.stringify(file))
+                    println(JSON.indented.stringify(file))
+                }
             }
             item("Reset") {
 
@@ -102,7 +105,7 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     var controllers: Map<Controller, Tab> = emptyMap()
 
-    lateinit var controller: Controller
+    private lateinit var controller: Controller
 
     fun loadController(controller: Controller) {
         this.controller = controller

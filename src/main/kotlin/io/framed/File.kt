@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class File(
         val root: Container,
-        val layer: Layer
+        val layer: Map<Long, Layer>
 )

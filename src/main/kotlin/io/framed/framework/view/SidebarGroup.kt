@@ -20,8 +20,8 @@ class SidebarGroup(
         return i
     }
 
-    fun <T : Any> select(label: String, values: List<T>, property: Property<T>): SelectView<T> {
-        val i = SelectView(values, property)
+    fun <T : Any> select(label: String, values: List<T>, property: Property<T>, transform: (T) -> String): SelectView<T> {
+        val i = SelectView(values, property, transform)
 
         listView {
             textView(label)

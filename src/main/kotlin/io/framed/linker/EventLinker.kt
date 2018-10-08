@@ -52,7 +52,9 @@ class EventLinker(
         title("Event")
 
         group("General") {
-            select("Type", EventType.values().toList(), typeProperty)
+            select("Type", EventType.values().toList(), typeProperty) {
+                it.printableName
+            }
         }
     }
 
@@ -67,7 +69,7 @@ class EventLinker(
         LinkerManager.setup(this)
     }
 
-    companion object: LinkerInfoItem {
+    companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
         override val name: String = "Event"
     }

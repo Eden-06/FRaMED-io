@@ -20,7 +20,6 @@ interface Property<T> {
     }
 }
 
-
 class ObjectProperty<T>(
         private val kProperty: KMutableProperty0<T>,
         private val validator: Validator<T>,

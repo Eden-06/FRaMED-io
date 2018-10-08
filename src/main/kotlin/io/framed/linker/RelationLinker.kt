@@ -100,7 +100,9 @@ class RelationLinker(
             input("Source cardinality", sourceCardinalityProperty, RelationMultiplicity.STRING_VALUES)
             input("Target cardinality", targetCardinalityProperty, RelationMultiplicity.STRING_VALUES)
 
-            select("Type", RelationType.values().toList(), typeProperty)
+            select("Type", RelationType.values().toList(), typeProperty) {
+                it.printableName
+            }
 
             button("Toggle direction") {
                 val h = source
