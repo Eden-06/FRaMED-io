@@ -13,6 +13,8 @@ interface Property<T> {
     fun get(): T
     fun set(value: T): Validator.Result
 
+    fun checkUpdate() {}
+
     val editable: Boolean
     val onChange: EventHandler<Unit>
     fun fire() {
@@ -31,11 +33,20 @@ class ObjectProperty<T>(
     override fun set(value: T) = validator.validate(value).also { result ->
         if (result != Validator.Result.ERROR && value != kProperty.get()) {
             kProperty.set(value)
+            lastValue = value
             fire()
         }
     }
 
     override val onChange = EventHandler<Unit>()
+
+    private var lastValue:T = get()
+    override fun checkUpdate() {
+        if (get() != lastValue) {
+            lastValue = get()
+            fire()
+        }
+    }
 }
 
 class ComplexProperty<T>(
@@ -78,7 +89,7 @@ class ComplexProperty<T>(
         onChange { _ ->
             if (propagate) {
                 properties.forEach {
-                    it.fire()
+                    it.checkUpdate()
                 }
             }
         }

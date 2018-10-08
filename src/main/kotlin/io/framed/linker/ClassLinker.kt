@@ -8,6 +8,7 @@ import io.framed.framework.pictogram.*
 import io.framed.framework.util.LinkerBox
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.property
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Attribute
 import io.framed.model.Class
@@ -21,7 +22,7 @@ class ClassLinker(
         override val parent: ContainerLinker
 ) : PreviewLinker<Class, BoxShape, TextShape> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex()))
+    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
     var name by nameProperty
 
     val attributes = LinkerBox(model::attributes)
@@ -59,13 +60,13 @@ class ClassLinker(
     override val contextMenu = contextMenu {
         title = "Class: $name"
         addItem(MaterialIcon.ADD, "Add attribute") {
-            attributes += AttributeLinker(Attribute(), this@ClassLinker).also {
-                it.focus()
+            attributes += AttributeLinker(Attribute(), this@ClassLinker).also { linker ->
+                linker.focus()
             }
         }
         addItem(MaterialIcon.ADD, "Add method") {
-            methods += MethodLinker(Method(), this@ClassLinker).also {
-                it.focus()
+            methods += MethodLinker(Method(), this@ClassLinker).also { linker ->
+                linker.focus()
             }
         }
         addItem(MaterialIcon.DELETE, "Delete") {

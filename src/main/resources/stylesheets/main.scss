@@ -519,4 +519,12 @@ table {
   &:hover {
     color: $icon-color-focus;
   }
+
+  &.inactive {
+    color: $icon-color-inactive;
+
+    &:hover {
+      color: $icon-color-inactive;
+    }
+  }
 }

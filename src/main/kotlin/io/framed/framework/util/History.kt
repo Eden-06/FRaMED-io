@@ -1,15 +1,24 @@
 package io.framed.framework.util
 
-class History {
+object History {
     private var list: List<HistoryItem> = emptyList()
     private var pointer: Int = list.size
 
     private var allowPush = true
 
-    fun <V : Any> push(property: Property<V>, oldValue: V, newValue: V = property.get()) {
+    fun <V : Any> push(property: Property<V>, oldValue: V, newValue: V = property.get()) =
+            push(HistoryProperty(property, oldValue, newValue))
+
+    fun push(historyItem: HistoryItem) {
         if (allowPush) {
-            list = list.subList(0, pointer) + HistoryProperty(property, oldValue, newValue)
-            pointer = list.size
+            val top = list.getOrNull(pointer - 1)
+
+            if (top == null || top.shouldAdd(historyItem)) {
+                list = list.subList(0, pointer) + historyItem
+                pointer = list.size
+
+                checkOnChange()
+            }
         }
     }
 
@@ -63,11 +72,11 @@ class History {
     }
 }
 
-fun <T : Any> Property<T>.history(history: History): Property<T> {
+fun <T : Any> Property<T>.trackHistory(): Property<T> {
     var oldValue = get()
 
     onChange {
-        history.push(this, oldValue)
+        History.push(this, oldValue)
         oldValue = get()
     }
     return this

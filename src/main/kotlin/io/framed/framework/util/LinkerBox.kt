@@ -18,7 +18,7 @@ class LinkerBox<M : ModelElement, L : Linker<M, out Shape>>(
 
     var linkers = emptyList<L>()
 
-    fun add(linker: L) {
+    private fun internalAdd(linker: L) {
         if (!backingField.contains(linker.model)) {
             backingField += linker.model
         }
@@ -33,9 +33,8 @@ class LinkerBox<M : ModelElement, L : Linker<M, out Shape>>(
         linkers += linker
     }
 
-    fun remove(linker: L) {
+    private fun internalRemove(linker: L) {
         backingField -= linker.model
-
         view -= linker.pictogram
 
         previewBox?.let { box ->
@@ -46,6 +45,23 @@ class LinkerBox<M : ModelElement, L : Linker<M, out Shape>>(
         linkers -= linker
 
         onRemove.fire(Unit)
+    }
+
+    fun add(linker: L) {
+        val addToHistory = !backingField.contains(linker.model)
+
+        val item = HistoryMethod(linker, this::internalAdd, this::internalRemove)
+        item.execute()
+
+        if (addToHistory) {
+            History.push(item)
+        }
+    }
+
+    fun remove(linker: L) {
+        val item = HistoryMethod(linker, this::internalRemove, this::internalAdd)
+        item.execute()
+        History.push(item)
     }
 
     operator fun plusAssign(linker: L) = add(linker)

@@ -19,8 +19,6 @@ class Controller(
         viewModel.connections = linker.connections.map { it.pictogram }
     }
 
-    //val history = History()
-
     val tabNameProperty: Property<String> = linker.nameProperty
 
     init {

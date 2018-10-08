@@ -19,8 +19,8 @@ class AttributeLinker(
         override val parent: ClassLinker
 ) : Linker<Attribute, TextShape> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
-    private val typeProperty = property(model::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
+    private val typeProperty = property(model::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
 
     private val lineProperty = property(nameProperty, typeProperty,
             getter = {

@@ -13,7 +13,7 @@ abstract class Pictogram {
         }
 
     val onSidebar = EventHandler<SidebarEvent>()
-    val onContext = EventHandler<ContextEvent>()
+    val onContextMenu = EventHandler<ContextEvent>()
     val onLayerChange = EventHandler<Unit>()
 
     var hasSidebar = false

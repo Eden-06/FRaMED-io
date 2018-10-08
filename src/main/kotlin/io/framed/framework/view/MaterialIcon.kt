@@ -410,7 +410,7 @@ enum class MaterialIcon(private val ligature: String) : Icon {
     HIGH_QUALITY("high_quality "),
     HIGHLIGHT("highlight"),
     HIGHLIGHT_OFF("highlight_off"),
-    HISTORY("history"),
+    HISTORY("trackHistory"),
     HOME("home"),
     HOT_TUB("hot_tub"),
     HOTEL("hotel"),

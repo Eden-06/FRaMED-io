@@ -21,6 +21,8 @@ class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
         }
     }
 
+    var inactive by ClassDelegate()
+
     /**
      * The icon to display.
      */

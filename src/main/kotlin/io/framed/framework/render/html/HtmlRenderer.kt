@@ -80,7 +80,7 @@ class HtmlRenderer(
 
         if (viewModel.container.hasContextMenu) {
             navigationView.onContext {
-                viewModel.container.onContext.fire(ContextEvent(it.point(), viewModel.container))
+                viewModel.container.onContextMenu.fire(ContextEvent(it.point(), viewModel.container))
             }
         }
         if (viewModel.container.hasSidebar) {
@@ -222,7 +222,7 @@ class HtmlRenderer(
             view.onContext {
                 it.stopPropagation()
                 it.preventDefault()
-                shape.onContext.fire(ContextEvent(it.point(), shape))
+                shape.onContextMenu.fire(ContextEvent(it.point(), shape))
             }
         }
         if (shape.hasSidebar) {
@@ -254,6 +254,8 @@ class HtmlRenderer(
                 if (force) {
                     left = shape.left ?: 0.0
                     top = shape.top ?: 0.0
+
+                    jsPlumbInstance.revalidate(html)
                 }
             }
 
@@ -327,6 +329,8 @@ class HtmlRenderer(
             if (force) {
                 left = shape.left ?: 0.0
                 top = shape.top ?: 0.0
+
+                jsPlumbInstance.revalidate(html)
             }
         }
 

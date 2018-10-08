@@ -2,10 +2,7 @@ package io.framed.linker
 
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.EventHandler
-import io.framed.framework.util.LinkerBox
-import io.framed.framework.util.RegexValidator
-import io.framed.framework.util.property
+import io.framed.framework.util.*
 import io.framed.framework.view.*
 import io.framed.model.*
 
@@ -17,7 +14,7 @@ class ContainerLinker(
         override val parent: ContainerLinker? = null
 ) : ModelLinker<Container, BoxShape, TextShape> {
 
-    override val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex()))
+    override val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
     override var name by nameProperty
 
     override val container: BoxShape = boxShape { }

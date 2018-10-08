@@ -8,6 +8,7 @@ import io.framed.framework.pictogram.*
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.Validator
 import io.framed.framework.util.property
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
@@ -24,23 +25,23 @@ class RelationLinker(
         override val parent: ContainerLinker
 ) : ConnectionLinker<Relation, Connection> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex()))
-    private val sourceCardinalityProperty = property(model::sourceCardinality)
-    private val targetCardinalityProperty = property(model::targetCardinality)
+    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
+    private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
+    private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 
-    override val sourceIdProperty = property(model::sourceId)
+    override val sourceIdProperty = property(model::sourceId).trackHistory()
     override val sourceShapeProperty = property(sourceIdProperty, getter = {
         parent.getShapeById(model.sourceId)!!
     }, setter = { Validator.Result.ERROR })
     var source by sourceIdProperty
 
-    override val targetIdProperty = property(model::targetId)
+    override val targetIdProperty = property(model::targetId).trackHistory()
     override val targetShapeProperty = property(targetIdProperty, getter = {
         parent.getShapeById(model.targetId)!!
     }, setter = { Validator.Result.ERROR })
     var target by targetIdProperty
 
-    private val typeProperty = property(model::type)
+    private val typeProperty = property(model::type).trackHistory()
     private var relationType by typeProperty
 
     override val pictogram = connection(sourceShapeProperty, targetShapeProperty) {

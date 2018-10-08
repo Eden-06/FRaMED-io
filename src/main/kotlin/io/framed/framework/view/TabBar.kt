@@ -18,12 +18,16 @@ class TabBar : ViewCollection<View<*>, HTMLDivElement>("div") {
         tab.onClose { _ ->
             if (tab.selected) {
                 val index = max(0, tabs.indexOf(tab) - 1)
+                remove(tab)
+                tabs -= tab
+
                 if (index >= 0) {
-                    tabs[0].open()
+                    tabs[index].open()
                 }
+            } else {
+                remove(tab)
+                tabs -= tab
             }
-            remove(tab)
-            tabs -= tab
         }
 
         append(tab)

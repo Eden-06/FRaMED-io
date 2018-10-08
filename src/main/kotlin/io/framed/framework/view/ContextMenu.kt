@@ -7,7 +7,7 @@ import kotlin.browser.window
 import kotlin.math.min
 
 /**
- * Represents a onContext menu with optional header.
+ * Represents a onContextMenu menu with optional header.
  *
  * @author lars
  */
@@ -32,7 +32,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
         }
 
     /**
-     * Add an item to the onContext menu.
+     * Add an item to the onContextMenu menu.
      *
      * @param icon Icon for the menu entry. `null` means no icon.
      * @param name Name for the menu entry.
@@ -75,7 +75,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
     }
 
     /**
-     * Close the onContext menu.
+     * Close the onContextMenu menu.
      */
     fun close() {
         Root -= this

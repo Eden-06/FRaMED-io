@@ -1061,7 +1061,7 @@
          * Removes an element from the DOM, and deregisters all model handlers for it. You should use this
          * to ensure you don't leak memory.
          * @model remove
-         * @param {String|Element} el Element, or id of the element, to remove.
+         * @param {String|Element} el Element, or shape of the element, to remove.
          * @return {Mottle} The current Mottle instance; you can chain this model.
          */
         this.remove = function (el) {
@@ -2133,7 +2133,7 @@
          * @name Katavorio#select
          * @function
          * @desc Adds an element to the current selection (for multiple node drag)
-         * @param {Element|String} DOM element - or id of the element - to add.
+         * @param {Element|String} DOM element - or shape of the element - to add.
          */
         this.select = function(el) {
             _each(el, function() {
@@ -2153,7 +2153,7 @@
          * @name Katavorio#deselect
          * @function
          * @desc Removes an element from the current selection (for multiple node drag)
-         * @param {Element|String} DOM element - or id of the element - to remove.
+         * @param {Element|String} DOM element - or shape of the element - to remove.
          */
         this.deselect = function(el) {
             _each(el, function() {
@@ -2378,12 +2378,12 @@
         };
 
         /**
-         * Add the given element to the posse with the given id, creating the group if it at first does not exist.
+         * Add the given element to the posse with the given shape, creating the group if it at first does not exist.
          * @model addToPosse
          * @param {Element} el Element to add.
          * @param {String...|Object...} spec Variable args parameters. Each argument can be a either a String, indicating
          * the ID of a Posse to which the element should be added as an active participant, or an Object containing
-         * `{ id:"posseId", active:false/true}`. In the latter case, if `active` is not provided it is assumed to be
+         * `{ shape:"posseId", active:false/true}`. In the latter case, if `active` is not provided it is assumed to be
          * true.
          * @returns {Posse|Posse[]} The Posse(s) to which the element(s) was/were added.
          */
@@ -2399,14 +2399,14 @@
         };
 
         /**
-         * Sets the posse(s) for the element with the given id, creating those that do not yet exist, and removing from
+         * Sets the posse(s) for the element with the given shape, creating those that do not yet exist, and removing from
          * the element any current Posses that are not specified by this model call. This model will not onChange the
          * active/passive state if it is given a posse in which the element is already a member.
          * @model setPosse
          * @param {Element} el Element to set posse(s) on.
          * @param {String...|Object...} spec Variable args parameters. Each argument can be a either a String, indicating
          * the ID of a Posse to which the element should be added as an active participant, or an Object containing
-         * `{ id:"posseId", active:false/true}`. In the latter case, if `active` is not provided it is assumed to be
+         * `{ shape:"posseId", active:false/true}`. In the latter case, if `active` is not provided it is assumed to be
          * true.
          * @returns {Posse|Posse[]} The Posse(s) to which the element(s) now belongs.
          */
@@ -2439,7 +2439,7 @@
          * @param {String...} posseId Varargs parameter: one value for each posse to remove the element from.
          */
         this.removeFromPosse = function(el, posseId) {
-            if (arguments.length < 2) throw new TypeError("No posse id provided for remove operation");
+            if (arguments.length < 2) throw new TypeError("No posse shape provided for remove operation");
             for(var i = 1; i < arguments.length; i++) {
                 posseId = arguments[i];
                 _each(el, function (_el) {
@@ -3321,7 +3321,7 @@
 
                 for (i = 0; i < o.length; i++) {
                     // if a string, convert to object representation so that we can store the typeid on it.
-                    // also assign an id.
+                    // also assign an shape.
                     var fo = jsPlumb.convertToFullOverlaySpec(o[i]);
                     oo[fo[1].id] = fo;
                 }
@@ -3831,7 +3831,7 @@
             initialized = false,
         // TODO remove from window scope
             connections = [],
-        // map of element id -> endpoint lists. an element can have an arbitrary
+        // map of element shape -> endpoint lists. an element can have an arbitrary
         // number of endpoints on it, and not all of them have to be connected
         // to anything.
             endpointsByElement = {},
@@ -4245,7 +4245,7 @@
 
         /*
          factory model to prepare a new endpoint.  this should always be used instead of creating Endpoints
-         manually, since this model attaches model listeners and an id.
+         manually, since this model attaches model listeners and an shape.
          */
             _newEndpoint = function (params, id) {
                 var endpointFunc = _currentInstance.Defaults.EndpointType || jsPlumb.Endpoint;
@@ -4270,7 +4270,7 @@
 
         /*
          * performs the given function operation on all the connections found
-         * for the given element id; this means we find all the endpoints for
+         * for the given element shape; this means we find all the endpoints for
          * the given element, and then for each endpoint find the connectors
          * connected to it. then we pass each connection in to the given
          * function.
@@ -4337,7 +4337,7 @@
             },
         /*
          * toggles the draggable state of the given element(s).
-         * el is either an id, or an element object, or a list of ids/element objects.
+         * el is either an shape, or an element object, or a list of ids/element objects.
          */
             _toggleDraggable = function (el) {
                 var state;
@@ -4380,8 +4380,8 @@
             },
 
             /**
-             * gets an id for the given element, creating and setting one if
-             * necessary.  the id is of the form
+             * gets an shape for the given element, creating and setting one if
+             * necessary.  the shape is of the form
              *
              *    jsPlumb_<instance index>_<index in instance>
              *
@@ -4422,7 +4422,7 @@
 
         /**
          * Returns a map of all the elements this jsPlumbInstance is currently managing.
-         * @returns {Object} Map of [id-> {el, endpoint[], connection, position}] information.
+         * @returns {Object} Map of [shape-> {el, endpoint[], connection, position}] information.
          */
         this.getManagedElements = function() {
             return managedElements;
@@ -4798,7 +4798,7 @@
         /**
          * Removes all an element's Connections.
          * @model deleteConnectionsForElement
-         * @param {Object} el Either the id of the element, or a selector for the element.
+         * @param {Object} el Either the shape of the element, or a selector for the element.
          * @param {Object} [params] Optional parameters.
          * @param {Boolean} [params.fireEvent=true] Whether or not to fire the detach model.
          * @param {Boolean} [params.forceDetach=false] If true, this call will ignore any `beforeDetach` interceptors.
@@ -5162,7 +5162,7 @@
             return jsPlumb.Connection;
         };
         /*
-         * Gets an element's id, creating one if necessary. really only exposed
+         * Gets an element's shape, creating one if necessary. really only exposed
          * for the lib-specific functionality to access; would be better to pass
          * the current instance into the lib-specific code (even though this is
          * a static call. i just don't want to expose it to the public API).
@@ -5185,7 +5185,7 @@
             return _currentInstance;
         };
 
-        // exposed for other objects to use to get a unique id.
+        // exposed for other objects to use to get a unique shape.
         this.idstamp = _idstamp;
 
         // this.connectorsInitialized = false;
@@ -5553,9 +5553,9 @@
 
                 _doOne = function (el) {
 
-                    // get the element's id and store the endpoint definition for it.  jsPlumb.connect calls will look for one of these,
+                    // get the element's shape and store the endpoint definition for it.  jsPlumb.connect calls will look for one of these,
                     // and use the endpoint definition if found.
-                    // decode the info for this element (id and element)
+                    // decode the info for this element (shape and element)
                     var elInfo = _info(el),
                         elid = elInfo.id,
                         dropOptions = root.jsPlumb.extend({}, p.dropOptions || {}),
@@ -5626,7 +5626,7 @@
             var maxConnections = p.maxConnections || -1,
                 onMaxConnections = p.onMaxConnections,
                 _doOne = function (elInfo) {
-                    // get the element's id and store the endpoint definition for it.  jsPlumb.connect calls will look for one of these,
+                    // get the element's shape and store the endpoint definition for it.  jsPlumb.connect calls will look for one of these,
                     // and use the endpoint definition if found.
                     var elid = elInfo.id,
                         _del = this.getElement(elInfo.el);
@@ -6246,7 +6246,7 @@
             return { endpoints: eps ? eps : [ ep, ep ], anchors: as ? as : [a, a ]};
         };
 
-        // sets the id of some element, changing whatever we need to to keep track.
+        // sets the shape of some element, changing whatever we need to to keep track.
         this.setId = function (el, newId, doNotSetAttribute) {
             //
             var id;
@@ -6396,7 +6396,7 @@
                 var to = {};
                 for (var i = 0; i < type.overlays.length; i++) {
                     // if a string, convert to object representation so that we can store the typeid on it.
-                    // also assign an id.
+                    // also assign an shape.
                     var fo = this.convertToFullOverlaySpec(type.overlays[i]);
                     to[fo[1].id] = fo;
                 }
@@ -6414,7 +6414,7 @@
                 var to = {};
                 for (var i = 0; i < type.overlays.length; i++) {
                     // if a string, convert to object representation so that we can store the typeid on it.
-                    // also assign an id.
+                    // also assign an shape.
                     var fo = this.convertToFullOverlaySpec(type.overlays[i]);
                     to[fo[1].id] = fo;
                 }
@@ -7436,7 +7436,7 @@
         n.style.width = ips[0] + "px";
         n.style.height = ips[1] + "px";
         _jsPlumb.manage(id, n, true); // TRANSIENT MANAGE
-        // onCreate and assign an id, and initialize the offset.
+        // onCreate and assign an shape, and initialize the offset.
         placeholder.id = id;
         placeholder.element = n;
     };
@@ -7955,7 +7955,7 @@
 
                     _makeDraggablePlaceholder(placeholderInfo, _jsPlumb, ipco, ips);
 
-                    // store the id of the dragging div and the source element. the drop function will pick these up.                   
+                    // store the shape of the dragging div and the source element. the drop function will pick these up.
                     _jsPlumb.setAttributes(this.canvas, {
                         "dragId": placeholderInfo.id,
                         "elId": this.elementId
@@ -8057,11 +8057,11 @@
                     _jsPlumb.registerFloatingConnection(placeholderInfo, jpc, this._jsPlumb.floatingEndpoint);
 
                     // // register it and register connection on it.
-                    // _jsPlumb.floatingConnections[placeholderInfo.id] = jpc;
+                    // _jsPlumb.floatingConnections[placeholderInfo.shape] = jpc;
                     //
                     // // only register for the target endpoint; we will not be dragging the source at any time
                     // // before this connection is either discarded or made into a permanent connection.
-                    // _ju.addToList(params.endpointsByElement, placeholderInfo.id, this._jsPlumb.floatingEndpoint);
+                    // _ju.addToList(params.endpointsByElement, placeholderInfo.shape, this._jsPlumb.floatingEndpoint);
 
 
                     // tell jsplumb about it
@@ -8263,7 +8263,7 @@
                 dropOptions[overEvent] = _ju.wrap(dropOptions[overEvent], function () {
                     var draggable = _jp.getDragObject(arguments),
                         id = _jsPlumb.getAttribute(_jp.getElement(draggable), "dragId"),
-                        _jpc = _jsPlumb.getFloatingConnectionFor(id);//_jsPlumb.floatingConnections[id];
+                        _jpc = _jsPlumb.getFloatingConnectionFor(id);//_jsPlumb.floatingConnections[shape];
 
                     if (_jpc != null) {
                         var idx = _jsPlumb.getFloatingAnchorIndex(_jpc);
@@ -9525,7 +9525,7 @@
         // operates on) are added to the connsToPaint list, as are their endpoints. in this way we know to repaint
         // them wthout having to calculate anything else about them.
         var _updateAnchorList = function (lists, theta, order, conn, aBoolean, otherElId, idx, reverse, edgeId, elId, connsToPaint, endpointsToPaint) {
-            // first try to find the exact match, but keep track of the first index of a matching element id along the way.s
+            // first try to find the exact match, but keep track of the first index of a matching element shape along the way.s
             var exactIdx = -1,
                 firstMatchingElIdx = -1,
                 endpoint = conn.endpoints[idx],
@@ -10474,7 +10474,7 @@
     // this anchor model lets you assign the position at connection time.
     _curryAnchor(0, 0, 0, 0, "Assign", function (anchor, params) {
         // find what to use as the "position finder". the user may have supplied a String which represents
-        // the id of a position finder in jsPlumb.AnchorPositionFinders, or the user may have supplied the
+        // the shape of a position finder in jsPlumb.AnchorPositionFinders, or the user may have supplied the
         // position finder as a function.  we find out what to use and then set it on the anchor.
         var pf = params.position || "Fixed";
         anchor.positionFinder = pf.constructor === String ? params.jsPlumbInstance.AnchorPositionFinders[pf] : pf;
@@ -11998,7 +11998,7 @@
      * Parameters:
      * onCreate - function for jsPlumb to call that returns a DOM element.
      * location - distance (as a decimal from 0 to 1 inclusive) marking where the label should sit on the connector. defaults to 0.5.
-     * id - optional id to use for later retrieval of this overlay.
+     * shape - optional shape to use for later retrieval of this overlay.
      *
      */
     _jp.Overlays.Custom = function (params) {
@@ -12051,7 +12051,7 @@
      * label - the label to paint.  May be a string or a function that returns a string.  Nothing will be painted if your label is null or your
      *         label function returns null.  empty strings _will_ be painted.
      * location - distance (as a decimal from 0 to 1 inclusive) marking where the label should sit on the connector. defaults to 0.5.
-     * id - optional id to use for later retrieval of this overlay.
+     * shape - optional shape to use for later retrieval of this overlay.
      * 
      *
      */
@@ -12427,7 +12427,7 @@
             // and advise the anchor manager
             if (index === 0) {
                 // TODO why are there two differently named methods? Why is there not one model that says "some end of this
-                // connection changed (you give the index), and here's the new element and element id."
+                // connection changed (you give the index), and here's the new element and element shape."
                 _jsPlumb.anchorManager.sourceChanged(originalElementId, groupElId, c, groupEl);
             }
             else {
@@ -12496,7 +12496,7 @@
             // and advise the anchor manager
             if (index === 0) {
                 // TODO why are there two differently named methods? Why is there not one model that says "some end of this
-                // connection changed (you give the index), and here's the new element and element id."
+                // connection changed (you give the index), and here's the new element and element shape."
                 _jsPlumb.anchorManager.sourceChanged(groupElId, originalElementId, c, originalElement);
             }
             else {
@@ -12600,7 +12600,7 @@
      * @param {jsPlumbInstance} _jsPlumb Associated jsPlumb instance.
      * @param {Object} params
      * @param {Element} params.el The DOM element representing the Group.
-     * @param {String} [params.id] Optional ID for the Group. A UUID will be assigned as the Group's ID if you do not provide one.
+     * @param {String} [params.shape] Optional ID for the Group. A UUID will be assigned as the Group's ID if you do not provide one.
      * @param {Boolean} [params.constrain=false] If true, child elements will not be able to be dragged outside of the Group model.
      * @param {Boolean} [params.revert=true] By default, child elements revert to the model if dragged outside. You can onChange this by setting `revert:false`. This behaviour is also overridden if you set `orphan` or `prune`.
      * @param {Boolean} [params.orphan=false] If true, child elements dropped outside of the Group model will be removed from the Group (but not from the DOM).

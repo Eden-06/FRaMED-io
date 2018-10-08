@@ -16,7 +16,7 @@ object LinkerManager {
 
         if (!linker.contextMenu.isEmpty) {
             pictogram.hasContextMenu = true
-            pictogram.onContext { event ->
+            pictogram.onContextMenu { event ->
                 linker.apply {
                     contextMenu.onOpen(event)
                     contextMenu.open(event)

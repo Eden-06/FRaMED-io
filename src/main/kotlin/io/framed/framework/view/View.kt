@@ -41,7 +41,7 @@ abstract class View<V : HTMLElement>(view: V) {
     val onClick = EventHandler<MouseEvent>()
 
     /**
-     * Fires on onContext menu open.
+     * Fires on onContextMenu menu open.
      */
     val onContext = EventHandler<MouseEvent>()
 

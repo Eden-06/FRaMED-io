@@ -9,6 +9,7 @@ import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.Validator
 import io.framed.framework.util.property
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Method
 import io.framed.model.Parameter
@@ -22,11 +23,11 @@ class MethodLinker(
         override val parent: ClassLinker
 ) : Linker<Method, TextShape> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
 
-    private val typeProperty = property(model::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val typeProperty = property(model::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
 
-    private val parameterProperty = property(model::parameters)
+    private val parameterProperty = property(model::parameters).trackHistory()
 
     private val lineProperty = property(nameProperty, typeProperty, parameterProperty,
             getter = {
@@ -236,7 +237,7 @@ class MethodLinker(
         LinkerManager.setup(this)
     }
 
-    companion object: LinkerInfoItem {
+    companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ClassLinker
         override val name: String = "Method"
     }

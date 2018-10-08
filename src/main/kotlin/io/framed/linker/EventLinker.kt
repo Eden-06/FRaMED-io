@@ -6,6 +6,7 @@ import io.framed.framework.LinkerManager
 import io.framed.framework.PreviewLinker
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.property
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Event
 import io.framed.model.EventType
@@ -15,7 +16,7 @@ class EventLinker(
         override val parent: ContainerLinker
 ) : PreviewLinker<Event, IconShape, IconShape> {
 
-    private val typeProperty = property(model::type)
+    private val typeProperty = property(model::type).trackHistory()
     private val symbolProperty = property(typeProperty,
             getter = {
                 typeProperty.get().symbol

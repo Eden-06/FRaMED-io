@@ -4,6 +4,7 @@ import io.framed.File
 import io.framed.framework.Controller
 import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
+import io.framed.framework.util.History
 import io.framed.framework.util.getCookie
 import io.framed.framework.util.setCookie
 import io.framed.linker.ContainerLinker
@@ -33,11 +34,16 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         }
         separator()
         actionUndo = action(ToolBar.Side.LEFT, MaterialIcon.UNDO) {
-
+            if (History.canUndo) {
+                History.undo()
+            }
         }
         actionRedo = action(ToolBar.Side.LEFT, MaterialIcon.REDO) {
-
+            if (History.canRedo) {
+                History.redo()
+            }
         }
+        updateUndoRedo()
 
         // Right block
         action(ToolBar.Side.RIGHT, MaterialIcon.PALETTE) {
@@ -130,8 +136,17 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     val renderer = HtmlRenderer(workspace)
 
+    private fun updateUndoRedo() {
+        actionUndo.inactive = !History.canUndo
+        actionRedo.inactive = !History.canRedo
+    }
+
     init {
         Root += this
+
+        History.onChange {
+            updateUndoRedo()
+        }
     }
 
     fun init() {

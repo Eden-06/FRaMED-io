@@ -145,7 +145,7 @@ class HtmlRelation(
                     (event as? MouseEvent)?.let { e ->
                         e.stopPropagation()
                         e.preventDefault()
-                        connection.onContext.fire(ContextEvent(e.point(), connection))
+                        connection.onContextMenu.fire(ContextEvent(e.point(), connection))
                     }
                 }
             }

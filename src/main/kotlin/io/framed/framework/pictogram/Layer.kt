@@ -2,6 +2,8 @@ package io.framed.framework.pictogram
 
 import io.framed.framework.util.Dimension
 import io.framed.framework.util.EventHandler
+import io.framed.framework.util.History
+import io.framed.framework.util.HistoryLayer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlin.reflect.KProperty
@@ -39,6 +41,14 @@ class Layer {
 
     operator fun set(shape: Shape, prop: Prop, value: Double?) {
         val dimension = position[shape.id] ?: Dimension(0.0, 0.0, null, null)
+
+        val oldValue = when (prop) {
+            Prop.LEFT -> dimension.left
+            Prop.TOP -> dimension.top
+            Prop.WIDTH -> dimension.width
+            Prop.HEIGHT -> dimension.height
+        }
+
         position[shape.id] = when (prop) {
             Prop.LEFT -> dimension.copy(left = value ?: 0.0)
             Prop.TOP -> dimension.copy(top = value ?: 0.0)
@@ -46,6 +56,8 @@ class Layer {
             Prop.HEIGHT -> dimension.copy(height = value)
         }
         listener[shape.id]?.fire(false)
+
+        History.push(HistoryLayer(this, shape, prop, oldValue, value))
     }
 
     operator fun getValue(shape: Shape, property: KProperty<*>): Double? =

@@ -7,6 +7,7 @@ import io.framed.framework.PreviewLinker
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.property
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.RoleType
 
@@ -18,7 +19,7 @@ class RoleTypeLinker(
         override val parent: ContainerLinker
 ) : PreviewLinker<RoleType, BoxShape, TextShape> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex()))
+    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
     var name by nameProperty
 
     private lateinit var bodyBox: BoxShape

@@ -47,7 +47,7 @@ fun init() {
 
         val account = clazz("Account") {
             attr("amount", "Money")
-            attr("id", "String")
+            attr("shape", "String")
             method("doSomething", "void") {
                 param("foo", "bar")
             }
