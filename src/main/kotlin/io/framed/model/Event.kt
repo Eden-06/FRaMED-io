@@ -17,7 +17,7 @@ class Event : ModelElement {
     /**
      * Type of the model
      */
-    var type: EventType = EventType.NONE
+    var type: EventType = EventType.STANDARD
     /**
      * Description of the Event
      */
@@ -41,8 +41,10 @@ fun Container.event(type: EventType, desc: String, init: Event.() -> Unit): Even
  * The enum defines the model and their specifications
  */
 enum class EventType(val printableName: String, val symbol: Icon?) {
-    RETURN("Return", MaterialIcon.BACKSPACE),
+    TIMER("Timer", MaterialIcon.AV_TIMER),
     MESSAGE("Message", MaterialIcon.MESSAGE),
-    ERROR("Error", MaterialIcon.ERROR),
-    NONE("None", null);
+    ERROR("Error", MaterialIcon.FLASH_ON),
+    STANDARD("Standard", MaterialIcon.RADIO_BUTTON_UNCHECKED),
+    CONDITION("Condition", MaterialIcon.REORDER),
+    SIGNAL("Signal", MaterialIcon.DETAILS);
 }
