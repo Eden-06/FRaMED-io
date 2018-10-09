@@ -5,10 +5,7 @@ import io.framed.framework.Controller
 import io.framed.framework.ControllerManager
 import io.framed.framework.render.Renderer
 import io.framed.framework.render.html.HtmlRenderer
-import io.framed.framework.util.History
-import io.framed.framework.util.getCookie
-import io.framed.framework.util.property
-import io.framed.framework.util.setCookie
+import io.framed.framework.util.*
 import io.framed.linker.ContainerLinker
 import kotlinx.serialization.json.JSON
 import org.w3c.dom.HTMLDivElement
@@ -136,6 +133,13 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
     private lateinit var controller: Controller
 
     fun loadController(controller: Controller) {
+        if (this::controller.isInitialized) {
+            if (this.controller == controller) {
+                return
+            }
+            History.push(HistoryModelLinker(this.controller.linker, controller.linker))
+        }
+
         this.controller = controller
 
         val tab = controllers[controller] ?: tabBar.tab(controller.tabNameProperty).also { tab ->
