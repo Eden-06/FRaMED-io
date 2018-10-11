@@ -11,11 +11,13 @@ class Controller(
         val layer: Layer
 ) {
 
-    val viewModel: ViewModel = ViewModel(linker.container).also { viewModel ->
+    val viewModel: ViewModel = ViewModel(
+            linker.container,
+            linker::canConnectionStart,
+            linker::canConnectionCreate,
+            linker::createConnection
+    ).also { viewModel ->
         viewModel.layer = layer
-        viewModel.onRelationDraw {
-            linker.createConnection(it.first, it.second)
-        }
         viewModel.connections = linker.connections.map { it.pictogram }
     }
 

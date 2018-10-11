@@ -62,8 +62,12 @@ class EventLinker(
     override val contextMenu = contextMenu {
         title = "Event"
         addItem(MaterialIcon.DELETE, "Delete") {
-            parent.events -= this@EventLinker
+            delete()
         }
+    }
+
+    override fun delete() {
+        parent.events -= this
     }
 
     init {

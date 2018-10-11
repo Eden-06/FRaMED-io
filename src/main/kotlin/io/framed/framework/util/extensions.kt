@@ -1,6 +1,7 @@
 package io.framed.framework.util
 
 import org.w3c.dom.Document
+import org.w3c.xhr.XMLHttpRequest
 import kotlin.browser.window
 import kotlin.js.Date
 
@@ -48,4 +49,26 @@ fun Document.setCookie(name: String, value: String, validity: Int = 0, path: Str
  */
 fun async(block: () -> Unit) {
     window.setTimeout(block, 1)
+}
+
+/**
+ * Make an ajax request.
+ *
+ * @param url Url of the requested resource.
+ * @param onError Listener for a failed request.
+ * @param onSuccess Listener for a successful request.
+ */
+fun loadFile(url: String, onError: (Int) -> Unit = {}, onSuccess: (String) -> Unit) {
+    val xhttp = XMLHttpRequest();
+    xhttp.open("GET", url, true);
+    xhttp.onreadystatechange = {
+        if (xhttp.readyState == 4.toShort()) {
+            if (xhttp.status == 200.toShort() || xhttp.status == 304.toShort()) {
+                onSuccess(xhttp.responseText)
+            } else {
+                onError(xhttp.status.toInt())
+            }
+        }
+    }
+    xhttp.send();
 }

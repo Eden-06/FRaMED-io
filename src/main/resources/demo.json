@@ -54,17 +54,19 @@
         ]
       }
     ],
-    "relations": [
+    "associations": [
       {
         "sourceId": 6,
         "targetId": 1,
         "id": 18,
         "name": "customers",
         "sourceCardinality": "1..*",
-        "targetCardinality": "1",
-        "type": "AGGREGATION"
+        "targetCardinality": "1"
       }
     ],
+    "aggregations": [],
+    "compositions": [],
+    "inheritances": [],
     "containers": [
       {
         "id": 11,
@@ -104,17 +106,19 @@
             ]
           }
         ],
-        "relations": [
+        "associations": [
           {
             "sourceId": 12,
             "targetId": 14,
             "id": 17,
             "name": "",
             "sourceCardinality": "",
-            "targetCardinality": "",
-            "type": "ASSOCIATION"
+            "targetCardinality": ""
           }
         ],
+        "aggregations": [],
+        "compositions": [],
+        "inheritances": [],
         "containers": [
         ],
         "roleTypes": [

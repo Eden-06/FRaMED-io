@@ -12,7 +12,17 @@ class Sidebar : ViewCollection<View<*>, HTMLDivElement>("div") {
         Application.propertyBar.content += this
     }
 
-    fun group(name: String, init: SidebarGroup.() -> Unit) = SidebarGroup(name).also(init).also(this::append)
+    private var groups: Map<String, SidebarGroup> = emptyMap()
+
+    fun group(name: String, init: SidebarGroup.() -> Unit): SidebarGroup {
+        val group = groups[name] ?: run {
+            SidebarGroup(name).also(this::append).also {
+                groups += name to it
+            }
+        }
+        group.init()
+        return group
+    }
 
     fun title(text: String): TextView {
         val view = TextView().also {

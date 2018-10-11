@@ -2,7 +2,7 @@ package io.framed.linker
 
 import io.framed.framework.ConnectionLinker
 import io.framed.framework.Linker
-import io.framed.framework.LinkerInfoRelation
+import io.framed.framework.LinkerInfoConnection
 import io.framed.framework.LinkerManager
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.RegexValidator
@@ -12,18 +12,17 @@ import io.framed.framework.util.trackHistory
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
-import io.framed.model.Relation
-import io.framed.model.RelationMultiplicity
-import io.framed.model.RelationType
+import io.framed.model.Association
+import io.framed.model.Inheritance
 
 /**
  * @author lars
  */
 
-class RelationLinker(
-        override val model: Relation,
+class InheritanceLinker(
+        override val model: Inheritance,
         override val parent: ContainerLinker
-) : ConnectionLinker<Relation, Connection> {
+) : ConnectionLinker<Inheritance> {
 
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
     private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
@@ -41,54 +40,25 @@ class RelationLinker(
     }, setter = { Validator.Result.ERROR })
     var target by targetIdProperty
 
-    private val typeProperty = property(model::type).trackHistory()
-    private var relationType by typeProperty
-
     override val pictogram = connection(sourceShapeProperty, targetShapeProperty) {
         labels += textShape(nameProperty) to 0.5
-        labels += textShape(sourceCardinalityProperty, RelationMultiplicity.STRING_VALUES) to -30.0
-        labels += textShape(targetCardinalityProperty, RelationMultiplicity.STRING_VALUES) to 31.0
+        labels += textShape(sourceCardinalityProperty) to -30.0
+        labels += textShape(targetCardinalityProperty) to 31.0
 
         line(ConnectionLine.Type.RECTANGLE) {
             stroke = Color(0, 0, 0)
             strokeWidth = 1
         }
-    }
 
-    /**
-     * The model styles the model based on their model
-     */
-    private fun updateEndStyle() {
-        when (relationType) {
-            RelationType.INHERITANCE -> {
-                pictogram.sourceStyle = null
-                pictogram.targetStyle = connectionEnd {
-                    width = 20
-                    length = 20
-                    foldback = 1.0
-                    paintStyle {
-                        stroke = Color(0, 0, 0)
-                        strokeWidth = 1
-                        fill = Color(255, 255, 255)
-                    }
-                }
-            }
-            RelationType.ASSOCIATION -> {
-                pictogram.sourceStyle = null
-                pictogram.targetStyle = null
-            }
-            RelationType.AGGREGATION -> {
-                pictogram.sourceStyle = null
-                pictogram.targetStyle = connectionEnd {
-                    width = 20
-                    length = 20
-                    foldback = 2.0
-                    paintStyle {
-                        stroke = Color(0, 0, 0)
-                        strokeWidth = 1
-                        fill = Color(255, 255, 255)
-                    }
-                }
+        sourceStyle = null
+        targetStyle = connectionEnd {
+            width = 20
+            length = 20
+            foldback = 1.0
+            paintStyle {
+                stroke = Color(0, 0, 0)
+                strokeWidth = 1
+                fill = Color(255, 255, 255)
             }
         }
     }
@@ -98,9 +68,10 @@ class RelationLinker(
 
         group("General") {
             input("Name", nameProperty)
-            input("Source cardinality", sourceCardinalityProperty, RelationMultiplicity.STRING_VALUES)
-            input("Target cardinality", targetCardinalityProperty, RelationMultiplicity.STRING_VALUES)
+            input("Source cardinality", sourceCardinalityProperty)
+            input("Target cardinality", targetCardinalityProperty)
 
+            /*
             select("Type", RelationType.values().toList(), typeProperty) {
                 it.printableName
             }
@@ -110,27 +81,28 @@ class RelationLinker(
                 source = target
                 target = h
             }
+            */
         }
     }
 
     override val contextMenu = contextMenu {
         title = "Connection"
         addItem(MaterialIcon.DELETE, "Delete") {
-            parent.removeRelation(this@RelationLinker)
+            delete()
         }
+    }
+
+    override fun delete() {
+        parent.inheritances -= this
     }
 
     init {
-        updateEndStyle()
-
-        typeProperty.onChange {
-            updateEndStyle()
-        }
-
-        LinkerManager.setup(this)
+        LinkerManager.setup(this, InheritanceLinker)
     }
 
-    companion object : LinkerInfoRelation {
+    companion object : LinkerInfoConnection {
+        override val info = ConnectionInfo("Inheritance", MaterialIcon.ADD)
+
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is ClassLinker || source is RoleTypeLinker || source is EventLinker
         }

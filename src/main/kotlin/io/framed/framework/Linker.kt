@@ -2,6 +2,7 @@ package io.framed.framework
 
 import io.framed.framework.pictogram.ContextEvent
 import io.framed.framework.pictogram.Pictogram
+import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.SidebarEvent
 import io.framed.framework.view.ContextMenu
 import io.framed.framework.view.Sidebar
@@ -24,6 +25,10 @@ interface Linker<M : ModelElement, P : Pictogram> {
     fun focus() {
         sidebar.open()
     }
+
+    fun delete()
+
+    fun findConnections(shape: Shape): List<ConnectionLinker<*>> = parent?.findConnections(shape) ?: emptyList()
 
     fun Sidebar.onOpen(event: SidebarEvent) {}
     fun ContextMenu.onOpen(event: ContextEvent) {}

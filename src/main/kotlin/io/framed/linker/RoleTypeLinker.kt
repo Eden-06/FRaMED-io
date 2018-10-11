@@ -56,8 +56,12 @@ class RoleTypeLinker(
     override val contextMenu = contextMenu {
         title = "Class: $name"
         addItem(MaterialIcon.DELETE, "Delete") {
-            parent.roleTypes -= this@RoleTypeLinker
+            delete()
         }
+    }
+
+    override fun delete() {
+        parent.roleTypes -= this
     }
 
     init {

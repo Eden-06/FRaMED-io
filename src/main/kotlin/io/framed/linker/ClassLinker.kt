@@ -5,7 +5,7 @@ import io.framed.framework.LinkerInfoItem
 import io.framed.framework.LinkerManager
 import io.framed.framework.PreviewLinker
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.LinkerBox
+import io.framed.framework.util.LinkerShapeBox
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.property
 import io.framed.framework.util.trackHistory
@@ -25,8 +25,8 @@ class ClassLinker(
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
     var name by nameProperty
 
-    val attributes = LinkerBox(model::attributes)
-    val methods = LinkerBox(model::methods)
+    val attributes = LinkerShapeBox(model::attributes)
+    val methods = LinkerShapeBox(model::methods)
 
     override val pictogram = boxShape {
         boxShape {
@@ -70,8 +70,12 @@ class ClassLinker(
             }
         }
         addItem(MaterialIcon.DELETE, "Delete") {
-            parent.classes -= this@ClassLinker
+            delete()
         }
+    }
+
+    override fun delete() {
+        parent.classes -= this
     }
 
     init {

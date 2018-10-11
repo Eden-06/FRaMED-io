@@ -85,8 +85,12 @@ class AttributeLinker(
     override val contextMenu = contextMenu {
         title = "Attribute: " + model.name
         addItem(MaterialIcon.DELETE, "Delete") {
-            parent.attributes -= this@AttributeLinker
+            delete()
         }
+    }
+
+    override fun delete() {
+        parent.attributes -= this
     }
 
     init {

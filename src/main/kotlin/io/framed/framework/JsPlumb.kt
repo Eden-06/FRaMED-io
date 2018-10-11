@@ -35,7 +35,7 @@ external interface JsPlumbInstance {
     /**
      * Bind an model on the instance.
      */
-    fun bind(event: String, function: (JsPlumbDropInfoInit) -> dynamic): JsPlumbDropInfoInit
+    fun bind(event: String, function: (JsPlumbDropInfoInit) -> dynamic): dynamic
 
     /**
      * Set the model for drawing.
@@ -220,23 +220,6 @@ external interface JsPlumbEndpointOptionsInit {
  *
  */
 fun jsPlumbEndpointOptions(init: JsPlumbEndpointOptionsInit.() -> Unit = {}): JsPlumbEndpointOptionsInit {
-    val h = js("{}")
-    init(h)
-    return h
-}
-/**
- *
- */
-fun jsPlumbDropOptionsInit(init: JsPlumbDropOptionsInit.() -> Unit = {}):JsPlumbDropOptionsInit {
-    val h = js("{}")
-    init(h)
-    return h
-}
-
-/**
- *
- */
-fun jsPlumbDragOptionsInit(init: JsPlumbDragOptionsInit.() -> Unit = {}):JsPlumbDragOptionsInit {
     val h = js("{}")
     init(h)
     return h

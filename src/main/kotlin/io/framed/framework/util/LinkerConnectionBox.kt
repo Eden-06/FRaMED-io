@@ -1,18 +1,14 @@
 package io.framed.framework.util
 
-import io.framed.framework.Linker
-import io.framed.framework.ModelElement
-import io.framed.framework.PreviewLinker
-import io.framed.framework.pictogram.BoxShape
-import io.framed.framework.pictogram.Shape
+import io.framed.framework.*
+import io.framed.framework.pictogram.Connection
 import kotlin.reflect.KMutableProperty0
 
-class LinkerBox<M : ModelElement, L : Linker<M, out Shape>>(
-        kProperty: KMutableProperty0<List<M>>
+class LinkerConnectionBox<M : ModelConnection, L : ConnectionLinker<M>>(
+        kProperty: KMutableProperty0<List<M>>,
+        val parent: ModelLinker<*, *, *>
 ) {
     val property: Property<List<M>> = property(kProperty)
-    lateinit var view: BoxShape
-    var previewBox: BoxShape? = null
 
     private var backingField by property
 
@@ -23,25 +19,15 @@ class LinkerBox<M : ModelElement, L : Linker<M, out Shape>>(
             backingField += linker.model
         }
 
-        view += linker.pictogram
+        parent.onConnectionAdd.fire(linker)
 
-        previewBox?.let { box ->
-            if (linker is PreviewLinker<*, *, *>) {
-                box += linker.preview
-            }
-        }
         linkers += linker
     }
 
     private fun internalRemove(linker: L) {
         backingField -= linker.model
-        view -= linker.pictogram
+        parent.onConnectionRemove.fire(linker)
 
-        previewBox?.let { box ->
-            if (linker is PreviewLinker<*, *, *>) {
-                box -= linker.preview
-            }
-        }
         linkers -= linker
 
         onRemove.fire(Unit)
@@ -69,3 +55,22 @@ class LinkerBox<M : ModelElement, L : Linker<M, out Shape>>(
 
     val onRemove = EventHandler<Unit>()
 }
+/*
+
+
+    private fun addRelation(linker: AssociationLinker) {
+        if (!model.relations.contains(linker.model)) {
+            model.relations += linker.model
+        }
+
+        relations += linker
+        onConnectionAdd.fire(linker)
+    }
+
+    fun removeRelation(linker: AssociationLinker) {
+        model.relations -= linker.model
+        relations -= linker
+        onConnectionRemove.fire(linker)
+    }
+
+*/

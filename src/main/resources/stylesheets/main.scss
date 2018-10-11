@@ -414,6 +414,7 @@ table {
       }
       .button {
         width: 100%;
+        background: $dialog-background;
       }
     }
     &.collapsed {
@@ -528,6 +529,40 @@ table {
 
     &:hover {
       color: $icon-color-inactive;
+    }
+  }
+}
+
+.cyclic-chooser {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+
+  & > div {
+    position: absolute;
+
+    & > div {
+      position: absolute;
+      background: $primary-background;
+      border: solid 1px $border-color-light;
+      border-radius: $border-radius;
+      padding: 0.5rem;
+      overflow: hidden;
+      * {
+        white-space: nowrap;
+      }
+
+      &:hover::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba($text-color, 0.05);
+      }
     }
   }
 }

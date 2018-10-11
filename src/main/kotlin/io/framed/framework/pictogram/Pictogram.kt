@@ -18,5 +18,4 @@ abstract class Pictogram {
 
     var hasSidebar = false
     var hasContextMenu = false
-    var acceptRelation = false
 }

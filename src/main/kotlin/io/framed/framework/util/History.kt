@@ -6,11 +6,16 @@ object History {
 
     private var allowPush = true
 
+    private var createGroup = false
+    private var group: List<HistoryItem> = emptyList()
+
     fun <V : Any> push(property: Property<V>, oldValue: V, newValue: V = property.get()) =
             push(HistoryProperty(property, oldValue, newValue))
 
     fun push(historyItem: HistoryItem) {
-        if (allowPush) {
+        if (allowPush) if (createGroup) {
+            group += historyItem
+        } else {
             val top = list.getOrNull(pointer - 1)
 
             if (top == null || top.shouldAdd(historyItem)) {
@@ -68,6 +73,19 @@ object History {
             lastCanRedo = canRedo
 
             onChange.fire(Unit)
+        }
+    }
+
+    fun startGroup() {
+        createGroup = true
+        group = emptyList()
+    }
+
+    fun endGroup() {
+        createGroup = false
+        if (group.isNotEmpty()) {
+            push(HistoryGroup(group))
+            group = emptyList()
         }
     }
 }

@@ -152,8 +152,12 @@ class MethodLinker(
     override val contextMenu = contextMenu {
         title = "Method: " + model.name
         addItem(MaterialIcon.DELETE, "Delete") {
-            parent.methods -= this@MethodLinker
+            delete()
         }
+    }
+
+    override fun delete() {
+        parent.methods -= this
     }
 
     private lateinit var sidebarParameters: SidebarGroup

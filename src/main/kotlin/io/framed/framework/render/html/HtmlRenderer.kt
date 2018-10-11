@@ -4,10 +4,7 @@ import io.framed.framework.JsPlumb
 import io.framed.framework.jsPlumbEndpointOptions
 import io.framed.framework.pictogram.*
 import io.framed.framework.render.Renderer
-import io.framed.framework.util.Dimension
-import io.framed.framework.util.EventHandler
-import io.framed.framework.util.Point
-import io.framed.framework.util.point
+import io.framed.framework.util.*
 import io.framed.framework.view.*
 import org.w3c.dom.HTMLElement
 
@@ -52,19 +49,31 @@ class HtmlRenderer(
         }
     }
 
+    private fun createConnection(source: Shape, target: Shape) {
+        viewModel.createConnection(source, target)
+    }
+
     private val jsPlumbInstance = JsPlumb.getInstance().apply {
         setContainer(navigationView.container.html)
 
         setZoom(1.0)
         bind("beforeDrop") { info: dynamic ->
-            val source = getShapeById(info.sourceId as String)
-            val target = getShapeById(info.targetId as String)
+            val source = getShapeById(info.sourceId as String) ?: return@bind false
+            val target = getShapeById(info.targetId as String) ?: return@bind false
 
-            if (source != null && target != null) {
-                viewModel.onRelationDraw.fire(source to target)
-            }
+            createConnection(source, target)
 
             return@bind false
+        }
+
+        bind("beforeDrag") { info: dynamic ->
+            val source = getShapeById(info.sourceId as String) ?: return@bind true
+            updateEndpoints(source)
+            true
+        }
+
+        bind("connectionDragStop") { _ ->
+            updateEndpoints()
         }
 
         navigationView.onZoom { zoom ->
@@ -79,7 +88,7 @@ class HtmlRenderer(
 
     private fun updateViewBox() {
         val box = navigationView.viewBox
-        println("update view box $box")
+
         viewModel.container.left = box.left
         viewModel.container.top = box.top
         viewModel.container.width = box.width
@@ -93,7 +102,6 @@ class HtmlRenderer(
         val height = viewModel.container.height
 
         if (left != null && top != null) {
-            println("load view box ${Dimension(left, top, width, height)}")
             navigationView.viewBox = Dimension(left, top, width, height)
         }
     }
@@ -117,19 +125,12 @@ class HtmlRenderer(
             }
         }
 
-        // Draw children
-        var map = viewModel.container.shapes.map {
-            it to drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE)
-        }.toMap()
-
+        viewModel.container.shapes.forEach {drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE)}
         viewModel.container.onAdd {
-            map += it to drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE)
+            drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE)
         }
         viewModel.container.onRemove {
-            map[it]?.let { v ->
-                navigationView.container.remove(v)
-            }
-            this.deleteEndpoint(it)
+            removeShape(it)
         }
 
         viewModel.connections.forEach {
@@ -146,11 +147,45 @@ class HtmlRenderer(
         }
     }
 
+    private fun updateEndpoints(source: Shape? = null) {
+        (endpointMap.keys - shapeMap.keys).forEach(this::deleteEndpoint)
+
+        if (source == null) {
+            shapeMap.keys.forEach {
+                if (viewModel.canConnectionStart(it)) {
+                    createEndpoint(it)
+                } else {
+                    deleteEndpoint(it)
+                }
+            }
+        } else {
+            (shapeMap.keys - source).forEach {
+                if (viewModel.canConnectionCreate(source, it)) {
+                    createEndpoint(it)
+                } else {
+                    deleteEndpoint(it)
+                }
+            }
+        }
+    }
+
+    fun createEndpoint(shape: Shape) {
+        if (endpointMap.containsKey(shape)) return
+        val html = shapeMap[shape]?.html ?: return
+        endpointMap[shape] = jsPlumbInstance.addEndpoint(html, jsPlumbEndpointOptions {
+            anchors = arrayOf("Bottom")
+            isSource = true
+            isTarget = true
+            endpoint = "Dot"
+        })
+    }
+
     /**
      * The model removes the endpoint for the given shape
      */
     fun deleteEndpoint(shape: Shape) {
-        this.endpointMap[shape]?.let(jsPlumbInstance::deleteEndpoint)
+        endpointMap[shape]?.let(jsPlumbInstance::deleteEndpoint)
+        endpointMap -= shape
     }
 
     /**
@@ -165,10 +200,26 @@ class HtmlRenderer(
     }?.key
 
     private var shapeMap: Map<Shape, View<*>> = emptyMap()
+        set(value) {
+            field = value
+            async {
+                updateEndpoints()
+            }
+        }
 
     private var relations: Map<Connection, HtmlRelation> = emptyMap()
     private fun drawRelation(relation: Connection) {
         relations += relation to HtmlRelation(relation, jsPlumbInstance, this)
+    }
+
+    private fun removeShape(shape: Shape) {
+        shapeMap[shape]?.let { v ->
+            navigationView.container.remove(v)
+            if (shape is BoxShape) {
+                shape.shapes.forEach(this::removeShape)
+            }
+            shapeMap -= shape
+        }
     }
 
     private fun drawShape(shape: Shape, parent: ViewCollection<View<*>, *>, position: BoxShape.Position): View<*> {
@@ -179,15 +230,6 @@ class HtmlRenderer(
             else -> throw UnsupportedOperationException()
         }.also { view ->
             shapeMap += shape to view
-
-            if (shape.acceptRelation) {
-                this.endpointMap[shape] = jsPlumbInstance.addEndpoint(view.html, jsPlumbEndpointOptions {
-                    anchors = arrayOf("Bottom")
-                    isSource = true
-                    isTarget = true
-                    endpoint = "Dot"
-                })
-            }
         }
     }
 
