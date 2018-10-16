@@ -28,6 +28,11 @@ class Container : ModelElementMetadata {
     var classes: List<Class> = emptyList()
 
     /**
+     * List of related compartments
+     */
+    var compartments: List<Compartment> = emptyList()
+
+    /**
      * List of nested containers.
      * Should this be a set?
      */

@@ -22,6 +22,9 @@ class ContainerLinker(
     val classes = LinkerShapeBox<Class, ClassLinker>(model::classes).also { box ->
         box.view = container
     }
+    val compartments = LinkerShapeBox<Compartment, CompartmentLinker>(model::compartments).also { box ->
+        box.view = container
+    }
     val containers = LinkerShapeBox<Container, ContainerLinker>(model::containers).also { box ->
         box.view = container
     }

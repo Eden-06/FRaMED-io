@@ -25,6 +25,8 @@ class ViewModel(
     val onRelationRemove = EventHandler<Connection>()
 
     val onLayerChange = EventHandler<Unit>()
+    
+    val onDrop = EventHandler<Shape>()
 
     operator fun plusAssign(connection: Connection) {
         connections += connection

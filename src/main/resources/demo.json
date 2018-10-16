@@ -145,6 +145,65 @@
         "desc": "terminate contract"
       }
     ],
+    "compartments": [
+      {
+        "id": 11,
+        "name": "Compartment",
+        "attributes": [
+          {
+            "id": 12,
+            "name": "amount",
+            "type": "Money"
+          },
+          {
+            "id": 13,
+            "name": "id",
+            "type": "String"
+          }
+        ],
+        "methods": [
+          {
+            "id": 14,
+            "name": "insolvency",
+            "type": "void",
+            "parameters": [
+            ]
+          }
+        ],
+        "classes": [
+          {
+            "id": 15,
+            "name": "Account",
+            "attributes": [
+              {
+                "id": 16,
+                "name": "amount",
+                "type": "Money"
+              },
+              {
+                "id": 17,
+                "name": "id",
+                "type": "String"
+              }
+            ],
+            "methods": [
+              {
+                "id": 18,
+                "name": "doSomething",
+                "type": "void",
+                "parameters": [
+                  {
+                    "id": 19,
+                    "name": "foo",
+                    "type": "bar"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "metadata": {
       "creationDate": "Sun, 07 Oct 2018 21:35:15 GMT",
       "modifiedDate": "Sun, 07 Oct 2018 21:35:15 GMT",

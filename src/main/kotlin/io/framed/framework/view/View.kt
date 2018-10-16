@@ -1,7 +1,9 @@
 package io.framed.framework.view
 
 import io.framed.framework.util.*
+import org.w3c.dom.DragEvent
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.events.Event
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
@@ -213,6 +215,8 @@ abstract class View<V : HTMLElement>(view: V) {
 
     var draggable = DragType.NONE
     val onDrag = EventHandler<DragEvent>()
+    val onDragOver = EventHandler<DragOverEvent>()
+    val onDragStart = EventHandler<DragEvent>()
 
     fun performDrag(dragEvent: DragEvent) {
         val newPosition = when (draggable) {
@@ -249,6 +253,8 @@ abstract class View<V : HTMLElement>(view: V) {
         html.addEventListener("keydown", onKeyDown.eventListener)
         html.addEventListener("keypress", onKeyPress.eventListener)
         html.addEventListener("keyup", onKeyUp.eventListener)
+        html.addEventListener("ondragstart", onDragStart.eventListener)
+        html.addEventListener("ondragover", onDragOver.eventListener)
 
         var isCurrentlyDragging = false
         var lastDragPosition = Point.ZERO
@@ -297,6 +303,9 @@ abstract class View<V : HTMLElement>(view: V) {
                 isCurrentlyDragging = true
             }
         }
+        onDragOver {
+            console.log("DAS DRAG OVER EVENT WURDE AUSGELÖST")
+        }
     }
 
     companion object {
@@ -336,6 +345,24 @@ abstract class View<V : HTMLElement>(view: V) {
             val newPosition: Point = Point.ZERO
     ) {
         val indirect: DragEvent
+            get() = copy(direct = false)
+    }
+
+    data class DropEvent(
+            val target: HTMLElement,
+            val element: HTMLElement,
+            val direct: Boolean
+    ) {
+        val indirect: DropEvent
+            get() = copy(direct = false)
+    }
+
+    data class DragOverEvent(
+            val target: HTMLElement,
+            val element: HTMLElement,
+            val direct: Boolean
+    ) {
+        val indirect: DragOverEvent
             get() = copy(direct = false)
     }
 }

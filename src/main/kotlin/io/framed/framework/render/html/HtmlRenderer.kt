@@ -316,6 +316,9 @@ class HtmlRenderer(
                 event.stopPropagation()
                 selectView(this, event.ctrlKey, true)
             }
+            onDragStart {
+                console.log("HALOOOO")
+            }
             onDrag { event ->
                 if (event.direct) {
                     (selectedViews - this).forEach {
@@ -326,6 +329,9 @@ class HtmlRenderer(
 
                 shape.left = event.newPosition.x
                 shape.top = event.newPosition.y
+            }
+            onDragOver {
+                console.log("DAS DRAG OVER EVENT WURDE AUSGELÖST")
             }
             draggableViews += this
         } else {
@@ -355,6 +361,10 @@ class HtmlRenderer(
 
                 onMouseDown {
                     focus()
+                }
+
+                onDragOver {
+                    console.log("DAS EVENT WURDE AUSGELÖST")
                 }
             }
 
@@ -400,6 +410,9 @@ class HtmlRenderer(
 
             shape.left = event.newPosition.x
             shape.top = event.newPosition.y
+        }
+        onDragOver {
+            console.log("DAS EVENT WURDE AUSGELÖST")
         }
         draggableViews += this
     }

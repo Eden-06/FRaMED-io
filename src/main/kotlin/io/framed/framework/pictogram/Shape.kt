@@ -31,6 +31,8 @@ abstract class Shape : Pictogram() {
         }
 
     val onPositionChange = EventHandler<Boolean>()
+    val onDrag = EventHandler<Shape>()
+    val onDrop = EventHandler<Shape>()
 
     var style: Style = Style()
 
