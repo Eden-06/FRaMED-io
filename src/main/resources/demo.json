@@ -119,12 +119,10 @@
         "aggregations": [],
         "compositions": [],
         "inheritances": [],
-        "containers": [
-        ],
-        "roleTypes": [
-        ],
-        "events": [
-        ],
+        "containers": [],
+        "compartments": [],
+        "roleTypes": [],
+        "events": [],
         "metadata": {
           "creationDate": "Sun, 07 Oct 2018 21:35:15 GMT",
           "modifiedDate": "Sun, 07 Oct 2018 21:35:15 GMT",
