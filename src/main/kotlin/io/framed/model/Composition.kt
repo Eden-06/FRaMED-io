@@ -33,10 +33,10 @@ class Composition(
     /**
      * Cardinality for the source side of this connection.
      */
-    var sourceCardinality: String = ""
+    var sourceCardinality: String = "1"
 
     /**
      * Cardinality for the target side of this connection.
      */
-    var targetCardinality: String = ""
+    var targetCardinality: String = "*"
 }

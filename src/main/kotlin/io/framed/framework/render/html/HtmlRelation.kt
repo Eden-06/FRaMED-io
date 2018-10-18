@@ -28,6 +28,7 @@ class HtmlRelation(
         InputView(shape.property).also {
             it.draggable = View.DragType.MARGIN
             it.autocomplete = shape.autocomplete
+            it.sizeMatchText()
         } to position
     }
 

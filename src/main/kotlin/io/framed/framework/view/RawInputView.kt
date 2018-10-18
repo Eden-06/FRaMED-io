@@ -8,6 +8,7 @@ import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.FocusEvent
 import org.w3c.dom.events.KeyboardEvent
+import kotlin.math.max
 
 /**
  * Represents html input element.
@@ -24,6 +25,9 @@ class RawInputView() : View<HTMLInputElement>("input") {
         set(value) {
             html.value = value
             lastValue = value
+            if (sizeMatch) {
+                size = max(value.length, 1)
+            }
         }
 
     /**
@@ -70,6 +74,18 @@ class RawInputView() : View<HTMLInputElement>("input") {
             readOnly = true
         }
     }
+
+    var size by AttributeDelegate(Int::class, 0)
+
+    private var sizeMatch = false
+    fun sizeMatchText() {
+        sizeMatch = true
+        size = max(value.length, 1)
+        onChange {
+            size = max(value.length, 1)
+        }
+    }
+
 
     private var lastValue: String = value
 

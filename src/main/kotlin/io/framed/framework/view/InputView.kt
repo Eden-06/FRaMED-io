@@ -88,6 +88,11 @@ class InputView() : View<HTMLDivElement>("div") {
     override fun focus() = input.focus()
     override fun blur() = input.blur()
 
+    var size by property(input::size)
+    fun sizeMatchText() = input.sizeMatchText()
+
+    private var focusClass by ClassDelegate("focus")
+
     init {
         updateAutocomplete()
         valueProperty.onChange {
@@ -101,10 +106,12 @@ class InputView() : View<HTMLDivElement>("div") {
             if (autocomplete.isNotEmpty()) {
                 autocompleteListView.visible = true
             }
+            focusClass = true
         }
         onFocusLeave { _ ->
             autocompleteListView.visible = false
             autocompleteMap.forEach { it.second.selectedView = false }
+            focusClass = false
         }
 
         onKeyPress { event ->
@@ -152,5 +159,5 @@ class InputView() : View<HTMLDivElement>("div") {
 fun ViewCollection<in InputView, *>.inputView(init: InputView.() -> Unit) =
         InputView().also(this::append).also(init)
 
-fun ViewCollection<in InputView, *>.inputView(property: Property<String>, init: InputView.() -> Unit)=
+fun ViewCollection<in InputView, *>.inputView(property: Property<String>, init: InputView.() -> Unit) =
         InputView(property).also(this::append).also(init)

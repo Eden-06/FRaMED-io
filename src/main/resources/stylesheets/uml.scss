@@ -60,13 +60,22 @@
   }
 }
 
-.front-end-label input {
-  background-color: rgba($primary-background, .6);
-  text-align: center;
-  &:hover, &:focus {
-    padding: .5rem;
-    background-color: rgba($primary-background, .9);
-    border: 2px solid $border-color;
-    border-radius: $border-radius;
+.front-end-label {
+  &.focus {
+    z-index: 1;
+  }
+  input {
+    background-color: rgba($primary-background, .6);
+    text-align: center;
+    &:hover, &:focus {
+      padding: .5rem;
+      background-color: rgba($primary-background, .9);
+      border: 2px solid $border-color;
+      border-radius: $border-radius;
+    }
+
+    &:placeholder-shown {
+      background: transparent;
+    }
   }
 }

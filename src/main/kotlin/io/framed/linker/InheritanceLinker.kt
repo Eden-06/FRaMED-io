@@ -5,10 +5,7 @@ import io.framed.framework.Linker
 import io.framed.framework.LinkerInfoConnection
 import io.framed.framework.LinkerManager
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.RegexValidator
-import io.framed.framework.util.Validator
-import io.framed.framework.util.property
-import io.framed.framework.util.trackHistory
+import io.framed.framework.util.*
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
@@ -24,7 +21,7 @@ class InheritanceLinker(
         override val parent: ContainerLinker
 ) : ConnectionLinker<Inheritance> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
+    private val nameProperty = property(model::name, TrueValidator()).trackHistory()
     private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
     private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 
@@ -32,18 +29,16 @@ class InheritanceLinker(
     override val sourceShapeProperty = property(sourceIdProperty, getter = {
         parent.getShapeById(model.sourceId)!!
     }, setter = { Validator.Result.ERROR })
-    var source by sourceIdProperty
 
     override val targetIdProperty = property(model::targetId).trackHistory()
     override val targetShapeProperty = property(targetIdProperty, getter = {
         parent.getShapeById(model.targetId)!!
     }, setter = { Validator.Result.ERROR })
-    var target by targetIdProperty
 
     override val pictogram = connection(sourceShapeProperty, targetShapeProperty) {
         labels += textShape(nameProperty) to 0.5
-        labels += textShape(sourceCardinalityProperty) to -30.0
-        labels += textShape(targetCardinalityProperty) to 31.0
+        labels += textShape(sourceCardinalityProperty, CardinalityPreset.STRING_VALUES) to -30.0
+        labels += textShape(targetCardinalityProperty, CardinalityPreset.STRING_VALUES) to 31.0
 
         line(ConnectionLine.Type.RECTANGLE) {
             stroke = Color(0, 0, 0)
@@ -70,18 +65,6 @@ class InheritanceLinker(
             input("Name", nameProperty)
             input("Source cardinality", sourceCardinalityProperty)
             input("Target cardinality", targetCardinalityProperty)
-
-            /*
-            select("Type", RelationType.values().toList(), typeProperty) {
-                it.printableName
-            }
-
-            button("Toggle direction") {
-                val h = source
-                source = target
-                target = h
-            }
-            */
         }
     }
 

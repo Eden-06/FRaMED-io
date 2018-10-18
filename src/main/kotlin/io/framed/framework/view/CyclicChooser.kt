@@ -3,6 +3,7 @@ package io.framed.framework.view
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.events.KeyboardEvent
 import kotlin.math.PI
 import kotlin.math.sqrt
 import kotlin.math.tan
@@ -29,6 +30,40 @@ class CyclicChooser<T>(
         return Point(x, y)
     }
 
+    private fun keyListener(event: KeyboardEvent) {
+        when (event.keyCode) {
+            27 -> {
+                close()
+            }
+            37, 65 -> selectDirection(Direction.LEFT)
+            38, 87 -> selectDirection(Direction.UP)
+            39, 68 -> selectDirection(Direction.RIGHT)
+            40, 83 -> selectDirection(Direction.DOWN)
+        }
+    }
+
+    private var positionMap: Map<IntRange, View<*>> = emptyMap()
+
+    private fun selectDirection(direction: Direction) {
+        positionMap.filterKeys {
+            println(it)
+            direction.angle in it
+        }.values.firstOrNull()?.let {
+            it.onClick.fire(js("{}"))
+            close()
+        }
+    }
+
+    fun open() {
+        Root += this
+        Root.onKeyDown += this::keyListener
+    }
+
+    private fun close() {
+        Root -= this
+        Root.onKeyDown -= this::keyListener
+    }
+
     init {
         val container = listView { }
 
@@ -38,28 +73,47 @@ class CyclicChooser<T>(
             }
         }
 
-        Root += this
+        open()
 
         onClick {
-            Root -= this
+            close()
         }
 
+
         async {
-            val height = (views.asSequence().map { it.clientHeight }.max() ?: 0) * 2.2
-            val width = (views.asSequence().map { it.clientWidth }.max() ?: 0) * 1.8
+            val height = (views.asSequence().map { it.clientHeight }.max() ?: 0).toDouble()
+            val width = (views.asSequence().map { it.clientWidth }.max() ?: 0).toDouble()
 
             container.left = Root.mousePosition.x
             container.top = Root.mousePosition.y
 
             val part = 360 / views.size
-            views.forEachIndexed { index, view ->
-                val pos = calc(width, height, part * index)
+            positionMap = views.mapIndexed { index, view ->
+                val angle = part * index
+                val pos = calc(width * 1.8, height * 2.4, angle)
                 view.top = pos.y
                 view.left = pos.x
 
-                view.marginTop = -(view.clientHeight / 2.0)
-                view.marginLeft = -(view.clientWidth / 2.0)
-            }
+                view.marginTop = -(height / 2.0)
+                view.marginLeft = -(width / 2.0)
+
+                view.width = width
+                view.height = height
+
+                println("${part * index}:")
+                println(view.html.innerHTML)
+
+                angle.rangeBy(part) to view
+            }.toMap()
         }
+    }
+
+    private fun Int.rangeBy(distance: Int): IntRange = (this - distance / 2)..(this + distance / 2)
+
+    enum class Direction(val angle: Int) {
+        LEFT(180),
+        UP(90),
+        RIGHT(0),
+        DOWN(270)
     }
 }
