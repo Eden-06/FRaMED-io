@@ -5,6 +5,7 @@ import io.framed.framework.LinkerInfoItem
 import io.framed.framework.LinkerManager
 import io.framed.framework.PreviewLinker
 import io.framed.framework.pictogram.*
+import io.framed.framework.util.LinkerShapeBox
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.property
 import io.framed.framework.util.trackHistory
@@ -26,11 +27,18 @@ class CompartmentLinker(
 
     private lateinit var bodyBox: BoxShape
 
+    val attributes = LinkerShapeBox(model::attributes)
+    val methods = LinkerShapeBox(model::methods)
+    val classes = LinkerShapeBox(model::classes)
+
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
         }
-        bodyBox = boxShape { }
+
+        attributes.view = boxShape { }
+        methods.view = boxShape { }
+        classes.view = boxShape { }
 
         style {
             background = linearGradient("to bottom") {
@@ -67,11 +75,15 @@ class CompartmentLinker(
     }
 
     init {
+        model.attributes.forEach { attributes += AttributeLinker(it, parent = null, parent2 = this) }
+        model.methods.forEach { methods += MethodLinker(it, parent = null, parent2 = this) }
+        model.classes.forEach { classes += ClassLinker(it, parent) }
+
         LinkerManager.setup(this)
     }
 
     companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
-        override val name: String = "Role type"
+        override val name: String = "Compartment"
     }
 }

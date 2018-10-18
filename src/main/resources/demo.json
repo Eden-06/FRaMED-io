@@ -145,23 +145,23 @@
     ],
     "compartments": [
       {
-        "id": 11,
+        "id": 15,
         "name": "Compartment",
         "attributes": [
           {
-            "id": 12,
+            "id": 16,
             "name": "amount",
             "type": "Money"
           },
           {
-            "id": 13,
+            "id": 17,
             "name": "id",
             "type": "String"
           }
         ],
         "methods": [
           {
-            "id": 14,
+            "id": 18,
             "name": "insolvency",
             "type": "void",
             "parameters": [
@@ -170,28 +170,28 @@
         ],
         "classes": [
           {
-            "id": 15,
+            "id": 19,
             "name": "Account",
             "attributes": [
               {
-                "id": 16,
+                "id": 20,
                 "name": "amount",
                 "type": "Money"
               },
               {
-                "id": 17,
+                "id": 21,
                 "name": "id",
                 "type": "String"
               }
             ],
             "methods": [
               {
-                "id": 18,
+                "id": 22,
                 "name": "doSomething",
                 "type": "void",
                 "parameters": [
                   {
-                    "id": 19,
+                    "id": 23,
                     "name": "foo",
                     "type": "bar"
                   }

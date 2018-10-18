@@ -60,12 +60,12 @@ class ClassLinker(
     override val contextMenu = contextMenu {
         title = "Class: $name"
         addItem(MaterialIcon.ADD, "Add attribute") {
-            attributes += AttributeLinker(Attribute(), this@ClassLinker).also { linker ->
+            attributes += AttributeLinker(Attribute(), this@ClassLinker, parent2 = null).also { linker ->
                 linker.focus()
             }
         }
         addItem(MaterialIcon.ADD, "Add method") {
-            methods += MethodLinker(Method(), this@ClassLinker).also { linker ->
+            methods += MethodLinker(Method(), this@ClassLinker, parent2 = null).also { linker ->
                 linker.focus()
             }
         }
@@ -79,8 +79,8 @@ class ClassLinker(
     }
 
     init {
-        model.attributes.forEach { attributes += AttributeLinker(it, this) }
-        model.methods.forEach { methods += MethodLinker(it, this) }
+        model.attributes.forEach { attributes += AttributeLinker(it, this, parent2 = null) }
+        model.methods.forEach { methods += MethodLinker(it, this, parent2 = null) }
 
         LinkerManager.setup(this)
     }

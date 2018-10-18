@@ -304,7 +304,7 @@ class HtmlRenderer(
                 }
             }
 
-            draggable = View.DragType.ABSOLUTE
+            drag = View.DragType.ABSOLUTE
             onMouseDown { event ->
                 event.stopPropagation()
                 selectView(this, event.ctrlKey, false)
@@ -388,7 +388,7 @@ class HtmlRenderer(
             }
         }
 
-        draggable = View.DragType.ABSOLUTE
+        drag = View.DragType.ABSOLUTE
         onMouseDown { event ->
             event.stopPropagation()
             selectView(this, event.ctrlKey, false)

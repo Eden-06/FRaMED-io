@@ -20,7 +20,8 @@ import io.framed.model.param
  */
 class MethodLinker(
         override val model: Method,
-        override val parent: ClassLinker
+        override val parent: ClassLinker?,
+        val parent2: CompartmentLinker?
 ) : Linker<Method, TextShape> {
 
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
@@ -157,7 +158,11 @@ class MethodLinker(
     }
 
     override fun delete() {
-        parent.methods -= this
+        if(parent != null){
+            parent.methods -= this
+        } else if(parent2 != null){
+            parent2.methods -= this
+        }
     }
 
     private lateinit var sidebarParameters: SidebarGroup

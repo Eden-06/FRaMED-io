@@ -213,7 +213,7 @@ class ContainerLinker(
         model.containers.forEach { containers += ContainerLinker(it, this) }
         model.roleTypes.forEach { roleTypes += RoleTypeLinker(it, this) }
         model.events.forEach { events += EventLinker(it, this) }
-
+        model.compartments.forEach { compartments += CompartmentLinker(it, this) }
         model.associations.forEach { associations += AssociationLinker(it, this) }
         model.aggregations.forEach { aggregations += AggregationLinker(it, this) }
         model.inheritances.forEach { inheritances += InheritanceLinker(it, this) }

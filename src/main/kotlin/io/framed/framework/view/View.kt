@@ -213,13 +213,13 @@ abstract class View<V : HTMLElement>(view: V) {
     var isMouseDown by ClassDelegate("mouse-down")
     var selectedView by ClassDelegate("selected-view")
 
-    var draggable = DragType.NONE
+    var drag = DragType.NONE
     val onDrag = EventHandler<DragEvent>()
     val onDragOver = EventHandler<DragOverEvent>()
     val onDragStart = EventHandler<DragEvent>()
 
     fun performDrag(dragEvent: DragEvent) {
-        val newPosition = when (draggable) {
+        val newPosition = when (drag) {
             View.DragType.NONE -> throw IllegalStateException()
             View.DragType.ABSOLUTE -> {
                 left += dragEvent.delta.x
@@ -243,7 +243,6 @@ abstract class View<V : HTMLElement>(view: V) {
         onContext {
             it.preventDefault()
         }
-
         html.addEventListener("mousedown", onMouseDown.eventListener)
         html.addEventListener("mousemove", onMouseMove.eventListener)
         html.addEventListener("mouseup", onMouseUp.eventListener)
@@ -263,6 +262,7 @@ abstract class View<V : HTMLElement>(view: V) {
             performDrag(DragEvent(delta, true))
             lastDragPosition = event.point()
         }
+        val draggable = AttributeDelegate(String::class, "false", "draggable", html)
         var dragEnd: (MouseEvent) -> Unit = {}
         fun removeDrag() {
             isCurrentlyDragging = false
@@ -279,7 +279,7 @@ abstract class View<V : HTMLElement>(view: V) {
         onMouseDown {
             isMouseDown = true
 
-            if (draggable != DragType.NONE) {
+            if (drag != DragType.NONE) {
                 it.stopPropagation()
 
                 Root.onMouseUp += dragEnd
@@ -291,7 +291,7 @@ abstract class View<V : HTMLElement>(view: V) {
         }
 
         onMouseMove {
-            if (isMouseDown && !isCurrentlyDragging && draggable != DragType.NONE) {
+            if (isMouseDown && !isCurrentlyDragging && drag != DragType.NONE) {
                 it.preventDefault()
                 it.stopPropagation()
 
