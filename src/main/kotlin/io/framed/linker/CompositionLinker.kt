@@ -75,10 +75,6 @@ class CompositionLinker(
         }
     }
 
-    override fun delete() {
-        parent.compositions -= this
-    }
-
     init {
         LinkerManager.setup(this, CompositionLinker)
     }

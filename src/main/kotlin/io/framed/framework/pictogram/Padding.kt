@@ -21,6 +21,7 @@ class Padding(
          */
         var paddingRight: Double = 0.0
 ) {
+    /*
     enum class BorderStyle(cssValue: String) {
         SMALL("10px"),
         MIDDLE("20px"),
@@ -28,11 +29,14 @@ class Padding(
 
         override fun toString(): String = name.toLowerCase()
     }
+    */
 
     fun toCss(): String = "${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px"
 }
+
 // The function initializes a new instance
 fun Style.padding(init: Padding.() -> Unit): Padding = Padding().also(init).also { padding = it }
+
 fun Style.padding(padding: Double): Padding = Padding().also {
     it.paddingTop = padding
     it.paddingLeft = padding

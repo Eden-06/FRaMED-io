@@ -236,6 +236,7 @@ abstract class View<V : HTMLElement>(view: V) {
     }
 
     var dragZoom = 1.0
+    var draggable by AttributeDelegate(Boolean::class, false)
 
     init {
         html.addEventListener("click", onClick.eventListener)
@@ -262,7 +263,7 @@ abstract class View<V : HTMLElement>(view: V) {
             performDrag(DragEvent(delta, true))
             lastDragPosition = event.point()
         }
-        val draggable = AttributeDelegate(String::class, "false", "draggable", html)
+
         var dragEnd: (MouseEvent) -> Unit = {}
         fun removeDrag() {
             isCurrentlyDragging = false

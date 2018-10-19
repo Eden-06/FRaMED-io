@@ -75,10 +75,6 @@ class InheritanceLinker(
         }
     }
 
-    override fun delete() {
-        parent.inheritances -= this
-    }
-
     init {
         LinkerManager.setup(this, InheritanceLinker)
     }

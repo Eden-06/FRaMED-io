@@ -16,8 +16,7 @@ import io.framed.model.Attribute
  */
 class AttributeLinker(
         override val model: Attribute,
-        override val parent: ClassLinker?,
-        val parent2: CompartmentLinker?
+        override val parent: Linker<*, *>
 ) : Linker<Attribute, TextShape> {
 
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
@@ -87,14 +86,6 @@ class AttributeLinker(
         title = "Attribute: " + model.name
         addItem(MaterialIcon.DELETE, "Delete") {
             delete()
-        }
-    }
-
-    override fun delete() {
-        if(parent != null) {
-            parent.attributes -= this
-        } else if(parent2 != null){
-            parent2.attributes -= this
         }
     }
 

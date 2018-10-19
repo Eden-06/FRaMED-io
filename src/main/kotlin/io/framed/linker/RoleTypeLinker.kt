@@ -60,10 +60,6 @@ class RoleTypeLinker(
         }
     }
 
-    override fun delete() {
-        parent.roleTypes -= this
-    }
-
     init {
         LinkerManager.setup(this)
     }

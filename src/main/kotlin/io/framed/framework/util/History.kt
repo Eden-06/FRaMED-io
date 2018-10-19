@@ -30,17 +30,11 @@ object History {
     val canUndo: Boolean
         get() = pointer > 0
 
-    private fun disablePush(block: () -> Unit) {
-        allowPush = false
-        block()
-        allowPush = true
-    }
-
     fun undo() {
         if (!canUndo) {
             throw IllegalStateException()
         }
-        disablePush {
+        ignore {
             list[pointer - 1].undo()
             pointer -= 1
 
@@ -55,7 +49,7 @@ object History {
         if (!canRedo) {
             throw IllegalStateException()
         }
-        disablePush {
+        ignore {
             list[pointer].redo()
             pointer += 1
 
@@ -76,17 +70,29 @@ object History {
         }
     }
 
-    fun startGroup() {
+    private fun startGroup() {
         createGroup = true
         group = emptyList()
     }
 
-    fun endGroup() {
+    private fun endGroup() {
         createGroup = false
         if (group.isNotEmpty()) {
             push(HistoryGroup(group))
             group = emptyList()
         }
+    }
+
+    fun group(block: () -> Unit) {
+        startGroup()
+        block()
+        endGroup()
+    }
+
+    fun ignore(block: () -> Unit) {
+        allowPush = false
+        block()
+        allowPush = true
     }
 }
 

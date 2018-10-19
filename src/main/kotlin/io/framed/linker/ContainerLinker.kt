@@ -19,26 +19,26 @@ class ContainerLinker(
 
     override val container: BoxShape = boxShape { }
 
-    val classes = LinkerShapeBox<Class, ClassLinker>(model::classes).also { box ->
+    private val classes = LinkerShapeBox<Class, ClassLinker>(model::classes).also { box ->
         box.view = container
     }
-    val compartments = LinkerShapeBox<Compartment, CompartmentLinker>(model::compartments).also { box ->
+    private val compartments = LinkerShapeBox<Compartment, CompartmentLinker>(model::compartments).also { box ->
         box.view = container
     }
-    val containers = LinkerShapeBox<Container, ContainerLinker>(model::containers).also { box ->
+    private val containers = LinkerShapeBox<Container, ContainerLinker>(model::containers).also { box ->
         box.view = container
     }
-    val roleTypes = LinkerShapeBox<RoleType, RoleTypeLinker>(model::roleTypes).also { box ->
+    private val roleTypes = LinkerShapeBox<RoleType, RoleTypeLinker>(model::roleTypes).also { box ->
         box.view = container
     }
-    val events = LinkerShapeBox<Event, EventLinker>(model::events).also { box ->
+    private val events = LinkerShapeBox<Event, EventLinker>(model::events).also { box ->
         box.view = container
     }
 
-    val associations = LinkerConnectionBox<Association, AssociationLinker>(model::associations, this)
-    val inheritances = LinkerConnectionBox<Inheritance, InheritanceLinker>(model::inheritances, this)
-    val aggregations = LinkerConnectionBox<Aggregation, AggregationLinker>(model::aggregations, this)
-    val compositions = LinkerConnectionBox<Composition, CompositionLinker>(model::compositions, this)
+    private val associations = LinkerConnectionBox<Association, AssociationLinker>(model::associations, this)
+    private val inheritances = LinkerConnectionBox<Inheritance, InheritanceLinker>(model::inheritances, this)
+    private val aggregations = LinkerConnectionBox<Aggregation, AggregationLinker>(model::aggregations, this)
+    private val compositions = LinkerConnectionBox<Composition, CompositionLinker>(model::compositions, this)
 
     override val content: List<PreviewLinker<*, *, *>>
         get() = classes.linkers + containers.linkers + roleTypes.linkers
@@ -156,10 +156,17 @@ class ContainerLinker(
         }
     }
 
-    override fun delete() {
-        parent?.let {
-            it.containers -= this@ContainerLinker
-        }
+    override fun remove(linker: Linker<*, *>) {
+        if (linker is ClassLinker) classes.remove(linker)
+        if (linker is CompartmentLinker) compartments.remove(linker)
+        if (linker is ContainerLinker) containers.remove(linker)
+        if (linker is RoleTypeLinker) roleTypes.remove(linker)
+        if (linker is EventLinker) events.remove(linker)
+
+        if (linker is AssociationLinker) associations.remove(linker)
+        if (linker is AggregationLinker) aggregations.remove(linker)
+        if (linker is CompositionLinker) compositions.remove(linker)
+        if (linker is InheritanceLinker) inheritances.remove(linker)
     }
 
     override fun ContextMenu.onOpen(event: ContextEvent) {

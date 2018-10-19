@@ -59,14 +59,14 @@ class LinkerShapeBox<M : ModelElement, L : Linker<M, out Shape>>(
     }
 
     fun remove(linker: L) {
-        History.startGroup()
-        linker.findConnections(linker.pictogram).forEach {
-            it.delete()
+        History.group {
+            linker.findConnections(linker.pictogram).forEach {
+                it.delete()
+            }
+            val item = HistoryMethod(linker, this::internalRemove, this::internalAdd)
+            item.execute()
+            History.push(item)
         }
-        val item = HistoryMethod(linker, this::internalRemove, this::internalAdd)
-        item.execute()
-        History.push(item)
-        History.endGroup()
     }
 
     operator fun plusAssign(linker: L) = add(linker)

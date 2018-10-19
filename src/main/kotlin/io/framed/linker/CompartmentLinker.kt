@@ -11,7 +11,6 @@ import io.framed.framework.util.property
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Compartment
-import io.framed.model.RoleType
 
 /**
  * @author Sebastian
@@ -19,13 +18,11 @@ import io.framed.model.RoleType
  */
 class CompartmentLinker(
         override val model: Compartment,
-        override val parent: ContainerLinker
+        override val parent: Linker<*, *>
 ) : PreviewLinker<Compartment, BoxShape, TextShape> {
 
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
     var name by nameProperty
-
-    private lateinit var bodyBox: BoxShape
 
     val attributes = LinkerShapeBox(model::attributes)
     val methods = LinkerShapeBox(model::methods)
@@ -70,13 +67,15 @@ class CompartmentLinker(
         }
     }
 
-    override fun delete() {
-        parent.compartments -= this
+    override fun remove(linker: Linker<*, *>) {
+        if (linker is AttributeLinker) attributes.remove(linker)
+        if (linker is MethodLinker) methods.remove(linker)
+        if (linker is ClassLinker) classes.remove(linker)
     }
 
     init {
-        model.attributes.forEach { attributes += AttributeLinker(it, parent = null, parent2 = this) }
-        model.methods.forEach { methods += MethodLinker(it, parent = null, parent2 = this) }
+        model.attributes.forEach { attributes += AttributeLinker(it, this) }
+        model.methods.forEach { methods += MethodLinker(it, this) }
         model.classes.forEach { classes += ClassLinker(it, parent) }
 
         LinkerManager.setup(this)

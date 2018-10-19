@@ -26,7 +26,9 @@ interface Linker<M : ModelElement, P : Pictogram> {
         sidebar.open()
     }
 
-    fun delete()
+    fun delete() = parent?.remove(this)
+
+    fun remove(linker: Linker<*,*>): Unit = throw UnsupportedOperationException()
 
     fun findConnections(shape: Shape): List<ConnectionLinker<*>> = parent?.findConnections(shape) ?: emptyList()
 

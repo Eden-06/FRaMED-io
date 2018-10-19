@@ -36,15 +36,14 @@ object LinkerManager {
                 info.info
             }, setter = {
                 async {
-                    History.startGroup()
-                    val source = linker.sourceShapeProperty.get()
-                    val target = linker.targetShapeProperty.get()
-                    val parent = linker.parent
-                    linker.delete()
+                    History.group {
+                        val source = linker.sourceShapeProperty.get()
+                        val target = linker.targetShapeProperty.get()
+                        val parent = linker.parent
+                        linker.delete()
 
-                    parent.createConnection(source, target, it).focus()
-
-                    History.endGroup()
+                        parent.createConnection(source, target, it).focus()
+                    }
                 }
 
                 Validator.Result.VALID

@@ -66,10 +66,6 @@ class EventLinker(
         }
     }
 
-    override fun delete() {
-        parent.events -= this
-    }
-
     init {
         LinkerManager.setup(this)
     }

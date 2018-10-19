@@ -20,8 +20,7 @@ import io.framed.model.param
  */
 class MethodLinker(
         override val model: Method,
-        override val parent: ClassLinker?,
-        val parent2: CompartmentLinker?
+        override val parent: Linker<*, *>
 ) : Linker<Method, TextShape> {
 
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
@@ -154,14 +153,6 @@ class MethodLinker(
         title = "Method: " + model.name
         addItem(MaterialIcon.DELETE, "Delete") {
             delete()
-        }
-    }
-
-    override fun delete() {
-        if(parent != null){
-            parent.methods -= this
-        } else if(parent2 != null){
-            parent2.methods -= this
         }
     }
 

@@ -65,10 +65,6 @@ class AssociationLinker(
         }
     }
 
-    override fun delete() {
-        parent.associations -= this
-    }
-
     init {
         LinkerManager.setup(this, AssociationLinker)
     }

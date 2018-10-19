@@ -19,7 +19,7 @@ import io.framed.model.Method
  */
 class ClassLinker(
         override val model: Class,
-        override val parent: ContainerLinker
+        override val parent: Linker<*,*>
 ) : PreviewLinker<Class, BoxShape, TextShape> {
 
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
@@ -60,12 +60,12 @@ class ClassLinker(
     override val contextMenu = contextMenu {
         title = "Class: $name"
         addItem(MaterialIcon.ADD, "Add attribute") {
-            attributes += AttributeLinker(Attribute(), this@ClassLinker, parent2 = null).also { linker ->
+            attributes += AttributeLinker(Attribute(), this@ClassLinker).also { linker ->
                 linker.focus()
             }
         }
         addItem(MaterialIcon.ADD, "Add method") {
-            methods += MethodLinker(Method(), this@ClassLinker, parent2 = null).also { linker ->
+            methods += MethodLinker(Method(), this@ClassLinker).also { linker ->
                 linker.focus()
             }
         }
@@ -74,13 +74,14 @@ class ClassLinker(
         }
     }
 
-    override fun delete() {
-        parent.classes -= this
+    override fun remove(linker: Linker<*, *>) {
+        if (linker is AttributeLinker) attributes.remove(linker)
+        if (linker is MethodLinker) methods.remove(linker)
     }
 
     init {
-        model.attributes.forEach { attributes += AttributeLinker(it, this, parent2 = null) }
-        model.methods.forEach { methods += MethodLinker(it, this, parent2 = null) }
+        model.attributes.forEach { attributes += AttributeLinker(it, this) }
+        model.methods.forEach { methods += MethodLinker(it, this) }
 
         LinkerManager.setup(this)
     }

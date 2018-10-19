@@ -2,7 +2,6 @@ package io.framed.framework
 
 import io.framed.framework.pictogram.Connection
 import io.framed.framework.pictogram.ConnectionInfo
-import io.framed.framework.pictogram.Pictogram
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.History
 import io.framed.framework.util.Property
@@ -23,11 +22,11 @@ interface ConnectionLinker<M : ModelElement> : Linker<M, Connection> {
             parent.canConnectionCreate(targetShapeProperty.get(), sourceShapeProperty.get()).contains(info)
 
     fun swap() {
-        History.startGroup()
-        val h = sourceIdProperty.get()
-        sourceIdProperty.set(targetIdProperty.get())
-        targetIdProperty.set(h)
-        History.endGroup()
+        History.group {
+            val h = sourceIdProperty.get()
+            sourceIdProperty.set(targetIdProperty.get())
+            targetIdProperty.set(h)
+        }
     }
 
     fun canConvert() = parent.canConnectionCreate(sourceShapeProperty.get(), targetShapeProperty.get())

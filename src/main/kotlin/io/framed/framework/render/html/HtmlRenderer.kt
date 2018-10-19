@@ -110,6 +110,10 @@ class HtmlRenderer(
         draggableViews = emptyList()
 
         loadViewBox()
+        viewModel.container.onPositionChange { force ->
+            if (force) loadViewBox()
+        }
+
         navigationView.container.clear()
 
         navigationView.onContext.clearListeners()
@@ -263,7 +267,7 @@ class HtmlRenderer(
         }
     }
 
-    private fun events(view: View<*>, shape: Shape) {
+    private fun events(view: View<*>, shape: Shape, parent: ViewCollection<View<*>, *>) {
         if (shape.hasContextMenu) {
             view.onContext {
                 it.stopPropagation()
@@ -280,6 +284,9 @@ class HtmlRenderer(
             }
             view.onClick { it.stopPropagation() }
         }
+        view.onDrag {
+            if (it.direct) parent.toForeground(view)
+        }
     }
 
     private fun drawBoxShape(
@@ -288,7 +295,7 @@ class HtmlRenderer(
             position: BoxShape.Position
     ): View<*> = parent.listView {
         style(this, shape.style)
-        events(this, shape)
+        events(this, shape, parent)
 
         if (position == BoxShape.Position.ABSOLUTE) {
             left = shape.left ?: 0.0
@@ -355,7 +362,7 @@ class HtmlRenderer(
     private fun drawTextShape(shape: TextShape, parent: ViewCollection<View<*>, *>): View<*> =
             parent.inputView(shape.property) {
                 style(this, shape.style)
-                events(this, shape)
+                events(this, shape, parent)
 
                 autocomplete = shape.autocomplete
 
@@ -373,7 +380,7 @@ class HtmlRenderer(
             parent: ViewCollection<View<*>, *>
     ): View<*> = parent.iconView(shape.property) {
         style(this, shape.style)
-        events(this, shape)
+        events(this, shape, parent)
 
         left = shape.left ?: 0.0
         top = shape.top ?: 0.0

@@ -75,10 +75,6 @@ class AggregationLinker(
         }
     }
 
-    override fun delete() {
-        parent.aggregations -= this
-    }
-
     init {
         LinkerManager.setup(this, AggregationLinker)
     }
