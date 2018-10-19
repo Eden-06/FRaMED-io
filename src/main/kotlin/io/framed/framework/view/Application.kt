@@ -8,7 +8,11 @@ import io.framed.framework.render.html.HtmlRenderer
 import io.framed.framework.util.*
 import io.framed.linker.ContainerLinker
 import kotlinx.serialization.json.JSON
+import kotlinx.serialization.toUtf8Bytes
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.url.URL
+import org.w3c.files.Blob
+import org.w3c.files.BlobPropertyBag
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.roundToInt
@@ -97,7 +101,13 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
     private val menuBar = menuBar {
         menu("File") {
             item("Open") {
+                loadLocalFile { content ->
+                    val file = JSON.parse<File>(content)
 
+                    ControllerManager.layers = file.layer
+
+                    ControllerManager.display(ContainerLinker(file.root))
+                }
             }
             item("Save") {
                 ControllerManager.root?.let { root ->
@@ -105,7 +115,9 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
                     val file = File(container, ControllerManager.layers)
 
-                    println(JSON.indented.stringify(file))
+                    val content = JSON.indented.stringify(file) + "\n"
+
+                    triggerDownload("${root.linker.name.toLowerCase()}.json", content)
                 }
             }
             item("Reset") {
