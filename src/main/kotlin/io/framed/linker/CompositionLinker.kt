@@ -87,7 +87,7 @@ class CompositionLinker(
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return target is ClassLinker || target is RoleTypeLinker || target is EventLinker
+            return canStart(source) && (target is ClassLinker || target is RoleTypeLinker || target is EventLinker)
         }
     }
 }

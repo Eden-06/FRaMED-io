@@ -1,9 +1,7 @@
 package io.framed.framework.view
 
 import io.framed.framework.util.*
-import org.w3c.dom.DragEvent
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.Event
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
@@ -38,6 +36,24 @@ abstract class View<V : HTMLElement>(view: V) {
     }
 
     /**
+
+    data class DropEvent(
+    val target: HTMLElement,
+    val element: HTMLElement,
+    val direct: Boolean
+    ) {
+    val indirect: DropEvent
+    get() = copy(direct = false)
+    }
+
+    data class DragOverEvent(
+    val target: HTMLElement,
+    val element: HTMLElement,
+    val direct: Boolean
+    ) {
+    val indirect: DragOverEvent
+    get() = copy(direct = false)
+    }
      * Fires on onClick.
      */
     val onClick = EventHandler<MouseEvent>()
@@ -127,6 +143,13 @@ abstract class View<V : HTMLElement>(view: V) {
             html.style.height = "${value}px"
         }
 
+    fun autoWidth() {
+        html.style.removeProperty("width")
+    }
+    fun autoHeight() {
+        html.style.removeProperty("height")
+    }
+
     /**
      * Accumulated offset top in px.
      */
@@ -213,14 +236,13 @@ abstract class View<V : HTMLElement>(view: V) {
     var isMouseDown by ClassDelegate("mouse-down")
     var selectedView by ClassDelegate("selected-view")
 
-    var drag = DragType.NONE
+    var dragType = DragType.NONE
     val onDrag = EventHandler<DragEvent>()
-    val onDragOver = EventHandler<DragOverEvent>()
-    val onDragStart = EventHandler<DragEvent>()
 
     fun performDrag(dragEvent: DragEvent) {
-        val newPosition = when (drag) {
+        val newPosition = when (dragType) {
             View.DragType.NONE -> throw IllegalStateException()
+            View.DragType.CUSTOM -> Point(dragEvent.delta.x, dragEvent.delta.y)
             View.DragType.ABSOLUTE -> {
                 left += dragEvent.delta.x
                 top += dragEvent.delta.y
@@ -253,8 +275,6 @@ abstract class View<V : HTMLElement>(view: V) {
         html.addEventListener("keydown", onKeyDown.eventListener)
         html.addEventListener("keypress", onKeyPress.eventListener)
         html.addEventListener("keyup", onKeyUp.eventListener)
-        html.addEventListener("ondragstart", onDragStart.eventListener)
-        html.addEventListener("ondragover", onDragOver.eventListener)
 
         var isCurrentlyDragging = false
         var lastDragPosition = Point.ZERO
@@ -280,7 +300,7 @@ abstract class View<V : HTMLElement>(view: V) {
         onMouseDown {
             isMouseDown = true
 
-            if (drag != DragType.NONE) {
+            if (dragType != DragType.NONE) {
                 it.stopPropagation()
 
                 Root.onMouseUp += dragEnd
@@ -292,7 +312,7 @@ abstract class View<V : HTMLElement>(view: V) {
         }
 
         onMouseMove {
-            if (isMouseDown && !isCurrentlyDragging && drag != DragType.NONE) {
+            if (isMouseDown && !isCurrentlyDragging && dragType != DragType.NONE) {
                 it.preventDefault()
                 it.stopPropagation()
 
@@ -303,9 +323,6 @@ abstract class View<V : HTMLElement>(view: V) {
 
                 isCurrentlyDragging = true
             }
-        }
-        onDragOver {
-            console.log("DAS DRAG OVER EVENT WURDE AUSGELÖST")
         }
     }
 
@@ -337,7 +354,8 @@ abstract class View<V : HTMLElement>(view: V) {
     enum class DragType {
         NONE,
         ABSOLUTE,
-        MARGIN
+        MARGIN,
+        CUSTOM
     }
 
     data class DragEvent(
@@ -346,24 +364,6 @@ abstract class View<V : HTMLElement>(view: V) {
             val newPosition: Point = Point.ZERO
     ) {
         val indirect: DragEvent
-            get() = copy(direct = false)
-    }
-
-    data class DropEvent(
-            val target: HTMLElement,
-            val element: HTMLElement,
-            val direct: Boolean
-    ) {
-        val indirect: DropEvent
-            get() = copy(direct = false)
-    }
-
-    data class DragOverEvent(
-            val target: HTMLElement,
-            val element: HTMLElement,
-            val direct: Boolean
-    ) {
-        val indirect: DragOverEvent
             get() = copy(direct = false)
     }
 }

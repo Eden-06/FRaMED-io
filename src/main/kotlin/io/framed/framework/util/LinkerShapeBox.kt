@@ -27,7 +27,7 @@ class LinkerShapeBox<M : ModelElement, L : Linker<M, out Shape>>(
 
         previewBox?.let { box ->
             if (linker is PreviewLinker<*, *, *>) {
-                box += linker.preview
+                box += linker.flatPreview
             }
         }
         linkers += linker
@@ -39,7 +39,7 @@ class LinkerShapeBox<M : ModelElement, L : Linker<M, out Shape>>(
 
         previewBox?.let { box ->
             if (linker is PreviewLinker<*, *, *>) {
-                box -= linker.preview
+                box -= linker.flatPreview
             }
         }
         linkers -= linker

@@ -5,9 +5,9 @@ package io.framed.framework.pictogram
  */
 class Border(
         var style: BorderStyle = BorderStyle.NONE,
-        var width: Double = 0.0,
-        var color: Color = Color.TRANSPARENT,
-        var radius: Double = 0.0
+        var width: Box<Double> = box(0.0),
+        var color: Box<Color> = box(Color.TRANSPARENT),
+        var radius: Box<Double>? = null
 ) {
     enum class BorderStyle {
         SOLID, DASHED, NONE;
@@ -15,7 +15,7 @@ class Border(
         override fun toString(): String = name.toLowerCase()
     }
 
-    fun toCss(): String = "$style ${width}px ${color.toCss()}"
+    //fun toCss(): String = "$style ${width}px ${color.toCss()}"
 }
 
 //fun border(init: Border.() -> Unit):Border = Border().also(init)

@@ -63,12 +63,12 @@ external interface JsPlumbInstance {
     /**
      * Make an element draggable.
      *
-     * @param element Element to drag.
+     * @param element Element to dragType.
      */
     fun draggable(element: Element)
 
     /**
-     * Set the current zoom for correct drag functionality.
+     * Set the current zoom for correct dragType functionality.
      *
      * @param zoom The current zoom.
      */

@@ -129,9 +129,9 @@ class HtmlRenderer(
             }
         }
 
-        viewModel.container.shapes.forEach {drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE)}
+        viewModel.container.shapes.forEach {drawShape(it, navigationView.container, viewModel.container.position)}
         viewModel.container.onAdd {
-            drawShape(it, navigationView.container, BoxShape.Position.ABSOLUTE)
+            drawShape(it, navigationView.container, viewModel.container.position)
         }
         viewModel.container.onRemove {
             removeShape(it)
@@ -238,17 +238,19 @@ class HtmlRenderer(
     }
 
     private fun style(view: View<*>, style: Style) {
-        style.background?.let {
-            view.html.style.background = it.toCss()
+        style.background?.let { bg ->
+            view.html.style.background = bg.toCss()
         }
-        style.border?.let {
-            view.html.style.border = it.toCss()
-            if (it.radius > 0) {
-                view.html.style.borderRadius = "${it.radius}px"
+        style.border?.let { border ->
+            view.html.style.borderStyle = border.style.toString()
+            view.html.style.borderWidth = border.width.toCss("px")
+            view.html.style.borderColor = border.color.toCss()
+            border.radius?.let { radius ->
+                view.html.style.borderRadius = radius.toCss("px")
             }
         }
-        style.padding?.let {
-            view.html.style.padding = it.toCss()
+        style.padding?.let { padding ->
+            view.html.style.padding = padding.toCss("px")
         }
     }
 
@@ -297,6 +299,22 @@ class HtmlRenderer(
         style(this, shape.style)
         events(this, shape, parent)
 
+        if (shape.position == BoxShape.Position.ABSOLUTE) {
+            this.html.style.position = "relative"
+        }
+
+        if (shape.resizeable) {
+            this.resizeable { event ->
+                jsPlumbInstance.revalidate(html)
+
+                shape.width = event.width
+                shape.height = event.height
+            }
+
+            shape.width?.let { width = it }
+            shape.height?.let { height = it }
+        }
+
         if (position == BoxShape.Position.ABSOLUTE) {
             left = shape.left ?: 0.0
             top = shape.top ?: 0.0
@@ -306,12 +324,14 @@ class HtmlRenderer(
                 if (force) {
                     left = shape.left ?: 0.0
                     top = shape.top ?: 0.0
+                    shape.width?.let { width = it } ?: autoWidth()
+                    shape.height?.let { height = it } ?: autoHeight()
 
                     jsPlumbInstance.revalidate(html)
                 }
             }
 
-            drag = View.DragType.ABSOLUTE
+            dragType = View.DragType.ABSOLUTE
             onMouseDown { event ->
                 event.stopPropagation()
                 selectView(this, event.ctrlKey, false)
@@ -323,9 +343,6 @@ class HtmlRenderer(
                 event.stopPropagation()
                 selectView(this, event.ctrlKey, true)
             }
-            onDragStart {
-                console.log("HALOOOO")
-            }
             onDrag { event ->
                 if (event.direct) {
                     (selectedViews - this).forEach {
@@ -336,9 +353,6 @@ class HtmlRenderer(
 
                 shape.left = event.newPosition.x
                 shape.top = event.newPosition.y
-            }
-            onDragOver {
-                console.log("DAS DRAG OVER EVENT WURDE AUSGELÖST")
             }
             draggableViews += this
         } else {
@@ -369,10 +383,6 @@ class HtmlRenderer(
                 onMouseDown {
                     focus()
                 }
-
-                onDragOver {
-                    console.log("DAS EVENT WURDE AUSGELÖST")
-                }
             }
 
     private fun drawIconShape(
@@ -395,7 +405,7 @@ class HtmlRenderer(
             }
         }
 
-        drag = View.DragType.ABSOLUTE
+        dragType = View.DragType.ABSOLUTE
         onMouseDown { event ->
             event.stopPropagation()
             selectView(this, event.ctrlKey, false)
@@ -417,9 +427,6 @@ class HtmlRenderer(
 
             shape.left = event.newPosition.x
             shape.top = event.newPosition.y
-        }
-        onDragOver {
-            console.log("DAS EVENT WURDE AUSGELÖST")
         }
         draggableViews += this
     }

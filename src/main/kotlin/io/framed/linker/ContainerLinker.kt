@@ -11,13 +11,13 @@ import io.framed.model.*
  */
 class ContainerLinker(
         override val model: Container,
-        override val parent: ContainerLinker? = null
+        override val parent: ModelLinker<*,*,*>? = null
 ) : ModelLinker<Container, BoxShape, TextShape> {
 
     override val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
     override var name by nameProperty
 
-    override val container: BoxShape = boxShape { }
+    override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
 
     private val classes = LinkerShapeBox<Class, ClassLinker>(model::classes).also { box ->
         box.view = container
@@ -40,11 +40,8 @@ class ContainerLinker(
     private val aggregations = LinkerConnectionBox<Aggregation, AggregationLinker>(model::aggregations, this)
     private val compositions = LinkerConnectionBox<Composition, CompositionLinker>(model::compositions, this)
 
-    override val content: List<PreviewLinker<*, *, *>>
-        get() = classes.linkers + containers.linkers + roleTypes.linkers
-
     override val connectable: List<Linker<*, *>>
-        get() = classes.linkers + containers.linkers + roleTypes.linkers + events.linkers
+        get() = classes.linkers + containers.linkers + roleTypes.linkers + events.linkers + compartments.linkers
 
     override val connections: List<ConnectionLinker<*>>
         get() = associations.linkers + inheritances.linkers + aggregations.linkers + compositions.linkers
@@ -52,9 +49,21 @@ class ContainerLinker(
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
+            style {
+                padding = box(8.0)
+            }
         }
 
-        val box = boxShape { }
+        val box = boxShape(BoxShape.Position.ABSOLUTE) {
+            style {
+                border {
+                    style = Border.BorderStyle.SOLID
+                    width = box(1.0, 0.0, 0.0, 0.0)
+                    color = box(color(0, 0, 0, 0.3))
+                }
+                padding = box(8.0)
+            }
+        }
         classes.previewBox = box
         containers.previewBox = box
         roleTypes.previewBox = box
@@ -67,13 +76,31 @@ class ContainerLinker(
             }
             border {
                 style = Border.BorderStyle.SOLID
-                width = 1.0
-                color = color(0, 0, 0, 0.3)
+                width = box(1.0)
+                color = box(color(0, 0, 0, 0.3))
+            }
+        }
+
+        resizeable = true
+    }
+
+    override val listPreview = textShape(nameProperty)
+
+    override val flatPreview = boxShape {
+        textShape(nameProperty)
+
+        style {
+            background = linearGradient("to bottom") {
+                add(color("#fffbd9"), 0.0)
+                add(color("#fff7c4"), 1.0)
+            }
+            border {
+                style = Border.BorderStyle.SOLID
+                width = box(1.0)
+                color = box(color(0, 0, 0, 0.3))
             }
         }
     }
-
-    override val preview: TextShape = textShape(nameProperty)
 
     private lateinit var sidebarActionsGroup: SidebarGroup
 
@@ -220,11 +247,12 @@ class ContainerLinker(
         model.containers.forEach { containers += ContainerLinker(it, this) }
         model.roleTypes.forEach { roleTypes += RoleTypeLinker(it, this) }
         model.events.forEach { events += EventLinker(it, this) }
+        model.compositions.forEach { compositions += CompositionLinker(it, this) }
+
         model.compartments.forEach { compartments += CompartmentLinker(it, this) }
         model.associations.forEach { associations += AssociationLinker(it, this) }
         model.aggregations.forEach { aggregations += AggregationLinker(it, this) }
         model.inheritances.forEach { inheritances += InheritanceLinker(it, this) }
-        model.compositions.forEach { compositions += CompositionLinker(it, this) }
 
         LinkerManager.setup(this)
         ControllerManager.register(this)

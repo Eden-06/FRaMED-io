@@ -1261,9 +1261,9 @@
 }).call(typeof window === "undefined" ? this : window);
 
 /**
- drag/drop functionality for use with jsPlumb but with
+ dragType/drop functionality for use with jsPlumb but with
  no knowledge of jsPlumb. supports multiple scopes (separated by whitespace), dragging
- multiple elements, constrain to parent, drop filters, drag start filters, custom
+ multiple elements, constrain to parent, drop filters, dragType start filters, custom
  css classes.
 
  a lot of the functionality of this script is expected to be plugged in:
@@ -1382,15 +1382,15 @@
         _classes = {
             draggable:"katavorio-draggable",    // draggable elements
             droppable:"katavorio-droppable",    // droppable elements
-            drag : "katavorio-drag",            // elements currently being dragged
-            selected:"katavorio-drag-selected", // elements in current drag selection
-            active : "katavorio-drag-active",   // droppables that are targets of a currently dragged element
-            hover : "katavorio-drag-hover",     // droppables over which a matching drag element is hovering
-            noSelect : "katavorio-drag-no-select", // added to the body to provide a hook to suppress text selection
-            ghostProxy:"katavorio-ghost-proxy",  // added to a ghost proxy element in use when a drag has exited the bounds of its parent.
-            clonedDrag:"katavorio-clone-drag"     // added to a node that is a clone of an element created at the start of a drag
+            drag : "katavorio-dragType",            // elements currently being dragged
+            selected:"katavorio-dragType-selected", // elements in current dragType selection
+            active : "katavorio-dragType-active",   // droppables that are targets of a currently dragged element
+            hover : "katavorio-dragType-hover",     // droppables over which a matching dragType element is hovering
+            noSelect : "katavorio-dragType-no-select", // added to the body to provide a hook to suppress text selection
+            ghostProxy:"katavorio-ghost-proxy",  // added to a ghost proxy element in use when a dragType has exited the bounds of its parent.
+            clonedDrag:"katavorio-clone-dragType"     // added to a node that is a clone of an element created at the start of a dragType
         },
-        _defaultScope = "katavorio-drag-scope",
+        _defaultScope = "katavorio-dragType-scope",
         _events = [ "stop", "start", "drag", "drop", "over", "out", "beforeStart" ],
         _devNull = function() {},
         _true = function() { return true; },
@@ -1561,8 +1561,8 @@
 
         var revertFunction;
         /**
-         * Sets a function to call on drag stop, which, if it returns true, indicates that the given element should
-         * revert to its position before the previous drag.
+         * Sets a function to call on dragType stop, which, if it returns true, indicates that the given element should
+         * revert to its position before the previous dragType.
          * @param fn
          */
         this.setRevert = function(fn) {
@@ -1684,7 +1684,7 @@
                     }
                 }
 
-                // it is possible that the start model caused the drag to be aborted. So we checkUpdates
+                // it is possible that the start model caused the dragType to be aborted. So we checkUpdates
                 // again that we are currently dragging.
                 if (downAt) {
                     intersectingDroppables.length = 0;
@@ -1951,10 +1951,10 @@
         this.isHover = function() { return hover; };
 
         this.setHover = function(drag, val, e) {
-            // if turning off hover but this was not the drag that caused the hover, ignore.
+            // if turning off hover but this was not the dragType that caused the hover, ignore.
             if (val || this.el._katavorioDragHover == null || this.el._katavorioDragHover === drag.el._katavorio) {
                 this.params[val ? "addClass" : "removeClass"](this.el, this._hoverClass);
-                //this.el._katavorioDragHover = val ? drag.el._katavorio : null;
+                //this.el._katavorioDragHover = val ? dragType.el._katavorio : null;
                 this.el._katavorioDragHover = val ? drag.el._katavorio : null;
                 if (hover !== val)
                     this.params.events[val ? "over" : "out"]({el:this.el, e:e, drag:drag, drop:this});
@@ -2075,14 +2075,14 @@
 
         var inputFilterSelector = katavorioParams.inputFilterSelector || _defaultInputFilterSelector;
         /**
-         * Gets the selector identifying which input elements to filter from drag events.
+         * Gets the selector identifying which input elements to filter from dragType events.
          * @model getInputFilterSelector
          * @return {String} Current input filter selector.
          */
         this.getInputFilterSelector = function() { return inputFilterSelector; };
 
         /**
-         * Sets the selector identifying which input elements to filter from drag events.
+         * Sets the selector identifying which input elements to filter from dragType events.
          * @model setInputFilterSelector
          * @param {String} selector Input filter selector to set.
          * @return {Katavorio} Current instance; model may be chained.
@@ -2132,7 +2132,7 @@
         /**
          * @name Katavorio#select
          * @function
-         * @desc Adds an element to the current selection (for multiple node drag)
+         * @desc Adds an element to the current selection (for multiple node dragType)
          * @param {Element|String} DOM element - or shape of the element - to add.
          */
         this.select = function(el) {
@@ -2152,7 +2152,7 @@
         /**
          * @name Katavorio#deselect
          * @function
-         * @desc Removes an element from the current selection (for multiple node drag)
+         * @desc Removes an element from the current selection (for multiple node dragType)
          * @param {Element|String} DOM element - or shape of the element - to remove.
          */
         this.deselect = function(el) {
@@ -2314,8 +2314,8 @@
         };
 
         /**
-         * Either completely remove drag functionality from the given element, or remove a specific model handler. If you
-         * call this model with a single argument - the element - all drag functionality is removed from it. Otherwise, if
+         * Either completely remove dragType functionality from the given element, or remove a specific model handler. If you
+         * call this model with a single argument - the element - all dragType functionality is removed from it. Otherwise, if
          * you provide an model name and listener function, this function is de-registered (if found).
          * @param el Element to update
          * @param {string} [evt] Optional model name to unsubscribe
@@ -2925,9 +2925,9 @@
     /**
      * Wraps one function with another, creating a placeholder for the
      * wrapped function if it was null. this is used to wrap the various
-     * drag/drop model functions - to allow jsPlumb to be notified of
+     * dragType/drop model functions - to allow jsPlumb to be notified of
      * important lifecycle events without imposing itself on the user's
-     * drag/drop functionality.
+     * dragType/drop functionality.
      * @model jsPlumbUtil.wrap
      * @param {Function} wrappedFunction original function to wrap; may be null.
      * @param {Function} newFunction function to wrap the original with.
@@ -4007,7 +4007,7 @@
                                 }
                             }
                             else {
-                                // already draggable. attach any start, drag or stop listeners to the current Drag.
+                                // already draggable. attach any start, dragType or stop listeners to the current Drag.
                                 if (dragOptions.force) {
                                     _currentInstance.initDraggable(element, options);
                                 }
@@ -4445,7 +4445,7 @@
         this.endpointAnchorClassPrefix = "jtk-endpoint-anchor";
         this.hoverSourceClass = "jtk-source-hover";
         this.hoverTargetClass = "jtk-target-hover";
-        this.dragSelectClass = "jtk-drag-select";
+        this.dragSelectClass = "jtk-dragType-select";
 
         this.Anchors = {};
         this.Connectors = {  "svg": {} };
@@ -5243,7 +5243,7 @@
         /**
          * updates the offset and size for a given element, and stores the
          * values. if 'offset' is not null we use that (it would have been
-         * passed in from a drag call) because it's faster; but if it is null,
+         * passed in from a dragType call) because it's faster; but if it is null,
          * or if 'recalc' is true in order to force a recalculation, we get the current values.
          */
         var _updateOffset = this.updateOffset = function (params) {
@@ -5676,9 +5676,9 @@
                         this.currentlyDragging = false;
                         if (ep._jsPlumb != null) { // if not cleaned up...
 
-                            // reset the anchor to the anchor that was initially provided. the one we were using to drag
+                            // reset the anchor to the anchor that was initially provided. the one we were using to dragType
                             // the connection was just a placeholder that was located at the place the user pressed the
-                            // mouse button to initiate the drag.
+                            // mouse button to initiate the dragType.
                             var anchorDef = p.anchor || this.Defaults.Anchor,
                                 oldAnchor = ep.anchor,
                                 oldConnection = ep.connections[0];
@@ -5782,7 +5782,7 @@
                             // this mouseup model is fired only if no dragging occurred, by jquery and yui, but for mootools
                             // it is fired even if dragging has occurred, in which case we would blow away a perfectly
                             // legitimate endpoint, were it not for this checkUpdates.  the flag is set after adding an
-                            // endpoint and cleared in a drag listener we set in the dragOptions above.
+                            // endpoint and cleared in a dragType listener we set in the dragOptions above.
                             _currentInstance.off(ep.canvas, "mouseup", _delTempEndpoint);
                             _currentInstance.off(elInfo.el, "mouseup", _delTempEndpoint);
                             if (endpointAddedButNoDragYet) {
@@ -5805,7 +5805,7 @@
                             }
                         }
 
-                        // and then trigger its mousedown model, which will kick off a drag, which will start dragging
+                        // and then trigger its mousedown model, which will kick off a dragType, which will start dragging
                         // a new connection from this endpoint.
                         _currentInstance.trigger(ep.canvas, "mousedown", e, payload);
 
@@ -5817,8 +5817,8 @@
                     _def.trigger = mouseDownListener;
 
                     // if a filter was provided, set it as a dragFilter on the element,
-                    // to prevent the element drag function from kicking in when we want to
-                    // drag a new connection
+                    // to prevent the element dragType function from kicking in when we want to
+                    // dragType a new connection
                     if (p.filter && (_ju.isString(p.filter) || _ju.isFunction(p.filter))) {
                         _currentInstance.setDragFilter(elInfo.el, p.filter);
                     }
@@ -6143,7 +6143,7 @@
         /**
          * Remove the given element, including cleaning up all endpoints registered for it.
          * This is exposed in the public API but also used internally by jsPlumb when removing the
-         * element associated with a connection drag.
+         * element associated with a connection dragType.
          */
         this.remove = function (el, doNotRepaint) {
             var info = _info(el), affectedElements = [];
@@ -6551,8 +6551,8 @@
      TODO instead of this being accessed directly, it should subscribe to events on the jsPlumb instance: every model
      in here is called directly by jsPlumb. But what should happen is that we have unpublished events that this listens
      to.  The only trick is getting one of these instantiated with every jsPlumb instance: it needs to have a hook somehow.
-     Basically the general idea is to pull ALL the drag code out (prototype model registrations plus this) into a
-     dedicated drag script), that does not necessarily need to be included.
+     Basically the general idea is to pull ALL the dragType code out (prototype model registrations plus this) into a
+     dedicated dragType script), that does not necessarily need to be included.
 
 
      */
@@ -6562,7 +6562,7 @@
             _draggablesForElements = {};
 
         /**
-         register some element as draggable.  right now the drag init stuff is done elsewhere, and it is
+         register some element as draggable.  right now the dragType init stuff is done elsewhere, and it is
          possible that will continue to be the case.
          */
         this.register = function (el) {
@@ -6639,7 +6639,7 @@
         /**
          notification that an endpoint was added to the given el.  we go up from that el's parent
          node, looking for a parent that has been registered as a draggable. if we find one, we add this
-         el to that parent's list of elements to update on drag (if it is not there already)
+         el to that parent's list of elements to update on dragType (if it is not there already)
          */
         this.endpointAdded = function (el, id) {
 
@@ -6713,7 +6713,7 @@
         };
 
         //
-        // notification drag ended. We checkUpdates automatically if need to update some
+        // notification dragType ended. We checkUpdates automatically if need to update some
         // ancestor's offsets.
         //
         this.dragEnded = function (el) {
@@ -7400,7 +7400,7 @@
     "use strict";
     var root = this, _jp = root.jsPlumb, _ju = root.jsPlumbUtil;
 
-    // onCreate the drag handler for a connection
+    // onCreate the dragType handler for a connection
     var _makeConnectionDragHandler = function (endpoint, placeholder, _jsPlumb) {
         var stopped = false;
         return {
@@ -7441,7 +7441,7 @@
         placeholder.element = n;
     };
 
-    // onCreate a floating endpoint (for drag connections)
+    // onCreate a floating endpoint (for dragType connections)
     var _makeFloatingEndpoint = function (paintStyle, referenceAnchor, endpoint, referenceCanvas, sourceElement, _jsPlumb, _newEndpoint, scope) {
         var floatingAnchor = new _jp.FloatingAnchor({ reference: referenceAnchor, referenceCanvas: referenceCanvas, jsPlumbInstance: _jsPlumb });
         //setting the scope here should not be the way to fix that mootools issue.  it should be fixed by not
@@ -7620,7 +7620,7 @@
                 endpoint = ep.clone();
             }
 
-            // assign a clone function using a copy of endpointArgs. this is used when a drag starts: the endpoint that was dragged is cloned,
+            // assign a clone function using a copy of endpointArgs. this is used when a dragType starts: the endpoint that was dragged is cloned,
             // and the clone is left in its place while the original one goes off on a magical journey.
             // the copy is to get around a closure problem, in which endpointArgs ends up getting shared by
             // the whole world.
@@ -7849,7 +7849,7 @@
         this.initDraggable = function () {
 
             // is this a connection source? we make it draggable and have the
-            // drag listener maintain a connection with a floating endpoint.
+            // dragType listener maintain a connection with a floating endpoint.
             if (!draggingInitialised && _jp.isDragSupported(this.element)) {
                 var placeholderInfo = { id: null, element: null },
                     jpc = null,
@@ -7872,7 +7872,7 @@
 
                 var start = function (startParams) {
 
-// -------------   first, get a connection to drag. this may be null, in which case we are dragging a new one.
+// -------------   first, get a connection to dragType. this may be null, in which case we are dragging a new one.
 
                     jpc = this.connectorSelector();
 
@@ -7887,7 +7887,7 @@
                     if (jpc == null && !this.isSource && !this.isTemporarySource) {
                         _continue = false;
                     }
-                    // otherwise if we're full and not allowed to drag, also return false.
+                    // otherwise if we're full and not allowed to dragType, also return false.
                     if (this.isSource && this.isFull() && !(jpc != null && this.dragAllowedWhenFull)) {
                         _continue = false;
                     }
@@ -7918,9 +7918,9 @@
                     }
 
                     if (_continue === false) {
-                        // this is for mootools and yui. returning false from this causes jquery to stop drag.
+                        // this is for mootools and yui. returning false from this causes jquery to stop dragType.
                         // the events are wrapped in both mootools and yui anyway, but i don't think returning
-                        // false from the start callback would stop a drag.
+                        // false from the start callback would stop a dragType.
                         if (_jsPlumb.stopDrag) {
                             _jsPlumb.stopDrag(this.canvas);
                         }
@@ -7947,7 +7947,7 @@
 
                     _jsPlumb.updateOffset({ elId: this.elementId });
 
-// ----------------    make the element we will drag around, and position it -----------------------------
+// ----------------    make the element we will dragType around, and position it -----------------------------
 
                     var ipco = this._jsPlumb.instance.getOffset(this.canvas),
                         canvasElement = this.canvas,
@@ -8003,7 +8003,7 @@
                         // fire an model that informs that a connection is being dragged
                         _jsPlumb.fire("connectionDrag", jpc);
 
-                        // register the new connection on the drag manager. This connection, at this point, is 'pending',
+                        // register the new connection on the dragType manager. This connection, at this point, is 'pending',
                         // and has as its target a temporary element (the 'placeholder'). If the connection subsequently
                         // becomes established, the anchor manager is informed that the target of the connection has
                         // changed.
@@ -8038,7 +8038,7 @@
                             _jsPlumb.anchorManager.updateOtherEndpoint(jpc.sourceId, jpc.endpoints[anchorIdx].elementId, jpc.targetId, jpc);
                         }
 
-                        // store the original endpoint and assign the new floating endpoint for the drag.
+                        // store the original endpoint and assign the new floating endpoint for the dragType.
                         jpc.suspendedEndpoint = jpc.endpoints[anchorIdx];
 
                         // PROVIDE THE SUSPENDED ELEMENT, BE IT A SOURCE OR TARGET (ISSUE 39)
@@ -8074,7 +8074,7 @@
                     if (jpc && jpc.endpoints != null) {
                         // get the actual drop model (decode from library args to stop function)
                         var originalEvent = _jsPlumb.getDropEvent(arguments);
-                        // unlock the other endpoint (if it is dynamic, it would have been locked at drag start)
+                        // unlock the other endpoint (if it is dynamic, it would have been locked at dragType start)
                         var idx = _jsPlumb.getFloatingAnchorIndex(jpc);
                         jpc.endpoints[idx === 0 ? 1 : 0].anchor.unlock();
                         // TODO: Dont want to know about css classes inside jsplumb, ideally.
@@ -8187,7 +8187,7 @@
                 dragOptions.scope = this.scope || dragOptions.scope;
                 dragOptions[beforeStartEvent] = _ju.wrap(dragOptions[beforeStartEvent], beforeStart, false);
                 dragOptions[startEvent] = _ju.wrap(dragOptions[startEvent], start, false);
-                // extracted drag handler function so can be used by makeSource
+                // extracted dragType handler function so can be used by makeSource
                 dragOptions[dragEvent] = _ju.wrap(dragOptions[dragEvent], _dragHandler.drag);
                 dragOptions[stopEvent] = _ju.wrap(dragOptions[stopEvent], stop);
                 dragOptions.multipleDrop = false;
@@ -8364,7 +8364,7 @@
             this.endpoint.cleanup(true);
             this.endpoint.destroy();
             this.endpoint = null;
-            // drag/drop
+            // dragType/drop
             this._jsPlumb.instance.destroyDraggable(this.canvas, "internal");
             this._jsPlumb.instance.destroyDroppable(this.canvas, "internal");
         },
@@ -8612,7 +8612,7 @@
                 }.bind(this);
 
                 var dontContinueFunction = function () {
-                    // otherwise just put it back on the endpoint it was on before the drag.
+                    // otherwise just put it back on the endpoint it was on before the dragType.
                     if (jpc.suspendedEndpoint) {
                         jpc.endpoints[idx] = jpc.suspendedEndpoint;
                         jpc.setHover(false);
@@ -10190,7 +10190,7 @@
     /**
      * An Anchor that floats. its orientation is computed dynamically from
      * its position relative to the anchor it is floating relative to.  It is used when creating
-     * a connection through drag and drop.
+     * a connection through dragType and drop.
      *
      * TODO FloatingAnchor could totally be refactored to extend Anchor just slightly.
      */
@@ -10228,7 +10228,7 @@
 
         this.compute = function (params) {
             var xy = params.xy,
-                result = [ xy[0] + (size[0] / 2), xy[1] + (size[1] / 2) ]; // return origin of the element. we may wish to improve this so that any object can be the drag proxy.
+                result = [ xy[0] + (size[0] / 2), xy[1] + (size[1] / 2) ]; // return origin of the element. we may wish to improve this so that any object can be the dragType proxy.
             _lastResult = result;
             return result;
         };
@@ -10343,7 +10343,7 @@
 
             // if anchor is locked or an opposite element was not given, we
             // maintain our state. anchor will be locked
-            // if it is the source of a drag and drop.
+            // if it is the source of a dragType and drop.
             if (this.isLocked() || txy == null || twh == null) {
                 return _curAnchor.compute(params);
             }
@@ -12826,7 +12826,7 @@
         }
 
         //
-        // unbind the group specific drag/revert handlers.
+        // unbind the group specific dragType/revert handlers.
         //
         function _unbindDragHandlers(_el) {
             if (!_el._katavorioDrag) {
@@ -14471,10 +14471,10 @@
                     noSelect: instance.dragSelectClass,
                     droppable: "jtk-droppable",
                     draggable: "jtk-draggable",
-                    drag: "jtk-drag",
-                    selected: "jtk-drag-selected",
-                    active: "jtk-drag-active",
-                    hover: "jtk-drag-hover",
+                    drag: "jtk-dragType",
+                    selected: "jtk-dragType-selected",
+                    active: "jtk-dragType-active",
+                    hover: "jtk-dragType-hover",
                     ghostProxy:"jtk-ghost-proxy"
                 }
             });

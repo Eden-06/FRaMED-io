@@ -5,11 +5,31 @@
   position: absolute;
   z-index: 1;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .14);
+  overflow: hidden;
+  /*
   & > div {
     padding: 0.4rem;
     &:not(:last-child) {
       border-bottom: solid 1px $uml-border;
     }
+  }
+  */
+}
+.resize-handler {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  display: block;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  cursor: nwse-resize;
+
+  border-style: solid;
+  border-color: transparent rgba($text-color, 0.3) rgba($text-color, 0.3) transparent;
+  border-width: 0.4rem;
+  &:hover {
+    background: rgba($text-color, 0.8);
   }
 }
 

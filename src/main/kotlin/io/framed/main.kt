@@ -32,11 +32,12 @@ fun init() {
     LinkerManager.register(EventLinker)
     LinkerManager.register(MethodLinker)
     LinkerManager.register(RoleTypeLinker)
+    LinkerManager.register(CompartmentLinker)
+
     LinkerManager.register(AssociationLinker)
     LinkerManager.register(InheritanceLinker)
     LinkerManager.register(AggregationLinker)
     LinkerManager.register(CompositionLinker)
-    LinkerManager.register(CompartmentLinker)
 
     Application.init()
 

@@ -12,7 +12,6 @@ import io.framed.framework.util.Property
 interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M, P, R> {
     val nameProperty: Property<String>
     val name: String
-    val content: List<PreviewLinker<*, *, *>>
     val connectable: List<Linker<*, *>>
 
     val container: BoxShape

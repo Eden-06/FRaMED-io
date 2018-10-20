@@ -137,6 +137,7 @@ select {
   clear: both;
   border-top: solid 1px $border-color-light;
   padding: 0 0.4rem;
+  z-index: 1;
 }
 .tab {
   height: $tab-bar-height;

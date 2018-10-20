@@ -28,24 +28,36 @@ class EventLinker(
             background = color(255, 255, 255)
             border {
                 style = Border.BorderStyle.SOLID
-                width = 1.0
-                color = color(0, 0, 0, 0.3)
-                radius = 20.0
+                width = box(1.0)
+                color = box(color(0, 0, 0, 0.3))
+                radius = box(20.0)
             }
-            padding(10.0)
+            padding = box(10.0)
         }
     }
 
-    override val preview: IconShape = iconShape(symbolProperty) {
+    override val listPreview: IconShape = iconShape(symbolProperty) {
         style {
             background = color(255, 255, 255)
             border {
                 style = Border.BorderStyle.SOLID
-                width = 1.0
-                color = color(0, 0, 0, 0.3)
-                radius = 20.0
+                width = box(1.0)
+                color = box(color(0, 0, 0, 0.3))
+                radius = box(20.0)
             }
-            padding(10.0)
+            padding = box(10.0)
+        }
+    }
+    override val flatPreview =iconShape(symbolProperty) {
+        style {
+            background = color(255, 255, 255)
+            border {
+                style = Border.BorderStyle.SOLID
+                width = box(1.0)
+                color = box(color(0, 0, 0, 0.3))
+                radius = box(20.0)
+            }
+            padding = box(10.0)
         }
     }
 

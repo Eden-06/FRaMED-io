@@ -73,11 +73,11 @@ class AssociationLinker(
         override val info = ConnectionInfo("Association", MaterialIcon.ADD)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is ClassLinker || source is RoleTypeLinker || source is EventLinker
+            return source is ClassLinker || source is RoleTypeLinker || source is EventLinker || source is CompartmentLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return target is ClassLinker || target is RoleTypeLinker || target is EventLinker
+            return canStart(source) && (target is ClassLinker || target is RoleTypeLinker || target is EventLinker || target is CompartmentLinker)
         }
     }
 }

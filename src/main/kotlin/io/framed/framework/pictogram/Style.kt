@@ -6,5 +6,5 @@ package io.framed.framework.pictogram
 class Style {
     var border: Border? = null
     var background: Paint? = null
-    var padding: Padding? = null
+    var padding: Box<Double>? = null
 }

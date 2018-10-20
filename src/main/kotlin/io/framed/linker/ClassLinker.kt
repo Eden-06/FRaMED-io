@@ -31,24 +31,63 @@ class ClassLinker(
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
+            style {
+                padding = box(8.0)
+            }
         }
-        attributes.view = boxShape { }
-        methods.view = boxShape { }
+        attributes.view = boxShape {
+            style {
+                border {
+                    style = Border.BorderStyle.SOLID
+                    width = box(1.0, 0.0, 0.0, 0.0)
+                    color = box(color(0, 0, 0, 0.3))
+                }
+                padding = box(8.0)
+            }
+        }
+        methods.view = boxShape {
+            style {
+                border {
+                    style = Border.BorderStyle.SOLID
+                    width = box(1.0, 0.0, 0.0, 0.0)
+                    color = box(color(0, 0, 0, 0.3))
+                }
+                padding = box(8.0)
+            }
+        }
 
         style {
             background = linearGradient("to bottom") {
-                add(color("#fffbd9"), 0.0)
-                add(color("#fff7c4"), 1.0)
+                add(color("#e3ffd9"), 0.0)
+                add(color("#e3ffd9"), 1.0)
             }
             border {
                 style = Border.BorderStyle.SOLID
-                width = 1.0
-                color = color(0, 0, 0, 0.3)
+                width = box(1.0)
+                color = box(color(0, 0, 0, 0.3))
+            }
+        }
+
+        resizeable = true
+    }
+
+    override val listPreview: TextShape = textShape(nameProperty)
+
+    override val flatPreview = boxShape {
+        textShape(nameProperty)
+
+        style {
+            background = linearGradient("to bottom") {
+                add(color("#e3ffd9"), 0.0)
+                add(color("#e3ffd9"), 1.0)
+            }
+            border {
+                style = Border.BorderStyle.SOLID
+                width = box(1.0)
+                color = box(color(0, 0, 0, 0.3))
             }
         }
     }
-
-    override val preview: TextShape = textShape(nameProperty)
 
     override val sidebar = sidebar {
         title("Class")

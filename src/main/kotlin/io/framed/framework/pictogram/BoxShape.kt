@@ -15,6 +15,7 @@ class BoxShape(
     }
 
     var position = Position.VERTICAL
+    var resizeable = false
 
     var shapes: List<Shape> = emptyList()
         private set
@@ -46,5 +47,8 @@ class BoxShape(
     }
 }
 
-fun Linker<*, *>.boxShape(init: BoxShape.() -> Unit) = BoxShape(id).also(init)
-fun BoxShape.boxShape(init: BoxShape.() -> Unit) = BoxShape(id).also(init).also(this::add)
+fun Linker<*, *>.boxShape(position: BoxShape.Position = BoxShape.Position.VERTICAL, init: BoxShape.() -> Unit) =
+        BoxShape(id).also(init).also { it.position = position }
+
+fun BoxShape.boxShape(position: BoxShape.Position = BoxShape.Position.VERTICAL, init: BoxShape.() -> Unit) =
+        BoxShape(id).also(init).also(this::add).also { it.position = position }

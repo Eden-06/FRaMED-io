@@ -26,7 +26,7 @@ class HtmlRelation(
 
     private val views = connection.labels.map { (shape, position) ->
         InputView(shape.property).also {
-            it.drag = View.DragType.MARGIN
+            it.dragType = View.DragType.MARGIN
             it.autocomplete = shape.autocomplete
             it.sizeMatchText()
         } to position
