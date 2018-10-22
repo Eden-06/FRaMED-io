@@ -43,21 +43,31 @@ class RoleTypeLinker(
         }
 
         style {
-            background = linearGradient("to bottom") {
-                add(color("#fffbd9"), 0.0)
-                add(color("#fff7c4"), 1.0)
-            }
+            background = color("#d6d6d6")
             border {
                 style = Border.BorderStyle.SOLID
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
-                radius = box(10.0)
+                radius = box(20.0)
             }
         }
     }
 
     override val listPreview: TextShape = textShape(nameProperty)
-    override val flatPreview = boxShape { textShape(nameProperty) }
+    override val flatPreview = boxShape {
+        textShape(nameProperty)
+
+        style {
+            background = color("#d6d6d6")
+            border {
+                style = Border.BorderStyle.SOLID
+                width = box(1.0)
+                color = box(color(0, 0, 0, 0.3))
+                radius = box(20.0)
+            }
+            padding = box(10.0)
+        }
+    }
 
     override val sidebar = sidebar {
         title("Class")

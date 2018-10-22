@@ -52,8 +52,8 @@ class ClassLinker(
 
         style {
             background = linearGradient("to bottom") {
-                add(color("#e3ffd9"), 0.0)
-                add(color("#e3ffd9"), 1.0)
+                add(color("#f9f9f9"), 0.0)
+                add(color("#eaeaea"), 1.0)
             }
             border {
                 style = Border.BorderStyle.SOLID
@@ -72,14 +72,15 @@ class ClassLinker(
 
         style {
             background = linearGradient("to bottom") {
-                add(color("#e3ffd9"), 0.0)
-                add(color("#e3ffd9"), 1.0)
+                add(color("#f9f9f9"), 0.0)
+                add(color("#eaeaea"), 1.0)
             }
             border {
                 style = Border.BorderStyle.SOLID
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
             }
+            padding = box(10.0)
         }
     }
 

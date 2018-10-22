@@ -83,14 +83,27 @@ class CompartmentLinker(
                 style = Border.BorderStyle.SOLID
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
-                radius = box(10.0)
+                radius = box(0.0)
             }
         }
         resizeable = true
     }
 
     override val listPreview: TextShape = textShape(nameProperty)
-    override val flatPreview = boxShape { textShape(nameProperty) }
+    override val flatPreview = boxShape {
+        textShape(nameProperty)
+
+        style {
+            background = color("#fffbd9")
+            border {
+                style = Border.BorderStyle.SOLID
+                width = box(1.0)
+                color = box(color(0, 0, 0, 0.3))
+                radius = box(0.0)
+            }
+            padding = box(10.0)
+        }
+    }
 
     override val sidebar = sidebar {
         title("Compartment")
