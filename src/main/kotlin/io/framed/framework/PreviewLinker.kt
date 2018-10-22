@@ -6,7 +6,7 @@ import io.framed.framework.pictogram.Shape
 /**
  * @author lars
  */
-interface PreviewLinker<M : ModelElement, P : Shape, R : Shape> : Linker<M, P> {
+interface PreviewLinker<M : ModelElement<M>, P : Shape, R : Shape> : ShapeLinker<M, P> {
     val listPreview: R
     val flatPreview: P
 }

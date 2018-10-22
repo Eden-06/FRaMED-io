@@ -10,11 +10,10 @@ import io.framed.framework.view.Sidebar
 /**
  * @author lars
  */
-interface Linker<M : ModelElement, P : Pictogram> {
+interface Linker<M : ModelElement<M>, P : Pictogram> {
     val pictogram: P
 
     val model: M
-    val parent: Linker<*, *>?
 
     val id: Long
         get() = model.id
@@ -26,11 +25,7 @@ interface Linker<M : ModelElement, P : Pictogram> {
         sidebar.open()
     }
 
-    fun delete() = parent?.remove(this)
-
-    fun remove(linker: Linker<*,*>): Unit = throw UnsupportedOperationException()
-
-    fun findConnections(shape: Shape): List<ConnectionLinker<*>> = parent?.findConnections(shape) ?: emptyList()
+    fun delete()
 
     fun Sidebar.onOpen(event: SidebarEvent) {}
     fun ContextMenu.onOpen(event: ContextEvent) {}

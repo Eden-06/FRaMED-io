@@ -5,13 +5,16 @@ import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.*
 import io.framed.model.*
+import kotlin.browser.document
+import kotlin.browser.window
 
 /**
  * @author lars
  */
 class ContainerLinker(
         override val model: Container,
-        override val parent: ModelLinker<*,*,*>? = null
+        override val connectionManager: ConnectionManager,
+        override val parent: ModelLinker<*, *, *>? = null
 ) : ModelLinker<Container, BoxShape, TextShape> {
 
     override val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
@@ -19,32 +22,24 @@ class ContainerLinker(
 
     override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
 
-    private val classes = LinkerShapeBox<Class, ClassLinker>(model::classes).also { box ->
+    private val classes = shapeBox<Class, ClassLinker>(model::classes, connectionManager) { box ->
         box.view = container
     }
-    private val compartments = LinkerShapeBox<Compartment, CompartmentLinker>(model::compartments).also { box ->
+    private val compartments = shapeBox<Compartment, CompartmentLinker>(model::compartments, connectionManager) { box ->
         box.view = container
     }
-    private val containers = LinkerShapeBox<Container, ContainerLinker>(model::containers).also { box ->
+    private val containers = shapeBox<Container, ContainerLinker>(model::containers, connectionManager) { box ->
         box.view = container
     }
-    private val roleTypes = LinkerShapeBox<RoleType, RoleTypeLinker>(model::roleTypes).also { box ->
+    private val roleTypes = shapeBox<RoleType, RoleTypeLinker>(model::roleTypes, connectionManager) { box ->
         box.view = container
     }
-    private val events = LinkerShapeBox<Event, EventLinker>(model::events).also { box ->
+    private val events = shapeBox<Event, EventLinker>(model::events, connectionManager) { box ->
         box.view = container
     }
 
-    private val associations = LinkerConnectionBox<Association, AssociationLinker>(model::associations, this)
-    private val inheritances = LinkerConnectionBox<Inheritance, InheritanceLinker>(model::inheritances, this)
-    private val aggregations = LinkerConnectionBox<Aggregation, AggregationLinker>(model::aggregations, this)
-    private val compositions = LinkerConnectionBox<Composition, CompositionLinker>(model::compositions, this)
-
-    override val connectable: List<Linker<*, *>>
+    override val shapeLinkers: Set<ShapeLinker<*, *>>
         get() = classes.linkers + containers.linkers + roleTypes.linkers + events.linkers + compartments.linkers
-
-    override val connections: List<ConnectionLinker<*>>
-        get() = associations.linkers + inheritances.linkers + aggregations.linkers + compositions.linkers
 
     override val pictogram = boxShape {
         boxShape {
@@ -172,7 +167,7 @@ class ContainerLinker(
             }
         }
         addItem(MaterialIcon.ADD, "Add package") { event ->
-            containers += ContainerLinker(Container()).also {
+            containers += ContainerLinker(Container(), connectionManager, this@ContainerLinker).also {
                 setPosition.fire(SetPosition(it, event.position))
                 it.focus()
             }
@@ -183,17 +178,28 @@ class ContainerLinker(
         }
     }
 
-    override fun remove(linker: Linker<*, *>) {
-        if (linker is ClassLinker) classes.remove(linker)
-        if (linker is CompartmentLinker) compartments.remove(linker)
-        if (linker is ContainerLinker) containers.remove(linker)
-        if (linker is RoleTypeLinker) roleTypes.remove(linker)
-        if (linker is EventLinker) events.remove(linker)
+    override fun remove(linker: ShapeLinker<*, *>) {
+        when (linker) {
+            is ClassLinker -> classes -= linker
+            is CompartmentLinker -> compartments -= linker
+            is ContainerLinker -> containers -= linker
+            is RoleTypeLinker -> roleTypes -= linker
+            is EventLinker -> events -= linker
 
-        if (linker is AssociationLinker) associations.remove(linker)
-        if (linker is AggregationLinker) aggregations.remove(linker)
-        if (linker is CompositionLinker) compositions.remove(linker)
-        if (linker is InheritanceLinker) inheritances.remove(linker)
+            else -> super.remove(linker)
+        }
+    }
+
+
+    override fun add(model: ModelElement<*>) {
+        when (model) {
+            is Class -> classes += ClassLinker(model, this)
+            is Compartment -> compartments += CompartmentLinker(model, connectionManager, this)
+            is Container -> containers += ContainerLinker(model, connectionManager, this)
+            is RoleType -> roleTypes += RoleTypeLinker(model, this)
+            is Event -> events += EventLinker(model, this)
+            else -> super.add(model)
+        }
     }
 
     override fun ContextMenu.onOpen(event: ContextEvent) {
@@ -202,40 +208,35 @@ class ContainerLinker(
         contextDelete.visible = parent != null
     }
 
-    override val onConnectionAdd = EventHandler<ConnectionLinker<*>>()
-    override val onConnectionRemove = EventHandler<ConnectionLinker<*>>()
     override val setPosition = EventHandler<SetPosition>()
 
-    override fun createConnection(source: Shape, target: Shape) {
-        val types = canConnectionCreate(source, target)
+    override fun dropShape(shape: Shape, target: Shape) {
+        val elementLinker = getLinkerByShape(shape) ?: throw IllegalArgumentException()
+        val targetLinker = getLinkerByShape(target) ?: throw IllegalArgumentException()
 
-        if (types.isEmpty()) return
+        val connectionCount = connectionManager.listConnections(elementLinker.id).size
 
+        val elementName = elementLinker.model::class.simpleName?.toLowerCase() ?: "element"
+        val targetName = targetLinker.model::class.simpleName?.toLowerCase() ?: "container"
 
-        if (types.size == 1) {
-            createConnection(source, target, types.first())
-        } else {
-            CyclicChooser(types) { type ->
-                iconView(type.icon)
-                textView(type.name)
-
-                onClick {
-                    createConnection(source, target, type)
+        if (connectionCount > 0) {
+            dialog {
+                title = "Move $elementName to $targetName"
+                contentView.textView("This will delete $connectionCount connection(s).")
+                closable = true
+                addButton("Move and delete", true) {
+                    History.group {
+                        remove(elementLinker)
+                        targetLinker.add(elementLinker.model.copy())
+                    }
                 }
+                addButton("Abort")
+            }.open()
+        } else {
+            History.group {
+                remove(elementLinker)
+                targetLinker.add(elementLinker.model.copy())
             }
-        }
-    }
-
-    override fun createConnection(source: Shape, target: Shape, type: ConnectionInfo): ConnectionLinker<*> {
-        val sourceId = getIdByShape(source) ?: throw IllegalArgumentException()
-        val targetId = getIdByShape(target) ?: throw IllegalArgumentException()
-
-        return when (type) {
-            AssociationLinker.info -> AssociationLinker(Association(sourceId, targetId), this).also(associations::add)
-            AggregationLinker.info -> AggregationLinker(Aggregation(sourceId, targetId), this).also(aggregations::add)
-            InheritanceLinker.info -> InheritanceLinker(Inheritance(sourceId, targetId), this).also(inheritances::add)
-            CompositionLinker.info -> CompositionLinker(Composition(sourceId, targetId), this).also(compositions::add)
-            else -> throw IllegalArgumentException()
         }
     }
 
@@ -244,22 +245,19 @@ class ContainerLinker(
      */
     init {
         model.classes.forEach { classes += ClassLinker(it, this) }
-        model.containers.forEach { containers += ContainerLinker(it, this) }
+        model.containers.forEach { containers += ContainerLinker(it, connectionManager, this) }
         model.roleTypes.forEach { roleTypes += RoleTypeLinker(it, this) }
         model.events.forEach { events += EventLinker(it, this) }
-        model.compositions.forEach { compositions += CompositionLinker(it, this) }
-
-        model.compartments.forEach { compartments += CompartmentLinker(it, this) }
-        model.associations.forEach { associations += AssociationLinker(it, this) }
-        model.aggregations.forEach { aggregations += AggregationLinker(it, this) }
-        model.inheritances.forEach { inheritances += InheritanceLinker(it, this) }
+        model.compartments.forEach { compartments += CompartmentLinker(it, connectionManager, this) }
 
         LinkerManager.setup(this)
-        ControllerManager.register(this)
+        connectionManager.addModel(this)
     }
 
     companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override fun contains(linker: Linker<*, *>): Boolean = linker is ContainerLinker
+
         override val name: String = "Container"
     }
 }

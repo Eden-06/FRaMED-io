@@ -31,6 +31,11 @@ class ClassList(
     operator fun get(clazz: String): Boolean = list.contains(clazz)
 
     /**
+     * Check if css class exits.
+     */
+    operator fun contains(clazz: String): Boolean = list.contains(clazz)
+
+    /**
      * Set css class present.
      */
     operator fun set(clazz: String, present: Boolean) =

@@ -50,7 +50,7 @@ class HtmlRenderer(
     }
 
     private fun createConnection(source: Shape, target: Shape) {
-        viewModel.createConnection(source, target)
+        viewModel.handler.createConnection(source, target)
     }
 
     private val jsPlumbInstance = JsPlumb.getInstance().apply {
@@ -129,7 +129,7 @@ class HtmlRenderer(
             }
         }
 
-        viewModel.container.shapes.forEach {drawShape(it, navigationView.container, viewModel.container.position)}
+        viewModel.container.shapes.forEach { drawShape(it, navigationView.container, viewModel.container.position) }
         viewModel.container.onAdd {
             drawShape(it, navigationView.container, viewModel.container.position)
         }
@@ -140,10 +140,10 @@ class HtmlRenderer(
         viewModel.connections.forEach {
             drawRelation(it)
         }
-        viewModel.onRelationAdd {
+        viewModel.onConnectionAdd {
             drawRelation(it)
         }
-        viewModel.onRelationRemove { r ->
+        viewModel.onConnectionRemove { r ->
             relations[r]?.let { relation ->
                 relations -= r
                 relation.remove()
@@ -156,7 +156,7 @@ class HtmlRenderer(
 
         if (source == null) {
             shapeMap.keys.forEach {
-                if (viewModel.canConnectionStart(it)) {
+                if (viewModel.handler.canConnectionStart(it)) {
                     createEndpoint(it)
                 } else {
                     deleteEndpoint(it)
@@ -164,7 +164,7 @@ class HtmlRenderer(
             }
         } else {
             (shapeMap.keys - source).forEach {
-                if (viewModel.canConnectionCreate(source, it)) {
+                if (viewModel.handler.canConnectionCreate(source, it)) {
                     createEndpoint(it)
                 } else {
                     deleteEndpoint(it)
@@ -197,7 +197,7 @@ class HtmlRenderer(
      */
     private val endpointMap = mutableMapOf<Shape, HTMLElement>()
 
-    operator fun get(shape: Shape): View<*> = shapeMap[shape] ?: throw IllegalArgumentException()
+    operator fun get(shape: Shape): View<*>? = shapeMap[shape]
 
     private fun getShapeById(id: String): Shape? = shapeMap.entries.find { (_, view) ->
         view.id == id
@@ -230,7 +230,7 @@ class HtmlRenderer(
         return when (shape) {
             is BoxShape -> drawBoxShape(shape, parent, position)
             is TextShape -> drawTextShape(shape, parent)
-            is IconShape -> drawIconShape(shape, parent)
+            is IconShape -> drawIconShape(shape, parent, position)
             else -> throw UnsupportedOperationException()
         }.also { view ->
             shapeMap += shape to view
@@ -291,6 +291,79 @@ class HtmlRenderer(
         }
     }
 
+    private fun checkDrop(shape: Shape? = null): Shape? {
+        shapeMap.values.filter { "drop-target" in it.classes }.forEach {
+            it.classes -= "drop-target"
+        }
+
+        if (shape != null) {
+            val mouse = navigationView.mouseToCanvas(Root.mousePosition)
+            val targets = shapeMap.filter { (s, view) ->
+                mouse in view.dimension && shape != s
+            }.filterKeys { target ->
+                viewModel.handler.canDropShape(shape, target)
+            }
+
+            if (targets.size == 1) {
+                val (target, view) = targets.entries.first()
+                view.classes += "drop-target"
+                return target
+            }
+        }
+        return null
+    }
+
+    private fun absolutePosition(view: View<*>, shape: Shape) = with(view) {
+        left = shape.left ?: 0.0
+        top = shape.top ?: 0.0
+        classes += "absolute-view"
+        var canDrop: Shape? = null
+
+        shape.onPositionChange { force ->
+            if (force) {
+                left = shape.left ?: 0.0
+                top = shape.top ?: 0.0
+                shape.width?.let { width = it } ?: autoWidth()
+                shape.height?.let { height = it } ?: autoHeight()
+
+                jsPlumbInstance.revalidate(html)
+            }
+        }
+
+        dragType = View.DragType.ABSOLUTE
+        onMouseDown { event ->
+            event.stopPropagation()
+            selectView(this, event.ctrlKey, false)
+        }
+        onClick { event ->
+            event.stopPropagation()
+        }
+        onDblClick { event ->
+            event.stopPropagation()
+            selectView(this, event.ctrlKey, true)
+        }
+        onDrag { event ->
+            if (event.direct) {
+                (selectedViews - this).forEach {
+                    it.performDrag(event.indirect)
+                }
+            }
+            jsPlumbInstance.revalidate(html)
+
+            shape.left = event.newPosition.x
+            shape.top = event.newPosition.y
+
+            canDrop = checkDrop(shape)
+        }
+        onMouseUp {
+            canDrop?.let { target ->
+                viewModel.handler.dropShape(shape, target)
+            }
+            checkDrop()
+        }
+        draggableViews += this
+    }
+
     private fun drawBoxShape(
             shape: BoxShape,
             parent: ViewCollection<View<*>, *>,
@@ -316,47 +389,7 @@ class HtmlRenderer(
         }
 
         if (position == BoxShape.Position.ABSOLUTE) {
-            left = shape.left ?: 0.0
-            top = shape.top ?: 0.0
-            classes += "absolute-view"
-
-            shape.onPositionChange { force ->
-                if (force) {
-                    left = shape.left ?: 0.0
-                    top = shape.top ?: 0.0
-                    shape.width?.let { width = it } ?: autoWidth()
-                    shape.height?.let { height = it } ?: autoHeight()
-
-                    jsPlumbInstance.revalidate(html)
-                }
-            }
-
-            dragType = View.DragType.ABSOLUTE
-            onMouseDown { event ->
-                event.stopPropagation()
-                selectView(this, event.ctrlKey, false)
-            }
-            onClick { event ->
-                event.stopPropagation()
-            }
-            onDblClick { event ->
-                event.stopPropagation()
-                selectView(this, event.ctrlKey, true)
-            }
-            onDrag { event ->
-                if (event.direct) {
-                    (selectedViews - this).forEach {
-                        it.performDrag(event.indirect)
-                    }
-                }
-                jsPlumbInstance.revalidate(html)
-
-                shape.left = event.newPosition.x
-                shape.top = event.newPosition.y
-            }
-            draggableViews += this
-        } else {
-            classes += "content-view"
+            absolutePosition(this, shape)
         }
 
         var map = shape.shapes.map {
@@ -387,48 +420,15 @@ class HtmlRenderer(
 
     private fun drawIconShape(
             shape: IconShape,
-            parent: ViewCollection<View<*>, *>
+            parent: ViewCollection<View<*>, *>,
+            position: BoxShape.Position
     ): View<*> = parent.iconView(shape.property) {
         style(this, shape.style)
         events(this, shape, parent)
 
-        left = shape.left ?: 0.0
-        top = shape.top ?: 0.0
-        classes += "absolute-view"
-
-        shape.onPositionChange { force ->
-            if (force) {
-                left = shape.left ?: 0.0
-                top = shape.top ?: 0.0
-
-                jsPlumbInstance.revalidate(html)
-            }
+        if (position == BoxShape.Position.ABSOLUTE) {
+            absolutePosition(this, shape)
         }
-
-        dragType = View.DragType.ABSOLUTE
-        onMouseDown { event ->
-            event.stopPropagation()
-            selectView(this, event.ctrlKey, false)
-        }
-        onClick { event ->
-            event.stopPropagation()
-        }
-        onDblClick { event ->
-            event.stopPropagation()
-            selectView(this, event.ctrlKey, true)
-        }
-        onDrag { event ->
-            if (event.direct) {
-                (selectedViews - this).forEach {
-                    it.performDrag(event.indirect)
-                }
-            }
-            jsPlumbInstance.revalidate(html)
-
-            shape.left = event.newPosition.x
-            shape.top = event.newPosition.y
-        }
-        draggableViews += this
     }
 
     override var zoom: Double

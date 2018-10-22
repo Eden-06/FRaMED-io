@@ -6,6 +6,7 @@ import io.framed.framework.ControllerManager
 import io.framed.framework.render.Renderer
 import io.framed.framework.render.html.HtmlRenderer
 import io.framed.framework.util.*
+import io.framed.linker.ConnectionManagerLinker
 import io.framed.linker.ContainerLinker
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.toUtf8Bytes
@@ -106,14 +107,15 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
                     ControllerManager.layers = file.layer
 
-                    ControllerManager.display(ContainerLinker(file.root))
+                    ControllerManager.display(ContainerLinker(file.root, ConnectionManagerLinker(file.connections)))
                 }
             }
             item("Save") {
                 ControllerManager.root?.let { root ->
-                    val container = (root.linker as ContainerLinker).model
+                    val linker = (root.linker as ContainerLinker)
+                    val connections = linker.connectionManager as ConnectionManagerLinker
 
-                    val file = File(container, ControllerManager.layers)
+                    val file = File(linker.model, connections.modelConnections, ControllerManager.layers)
 
                     val content = JSON.indented.stringify(file) + "\n"
 

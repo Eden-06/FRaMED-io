@@ -9,8 +9,8 @@ import io.framed.framework.util.Property
 /**
  * @author lars
  */
-interface ConnectionLinker<M : ModelElement> : Linker<M, Connection> {
-    override val parent: ModelLinker<*, *, *>
+interface ConnectionLinker<M : ModelElement<M>>: Linker<M, Connection> {
+    val manager: ConnectionManager
 
     val sourceIdProperty: Property<Long>
     val sourceShapeProperty: Property<Shape>
@@ -19,7 +19,7 @@ interface ConnectionLinker<M : ModelElement> : Linker<M, Connection> {
     val targetShapeProperty: Property<Shape>
 
     fun canSwap(info: ConnectionInfo): Boolean =
-            parent.canConnectionCreate(targetShapeProperty.get(), sourceShapeProperty.get()).contains(info)
+            manager.canConnectionCreate(targetShapeProperty.get(), sourceShapeProperty.get()).contains(info)
 
     fun swap() {
         History.group {
@@ -29,6 +29,8 @@ interface ConnectionLinker<M : ModelElement> : Linker<M, Connection> {
         }
     }
 
-    fun canConvert() = parent.canConnectionCreate(sourceShapeProperty.get(), targetShapeProperty.get())
+    override fun delete() = manager.remove(this)
+
+    fun canConvert() = manager.canConnectionCreate(sourceShapeProperty.get(), targetShapeProperty.get())
     operator fun contains(shape: Shape): Boolean = sourceShapeProperty.get() == shape || targetShapeProperty.get() == shape
 }

@@ -7,6 +7,6 @@ import io.framed.framework.ModelElement
  *
  * @author lars
  */
-interface ModelElementMetadata: ModelElement {
+interface ModelElementMetadata<M : ModelElementMetadata<M>> : ModelElement<M> {
     val metadata: Metadata
 }

@@ -9,7 +9,11 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Parameter : ModelElement {
+class Parameter() : ModelElement<Parameter> {
+
+    constructor(init: (Parameter) -> Unit) : this() {
+        init(this)
+    }
 
     override val id: Long = ModelElement.lastId++
 
@@ -43,20 +47,9 @@ class Parameter : ModelElement {
         result = 31 * result + type.hashCode()
         return result
     }
-}
 
-/**
- * Create a new parameter within the current model.
- *
- * @param name Name of the new parameter.
- * @param type Optional model of the new parameter.
- *
- * @return The new parameter.
- */
-fun Method.param(name: String, type: String = ""): Parameter {
-    val parameter = Parameter()
-    parameters += parameter
-    parameter.name = name
-    parameter.type = type
-    return parameter
+    override fun copy() = Parameter { new ->
+        new.name = name
+        new.type = type
+    }
 }

@@ -39,22 +39,22 @@ object LinkerManager {
                     History.group {
                         val source = linker.sourceShapeProperty.get()
                         val target = linker.targetShapeProperty.get()
-                        val parent = linker.parent
+                        val manager = linker.manager
                         linker.delete()
 
-                        parent.createConnection(source, target, it).focus()
+                        manager.createConnection(source, target, it).focus()
                     }
                 }
 
                 Validator.Result.VALID
             })
-
             linker.sidebar.group("Structure") {
                 select("Type", convert, infoProperty) {
                     it.name
                 }
             }
         }
+
         if (linker.canSwap(info.info)) {
             linker.sidebar.group("Structure") {
                 button("Swap direction") {

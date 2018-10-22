@@ -43,9 +43,7 @@ fun init() {
 
     loadAjaxFile("demo.json") {
         val file = JSON.parse<File>(it)
-
         ControllerManager.layers = file.layer
-
-        ControllerManager.display(ContainerLinker(file.root))
+        ControllerManager.display(ContainerLinker(file.root, ConnectionManagerLinker(file.connections)))
     }
 }

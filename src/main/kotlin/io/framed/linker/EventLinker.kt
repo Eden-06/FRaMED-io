@@ -84,6 +84,8 @@ class EventLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override fun contains(linker: Linker<*, *>): Boolean = linker is EventLinker
+
         override val name: String = "Event"
     }
 }

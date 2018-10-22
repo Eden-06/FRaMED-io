@@ -21,7 +21,11 @@ class Association(
          * The connections target class.
          */
         override var targetId: Long
-) : ModelConnection {
+) : ModelConnection<Association> {
+    
+    constructor(sourceId: Long, targetId: Long, init: (Association) -> Unit) : this(sourceId, targetId) {
+        init(this)
+    }
 
     override val id: Long = ModelElement.lastId++
 
@@ -39,4 +43,10 @@ class Association(
      * Cardinality for the target side of this connection.
      */
     var targetCardinality: String = "*"
+    
+    override fun copy() = Association(sourceId, targetId) { new ->
+        new.name = name
+        new.sourceCardinality = sourceCardinality
+        new.targetCardinality = targetCardinality
+    }
 }

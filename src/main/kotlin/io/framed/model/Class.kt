@@ -9,7 +9,11 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Class : ModelElement {
+class Class() : ModelElement<Class> {
+
+    constructor(init: (Class) -> Unit) : this() {
+        init(this)
+    }
 
     override val id: Long = ModelElement.lastId++
 
@@ -27,20 +31,10 @@ class Class : ModelElement {
      * List of class methods
      */
     var methods: List<Method> = emptyList()
-}
 
-/**
- * Create a new class within the current model
- *
- * @param name Name of the new class
- * @param init Builder callback for this class
- *
- * @return The new class
- */
-fun Container.clazz(name: String, init: Class.() -> Unit): Class {
-    val clazz = Class()
-    clazz.name = name
-    clazz.init()
-    classes += clazz
-    return clazz
+    override fun copy() = Class { new ->
+        new.name = name
+        new.attributes = attributes
+        new.methods = methods
+    }
 }

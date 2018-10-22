@@ -9,7 +9,11 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Attribute : ModelElement {
+class Attribute() : ModelElement<Attribute> {
+
+    constructor(init: (Attribute) -> Unit) : this() {
+        init(this)
+    }
 
     override val id: Long = ModelElement.lastId++
 
@@ -22,20 +26,9 @@ class Attribute : ModelElement {
      * Type of this model.
      */
     var type: String = ""
-}
 
-/**
- * Create a new model within the current class.
- *
- * @param name Name of the new model.
- * @param type Optional model of the new model.
- *
- * @return The new model.
- */
-fun Class.attr(name: String, type: String = ""): Attribute {
-    val attribute = Attribute()
-    attributes += attribute
-    attribute.name = name
-    attribute.type = type
-    return attribute
+    override fun copy() = Attribute { new ->
+        new.name = name
+        new.type = type
+    }
 }

@@ -3,6 +3,8 @@ package io.framed.linker
 import io.framed.framework.Linker
 import io.framed.framework.LinkerInfoItem
 import io.framed.framework.LinkerManager
+import io.framed.framework.ShapeLinker
+import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.*
@@ -16,8 +18,8 @@ import io.framed.model.Attribute
  */
 class AttributeLinker(
         override val model: Attribute,
-        override val parent: Linker<*, *>
-) : Linker<Attribute, TextShape> {
+        override val parent: ShapeLinker<*, *>
+) : ShapeLinker<Attribute, TextShape> {
 
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
     private val typeProperty = property(model::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
@@ -95,6 +97,8 @@ class AttributeLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ClassLinker
+        override fun contains(linker: Linker<*, *>): Boolean = linker is AttributeLinker
+
         override val name: String = "Attribute"
     }
 }

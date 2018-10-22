@@ -6,14 +6,6 @@
   z-index: 1;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .14);
   overflow: hidden;
-  /*
-  & > div {
-    padding: 0.4rem;
-    &:not(:last-child) {
-      border-bottom: solid 1px $uml-border;
-    }
-  }
-  */
 }
 .resize-handler {
   position: absolute;
@@ -74,9 +66,25 @@
       border-color: $toolbar-color;
     }
   }
+}
 
-  .selected-view {
-    outline: solid 2px $toolbar-color;
+.selected-view {
+  outline: solid 2px $toolbar-color;
+}
+
+.drop-target {
+  outline: solid 2px $toolbar-color;
+  &:after {
+    content: '';
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba($toolbar-color, 0.2);
+    display: block;
+    position: absolute;
+    z-index: 5;
   }
 }
 

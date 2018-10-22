@@ -21,7 +21,11 @@ class Inheritance(
          * The connections target class.
          */
         override var targetId: Long
-) : ModelConnection {
+) : ModelConnection<Inheritance> {
+
+    constructor(sourceId: Long, targetId: Long, init: (Inheritance) -> Unit) : this(sourceId, targetId) {
+        init(this)
+    }
 
     override val id: Long = ModelElement.lastId++
 
@@ -39,4 +43,10 @@ class Inheritance(
      * Cardinality for the target side of this connection.
      */
     var targetCardinality: String = ""
+
+    override fun copy() = Inheritance(sourceId, targetId) { new ->
+        new.name = name
+        new.sourceCardinality = sourceCardinality
+        new.targetCardinality = targetCardinality
+    }
 }

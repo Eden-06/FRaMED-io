@@ -104,8 +104,8 @@ class HtmlRelation(
     fun draw(sourceShape: Shape, targetShape: Shape) {
         remove()
 
-        val sourceView = renderer[sourceShape]
-        val targetView = renderer[targetShape]
+        val sourceView = renderer[sourceShape] ?: return
+        val targetView = renderer[targetShape] ?: return
 
         // Click area
         connections += jsPlumbInstance.connect(jsPlumbConnect {

@@ -4,9 +4,7 @@ import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.*
-import io.framed.model.Class
-import io.framed.model.Compartment
-import io.framed.model.Container
+import io.framed.model.*
 
 /**
  * @author Sebastian
@@ -14,6 +12,7 @@ import io.framed.model.Container
  */
 class CompartmentLinker(
         override val model: Compartment,
+        override val connectionManager: ConnectionManager,
         override val parent: ModelLinker<*, *, *>
 ) : ModelLinker<Compartment, BoxShape, TextShape> {
 
@@ -22,21 +21,18 @@ class CompartmentLinker(
 
     override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
 
-    val attributes = LinkerShapeBox(model::attributes).also { box ->
+    val attributes = shapeBox<Attribute, AttributeLinker>(model::attributes) { box ->
         box.view = container
     }
-    val methods = LinkerShapeBox(model::methods).also { box ->
+    val methods = shapeBox<Method, MethodLinker>(model::methods) { box ->
         box.view = container
     }
-    val classes = LinkerShapeBox(model::classes).also { box ->
+    val classes = shapeBox<Class, ClassLinker>(model::classes, connectionManager) { box ->
         box.view = container
     }
 
-    override val connectable: List<Linker<*, *>>
-        get() = emptyList()
-
-    override val connections: List<ConnectionLinker<*>>
-        get() = emptyList()
+    override val shapeLinkers: Set<ShapeLinker<*, *>>
+        get() = emptySet()
 
     override val pictogram = boxShape {
         boxShape {
@@ -97,7 +93,7 @@ class CompartmentLinker(
     override val flatPreview = boxShape { textShape(nameProperty) }
 
     override val sidebar = sidebar {
-        title("Class")
+        title("Compartment")
         group("General") {
             input("Name", nameProperty)
         }
@@ -133,24 +129,19 @@ class CompartmentLinker(
         }
     }
 
-    override fun remove(linker: Linker<*, *>) {
-        if (linker is AttributeLinker) attributes.remove(linker)
-        if (linker is MethodLinker) methods.remove(linker)
-        if (linker is ClassLinker) classes.remove(linker)
+    override fun remove(linker: ShapeLinker<*, *>) {
+        when (linker) {
+            is AttributeLinker -> attributes -= linker
+            is MethodLinker -> methods -= linker
+            is ClassLinker -> classes -= linker
+
+            else -> super.remove(linker)
+        }
     }
 
-    override val onConnectionAdd = EventHandler<ConnectionLinker<*>>()
-    override val onConnectionRemove = EventHandler<ConnectionLinker<*>>()
     override val setPosition = EventHandler<SetPosition>()
 
-    override fun createConnection(source: Shape, target: Shape) {
-        throw UnsupportedOperationException()
-    }
-
-    override fun createConnection(source: Shape, target: Shape, type: ConnectionInfo): ConnectionLinker<*> {
-        //val sourceId = getIdByShape(source) ?: throw IllegalArgumentException()
-        //val targetId = getIdByShape(target) ?: throw IllegalArgumentException()
-
+    override fun dropShape(shape: Shape, target: Shape) {
         throw UnsupportedOperationException()
     }
 
@@ -160,10 +151,13 @@ class CompartmentLinker(
         model.classes.forEach { classes += ClassLinker(it, parent) }
 
         LinkerManager.setup(this)
+        connectionManager.addModel(this)
     }
 
     companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override fun contains(linker: Linker<*, *>): Boolean = linker is CompartmentLinker
+
         override val name: String = "Compartment"
     }
 }

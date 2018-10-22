@@ -9,7 +9,11 @@ import kotlinx.serialization.Serializable
  * @author Sebastian
  */
 @Serializable
-class Compartment : ModelElement {
+class Compartment() : ModelElement<Compartment> {
+
+    constructor(init: (Compartment) -> Unit) : this() {
+        init(this)
+    }
 
     override val id: Long = ModelElement.lastId++
 
@@ -24,28 +28,19 @@ class Compartment : ModelElement {
     var attributes: List<Attribute> = emptyList()
 
     /**
-     * List of classes
-     */
-    var classes: List<Class> = emptyList()
-
-    /**
      * List of class methods
      */
     var methods: List<Method> = emptyList()
-}
 
-/**
- * Create a new class within the current model
- *
- * @param name Name of the new compartment
- * @param init Builder callback for this compartment
- *
- * @return The new class
- */
-fun Container.compartment(name: String, init: Compartment.() -> Unit): Compartment {
-    val compartment = Compartment()
-    compartment.name = name
-    compartment.init()
-    compartments += compartment
-    return compartment
+    /**
+     * List of classes
+     */
+    var classes: Set<Class> = emptySet()
+
+    override fun copy() = Compartment { new ->
+        new.name = name
+        new.attributes = attributes
+        new.classes = classes
+        new.methods = methods
+    }
 }

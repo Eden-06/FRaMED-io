@@ -1,14 +1,8 @@
 package io.framed.linker
 
-import io.framed.framework.Linker
-import io.framed.framework.LinkerInfoItem
-import io.framed.framework.LinkerManager
-import io.framed.framework.PreviewLinker
+import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.LinkerShapeBox
-import io.framed.framework.util.RegexValidator
-import io.framed.framework.util.property
-import io.framed.framework.util.trackHistory
+import io.framed.framework.util.*
 import io.framed.framework.view.*
 import io.framed.model.Attribute
 import io.framed.model.Class
@@ -19,14 +13,14 @@ import io.framed.model.Method
  */
 class ClassLinker(
         override val model: Class,
-        override val parent: Linker<*,*>
+        override val parent: ShapeLinker<*,*>
 ) : PreviewLinker<Class, BoxShape, TextShape> {
 
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
     var name by nameProperty
 
-    val attributes = LinkerShapeBox(model::attributes)
-    val methods = LinkerShapeBox(model::methods)
+    val attributes = shapeBox(model::attributes)
+    val methods = shapeBox(model::methods)
 
     override val pictogram = boxShape {
         boxShape {
@@ -113,9 +107,12 @@ class ClassLinker(
         }
     }
 
-    override fun remove(linker: Linker<*, *>) {
-        if (linker is AttributeLinker) attributes.remove(linker)
-        if (linker is MethodLinker) methods.remove(linker)
+    override fun remove(linker: ShapeLinker<*, *>) {
+        when (linker) {
+            is AttributeLinker -> attributes.remove(linker)
+            is MethodLinker -> methods.remove(linker)
+            else -> super.remove(linker)
+        }
     }
 
     init {
@@ -127,6 +124,8 @@ class ClassLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override fun contains(linker: Linker<*, *>): Boolean = linker is ClassLinker
+
         override val name: String = "Class"
     }
 }

@@ -1,7 +1,6 @@
 package io.framed.framework
 
 import io.framed.framework.pictogram.BoxShape
-import io.framed.framework.pictogram.ConnectionInfo
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.EventHandler
 import io.framed.framework.util.Property
@@ -9,41 +8,34 @@ import io.framed.framework.util.Property
 /**
  * @author lars
  */
-interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M, P, R> {
+interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker<M, P, R> {
     val nameProperty: Property<String>
     val name: String
-    val connectable: List<Linker<*, *>>
+
+    val shapeLinkers: Set<ShapeLinker<*, *>>
+
+    val connectionManager: ConnectionManager
 
     val container: BoxShape
 
     fun getShapeById(id: Long): Shape? =
-            connectable.find { it.id == id }?.pictogram as? Shape
+            shapeLinkers.find { it.id == id }?.pictogram
 
     fun getIdByShape(shape: Shape): Long? =
-            connectable.find { it.pictogram == shape }?.id
+            getLinkerByShape(shape)?.id
 
-
-    val connections: List<ConnectionLinker<*>>
-    val onConnectionAdd: EventHandler<ConnectionLinker<*>>
-    val onConnectionRemove: EventHandler<ConnectionLinker<*>>
+    fun getLinkerByShape(shape: Shape): ShapeLinker<*, *>? =
+            shapeLinkers.find { it.pictogram == shape }
 
     val setPosition: EventHandler<SetPosition>
 
-    fun canConnectionStart(source: Shape): List<ConnectionInfo> {
-        val sourceLinker = connectable.find { it.pictogram == source } ?: return emptyList()
 
-        return LinkerManager.linkerConnectionList.asSequence().filter { it.canStart(sourceLinker) }.map { it.info }.toList()
+    fun canDropShape(shape: Shape, target: Shape): Boolean {
+        val shapeLinker = shapeLinkers.find { it.pictogram == shape } ?: return false
+        val targetLinker = shapeLinkers.find { it.pictogram == target } ?: return false
+
+        return LinkerManager.linkerItemList.find { shapeLinker in it }?.canCreate(targetLinker) ?: false
     }
 
-    fun canConnectionCreate(source: Shape, target: Shape): List<ConnectionInfo> {
-        val sourceLinker = connectable.find { it.pictogram == source } ?: return emptyList()
-        val targetLinker = connectable.find { it.pictogram == target } ?: return emptyList()
-
-        return LinkerManager.linkerConnectionList.asSequence().filter { it.canCreate(sourceLinker, targetLinker) }.map { it.info }.toList()
-    }
-
-    fun createConnection(source: Shape, target: Shape)
-    fun createConnection(source: Shape, target: Shape, type: ConnectionInfo): ConnectionLinker<*>
-
-    override fun findConnections(shape: Shape): List<ConnectionLinker<*>> = super.findConnections(shape) + connections.filter { shape in it }
+    fun dropShape(shape: Shape, target: Shape)
 }

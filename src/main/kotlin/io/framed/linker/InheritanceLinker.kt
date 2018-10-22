@@ -1,9 +1,6 @@
 package io.framed.linker
 
-import io.framed.framework.ConnectionLinker
-import io.framed.framework.Linker
-import io.framed.framework.LinkerInfoConnection
-import io.framed.framework.LinkerManager
+import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.MaterialIcon
@@ -18,7 +15,7 @@ import io.framed.model.Inheritance
 
 class InheritanceLinker(
         override val model: Inheritance,
-        override val parent: ContainerLinker
+        override val manager: ConnectionManager
 ) : ConnectionLinker<Inheritance> {
 
     private val nameProperty = property(model::name, TrueValidator()).trackHistory()
@@ -27,12 +24,12 @@ class InheritanceLinker(
 
     override val sourceIdProperty = property(model::sourceId).trackHistory()
     override val sourceShapeProperty = property(sourceIdProperty, getter = {
-        parent.getShapeById(model.sourceId)!!
+        manager.getShapeById(model.sourceId)!!
     }, setter = { Validator.Result.ERROR })
 
     override val targetIdProperty = property(model::targetId).trackHistory()
     override val targetShapeProperty = property(targetIdProperty, getter = {
-        parent.getShapeById(model.targetId)!!
+        manager.getShapeById(model.targetId)!!
     }, setter = { Validator.Result.ERROR })
 
     override val pictogram = connection(sourceShapeProperty, targetShapeProperty) {

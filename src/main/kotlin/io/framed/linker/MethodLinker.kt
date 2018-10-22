@@ -3,6 +3,7 @@ package io.framed.linker
 import io.framed.framework.Linker
 import io.framed.framework.LinkerInfoItem
 import io.framed.framework.LinkerManager
+import io.framed.framework.ShapeLinker
 import io.framed.framework.pictogram.ContextEvent
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
@@ -13,15 +14,14 @@ import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Method
 import io.framed.model.Parameter
-import io.framed.model.param
 
 /**
  * @author lars
  */
 class MethodLinker(
         override val model: Method,
-        override val parent: Linker<*, *>
-) : Linker<Method, TextShape> {
+        override val parent: ShapeLinker<*, *>
+) : ShapeLinker<Method, TextShape> {
 
     private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
 
@@ -218,7 +218,7 @@ class MethodLinker(
             iconView(MaterialIcon.ADD)
             textView("Add parameter")
             onClick {
-                model.param("")
+                model.parameters += Parameter()
                 redraw = true
                 parameterProperty.fire()
             }
@@ -239,6 +239,8 @@ class MethodLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ClassLinker
+        override fun contains(linker: Linker<*, *>): Boolean = linker is MethodLinker
+
         override val name: String = "Method"
     }
 }

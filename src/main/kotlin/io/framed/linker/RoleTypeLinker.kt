@@ -79,6 +79,8 @@ class RoleTypeLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override fun contains(linker: Linker<*, *>): Boolean = linker is RoleTypeLinker
+
         override val name: String = "Role type"
     }
 }

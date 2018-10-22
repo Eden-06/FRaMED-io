@@ -9,7 +9,11 @@ import kotlinx.serialization.Serializable
  * It contains classes, connections, role types and nested containers.
  */
 @Serializable
-class Container : ModelElementMetadata {
+class Container() : ModelElementMetadata<Container> {
+
+    constructor(init: (Container) -> Unit) : this() {
+        init(this)
+    }
 
     /**
      * Identification of the instance
@@ -25,36 +29,40 @@ class Container : ModelElementMetadata {
      * List of nested classes.
      * Should this be a set?
      */
-    var classes: List<Class> = emptyList()
+    var classes: Set<Class> = emptySet()
 
     /**
      * List of related compartments
      */
-    var compartments: List<Compartment> = emptyList()
+    var compartments: Set<Compartment> = emptySet()
 
     /**
      * List of nested containers.
      * Should this be a set?
      */
-    var containers: List<Container> = emptyList()
+    var containers: Set<Container> = emptySet()
 
     /**
      * List of related role types
      */
-    var roleTypes: List<RoleType> = emptyList()
+    var roleTypes: Set<RoleType> = emptySet()
 
     /**
      * List of all events of the current application
      */
-    var events: List<Event> = emptyList()
-
-    var associations: List<Association> = emptyList()
-    var inheritances: List<Inheritance> = emptyList()
-    var aggregations: List<Aggregation> = emptyList()
-    var compositions: List<Composition> = emptyList()
+    var events: Set<Event> = emptySet()
 
     /**
      * Stores the metadata of the current model
      */
     override val metadata = Metadata()
+
+    override fun copy() = Container {new ->
+        new.name = name
+        new.classes = classes
+        new.compartments = compartments
+        new.containers = containers
+        new.roleTypes = roleTypes
+        new.events = events
+    }
 }

@@ -4,15 +4,15 @@ import io.framed.framework.*
 import io.framed.framework.pictogram.Connection
 import kotlin.reflect.KMutableProperty0
 
-class LinkerConnectionBox<M : ModelConnection, L : ConnectionLinker<M>>(
-        kProperty: KMutableProperty0<List<M>>,
-        val parent: ModelLinker<*, *, *>
+class LinkerConnectionBox<M : ModelConnection<M>, L : ConnectionLinker<M>>(
+        kProperty: KMutableProperty0<Set<M>>,
+        val parent: ConnectionManager
 ) {
-    val property: Property<List<M>> = property(kProperty)
+    val property: Property<Set<M>> = property(kProperty)
 
     private var backingField by property
 
-    var linkers = emptyList<L>()
+    var linkers = emptySet<L>()
 
     private fun internalAdd(linker: L) {
         if (!backingField.contains(linker.model)) {
@@ -55,22 +55,3 @@ class LinkerConnectionBox<M : ModelConnection, L : ConnectionLinker<M>>(
 
     val onRemove = EventHandler<Unit>()
 }
-/*
-
-
-    private fun addRelation(linker: AssociationLinker) {
-        if (!model.relations.contains(linker.model)) {
-            model.relations += linker.model
-        }
-
-        relations += linker
-        onConnectionAdd.fire(linker)
-    }
-
-    fun removeRelation(linker: AssociationLinker) {
-        model.relations -= linker.model
-        relations -= linker
-        onConnectionRemove.fire(linker)
-    }
-
-*/

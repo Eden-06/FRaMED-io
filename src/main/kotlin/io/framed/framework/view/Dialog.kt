@@ -40,7 +40,7 @@ class Dialog : View<HTMLDivElement>("div") {
                     this.primary = true
                     primaryListener = onClick
                 }
-            }
+            }.also(buttonView::toBackground)
 
     var closable: Boolean = false
 

@@ -21,7 +21,11 @@ class Aggregation(
          * The connections target class.
          */
         override var targetId: Long
-) : ModelConnection {
+) : ModelConnection<Aggregation> {
+
+    constructor(sourceId: Long, targetId: Long, init: (Aggregation) -> Unit) : this(sourceId, targetId) {
+        init(this)
+    }
 
     override val id: Long = ModelElement.lastId++
 
@@ -39,4 +43,10 @@ class Aggregation(
      * Cardinality for the target side of this connection.
      */
     var targetCardinality: String = "*"
+
+    override fun copy() = Aggregation(sourceId, targetId) { new ->
+        new.name = name
+        new.sourceCardinality = sourceCardinality
+        new.targetCardinality = targetCardinality
+    }
 }

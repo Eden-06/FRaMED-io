@@ -482,8 +482,10 @@ table {
 
 .dialog-button {
   padding: 0 0.3rem;
+  white-space: nowrap;
+  text-align: right;
   .button {
-    float: right;
+    display: inline-block;
     margin: 0.5rem 0.3rem;
   }
 }

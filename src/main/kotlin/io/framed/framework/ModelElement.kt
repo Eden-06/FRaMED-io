@@ -5,8 +5,11 @@ package io.framed.framework
  *
  * @author lars
  */
-interface ModelElement {
+interface ModelElement<M : ModelElement<M>> {
     val id: Long
+
+    fun copy(): M
+    fun getChildren(): List<ModelElement<*>> = listOf(this)
 
     companion object {
         var lastId: Long = 0

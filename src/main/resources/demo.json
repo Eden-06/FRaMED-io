@@ -54,19 +54,6 @@
         ]
       }
     ],
-    "associations": [
-      {
-        "sourceId": 6,
-        "targetId": 1,
-        "id": 18,
-        "name": "customers",
-        "sourceCardinality": "1..*",
-        "targetCardinality": "1"
-      }
-    ],
-    "aggregations": [],
-    "compositions": [],
-    "inheritances": [],
     "containers": [
       {
         "id": 11,
@@ -106,19 +93,6 @@
             ]
           }
         ],
-        "associations": [
-          {
-            "sourceId": 12,
-            "targetId": 14,
-            "id": 17,
-            "name": "",
-            "sourceCardinality": "",
-            "targetCardinality": ""
-          }
-        ],
-        "aggregations": [],
-        "compositions": [],
-        "inheritances": [],
         "containers": [],
         "compartments": [],
         "roleTypes": [],
@@ -207,6 +181,29 @@
       "modifiedDate": "Sun, 07 Oct 2018 21:35:15 GMT",
       "author": ""
     }
+  },
+  "connections": {
+    "associations": [
+      {
+        "sourceId": 6,
+        "targetId": 1,
+        "id": 18,
+        "name": "customers",
+        "sourceCardinality": "1..*",
+        "targetCardinality": "1"
+      },
+      {
+        "sourceId": 12,
+        "targetId": 14,
+        "id": 17,
+        "name": "",
+        "sourceCardinality": "",
+        "targetCardinality": ""
+      }
+    ],
+    "aggregations": [],
+    "compositions": [],
+    "inheritances": []
   },
   "layer": {
     "0": {

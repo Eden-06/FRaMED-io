@@ -21,7 +21,11 @@ class Composition(
          * The connections target class.
          */
         override var targetId: Long
-) : ModelConnection {
+) : ModelConnection<Composition> {
+
+    constructor(sourceId: Long, targetId: Long, init: (Composition) -> Unit) : this(sourceId, targetId) {
+        init(this)
+    }
 
     override val id: Long = ModelElement.lastId++
 
@@ -39,4 +43,10 @@ class Composition(
      * Cardinality for the target side of this connection.
      */
     var targetCardinality: String = "*"
+
+    override fun copy() = Composition(sourceId, targetId) { new ->
+        new.name = name
+        new.sourceCardinality = sourceCardinality
+        new.targetCardinality = targetCardinality
+    }
 }

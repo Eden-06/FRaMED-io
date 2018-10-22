@@ -1,6 +1,6 @@
 package io.framed.framework
 
-interface ModelConnection : ModelElement {
+interface ModelConnection<M : ModelConnection<M>> : ModelElement<M> {
 
     /**
      * The connections source class.
