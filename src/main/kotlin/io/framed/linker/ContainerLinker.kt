@@ -61,8 +61,9 @@ class ContainerLinker(
         }
         classes.previewBox = box
         containers.previewBox = box
+        compartments.previewBox = box
         roleTypes.previewBox = box
-        //events.previewBox = box
+        events.previewBox = box
 
         style {
             background = linearGradient("to bottom") {
@@ -252,6 +253,7 @@ class ContainerLinker(
 
         LinkerManager.setup(this)
         connectionManager.addModel(this)
+        autoLayout()
     }
 
     companion object : LinkerInfoItem {

@@ -48,6 +48,7 @@ class EventLinker(
             padding = box(10.0)
         }
     }
+
     override val flatPreview =iconShape(symbolProperty) {
         style {
             background = color(255, 255, 255)

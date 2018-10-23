@@ -165,6 +165,7 @@ class CompartmentLinker(
 
         LinkerManager.setup(this)
         connectionManager.addModel(this)
+        autoLayout()
     }
 
     companion object : LinkerInfoItem {
