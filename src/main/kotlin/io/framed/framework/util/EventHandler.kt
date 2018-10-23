@@ -45,6 +45,8 @@ class EventHandler<E> {
         listeners = emptySet()
     }
 
+    fun withRemover(listener: (event: E) -> Unit) = Remover(addListener(listener))
+
     /**
      * Fires a new model. Call all assigned listeners.
      *
@@ -63,4 +65,10 @@ class EventHandler<E> {
                 }
             }
         }
+
+    inner class Remover(val listener: (event: E) -> Unit) {
+        fun remove() {
+            removeListener(listener)
+        }
+    }
 }

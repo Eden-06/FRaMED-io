@@ -26,9 +26,21 @@ class HtmlRenderer(
         }
 
         this.viewModel = viewModel
+        reset()
 
         this.viewModel.onLayerChange += layerChangeListener
         draw()
+    }
+
+    private var removerList: List<EventHandler<*>.Remover> = emptyList()
+    fun reset() {
+        jsPlumbInstance.deleteEveryConnection()
+        jsPlumbInstance.deleteEveryEndpoint()
+        endpointMap.clear()
+        shapeMap = emptyMap()
+
+        removerList.forEach { it.remove() }
+        removerList = emptyList()
     }
 
     private var draggableViews: List<View<*>> = emptyList()
@@ -130,20 +142,20 @@ class HtmlRenderer(
         }
 
         viewModel.container.shapes.forEach { drawShape(it, navigationView.container, viewModel.container.position) }
-        viewModel.container.onAdd {
+        removerList += viewModel.container.onAdd.withRemover {
             drawShape(it, navigationView.container, viewModel.container.position)
         }
-        viewModel.container.onRemove {
+        removerList += viewModel.container.onRemove.withRemover {
             removeShape(it)
         }
 
         viewModel.connections.forEach {
             drawRelation(it)
         }
-        viewModel.onConnectionAdd {
+        removerList += viewModel.onConnectionAdd.withRemover {
             drawRelation(it)
         }
-        viewModel.onConnectionRemove { r ->
+        removerList += viewModel.onConnectionRemove.withRemover { r ->
             relations[r]?.let { relation ->
                 relations -= r
                 relation.remove()
@@ -319,7 +331,7 @@ class HtmlRenderer(
         classes += "absolute-view"
         var canDrop: Shape? = null
 
-        shape.onPositionChange { force ->
+        removerList += shape.onPositionChange.withRemover { force ->
             if (force) {
                 left = shape.left ?: 0.0
                 top = shape.top ?: 0.0
@@ -396,10 +408,10 @@ class HtmlRenderer(
             it to drawShape(it, this, shape.position)
         }.toMap()
 
-        shape.onAdd {
+        removerList += shape.onAdd.withRemover {
             map += it to drawShape(it, this, shape.position)
         }
-        shape.onRemove {
+        removerList += shape.onRemove.withRemover {
             map[it]?.let { v ->
                 remove(v)
             }

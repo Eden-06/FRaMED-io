@@ -95,6 +95,9 @@ external interface JsPlumbInstance {
      *
      */
     fun deleteEndpoint(target: HTMLElement)
+
+    fun deleteEveryConnection()
+    fun deleteEveryEndpoint()
 }
 
 /**
