@@ -38,6 +38,19 @@ class BoxShape(
 
     operator fun Shape.unaryPlus() = add(this)
 
+    fun autoLayout() {
+        if (position == Position.ABSOLUTE) {
+            var currentTop = 0.0
+            shapes.forEach {
+                it.top = currentTop
+                it.left = 100.00
+                println("SET (${it.top}/${it.left})")
+                it.onPositionChange.fire(true)
+                currentTop += it.height ?: 50.0
+            }
+        }
+    }
+
     init {
         onLayerChange { _ ->
             shapes.forEach { shape ->

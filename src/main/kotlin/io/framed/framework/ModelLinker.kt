@@ -38,22 +38,4 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     }
 
     fun dropShape(shape: Shape, target: Shape)
-
-    /**
-     * @author Sebastian
-     */
-    fun autoLayout() {
-        var currentTop = 0.0
-        this.shapeLinkers.forEach {
-            it.pictogram.top = currentTop
-            it.pictogram.left = 100.00
-            console.log("SET (" + it.pictogram.top + "/" + it.pictogram.left + ")")
-            it.pictogram.onPositionChange.fire(true)
-            if (it.pictogram.height != null){
-                currentTop += it.pictogram.height!!
-            } else {
-                currentTop += 50.0
-            }
-        }
-    }
 }

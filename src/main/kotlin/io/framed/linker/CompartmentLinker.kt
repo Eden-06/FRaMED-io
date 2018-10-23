@@ -4,7 +4,10 @@ import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.*
-import io.framed.model.*
+import io.framed.model.Attribute
+import io.framed.model.Class
+import io.framed.model.Compartment
+import io.framed.model.Method
 
 /**
  * @author Sebastian
@@ -165,7 +168,6 @@ class CompartmentLinker(
 
         LinkerManager.setup(this)
         connectionManager.addModel(this)
-        autoLayout()
     }
 
     companion object : LinkerInfoItem {

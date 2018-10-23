@@ -1,8 +1,10 @@
 package io.framed.framework.util
 
-import io.framed.framework.*
+import io.framed.framework.ConnectionManager
+import io.framed.framework.ModelElement
+import io.framed.framework.PreviewLinker
+import io.framed.framework.ShapeLinker
 import io.framed.framework.pictogram.BoxShape
-import io.framed.framework.pictogram.Shape
 import kotlin.reflect.KMutableProperty0
 
 sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
@@ -28,6 +30,8 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
             if (linker is PreviewLinker<*, *, *>) {
                 box += linker.flatPreview
             }
+
+            box.autoLayout()
         }
         linkers += linker
     }
@@ -40,6 +44,7 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
             if (linker is PreviewLinker<*, *, *>) {
                 box -= linker.flatPreview
             }
+            box.autoLayout()
         }
         linkers -= linker
 

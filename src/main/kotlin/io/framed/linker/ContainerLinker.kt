@@ -5,8 +5,6 @@ import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.*
 import io.framed.model.*
-import kotlin.browser.document
-import kotlin.browser.window
 
 /**
  * @author lars
@@ -253,7 +251,6 @@ class ContainerLinker(
 
         LinkerManager.setup(this)
         connectionManager.addModel(this)
-        autoLayout()
     }
 
     companion object : LinkerInfoItem {
