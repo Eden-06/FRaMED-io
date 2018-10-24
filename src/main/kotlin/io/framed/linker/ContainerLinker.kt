@@ -123,15 +123,28 @@ class ContainerLinker(
         }
         sidebarActionsGroup = group("Actions") {
             button("Reset zoom") {
-                //application.renderer.zoomTo(1.0)
+                Application.renderer.zoom = 1.0
             }
             button("Reset pan") {
-                //application.renderer.panTo(Point.ZERO)
+                Application.renderer.panTo(Point.ZERO)
             }
         }
         sidebarPreviewGroup = group("Preview") {
             button("Toggle preview") {
+                autoLayoutBox.position = if (autoLayoutBox.position == BoxShape.Position.ABSOLUTE) {
+                    BoxShape.Position.VERTICAL
+                } else {
+                    BoxShape.Position.ABSOLUTE
+                }
 
+                autoLayoutBox.clear()
+                this@ContainerLinker.classes.updatePreview()
+                containers.updatePreview()
+                compartments.updatePreview()
+                roleTypes.updatePreview()
+                events.updatePreview()
+
+                parent?.redraw(this@ContainerLinker)
             }
             button("Auto layout") {
                 autoLayoutBox.autoLayout()
@@ -206,6 +219,19 @@ class ContainerLinker(
             is RoleType -> roleTypes += RoleTypeLinker(model, this)
             is Event -> events += EventLinker(model, this)
             else -> super.add(model)
+        }
+    }
+
+
+    override fun redraw(linker: ShapeLinker<*, *>) {
+        when (linker) {
+            is ClassLinker -> classes.redraw(linker)
+            is CompartmentLinker -> compartments.redraw(linker)
+            is ContainerLinker -> containers.redraw(linker)
+            is RoleTypeLinker -> roleTypes.redraw(linker)
+            is EventLinker -> events.redraw(linker)
+
+            else -> super.remove(linker)
         }
     }
 

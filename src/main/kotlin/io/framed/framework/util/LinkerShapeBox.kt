@@ -19,6 +19,20 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
     protected abstract fun backingAdd(model: M)
     protected abstract fun backingRemove(model: M)
 
+    fun updatePreview() {
+        previewBox?.let { box ->
+            linkers.forEach { linker ->
+                if (linker is PreviewLinker<*, *, *>) {
+                    if (box.position == BoxShape.Position.ABSOLUTE) {
+                        box += linker.flatPreview
+                    } else {
+                        box += linker.listPreview
+                    }
+                }
+            }
+        }
+    }
+
     private fun internalAdd(linker: L) {
         if (!backingContains(linker.model)) {
             backingAdd(linker.model)
@@ -28,7 +42,11 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
 
         previewBox?.let { box ->
             if (linker is PreviewLinker<*, *, *>) {
-                box += linker.flatPreview
+                if (box.position == BoxShape.Position.ABSOLUTE) {
+                    box += linker.flatPreview
+                } else {
+                    box += linker.listPreview
+                }
             }
         }
         linkers += linker
@@ -41,6 +59,7 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
         previewBox?.let { box ->
             if (linker is PreviewLinker<*, *, *>) {
                 box -= linker.flatPreview
+                box -= linker.listPreview
             }
         }
         linkers -= linker
@@ -70,6 +89,15 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
             item.execute()
             History.push(item)
         }
+    }
+
+    fun redraw(linker: L) {
+        internalRemove(linker)
+        internalAdd(linker)
+    }
+
+    fun redraw() {
+        linkers.forEach(this::remove)
     }
 
     operator fun plusAssign(linker: L) = add(linker)

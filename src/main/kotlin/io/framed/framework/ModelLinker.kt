@@ -29,6 +29,7 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
 
     val setPosition: EventHandler<SetPosition>
 
+    fun redraw(linker: ShapeLinker<*, *>)
 
     fun canDropShape(shape: Shape, target: Shape): Boolean {
         val shapeLinker = shapeLinkers.find { it.pictogram == shape } ?: return false

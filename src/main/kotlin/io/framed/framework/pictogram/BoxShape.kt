@@ -37,6 +37,10 @@ class BoxShape(
         onRemove.fire(shape)
     }
 
+    fun clear() {
+        shapes.forEach(this::remove)
+    }
+
     operator fun Shape.unaryPlus() = add(this)
 
     fun autoLayout() {

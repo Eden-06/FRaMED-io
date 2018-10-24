@@ -155,6 +155,16 @@ class CompartmentLinker(
         }
     }
 
+    override fun redraw(linker: ShapeLinker<*, *>) {
+        when (linker) {
+            is AttributeLinker -> attributes.redraw(linker)
+            is MethodLinker -> methods.redraw(linker)
+            is ClassLinker -> classes.redraw(linker)
+
+            else -> super.remove(linker)
+        }
+    }
+
     override val setPosition = EventHandler<SetPosition>()
 
     override fun dropShape(shape: Shape, target: Shape) {
