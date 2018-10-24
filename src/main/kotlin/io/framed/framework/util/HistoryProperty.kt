@@ -5,6 +5,9 @@ class HistoryProperty<T : Any>(
         private val oldValue: T,
         private var newValue: T
 ) : HistoryItem {
+
+    override val description: String = "Change property"
+
     override fun undo() {
         property.set(oldValue)
     }

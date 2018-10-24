@@ -2,6 +2,7 @@ package io.framed.framework.pictogram
 
 import io.framed.framework.Linker
 import io.framed.framework.util.EventHandler
+import io.framed.framework.util.History
 
 /**
  * @author lars
@@ -40,13 +41,15 @@ class BoxShape(
 
     fun autoLayout() {
         if (position == Position.ABSOLUTE) {
-            var currentTop = 0.0
-            shapes.forEach {
-                it.top = currentTop
-                it.left = 100.00
-                println("SET (${it.top}/${it.left})")
-                it.onPositionChange.fire(true)
-                currentTop += it.height ?: 50.0
+            History.group("Auto layout shape $id") {
+                var currentTop = 0.0
+                shapes.forEach {
+                    it.top = currentTop
+                    it.left = 100.00
+                    println("SET (${it.top}/${it.left})")
+                    it.onPositionChange.fire(true)
+                    currentTop += it.height ?: 50.0
+                }
             }
         }
     }

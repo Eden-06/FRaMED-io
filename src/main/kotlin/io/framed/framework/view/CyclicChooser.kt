@@ -46,7 +46,6 @@ class CyclicChooser<T>(
 
     private fun selectDirection(direction: Direction) {
         positionMap.filterKeys {
-            println(it)
             direction.angle in it
         }.values.firstOrNull()?.let {
             it.onClick.fire(js("{}"))
@@ -99,9 +98,6 @@ class CyclicChooser<T>(
 
                 view.width = width
                 view.height = height
-
-                println("${part * index}:")
-                println(view.html.innerHTML)
 
                 angle.rangeBy(part) to view
             }.toMap()

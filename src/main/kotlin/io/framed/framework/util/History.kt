@@ -6,15 +6,19 @@ object History {
 
     private var allowPush = true
 
-    private var createGroup = false
+    private var createGroup = 0
     private var group: List<HistoryItem> = emptyList()
 
     fun <V : Any> push(property: Property<V>, oldValue: V, newValue: V = property.get()) =
             push(HistoryProperty(property, oldValue, newValue))
 
     fun push(historyItem: HistoryItem) {
-        if (allowPush) if (createGroup) {
-            group += historyItem
+        if (allowPush) if (createGroup > 0) {
+            val top = group.lastOrNull()
+
+            if (top == null || top.shouldAdd(historyItem)) {
+                group += historyItem
+            }
         } else {
             val top = list.getOrNull(pointer - 1)
 
@@ -70,21 +74,24 @@ object History {
         }
     }
 
-    private fun startGroup() {
-        createGroup = true
-        group = emptyList()
+    private fun startGroup(description: String) {
+        if (createGroup == 0) {
+            groupDescription = description
+        }
+        createGroup += 1
     }
 
     private fun endGroup() {
-        createGroup = false
-        if (group.isNotEmpty()) {
-            push(HistoryGroup(group))
+        createGroup -= 1
+        if (createGroup == 0 && group.isNotEmpty()) {
+            push(HistoryGroup(group, groupDescription))
             group = emptyList()
         }
     }
 
-    fun group(block: () -> Unit) {
-        startGroup()
+    var groupDescription = ""
+    fun group(description: String, block: () -> Unit) {
+        startGroup(description)
         block()
         endGroup()
     }

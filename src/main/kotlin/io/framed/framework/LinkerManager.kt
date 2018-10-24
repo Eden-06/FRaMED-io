@@ -34,15 +34,15 @@ object LinkerManager {
         if (convert.size > 1) {
             val infoProperty = property(getter = {
                 info.info
-            }, setter = {
+            }, setter = { connectionInfo ->
                 async {
-                    History.group {
+                    History.group("Set connection type to ${connectionInfo.name}") {
                         val source = linker.sourceShapeProperty.get()
                         val target = linker.targetShapeProperty.get()
                         val manager = linker.manager
                         linker.delete()
 
-                        manager.createConnection(source, target, it).focus()
+                        manager.createConnection(source, target, connectionInfo).focus()
                     }
                 }
 

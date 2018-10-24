@@ -57,6 +57,15 @@ class Container() : ModelElementMetadata<Container> {
      */
     override val metadata = Metadata()
 
+    override fun maxId(): Long = listOf(
+            id,
+            containers.map { it.maxId() }.max() ?: 0,
+            compartments.map { it.maxId() }.max() ?: 0,
+            classes.map { it.maxId() }.max() ?: 0,
+            roleTypes.map { it.maxId() }.max() ?: 0,
+            events.map { it.maxId() }.max() ?: 0
+    ).max() ?: id
+
     override fun copy() = Container {new ->
         new.name = name
         new.classes = classes

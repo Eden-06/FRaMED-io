@@ -32,6 +32,11 @@ class Method(): ModelElement<Method> {
      */
     var parameters: List<Parameter> = emptyList()
 
+    override fun maxId(): Long = listOf(
+            id,
+            parameters.map { it.maxId() }.max() ?: 0
+    ).max() ?: id
+
     override fun copy() = Method {new ->
         new.name = name
         new.type = type

@@ -9,6 +9,8 @@ class HistoryLayer(
         var map: Map<Layer.Prop, Value>
 ) : HistoryItem {
 
+    override val description: String = "Move shape ${shape.id}"
+
     constructor(layer: Layer, shape: Shape, prop: Layer.Prop, oldValue: Double?, newValue: Double?) :
             this(layer, shape, mapOf(prop to Value(oldValue, newValue)))
 

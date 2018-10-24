@@ -37,6 +37,13 @@ class Compartment() : ModelElement<Compartment> {
      */
     var classes: Set<Class> = emptySet()
 
+    override fun maxId(): Long = listOf(
+            id,
+            attributes.map { it.maxId() }.max() ?: 0,
+            methods.map { it.maxId() }.max() ?: 0,
+            classes.map { it.maxId() }.max() ?: 0
+    ).max() ?: id
+
     override fun copy() = Compartment { new ->
         new.name = name
         new.attributes = attributes

@@ -22,7 +22,7 @@ interface ConnectionLinker<M : ModelElement<M>>: Linker<M, Connection> {
             manager.canConnectionCreate(targetShapeProperty.get(), sourceShapeProperty.get()).contains(info)
 
     fun swap() {
-        History.group {
+        History.group("Swap connection") {
             val h = sourceIdProperty.get()
             sourceIdProperty.set(targetIdProperty.get())
             targetIdProperty.set(h)

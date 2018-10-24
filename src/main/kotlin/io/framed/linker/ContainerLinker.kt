@@ -39,6 +39,7 @@ class ContainerLinker(
     override val shapeLinkers: Set<ShapeLinker<*, *>>
         get() = classes.linkers + containers.linkers + roleTypes.linkers + events.linkers + compartments.linkers
 
+    private lateinit var autoLayoutBox: BoxShape
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
@@ -47,7 +48,7 @@ class ContainerLinker(
             }
         }
 
-        val box = boxShape(BoxShape.Position.ABSOLUTE) {
+        autoLayoutBox = boxShape(BoxShape.Position.ABSOLUTE) {
             style {
                 border {
                     style = Border.BorderStyle.SOLID
@@ -57,11 +58,11 @@ class ContainerLinker(
                 padding = box(8.0)
             }
         }
-        classes.previewBox = box
-        containers.previewBox = box
-        compartments.previewBox = box
-        roleTypes.previewBox = box
-        events.previewBox = box
+        classes.previewBox = autoLayoutBox
+        containers.previewBox = autoLayoutBox
+        compartments.previewBox = autoLayoutBox
+        roleTypes.previewBox = autoLayoutBox
+        events.previewBox = autoLayoutBox
 
         style {
             background = linearGradient("to bottom") {
@@ -97,6 +98,7 @@ class ContainerLinker(
     }
 
     private lateinit var sidebarActionsGroup: SidebarGroup
+    private lateinit var sidebarPreviewGroup: SidebarGroup
 
     private val creationProperty = property(model.metadata::creationDate)
     private val creationStringProperty = property(creationProperty,
@@ -120,14 +122,19 @@ class ContainerLinker(
             input("Name", nameProperty)
         }
         sidebarActionsGroup = group("Actions") {
-            button("Auto layout") {
-                //autoLayout()
-            }
             button("Reset zoom") {
                 //application.renderer.zoomTo(1.0)
             }
             button("Reset pan") {
                 //application.renderer.panTo(Point.ZERO)
+            }
+        }
+        sidebarPreviewGroup = group("Preview") {
+            button("Toggle preview") {
+
+            }
+            button("Auto layout") {
+                autoLayoutBox.autoLayout()
             }
         }
 
@@ -141,8 +148,9 @@ class ContainerLinker(
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
-        val h = event.target != pictogram
-        sidebarActionsGroup.visible = h
+        val h = event.target == pictogram
+        sidebarActionsGroup.visible = !h
+        sidebarPreviewGroup.visible = h
     }
 
     private lateinit var contextStepIn: ListView
@@ -224,7 +232,7 @@ class ContainerLinker(
                 contentView.textView("This will delete $connectionCount connection(s).")
                 closable = true
                 addButton("Move and delete", true) {
-                    History.group {
+                    History.group("Move $elementName to $targetName") {
                         remove(elementLinker)
                         targetLinker.add(elementLinker.model.copy())
                     }
@@ -232,7 +240,7 @@ class ContainerLinker(
                 addButton("Abort")
             }.open()
         } else {
-            History.group {
+            History.group("Move $elementName to $targetName") {
                 remove(elementLinker)
                 targetLinker.add(elementLinker.model.copy())
             }

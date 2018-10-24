@@ -11,6 +11,8 @@ interface ModelElement<M : ModelElement<M>> {
     fun copy(): M
     fun getChildren(): List<ModelElement<*>> = listOf(this)
 
+    fun maxId(): Long = id
+
     companion object {
         var lastId: Long = 0
     }

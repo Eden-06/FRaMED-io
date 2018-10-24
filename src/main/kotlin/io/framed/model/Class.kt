@@ -32,6 +32,12 @@ class Class() : ModelElement<Class> {
      */
     var methods: List<Method> = emptyList()
 
+    override fun maxId(): Long = listOf(
+            id,
+            attributes.map { it.maxId() }.max() ?: 0,
+            methods.map { it.maxId() }.max() ?: 0
+    ).max() ?: id
+
     override fun copy() = Class { new ->
         new.name = name
         new.attributes = attributes

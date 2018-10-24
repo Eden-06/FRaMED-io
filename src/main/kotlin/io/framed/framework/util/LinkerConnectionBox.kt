@@ -1,7 +1,8 @@
 package io.framed.framework.util
 
-import io.framed.framework.*
-import io.framed.framework.pictogram.Connection
+import io.framed.framework.ConnectionLinker
+import io.framed.framework.ConnectionManager
+import io.framed.framework.ModelConnection
 import kotlin.reflect.KMutableProperty0
 
 class LinkerConnectionBox<M : ModelConnection<M>, L : ConnectionLinker<M>>(
@@ -36,7 +37,7 @@ class LinkerConnectionBox<M : ModelConnection<M>, L : ConnectionLinker<M>>(
     fun add(linker: L) {
         val addToHistory = !backingField.contains(linker.model)
 
-        val item = HistoryMethod(linker, this::internalAdd, this::internalRemove)
+        val item = HistoryMethod(linker, this::internalAdd, this::internalRemove, "Add ${linker::class.simpleName} - ${linker.id}")
         item.execute()
 
         if (addToHistory) {
@@ -45,7 +46,7 @@ class LinkerConnectionBox<M : ModelConnection<M>, L : ConnectionLinker<M>>(
     }
 
     fun remove(linker: L) {
-        val item = HistoryMethod(linker, this::internalRemove, this::internalAdd)
+        val item = HistoryMethod(linker, this::internalRemove, this::internalAdd, "Remove ${linker::class.simpleName} - ${linker.id}")
         item.execute()
         History.push(item)
     }

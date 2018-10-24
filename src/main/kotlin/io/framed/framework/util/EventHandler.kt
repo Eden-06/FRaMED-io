@@ -45,7 +45,7 @@ class EventHandler<E> {
         listeners = emptySet()
     }
 
-    fun withRemover(listener: (event: E) -> Unit) = Remover(addListener(listener))
+    fun withRemover(tag: Long? = null, listener: (event: E) -> Unit) = Remover(tag, addListener(listener))
 
     /**
      * Fires a new model. Call all assigned listeners.
@@ -55,6 +55,9 @@ class EventHandler<E> {
     fun fire(event: E) {
         listeners.forEach { it(event) }
     }
+
+    val size: Int
+        get() = listeners.size
 
     @Suppress("UNCHECKED_CAST")
     val eventListener: EventListener
@@ -66,7 +69,7 @@ class EventHandler<E> {
             }
         }
 
-    inner class Remover(val listener: (event: E) -> Unit) {
+    inner class Remover(val tag: Long?, val listener: (event: E) -> Unit) {
         fun remove() {
             removeListener(listener)
         }

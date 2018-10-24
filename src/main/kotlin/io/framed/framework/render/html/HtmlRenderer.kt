@@ -235,6 +235,8 @@ class HtmlRenderer(
                 shape.shapes.forEach(this::removeShape)
             }
             shapeMap -= shape
+
+            removerList -= removerList.asSequence().filter { it.tag == shape.id }.onEach { it.remove() }.toList()
         }
     }
 
@@ -331,7 +333,7 @@ class HtmlRenderer(
         classes += "absolute-view"
         var canDrop: Shape? = null
 
-        removerList += shape.onPositionChange.withRemover { force ->
+        removerList += shape.onPositionChange.withRemover(shape.id) { force ->
             if (force) {
                 left = shape.left ?: 0.0
                 top = shape.top ?: 0.0
@@ -408,13 +410,14 @@ class HtmlRenderer(
             it to drawShape(it, this, shape.position)
         }.toMap()
 
-        removerList += shape.onAdd.withRemover {
+        removerList += shape.onAdd.withRemover(shape.id) {
             map += it to drawShape(it, this, shape.position)
         }
-        removerList += shape.onRemove.withRemover {
-            map[it]?.let { v ->
+        removerList += shape.onRemove.withRemover(shape.id) { s ->
+            map[s]?.let { v ->
                 remove(v)
             }
+            removerList -= removerList.asSequence().filter { it.tag == s.id }.onEach { it.remove() }.toList()
         }
     }
 

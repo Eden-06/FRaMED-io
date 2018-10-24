@@ -30,8 +30,6 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
             if (linker is PreviewLinker<*, *, *>) {
                 box += linker.flatPreview
             }
-
-            box.autoLayout()
         }
         linkers += linker
     }
@@ -44,7 +42,6 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
             if (linker is PreviewLinker<*, *, *>) {
                 box -= linker.flatPreview
             }
-            box.autoLayout()
         }
         linkers -= linker
 
@@ -54,20 +51,22 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
     fun add(linker: L) {
         val addToHistory = !backingContains(linker.model)
 
-        val item = HistoryMethod(linker, this::internalAdd, this::internalRemove)
+        val item = HistoryMethod(linker, this::internalAdd, this::internalRemove, "Add ${linker::class.simpleName} - ${linker.id}")
         item.execute()
 
         if (addToHistory) {
             History.push(item)
+
+            previewBox?.autoLayout()
         }
     }
 
     fun remove(linker: L) {
-        History.group {
+        History.group("Remove ${linker::class.simpleName} - ${linker.id}") {
             connectionManager?.listConnections(linker.id)?.forEach {
                 it.delete()
             }
-            val item = HistoryMethod(linker, this::internalRemove, this::internalAdd)
+            val item = HistoryMethod(linker, this::internalRemove, this::internalAdd, "Remove ${linker::class.simpleName} - ${linker.id}")
             item.execute()
             History.push(item)
         }

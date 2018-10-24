@@ -1,11 +1,9 @@
 package io.framed
 
-import io.framed.framework.ControllerManager
 import io.framed.framework.LinkerManager
 import io.framed.framework.util.loadAjaxFile
 import io.framed.framework.view.Application
 import io.framed.linker.*
-import kotlinx.serialization.json.JSON
 import kotlin.browser.window
 
 /**
@@ -42,8 +40,6 @@ fun init() {
     Application.init()
 
     loadAjaxFile("demo.json") {
-        val file = JSON.parse<File>(it)
-        ControllerManager.layers = file.layer
-        ControllerManager.display(ContainerLinker(file.root, ConnectionManagerLinker(file.connections)))
+        File.fromJSON(it)
     }
 }
