@@ -6,6 +6,7 @@ import io.framed.framework.util.History
 import io.framed.framework.util.HistoryLayer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 /**
@@ -14,6 +15,16 @@ import kotlin.reflect.KProperty
 @Serializable
 class Layer {
     val position: MutableMap<Long, Dimension> = mutableMapOf()
+
+    val data: MutableMap<Long, MutableMap<String, String>> = mutableMapOf()
+
+    fun getData(id: Long, property: String, default: Any): String {
+        return data.getOrElse(id) { mutableMapOf() }.getOrElse(property) { default.toString() }
+    }
+
+    fun setData(id: Long, property: String, value: String) {
+        data.getOrPut(id) { mutableMapOf() }[property] = value
+    }
 
     @Transient
     val listener: MutableMap<Long, EventHandler<Boolean>> = mutableMapOf()
@@ -86,14 +97,32 @@ class Layer {
             )
 
     fun onUpdate(shape: Shape): EventHandler<Boolean> {
-        return listener[shape.id] ?: run {
-            val e = EventHandler<Boolean>()
-            listener[shape.id] = e
-            e
-        }
+        return listener.getOrPut(shape.id) { EventHandler() }
     }
 
     enum class Prop {
         LEFT, TOP, WIDTH, HEIGHT
+    }
+}
+
+inline fun <reified T : Any> Pictogram.data(default: T) = PictogramData<T>(T::class, this, default)
+
+@Suppress("UNCHECKED_CAST")
+class PictogramData<T : Any>(
+        val type: KClass<T>,
+        val picto: Pictogram,
+        val default: T
+) {
+    operator fun getValue(thisRef: Any, property: KProperty<*>): T {
+        val data = picto.layer.getData(picto.id, property.name, default)
+        return when (type) {
+            String::class -> data as T
+            Boolean::class -> data.toBoolean() as T
+            else -> default
+        }
+    }
+
+    operator fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
+        picto.layer.setData(picto.id, property.name, value.toString())
     }
 }

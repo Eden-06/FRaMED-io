@@ -327,7 +327,7 @@ class HtmlRenderer(
         return null
     }
 
-    private fun absolutePosition(view: View<*>, shape: Shape) = with(view) {
+    private fun absolutePosition(view: View<*>, shape: Shape, parent: ViewCollection<View<*>, *>) = with(view) {
         left = shape.left ?: 0.0
         top = shape.top ?: 0.0
         classes += "absolute-view"
@@ -376,6 +376,11 @@ class HtmlRenderer(
             checkDrop()
         }
         draggableViews += this
+
+        if (parent != navigationView.container) {
+            minTop = 0.0
+            minLeft = 0.0
+        }
     }
 
     private fun drawBoxShape(
@@ -403,7 +408,7 @@ class HtmlRenderer(
         }
 
         if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(this, shape)
+            absolutePosition(this, shape, parent)
         }
 
         var map = shape.shapes.map {
@@ -442,7 +447,7 @@ class HtmlRenderer(
         events(this, shape, parent)
 
         if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(this, shape)
+            absolutePosition(this, shape, parent)
         }
     }
 

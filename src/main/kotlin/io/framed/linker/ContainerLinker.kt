@@ -48,7 +48,7 @@ class ContainerLinker(
             }
         }
 
-        autoLayoutBox = boxShape(BoxShape.Position.ABSOLUTE) {
+        autoLayoutBox = boxShape(BoxShape.Position.VERTICAL) {
             style {
                 border {
                     style = Border.BorderStyle.SOLID
@@ -77,6 +77,10 @@ class ContainerLinker(
         }
 
         resizeable = true
+
+        onLayerChange {
+            updatePreviewType()
+        }
     }
 
     override val listPreview = textShape(nameProperty)
@@ -97,6 +101,8 @@ class ContainerLinker(
         }
     }
 
+    private var isFlatPreview by pictogram.data(false)
+
     private lateinit var sidebarActionsGroup: SidebarGroup
     private lateinit var sidebarPreviewGroup: SidebarGroup
 
@@ -116,6 +122,26 @@ class ContainerLinker(
 
     private val authorProperty = property(model.metadata::author)
 
+    private fun updatePreviewType() {
+        val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.ABSOLUTE
+        if (shapeIsFlat == isFlatPreview) return
+
+        autoLayoutBox.position = if (isFlatPreview) {
+            BoxShape.Position.ABSOLUTE
+        } else {
+            BoxShape.Position.VERTICAL
+        }
+
+        autoLayoutBox.clear()
+        this@ContainerLinker.classes.updatePreview()
+        containers.updatePreview()
+        compartments.updatePreview()
+        roleTypes.updatePreview()
+        events.updatePreview()
+
+        parent?.redraw(this@ContainerLinker)
+    }
+
     override val sidebar = sidebar {
         title("Container")
         group("General") {
@@ -131,20 +157,8 @@ class ContainerLinker(
         }
         sidebarPreviewGroup = group("Preview") {
             button("Toggle preview") {
-                autoLayoutBox.position = if (autoLayoutBox.position == BoxShape.Position.ABSOLUTE) {
-                    BoxShape.Position.VERTICAL
-                } else {
-                    BoxShape.Position.ABSOLUTE
-                }
-
-                autoLayoutBox.clear()
-                this@ContainerLinker.classes.updatePreview()
-                containers.updatePreview()
-                compartments.updatePreview()
-                roleTypes.updatePreview()
-                events.updatePreview()
-
-                parent?.redraw(this@ContainerLinker)
+                isFlatPreview = !isFlatPreview
+                updatePreviewType()
             }
             button("Auto layout") {
                 autoLayoutBox.autoLayout()

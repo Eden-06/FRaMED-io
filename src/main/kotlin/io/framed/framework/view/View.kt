@@ -5,6 +5,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
+import kotlin.math.max
 import kotlin.reflect.KClass
 
 /**
@@ -146,6 +147,7 @@ abstract class View<V : HTMLElement>(view: V) {
     fun autoWidth() {
         html.style.removeProperty("width")
     }
+
     fun autoHeight() {
         html.style.removeProperty("height")
     }
@@ -239,13 +241,19 @@ abstract class View<V : HTMLElement>(view: V) {
     var dragType = DragType.NONE
     val onDrag = EventHandler<DragEvent>()
 
+    var minTop: Double? = null
+    var minLeft: Double? = null
+
     fun performDrag(dragEvent: DragEvent) {
         val newPosition = when (dragType) {
             View.DragType.NONE -> throw IllegalStateException()
             View.DragType.CUSTOM -> Point(dragEvent.delta.x, dragEvent.delta.y)
             View.DragType.ABSOLUTE -> {
-                left += dragEvent.delta.x
-                top += dragEvent.delta.y
+                val newLeft = left + dragEvent.delta.x
+                val newTop = top + dragEvent.delta.y
+
+                left = minLeft?.let { max(it, newLeft) } ?: newLeft
+                top = minTop?.let { max(it, newTop) } ?: newTop
                 Point(left, top)
             }
             View.DragType.MARGIN -> {

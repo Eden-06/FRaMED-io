@@ -59,7 +59,7 @@ class BoxShape(
     }
 
     init {
-        onLayerChange { _ ->
+        onLayerChange {
             shapes.forEach { shape ->
                 shape.layer = layer
             }

@@ -7,8 +7,6 @@ import io.framed.framework.util.EventHandler
  */
 abstract class Shape : Pictogram() {
 
-    abstract val id: Long
-
     var left: Double?
         get() = layer[this, Layer.Prop.LEFT]
         set(value) {
@@ -39,11 +37,12 @@ abstract class Shape : Pictogram() {
     }
 
     init {
-        layer.onUpdate(this).addListener { force ->
+        var remover = layer.onUpdate(this).withRemover {force ->
             onPositionChange.fire(force)
         }
         onLayerChange {
-            layer.onUpdate(this).addListener { force ->
+            remover.remove()
+            remover = layer.onUpdate(this).withRemover { force ->
                 onPositionChange.fire(force)
             }
         }

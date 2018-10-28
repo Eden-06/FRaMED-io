@@ -6,6 +6,9 @@ import io.framed.framework.util.EventHandler
  * @author lars
  */
 abstract class Pictogram {
+
+    abstract val id: Long
+
     var layer: Layer = Layer()
         set(value) {
             field = value

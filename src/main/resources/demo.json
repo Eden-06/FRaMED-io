@@ -238,6 +238,11 @@
           "width": null,
           "height": null
         }
+      },
+      "data": {
+        "11": {
+          "isFlatPreview": "true"
+        }
       }
     },
     "11": {
@@ -254,7 +259,8 @@
           "width": null,
           "height": null
         }
-      }
+      },
+      "data": {}
     }
   }
 }

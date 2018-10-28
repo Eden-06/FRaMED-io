@@ -1,5 +1,6 @@
 package io.framed.framework.pictogram
 
+import io.framed.framework.ConnectionLinker
 import io.framed.framework.util.EventHandler
 import io.framed.framework.util.Property
 
@@ -8,7 +9,8 @@ import io.framed.framework.util.Property
  */
 class Connection(
         val source: Property<Shape>,
-        val target: Property<Shape>
+        val target: Property<Shape>,
+        override val id: Long
 ) : Pictogram() {
     var labels: Map<TextShape, Double> = emptyMap()
         set(value) {
@@ -37,5 +39,5 @@ class Connection(
     val onStyleChange = EventHandler<Unit>()
 }
 
-fun connection(source: Property<Shape>, target: Property<Shape>, init: Connection.() -> Unit) =
-        Connection(source, target).also(init)
+fun ConnectionLinker<*>.connection(source: Property<Shape>, target: Property<Shape>, init: Connection.() -> Unit) =
+        Connection(source, target, id).also(init)

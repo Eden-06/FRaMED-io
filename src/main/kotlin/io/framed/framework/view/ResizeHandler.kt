@@ -9,8 +9,8 @@ class ResizeHandler(val target: View<*>) : View<HTMLSpanElement>("span") {
 
         dragType = DragType.CUSTOM
         onDrag { event ->
-            target.width += event.delta.x
-            target.height += event.delta.y
+            target.width += event.delta.x / target.dragZoom
+            target.height += event.delta.y / target.dragZoom
 
             onResize.fire(ResizeEvent(target.width, target.height))
         }

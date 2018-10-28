@@ -18,6 +18,8 @@ data class SidebarEvent(
     val isNone = this == NONE
 
     companion object {
-        val NONE = SidebarEvent(object : Pictogram() {})
+        val NONE = SidebarEvent(object : Pictogram() {
+            override val id: Long = -1
+        })
     }
 }

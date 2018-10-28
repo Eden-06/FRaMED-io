@@ -37,6 +37,8 @@ class CompartmentLinker(
     override val shapeLinkers: Set<ShapeLinker<*, *>>
         get() = emptySet()
 
+    private lateinit var autoLayoutBox: BoxShape
+
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
@@ -65,7 +67,7 @@ class CompartmentLinker(
                 padding = box(8.0)
             }
         }
-        val box = boxShape(BoxShape.Position.ABSOLUTE) {
+        autoLayoutBox = boxShape(BoxShape.Position.ABSOLUTE) {
             style {
                 border {
                     style = Border.BorderStyle.SOLID
@@ -75,7 +77,7 @@ class CompartmentLinker(
                 padding = box(8.0)
             }
         }
-        classes.previewBox = box
+        classes.previewBox = autoLayoutBox
 
         style {
             background = linearGradient("to bottom") {
@@ -90,6 +92,10 @@ class CompartmentLinker(
             }
         }
         resizeable = true
+
+        onLayerChange {
+            updatePreviewType()
+        }
     }
 
     override val listPreview: TextShape = textShape(nameProperty)
@@ -108,11 +114,43 @@ class CompartmentLinker(
         }
     }
 
+    private var isFlatPreview by pictogram.data(false)
+
+    private fun updatePreviewType() {
+        val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.ABSOLUTE
+        if (shapeIsFlat == isFlatPreview) return
+
+        autoLayoutBox.position = if (isFlatPreview) {
+            BoxShape.Position.ABSOLUTE
+        } else {
+            BoxShape.Position.VERTICAL
+        }
+
+        autoLayoutBox.clear()
+        this@CompartmentLinker.classes.updatePreview()
+
+        parent.redraw(this@CompartmentLinker)
+    }
+
+    private lateinit var sidebarPreviewGroup: SidebarGroup
     override val sidebar = sidebar {
         title("Compartment")
         group("General") {
             input("Name", nameProperty)
         }
+        sidebarPreviewGroup = group("Preview") {
+            button("Toggle preview") {
+                isFlatPreview = !isFlatPreview
+                updatePreviewType()
+            }
+            button("Auto layout") {
+                autoLayoutBox.autoLayout()
+            }
+        }
+    }
+
+    override fun Sidebar.onOpen(event: SidebarEvent) {
+        sidebarPreviewGroup.visible = event.target == pictogram
     }
 
     private lateinit var contextStepIn: ListView
