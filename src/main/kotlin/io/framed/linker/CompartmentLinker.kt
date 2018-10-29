@@ -205,7 +205,7 @@ class CompartmentLinker(
 
     override val setPosition = EventHandler<SetPosition>()
 
-    override fun dropShape(shape: Shape, target: Shape) {
+    override fun dropShape(element: Long, target: Long) {
         throw UnsupportedOperationException()
     }
 

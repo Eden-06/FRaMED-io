@@ -18,28 +18,30 @@ interface ConnectionManager {
     val onConnectionAdd: EventHandler<ConnectionLinker<*>>
     val onConnectionRemove: EventHandler<ConnectionLinker<*>>
 
+    /*
     fun getShapeById(id: Long): Shape? {
         return shapes.find { it.id == id }?.pictogram
     }
-    fun getLinkerByShape(shape: Shape): ShapeLinker<*, *>? = shapes.find { it.pictogram == shape }
+    */
+    fun getLinkerById(id: Long): ShapeLinker<*, *>? = shapes.find { it.id == id }
 
-    fun createConnection(source: Shape, target: Shape)
-    fun createConnection(source: Shape, target: Shape, type: ConnectionInfo): ConnectionLinker<*>
+    fun createConnection(source: Long, target: Long)
+    fun createConnection(source: Long, target: Long, type: ConnectionInfo): ConnectionLinker<*>
 
     fun addModel(modelLinker: ModelLinker<*, *, *>)
 
     fun listConnections(id: Long): List<ConnectionLinker<*>> =
             connections.filter { it.sourceIdProperty.get() == id || it.targetIdProperty.get() == id }
 
-    fun canConnectionStart(source: Shape): List<ConnectionInfo> {
-        val sourceLinker = getLinkerByShape(source) ?: return emptyList()
+    fun canConnectionStart(source: Long): List<ConnectionInfo> {
+        val sourceLinker = getLinkerById(source) ?: return emptyList()
 
         return LinkerManager.linkerConnectionList.asSequence().filter { it.canStart(sourceLinker) }.map { it.info }.toList()
     }
 
-    fun canConnectionCreate(source: Shape, target: Shape): List<ConnectionInfo> {
-        val sourceLinker = getLinkerByShape(source) ?: return emptyList()
-        val targetLinker = getLinkerByShape(target) ?: return emptyList()
+    fun canConnectionCreate(source: Long, target: Long): List<ConnectionInfo> {
+        val sourceLinker = getLinkerById(source) ?: return emptyList()
+        val targetLinker = getLinkerById(target) ?: return emptyList()
 
         return LinkerManager.linkerConnectionList.asSequence().filter { it.canCreate(sourceLinker, targetLinker) }.map { it.info }.toList()
     }

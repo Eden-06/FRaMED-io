@@ -37,12 +37,12 @@ abstract class Shape : Pictogram() {
     }
 
     init {
-        var remover = layer.onUpdate(this).withRemover {force ->
+        var remover = layer.onUpdate(this)?.withRemover {force ->
             onPositionChange.fire(force)
         }
         onLayerChange {
-            remover.remove()
-            remover = layer.onUpdate(this).withRemover { force ->
+            remover?.remove()
+            remover = layer.onUpdate(this)?.withRemover { force ->
                 onPositionChange.fire(force)
             }
         }

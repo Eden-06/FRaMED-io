@@ -257,9 +257,9 @@ class ContainerLinker(
 
     override val setPosition = EventHandler<SetPosition>()
 
-    override fun dropShape(shape: Shape, target: Shape) {
-        val elementLinker = getLinkerByShape(shape) ?: throw IllegalArgumentException()
-        val targetLinker = getLinkerByShape(target) ?: throw IllegalArgumentException()
+    override fun dropShape(element: Long, target: Long) {
+        val elementLinker = getLinkerById(element) ?: throw IllegalArgumentException()
+        val targetLinker = getLinkerById(target) ?: throw IllegalArgumentException()
 
         val connectionCount = connectionManager.listConnections(elementLinker.id).size
 

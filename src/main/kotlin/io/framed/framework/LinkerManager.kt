@@ -37,8 +37,8 @@ object LinkerManager {
             }, setter = { connectionInfo ->
                 async {
                     History.group("Set connection type to ${connectionInfo.name}") {
-                        val source = linker.sourceShapeProperty.get()
-                        val target = linker.targetShapeProperty.get()
+                        val source = linker.sourceIdProperty.get()
+                        val target = linker.targetIdProperty.get()
                         val manager = linker.manager
                         linker.delete()
 

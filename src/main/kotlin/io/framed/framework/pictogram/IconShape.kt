@@ -9,14 +9,14 @@ import io.framed.framework.view.Icon
  */
 class IconShape(
         val property: Property<out Icon?>,
-        override val id: Long
+        override val id: Long?
 ) : Shape() {
 
 }
 
 fun BoxShape.iconShape(
         property: Property<out Icon?>
-) = IconShape(property, id).also(this::add)
+) = IconShape(property, null).also(this::add)
 
 fun Linker<*, *>.iconShape(
         property: Property<out Icon?>,

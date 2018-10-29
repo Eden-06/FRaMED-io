@@ -7,7 +7,7 @@ import io.framed.framework.util.EventHandler
  */
 abstract class Pictogram {
 
-    abstract val id: Long
+    abstract val id: Long?
 
     var layer: Layer = Layer()
         set(value) {
@@ -21,4 +21,8 @@ abstract class Pictogram {
 
     var hasSidebar = false
     var hasContextMenu = false
+
+    override fun toString(): String {
+        return "${this::class.simpleName}($id)"
+    }
 }

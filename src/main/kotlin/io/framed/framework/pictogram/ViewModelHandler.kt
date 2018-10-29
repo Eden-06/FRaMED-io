@@ -2,10 +2,10 @@ package io.framed.framework.pictogram
 
 interface ViewModelHandler {
 
-    fun canConnectionStart(source: Shape): Boolean
-    fun canConnectionCreate(source: Shape, target: Shape): Boolean
-    fun createConnection(source: Shape, target: Shape)
+    fun canConnectionStart(source: Long): Boolean
+    fun canConnectionCreate(source: Long, target: Long): Boolean
+    fun createConnection(source: Long, target: Long)
 
-    fun canDropShape(shape: Shape, target: Shape): Boolean
-    fun dropShape(shape: Shape, target: Shape)
+    fun canDropShape(shape: Long, target: Long): Boolean
+    fun dropShape(shape: Long, target: Long)
 }

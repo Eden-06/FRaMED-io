@@ -18,25 +18,19 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
 
     val container: BoxShape
 
-    fun getShapeById(id: Long): Shape? =
-            shapeLinkers.find { it.id == id }?.pictogram
-
-    fun getIdByShape(shape: Shape): Long? =
-            getLinkerByShape(shape)?.id
-
-    fun getLinkerByShape(shape: Shape): ShapeLinker<*, *>? =
-            shapeLinkers.find { it.pictogram == shape }
+    fun getLinkerById(id: Long): ShapeLinker<*, *>? =
+            shapeLinkers.find { it.id == id }
 
     val setPosition: EventHandler<SetPosition>
 
     fun redraw(linker: ShapeLinker<*, *>)
 
-    fun canDropShape(shape: Shape, target: Shape): Boolean {
-        val shapeLinker = shapeLinkers.find { it.pictogram == shape } ?: return false
-        val targetLinker = shapeLinkers.find { it.pictogram == target } ?: return false
+    fun canDropShape(element: Long, target: Long): Boolean {
+        val shapeLinker = shapeLinkers.find { it.id == element } ?: return false
+        val targetLinker = shapeLinkers.find { it.id == target } ?: return false
 
         return LinkerManager.linkerItemList.find { shapeLinker in it }?.canCreate(targetLinker) ?: false
     }
 
-    fun dropShape(shape: Shape, target: Shape)
+    fun dropShape(element: Long, target: Long)
 }

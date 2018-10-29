@@ -1,6 +1,7 @@
 package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumb
+import io.framed.framework.JsPlumbInstance
 import io.framed.framework.jsPlumbEndpointOptions
 import io.framed.framework.pictogram.*
 import io.framed.framework.render.Renderer
@@ -34,8 +35,9 @@ class HtmlRenderer(
 
     private var removerList: List<EventHandler<*>.Remover> = emptyList()
     fun reset() {
-        jsPlumbInstance.deleteEveryConnection()
-        jsPlumbInstance.deleteEveryEndpoint()
+        jsPlumbList.forEach { it.deleteEveryConnection() }
+        jsPlumbList.forEach { it.deleteEveryEndpoint() }
+
         endpointMap.clear()
         shapeMap = emptyMap()
 
@@ -61,41 +63,50 @@ class HtmlRenderer(
         }
     }
 
-    private fun createConnection(source: Shape, target: Shape) {
+    private fun createConnection(source: Long, target: Long) {
         viewModel.handler.createConnection(source, target)
     }
 
-    private val jsPlumbInstance = JsPlumb.getInstance().apply {
-        setContainer(navigationView.container.html)
+    private var jsPlumbList: List<JsPlumbInstance> = emptyList()
 
-        setZoom(1.0)
-        bind("beforeDrop") { info: dynamic ->
-            val source = getShapeById(info.sourceId as String) ?: return@bind false
-            val target = getShapeById(info.targetId as String) ?: return@bind false
+    private fun createJsPlumb(container: HTMLElement): JsPlumbInstance {
+        println("create instance")
+        val instance = JsPlumb.getInstance().apply {
+            setContainer(container)
 
-            createConnection(source, target)
+            setZoom(1.0)
+            bind("beforeDrop") { info: dynamic ->
+                val source = getShapeById(info.sourceId as String)?.id ?: return@bind false
+                val target = getShapeById(info.targetId as String)?.id ?: return@bind false
 
-            return@bind false
+                createConnection(source, target)
+
+                return@bind false
+            }
+
+            bind("beforeDrag") { info: dynamic ->
+                val source = getShapeById(info.sourceId as String) ?: return@bind true
+                updateEndpoints(source)
+                true
+            }
+
+            bind("connectionDragStop") { _ ->
+                updateEndpoints()
+            }
+
+            navigationView.onZoom { zoom ->
+                setZoom(zoom)
+                draggableViews.forEach { it.dragZoom = zoom }
+                updateViewBox()
+            }
+            navigationView.onPan {
+                updateViewBox()
+            }
         }
 
-        bind("beforeDrag") { info: dynamic ->
-            val source = getShapeById(info.sourceId as String) ?: return@bind true
-            updateEndpoints(source)
-            true
-        }
+        jsPlumbList += instance
 
-        bind("connectionDragStop") { _ ->
-            updateEndpoints()
-        }
-
-        navigationView.onZoom { zoom ->
-            setZoom(zoom)
-            draggableViews.forEach { it.dragZoom = zoom }
-            updateViewBox()
-        }
-        navigationView.onPan {
-            updateViewBox()
-        }
+        return instance
     }
 
     private fun updateViewBox() {
@@ -141,19 +152,21 @@ class HtmlRenderer(
             }
         }
 
-        viewModel.container.shapes.forEach { drawShape(it, navigationView.container, viewModel.container.position) }
+        val jsPlumbInstance = createJsPlumb(navigationView.container.html)
+
+        viewModel.container.shapes.forEach { drawShape(it, navigationView.container, viewModel.container.position, jsPlumbInstance) }
         removerList += viewModel.container.onAdd.withRemover {
-            drawShape(it, navigationView.container, viewModel.container.position)
+            drawShape(it, navigationView.container, viewModel.container.position, jsPlumbInstance)
         }
         removerList += viewModel.container.onRemove.withRemover {
             removeShape(it)
         }
 
         viewModel.connections.forEach {
-            drawRelation(it)
+            drawRelation(findInstance(listOf(it.source.get(), it.target.get())) ?: throw IllegalArgumentException("Shapes are not in the same layer!"), it)
         }
         removerList += viewModel.onConnectionAdd.withRemover {
-            drawRelation(it)
+            drawRelation(findInstance(listOf(it.source.get(), it.target.get())) ?: throw IllegalArgumentException("Shapes are not in the same layer!"), it)
         }
         removerList += viewModel.onConnectionRemove.withRemover { r ->
             relations[r]?.let { relation ->
@@ -163,12 +176,23 @@ class HtmlRenderer(
         }
     }
 
+    private fun findInstance(idList: List<Long>): JsPlumbInstance? {
+        val list = shapeMap.filterKeys { it.id in idList }.values.map { it.jsPlumbInstance }.distinct()
+        return if (list.size == 1) {
+            list.first()
+        } else {
+            null
+        }
+    }
+
     private fun updateEndpoints(source: Shape? = null) {
-        (endpointMap.keys - shapeMap.keys).forEach(this::deleteEndpoint)
+        (endpointMap.keys - shapeMap.keys).forEach {
+            deleteEndpoint(it)
+        }
 
         if (source == null) {
             shapeMap.keys.forEach {
-                if (viewModel.handler.canConnectionStart(it)) {
+                if (viewModel.handler.canConnectionStart(it.id ?: return)) {
                     createEndpoint(it)
                 } else {
                     deleteEndpoint(it)
@@ -176,7 +200,7 @@ class HtmlRenderer(
             }
         } else {
             (shapeMap.keys - source).forEach {
-                if (viewModel.handler.canConnectionCreate(source, it)) {
+                if (viewModel.handler.canConnectionCreate(source.id ?: return, it.id ?: return)) {
                     createEndpoint(it)
                 } else {
                     deleteEndpoint(it)
@@ -187,7 +211,9 @@ class HtmlRenderer(
 
     fun createEndpoint(shape: Shape) {
         if (endpointMap.containsKey(shape)) return
-        val html = shapeMap[shape]?.html ?: return
+        val html = shapeMap[shape]?.view?.html ?: return
+        val jsPlumbInstance = shapeMap[shape]?.jsPlumbInstance ?: return
+
         endpointMap[shape] = jsPlumbInstance.addEndpoint(html, jsPlumbEndpointOptions {
             anchors = arrayOf("Bottom")
             isSource = true
@@ -200,6 +226,7 @@ class HtmlRenderer(
      * The model removes the endpoint for the given shape
      */
     fun deleteEndpoint(shape: Shape) {
+        val jsPlumbInstance = shapeMap[shape]?.jsPlumbInstance ?: return
         endpointMap[shape]?.let(jsPlumbInstance::deleteEndpoint)
         endpointMap -= shape
     }
@@ -209,13 +236,14 @@ class HtmlRenderer(
      */
     private val endpointMap = mutableMapOf<Shape, HTMLElement>()
 
-    operator fun get(shape: Shape): View<*>? = shapeMap[shape]
+    operator fun get(shape: Shape): View<*>? = shapeMap[shape]?.view
+    operator fun get(id: Long): View<*>? = shapeMap.filterKeys { it.id == id }.values.firstOrNull()?.view
 
     private fun getShapeById(id: String): Shape? = shapeMap.entries.find { (_, view) ->
-        view.id == id
+        view.view.id == id
     }?.key
 
-    private var shapeMap: Map<Shape, View<*>> = emptyMap()
+    private var shapeMap: Map<Shape, ShapeItem> = emptyMap()
         set(value) {
             field = value
             async {
@@ -224,13 +252,13 @@ class HtmlRenderer(
         }
 
     private var relations: Map<Connection, HtmlRelation> = emptyMap()
-    private fun drawRelation(relation: Connection) {
+    private fun drawRelation(jsPlumbInstance: JsPlumbInstance, relation: Connection) {
         relations += relation to HtmlRelation(relation, jsPlumbInstance, this)
     }
 
     private fun removeShape(shape: Shape) {
         shapeMap[shape]?.let { v ->
-            navigationView.container.remove(v)
+            navigationView.container.remove(v.view)
             if (shape is BoxShape) {
                 shape.shapes.forEach(this::removeShape)
             }
@@ -240,14 +268,16 @@ class HtmlRenderer(
         }
     }
 
-    private fun drawShape(shape: Shape, parent: ViewCollection<View<*>, *>, position: BoxShape.Position): View<*> {
+    private fun drawShape(shape: Shape, parent: ViewCollection<View<*>, *>, position: BoxShape.Position, jsPlumbInstance: JsPlumbInstance): View<*> {
         return when (shape) {
-            is BoxShape -> drawBoxShape(shape, parent, position)
+            is BoxShape -> drawBoxShape(shape, parent, position, jsPlumbInstance)
             is TextShape -> drawTextShape(shape, parent)
-            is IconShape -> drawIconShape(shape, parent, position)
+            is IconShape -> drawIconShape(shape, parent, position, jsPlumbInstance)
             else -> throw UnsupportedOperationException()
         }.also { view ->
-            shapeMap += shape to view
+            if (shape.id != null) {
+                shapeMap += shape to ShapeItem(view, jsPlumbInstance)
+            }
         }
     }
 
@@ -306,28 +336,28 @@ class HtmlRenderer(
     }
 
     private fun checkDrop(shape: Shape? = null): Shape? {
-        shapeMap.values.filter { "drop-target" in it.classes }.forEach {
-            it.classes -= "drop-target"
+        shapeMap.values.filter { "drop-target" in it.view.classes }.forEach {
+            it.view.classes -= "drop-target"
         }
 
         if (shape != null) {
             val mouse = navigationView.mouseToCanvas(Root.mousePosition)
             val targets = shapeMap.filter { (s, view) ->
-                mouse in view.dimension && shape != s
+                mouse in view.view.dimension && shape != s
             }.filterKeys { target ->
-                viewModel.handler.canDropShape(shape, target)
+                viewModel.handler.canDropShape(shape.id ?: return null, target.id ?: return null)
             }
 
             if (targets.size == 1) {
                 val (target, view) = targets.entries.first()
-                view.classes += "drop-target"
+                view.view.classes += "drop-target"
                 return target
             }
         }
         return null
     }
 
-    private fun absolutePosition(view: View<*>, shape: Shape, parent: ViewCollection<View<*>, *>) = with(view) {
+    private fun absolutePosition(view: View<*>, shape: Shape, parent: ViewCollection<View<*>, *>, jsPlumbInstance: JsPlumbInstance) = with(view) {
         left = shape.left ?: 0.0
         top = shape.top ?: 0.0
         classes += "absolute-view"
@@ -371,7 +401,7 @@ class HtmlRenderer(
         }
         onMouseUp {
             canDrop?.let { target ->
-                viewModel.handler.dropShape(shape, target)
+                viewModel.handler.dropShape(shape.id ?: return@onMouseUp, target.id ?: return@onMouseUp)
             }
             checkDrop()
         }
@@ -386,7 +416,8 @@ class HtmlRenderer(
     private fun drawBoxShape(
             shape: BoxShape,
             parent: ViewCollection<View<*>, *>,
-            position: BoxShape.Position
+            position: BoxShape.Position,
+            jsPlumbInstance: JsPlumbInstance
     ): View<*> = parent.listView {
         style(this, shape.style)
         events(this, shape, parent)
@@ -408,15 +439,19 @@ class HtmlRenderer(
         }
 
         if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(this, shape, parent)
+            absolutePosition(this, shape, parent, jsPlumbInstance)
         }
 
+        val childJsPlumbInstance = if (shape.position == BoxShape.Position.ABSOLUTE) {
+            createJsPlumb(this.html)
+        } else jsPlumbInstance
+
         var map = shape.shapes.map {
-            it to drawShape(it, this, shape.position)
+            it to drawShape(it, this, shape.position, childJsPlumbInstance)
         }.toMap()
 
         removerList += shape.onAdd.withRemover(shape.id) {
-            map += it to drawShape(it, this, shape.position)
+            map += it to drawShape(it, this, shape.position, childJsPlumbInstance)
         }
         removerList += shape.onRemove.withRemover(shape.id) { s ->
             map[s]?.let { v ->
@@ -441,13 +476,14 @@ class HtmlRenderer(
     private fun drawIconShape(
             shape: IconShape,
             parent: ViewCollection<View<*>, *>,
-            position: BoxShape.Position
+            position: BoxShape.Position,
+            jsPlumbInstance: JsPlumbInstance
     ): View<*> = parent.iconView(shape.property) {
         style(this, shape.style)
         events(this, shape, parent)
 
         if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(this, shape, parent)
+            absolutePosition(this, shape, parent, jsPlumbInstance)
         }
     }
 
@@ -462,4 +498,9 @@ class HtmlRenderer(
     override fun panTo(point: Point) {
         navigationView.panTo(point)
     }
+
+    class ShapeItem(
+            val view: View<*>,
+            val jsPlumbInstance: JsPlumbInstance
+    )
 }

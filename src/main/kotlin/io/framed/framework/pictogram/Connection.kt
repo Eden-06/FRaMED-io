@@ -8,8 +8,8 @@ import io.framed.framework.util.Property
  * @author lars
  */
 class Connection(
-        val source: Property<Shape>,
-        val target: Property<Shape>,
+        val source: Property<Long>,
+        val target: Property<Long>,
         override val id: Long
 ) : Pictogram() {
     var labels: Map<TextShape, Double> = emptyMap()
@@ -39,5 +39,5 @@ class Connection(
     val onStyleChange = EventHandler<Unit>()
 }
 
-fun ConnectionLinker<*>.connection(source: Property<Shape>, target: Property<Shape>, init: Connection.() -> Unit) =
+fun ConnectionLinker<*>.connection(source: Property<Long>, target: Property<Long>, init: Connection.() -> Unit) =
         Connection(source, target, id).also(init)

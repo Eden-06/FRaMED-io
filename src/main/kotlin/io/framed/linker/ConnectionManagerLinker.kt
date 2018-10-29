@@ -47,7 +47,7 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
     override val onConnectionAdd = EventHandler<ConnectionLinker<*>>()
     override val onConnectionRemove = EventHandler<ConnectionLinker<*>>()
 
-    override fun createConnection(source: Shape, target: Shape) {
+    override fun createConnection(source: Long, target: Long) {
         val types = canConnectionCreate(source, target)
         if (types.isEmpty()) return
 
@@ -65,15 +65,13 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
         }
     }
 
-    override fun createConnection(source: Shape, target: Shape, type: ConnectionInfo): ConnectionLinker<*> {
-        val sourceId = source.id
-        val targetId = target.id
+    override fun createConnection(source: Long, target: Long, type: ConnectionInfo): ConnectionLinker<*> {
 
         return when (type) {
-            AssociationLinker.info -> AssociationLinker(Association(sourceId, targetId), this).also(associations::add)
-            AggregationLinker.info -> AggregationLinker(Aggregation(sourceId, targetId), this).also(aggregations::add)
-            InheritanceLinker.info -> InheritanceLinker(Inheritance(sourceId, targetId), this).also(inheritances::add)
-            CompositionLinker.info -> CompositionLinker(Composition(sourceId, targetId), this).also(compositions::add)
+            AssociationLinker.info -> AssociationLinker(Association(source, target), this).also(associations::add)
+            AggregationLinker.info -> AggregationLinker(Aggregation(source, target), this).also(aggregations::add)
+            InheritanceLinker.info -> InheritanceLinker(Inheritance(source, target), this).also(inheritances::add)
+            CompositionLinker.info -> CompositionLinker(Composition(source, target), this).also(compositions::add)
             else -> throw IllegalArgumentException()
         }
     }

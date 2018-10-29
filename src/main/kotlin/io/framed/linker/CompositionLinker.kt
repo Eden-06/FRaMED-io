@@ -23,16 +23,9 @@ class CompositionLinker(
     private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 
     override val sourceIdProperty = property(model::sourceId).trackHistory()
-    override val sourceShapeProperty = property(sourceIdProperty, getter = {
-        manager.getShapeById(model.sourceId)!!
-    }, setter = { Validator.Result.ERROR })
-
     override val targetIdProperty = property(model::targetId).trackHistory()
-    override val targetShapeProperty = property(targetIdProperty, getter = {
-        manager.getShapeById(model.targetId)!!
-    }, setter = { Validator.Result.ERROR })
 
-    override val pictogram = connection(sourceShapeProperty, targetShapeProperty) {
+    override val pictogram = connection(sourceIdProperty, targetIdProperty) {
         labels += textShape(nameProperty) to 0.5
         labels += textShape(sourceCardinalityProperty, CardinalityPreset.STRING_VALUES) to -30.0
         labels += textShape(targetCardinalityProperty, CardinalityPreset.STRING_VALUES) to 31.0

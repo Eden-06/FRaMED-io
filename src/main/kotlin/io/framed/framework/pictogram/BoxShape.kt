@@ -8,7 +8,7 @@ import io.framed.framework.util.History
  * @author lars
  */
 class BoxShape(
-        override val id: Long
+        override val id: Long?
 ) : Shape() {
 
     enum class Position {
@@ -71,4 +71,4 @@ fun Linker<*, *>.boxShape(position: BoxShape.Position = BoxShape.Position.VERTIC
         BoxShape(id).also(init).also { it.position = position }
 
 fun BoxShape.boxShape(position: BoxShape.Position = BoxShape.Position.VERTICAL, init: BoxShape.() -> Unit) =
-        BoxShape(id).also(init).also(this::add).also { it.position = position }
+        BoxShape(null).also(init).also(this::add).also { it.position = position }

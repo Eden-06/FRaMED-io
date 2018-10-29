@@ -14,18 +14,18 @@ class Controller(
 ) {
 
     val handler = object : ViewModelHandler {
-        override fun canConnectionStart(source: Shape): Boolean =
+        override fun canConnectionStart(source: Long): Boolean =
                 linker.connectionManager.canConnectionStart(source).isNotEmpty()
 
-        override fun canConnectionCreate(source: Shape, target: Shape): Boolean =
+        override fun canConnectionCreate(source: Long, target: Long): Boolean =
                 linker.connectionManager.canConnectionCreate(source, target).isNotEmpty()
 
-        override fun createConnection(source: Shape, target: Shape) =
+        override fun createConnection(source: Long, target: Long) =
                 linker.connectionManager.createConnection(source, target)
 
-        override fun canDropShape(shape: Shape, target: Shape): Boolean = linker.canDropShape(shape, target)
+        override fun canDropShape(shape: Long, target: Long): Boolean = linker.canDropShape(shape, target)
 
-        override fun dropShape(shape: Shape, target: Shape) = linker.dropShape(shape, target)
+        override fun dropShape(shape: Long, target: Long) = linker.dropShape(shape, target)
 
     }
 

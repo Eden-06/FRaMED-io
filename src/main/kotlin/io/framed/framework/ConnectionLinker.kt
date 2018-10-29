@@ -13,13 +13,11 @@ interface ConnectionLinker<M : ModelElement<M>>: Linker<M, Connection> {
     val manager: ConnectionManager
 
     val sourceIdProperty: Property<Long>
-    val sourceShapeProperty: Property<Shape>
 
     val targetIdProperty: Property<Long>
-    val targetShapeProperty: Property<Shape>
 
     fun canSwap(info: ConnectionInfo): Boolean =
-            manager.canConnectionCreate(targetShapeProperty.get(), sourceShapeProperty.get()).contains(info)
+            manager.canConnectionCreate(targetIdProperty.get(), sourceIdProperty.get()).contains(info)
 
     fun swap() {
         History.group("Swap connection") {
@@ -31,6 +29,7 @@ interface ConnectionLinker<M : ModelElement<M>>: Linker<M, Connection> {
 
     override fun delete() = manager.remove(this)
 
-    fun canConvert() = manager.canConnectionCreate(sourceShapeProperty.get(), targetShapeProperty.get())
-    operator fun contains(shape: Shape): Boolean = sourceShapeProperty.get() == shape || targetShapeProperty.get() == shape
+    fun canConvert() = manager.canConnectionCreate(sourceIdProperty.get(), targetIdProperty.get())
+    operator fun contains(shape: Shape): Boolean = sourceIdProperty.get() == shape.id || targetIdProperty.get() == shape.id
+    operator fun contains(id: Long): Boolean = sourceIdProperty.get() == id || targetIdProperty.get() == id
 }

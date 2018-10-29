@@ -101,11 +101,13 @@ class HtmlRelation(
         connectInit.overlays = overlays.toTypedArray()
     }
 
-    fun draw(sourceShape: Shape, targetShape: Shape) {
+    fun draw(sourceId: Long, targetId: Long) {
         remove()
 
-        val sourceView = renderer[sourceShape] ?: return
-        val targetView = renderer[targetShape] ?: return
+        val sourceView = renderer[sourceId] ?: return
+        val targetView = renderer[targetId] ?: return
+
+        val zIndex = listOfNotNull(sourceView.zIndex, targetView.zIndex).max() ?: 0
 
         // Click area
         connections += jsPlumbInstance.connect(jsPlumbConnect {
@@ -122,15 +124,21 @@ class HtmlRelation(
                 stroke = "transparent"
                 strokeWidth = 15
             }
-        })
+        }).also {
+            it.canvas.style.zIndex = zIndex.toString()
+        }
 
         connection.lines.dropLast(1).forEach { line ->
-            connections += jsPlumbInstance.connect(createJsPlumbConnection(line, sourceView, targetView))
+            connections += jsPlumbInstance.connect(createJsPlumbConnection(line, sourceView, targetView)).also {
+                it.canvas.style.zIndex = zIndex.toString()
+            }
         }
         connection.lines.lastOrNull()?.let { line ->
             val init = createJsPlumbConnection(line, sourceView, targetView)
             createEndStyle(init)
-            connections += jsPlumbInstance.connect(init)
+            connections += jsPlumbInstance.connect(init).also {
+                it.canvas.style.zIndex = zIndex.toString()
+            }
         }
 
         connections.forEach { c ->

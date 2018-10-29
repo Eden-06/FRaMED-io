@@ -143,6 +143,15 @@ abstract class View<V : HTMLElement>(view: V) {
         set(value) {
             html.style.height = "${value}px"
         }
+    var zIndex: Int?
+        get() = html.style.zIndex.toIntOrNull()
+        set(value) {
+            if (value == null) {
+                html.style.removeProperty("z-index")
+            } else {
+                html.style.zIndex = value.toString()
+            }
+        }
 
     fun autoWidth() {
         html.style.removeProperty("width")

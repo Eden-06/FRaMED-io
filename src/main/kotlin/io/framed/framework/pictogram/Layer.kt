@@ -31,27 +31,30 @@ class Layer {
 
     operator fun get(shape: Shape): Dimension? = position[shape.id]
     operator fun set(shape: Shape, dimension: Dimension?) {
+        val id = shape.id ?: return
         if (dimension == null) {
-            position.remove(shape.id)
+            position.remove(id)
         } else {
-            position[shape.id] = dimension
+            position[id] = dimension
         }
 
-        listener[shape.id]?.fire(true)
+        listener[id]?.fire(true)
     }
 
-    operator fun get(shape: Shape, prop: Prop): Double? =
-            position[shape.id]?.let { dimension ->
-                when (prop) {
-                    Prop.LEFT -> dimension.left
-                    Prop.TOP -> dimension.top
-                    Prop.WIDTH -> dimension.width
-                    Prop.HEIGHT -> dimension.height
-                }
+    operator fun get(shape: Shape, prop: Prop): Double? {
+        return position[shape.id ?: return null]?.let { dimension ->
+            when (prop) {
+                Prop.LEFT -> dimension.left
+                Prop.TOP -> dimension.top
+                Prop.WIDTH -> dimension.width
+                Prop.HEIGHT -> dimension.height
             }
+        }
+    }
 
     operator fun set(shape: Shape, prop: Prop, value: Double?) {
-        val dimension = position[shape.id] ?: Dimension(0.0, 0.0, null, null)
+        val id = shape.id ?: return
+        val dimension = position[id] ?: Dimension(0.0, 0.0, null, null)
 
         val oldValue = when (prop) {
             Prop.LEFT -> dimension.left
@@ -60,13 +63,13 @@ class Layer {
             Prop.HEIGHT -> dimension.height
         }
 
-        position[shape.id] = when (prop) {
+        position[id] = when (prop) {
             Prop.LEFT -> dimension.copy(left = value ?: 0.0)
             Prop.TOP -> dimension.copy(top = value ?: 0.0)
             Prop.WIDTH -> dimension.copy(width = value)
             Prop.HEIGHT -> dimension.copy(height = value)
         }
-        listener[shape.id]?.fire(false)
+        listener[id]?.fire(false)
 
         History.push(HistoryLayer(this, shape, prop, oldValue, value))
     }
@@ -96,8 +99,9 @@ class Layer {
                     value
             )
 
-    fun onUpdate(shape: Shape): EventHandler<Boolean> {
-        return listener.getOrPut(shape.id) { EventHandler() }
+    fun onUpdate(shape: Shape): EventHandler<Boolean>? {
+        val id = shape.id ?: return null
+        return listener.getOrPut(id) { EventHandler() }
     }
 
     enum class Prop {
@@ -114,7 +118,8 @@ class PictogramData<T : Any>(
         val default: T
 ) {
     operator fun getValue(thisRef: Any, property: KProperty<*>): T {
-        val data = picto.layer.getData(picto.id, property.name, default)
+        val id = picto.id ?: return default
+        val data = picto.layer.getData(id, property.name, default)
         return when (type) {
             String::class -> data as T
             Boolean::class -> data.toBoolean() as T
@@ -123,6 +128,7 @@ class PictogramData<T : Any>(
     }
 
     operator fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
-        picto.layer.setData(picto.id, property.name, value.toString())
+        val id = picto.id ?: return
+        picto.layer.setData(id, property.name, value.toString())
     }
 }
