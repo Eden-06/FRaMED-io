@@ -2,20 +2,19 @@ group = 'de.framed-io.kotlin'
 version = '1.0.0'
 
 buildscript {
-    ext.kotlin_version = '1.2.71'
-    ext.serialization_version = '0.6.2'
+    ext.kotlin_version = '1.3.0'
+    ext.serialization_version = '0.9.0'
     ext.web_path = 'web'
 
     repositories {
         jcenter()
         mavenCentral()
-        maven { url "https://kotlin.bintray.com/kotlinx" }
         maven { url "https://plugins.gradle.org/m2/" }
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
         classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
     }
 }

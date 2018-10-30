@@ -10,6 +10,7 @@ import io.framed.model.Container
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JSON
+import kotlinx.serialization.stringify
 
 @Serializable
 class File(
@@ -23,13 +24,13 @@ class File(
         get() = root.name.toLowerCase()
 
     fun toJSON(): String {
-        return JSON.indented.stringify(this) + "\n"
+        return JSON.indented.stringify(File.serializer(), this) + "\n"
     }
 
     companion object {
 
         fun fromJSON(content: String): File {
-            val file = JSON.parse<File>(content)
+            val file = JSON.parse(File.serializer(), content)
 
             ModelElement.lastId = file.root.maxId() + 1
 

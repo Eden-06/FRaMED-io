@@ -1,7 +1,7 @@
 package io.framed.model
 
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.SerialClassDescImpl
+import kotlinx.serialization.internal.StringDescriptor
 import kotlin.js.Date
 
 @Serializable
@@ -17,14 +17,13 @@ class Metadata {
 
 @Serializer(forClass = Date::class)
 object DateSerializer: KSerializer<Date> {
-    override fun save(output: KOutput, obj: Date) {
-        output.writeStringValue(obj.toUTCString())
+    override val descriptor: SerialDescriptor = StringDescriptor
+
+    override fun serialize(output: Encoder, obj: Date) {
+        output.encodeString(obj.toString())
     }
 
-    override fun load(input: KInput): Date {
-        return Date(input.readStringValue())
+    override fun deserialize(input: Decoder): Date {
+        return Date(input.decodeString())
     }
-
-    override val serialClassDesc: KSerialClassDesc = SerialClassDescImpl("kotlin.js.Date")
-
 }
