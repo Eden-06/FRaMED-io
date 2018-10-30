@@ -70,7 +70,6 @@ class HtmlRenderer(
     private var jsPlumbList: List<JsPlumbInstance> = emptyList()
 
     private fun createJsPlumb(container: HTMLElement): JsPlumbInstance {
-        println("create instance")
         val instance = JsPlumb.getInstance().apply {
             setContainer(container)
 
@@ -154,19 +153,21 @@ class HtmlRenderer(
 
         val jsPlumbInstance = createJsPlumb(navigationView.container.html)
 
-        viewModel.container.shapes.forEach { drawShape(it, navigationView.container, viewModel.container.position, jsPlumbInstance) }
+        viewModel.container.shapes.forEach { drawShape(it, navigationView.container, viewModel.container.position, jsPlumbInstance, 0) }
         removerList += viewModel.container.onAdd.withRemover {
-            drawShape(it, navigationView.container, viewModel.container.position, jsPlumbInstance)
+            drawShape(it, navigationView.container, viewModel.container.position, jsPlumbInstance, 0)
         }
         removerList += viewModel.container.onRemove.withRemover {
             removeShape(it)
         }
 
         viewModel.connections.forEach {
-            drawRelation(findInstance(listOf(it.source.get(), it.target.get())) ?: throw IllegalArgumentException("Shapes are not in the same layer!"), it)
+            drawRelation(findInstance(listOf(it.source.get(), it.target.get()))
+                    ?: throw IllegalArgumentException("Shapes are not in the same layer!"), it)
         }
         removerList += viewModel.onConnectionAdd.withRemover {
-            drawRelation(findInstance(listOf(it.source.get(), it.target.get())) ?: throw IllegalArgumentException("Shapes are not in the same layer!"), it)
+            drawRelation(findInstance(listOf(it.source.get(), it.target.get()))
+                    ?: throw IllegalArgumentException("Shapes are not in the same layer!"), it)
         }
         removerList += viewModel.onConnectionRemove.withRemover { r ->
             relations[r]?.let { relation ->
@@ -180,6 +181,8 @@ class HtmlRenderer(
         val list = shapeMap.filterKeys { it.id in idList }.values.map { it.jsPlumbInstance }.distinct()
         return if (list.size == 1) {
             list.first()
+        } else if (jsPlumbList.first() in list) {
+            jsPlumbList.first()
         } else {
             null
         }
@@ -236,8 +239,23 @@ class HtmlRenderer(
      */
     private val endpointMap = mutableMapOf<Shape, HTMLElement>()
 
-    operator fun get(shape: Shape): View<*>? = shapeMap[shape]?.view
-    operator fun get(id: Long): View<*>? = shapeMap.filterKeys { it.id == id }.values.firstOrNull()?.view
+    operator fun get(id: Long, jsPlumbInstance: JsPlumbInstance, findParent: Boolean = false): View<*>? = shapeMap
+            .filter { it.key.id == id }.values.firstOrNull()?.let {
+        if (findParent) {
+            var item: ShapeItem? = it
+            while (item != null) {
+                if (item.jsPlumbInstance == jsPlumbInstance) {
+                    return@let item
+                }
+                item = item.parent
+            }
+            null
+        } else {
+            if (it.jsPlumbInstance == jsPlumbInstance) {
+                it
+            } else null
+        }
+    }?.view
 
     private fun getShapeById(id: String): Shape? = shapeMap.entries.find { (_, view) ->
         view.view.id == id
@@ -268,15 +286,15 @@ class HtmlRenderer(
         }
     }
 
-    private fun drawShape(shape: Shape, parent: ViewCollection<View<*>, *>, position: BoxShape.Position, jsPlumbInstance: JsPlumbInstance): View<*> {
+    private fun drawShape(shape: Shape, parent: ViewCollection<View<*>, *>, position: BoxShape.Position, jsPlumbInstance: JsPlumbInstance, parentId: Long?): View<*> {
         return when (shape) {
-            is BoxShape -> drawBoxShape(shape, parent, position, jsPlumbInstance)
+            is BoxShape -> drawBoxShape(shape, parent, position, jsPlumbInstance, parentId)
             is TextShape -> drawTextShape(shape, parent)
             is IconShape -> drawIconShape(shape, parent, position, jsPlumbInstance)
             else -> throw UnsupportedOperationException()
         }.also { view ->
             if (shape.id != null) {
-                shapeMap += shape to ShapeItem(view, jsPlumbInstance)
+                shapeMap += shape to ShapeItem(view, jsPlumbInstance, shapeMap.filterKeys { it.id == parentId }.values.firstOrNull())
             }
         }
     }
@@ -417,7 +435,8 @@ class HtmlRenderer(
             shape: BoxShape,
             parent: ViewCollection<View<*>, *>,
             position: BoxShape.Position,
-            jsPlumbInstance: JsPlumbInstance
+            jsPlumbInstance: JsPlumbInstance,
+            parentId: Long?
     ): View<*> = parent.listView {
         style(this, shape.style)
         events(this, shape, parent)
@@ -447,11 +466,11 @@ class HtmlRenderer(
         } else jsPlumbInstance
 
         var map = shape.shapes.map {
-            it to drawShape(it, this, shape.position, childJsPlumbInstance)
+            it to drawShape(it, this, shape.position, childJsPlumbInstance, shape.id ?: parentId)
         }.toMap()
 
         removerList += shape.onAdd.withRemover(shape.id) {
-            map += it to drawShape(it, this, shape.position, childJsPlumbInstance)
+            map += it to drawShape(it, this, shape.position, childJsPlumbInstance, shape.id ?: parentId)
         }
         removerList += shape.onRemove.withRemover(shape.id) { s ->
             map[s]?.let { v ->
@@ -501,6 +520,7 @@ class HtmlRenderer(
 
     class ShapeItem(
             val view: View<*>,
-            val jsPlumbInstance: JsPlumbInstance
+            val jsPlumbInstance: JsPlumbInstance,
+            val parent: ShapeItem?
     )
 }

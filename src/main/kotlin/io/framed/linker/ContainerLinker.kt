@@ -269,12 +269,35 @@ class ContainerLinker(
         if (connectionCount > 0) {
             dialog {
                 title = "Move $elementName to $targetName"
-                contentView.textView("This will delete $connectionCount connection(s).")
+                contentView.textView("How should $connectionCount connection(s) be handled.")
                 closable = true
                 addButton("Move and delete", true) {
                     History.group("Move $elementName to $targetName") {
                         remove(elementLinker)
                         targetLinker.add(elementLinker.model.copy())
+                    }
+                }
+                addButton("Move and keep") {
+                    History.group("Move $elementName to $targetName") {
+                        val connectionList = connectionManager.listConnections(elementLinker.id).map { it.model }
+
+                        val oldId = elementLinker.id
+                        remove(elementLinker)
+                        val model = elementLinker.model.copy()
+                        targetLinker.add(model)
+                        val newId = model.id
+
+                        connectionList.forEach {
+                            if (it.sourceId == oldId) {
+                                println("set source")
+                                it.sourceId = newId
+                            }
+                            if (it.targetId == oldId) {
+                                println("set target")
+                                it.targetId = newId
+                            }
+                            connectionManager.add(it)
+                        }
                     }
                 }
                 addButton("Abort")

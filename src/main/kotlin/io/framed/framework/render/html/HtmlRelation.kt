@@ -42,12 +42,12 @@ class HtmlRelation(
 
         anchor = arrayOf("Top", "Left", "Bottom", "Right")
 
-        when (line.type) {
+        connector = when (line.type) {
             ConnectionLine.Type.STRAIGHT -> {
-                connector = arrayOf("Straight")
+                arrayOf("Straight")
             }
             ConnectionLine.Type.RECTANGLE -> {
-                connector = arrayOf("Flowchart", object {
+                arrayOf("Flowchart", object {
                     val cornerRadius = 5
                 })
             }
@@ -60,7 +60,7 @@ class HtmlRelation(
         }
     }
 
-    fun createEndStyle(connectInit: JsPlumbConnectInit) {
+    private fun createEndStyle(connectInit: JsPlumbConnectInit, drawSource: Boolean, drawTarget: Boolean) {
         var overlays = views.map { (view, position) ->
             arrayOf("Custom", object {
                 val create = { _: dynamic ->
@@ -71,31 +71,36 @@ class HtmlRelation(
             })
         }
 
-        connection.sourceStyle?.let { style ->
-            overlays += listOf(arrayOf("Arrow", object {
-                val width = style.width
-                val length = style.length
-                val foldback = style.foldback
-                val paintStyle = jsPlumbPaintStyle {
-                    stroke = style.paintStyle.stroke.toCss()
-                    strokeWidth = style.paintStyle.strokeWidth
-                    fill = style.paintStyle.fill.toCss()
-                }
-                val location = 0
-            }))
+        if (drawSource) {
+            connection.sourceStyle?.let { style ->
+                overlays += listOf(arrayOf("Arrow", object {
+                    val width = style.width
+                    val length = style.length
+                    val foldback = style.foldback
+                    val paintStyle = jsPlumbPaintStyle {
+                        stroke = style.paintStyle.stroke.toCss()
+                        strokeWidth = style.paintStyle.strokeWidth
+                        fill = style.paintStyle.fill.toCss()
+                    }
+                    val location = 0
+                }))
+            }
         }
-        connection.targetStyle?.let { style ->
-            overlays += listOf(arrayOf("Arrow", object {
-                val width = style.width
-                val length = style.length
-                val foldback = style.foldback
-                val paintStyle = jsPlumbPaintStyle {
-                    stroke = style.paintStyle.stroke.toCss()
-                    strokeWidth = style.paintStyle.strokeWidth
-                    fill = style.paintStyle.fill.toCss()
-                }
-                val location = 1
-            }))
+
+        if (drawTarget) {
+            connection.targetStyle?.let { style ->
+                overlays += listOf(arrayOf("Arrow", object {
+                    val width = style.width
+                    val length = style.length
+                    val foldback = style.foldback
+                    val paintStyle = jsPlumbPaintStyle {
+                        stroke = style.paintStyle.stroke.toCss()
+                        strokeWidth = style.paintStyle.strokeWidth
+                        fill = style.paintStyle.fill.toCss()
+                    }
+                    val location = 1
+                }))
+            }
         }
 
         connectInit.overlays = overlays.toTypedArray()
@@ -104,8 +109,14 @@ class HtmlRelation(
     fun draw(sourceId: Long, targetId: Long) {
         remove()
 
-        val sourceView = renderer[sourceId] ?: return
-        val targetView = renderer[targetId] ?: return
+        val directSourceView = renderer[sourceId, jsPlumbInstance]
+        val directTargetView = renderer[targetId, jsPlumbInstance]
+
+        val drawSource = directSourceView != null
+        val drawTarget = directTargetView != null
+
+        val sourceView = directSourceView ?: renderer[sourceId, jsPlumbInstance, true] ?: return
+        val targetView = directTargetView ?: renderer[targetId, jsPlumbInstance, true] ?: return
 
         val zIndex = listOfNotNull(sourceView.zIndex, targetView.zIndex).max() ?: 0
 
@@ -135,7 +146,7 @@ class HtmlRelation(
         }
         connection.lines.lastOrNull()?.let { line ->
             val init = createJsPlumbConnection(line, sourceView, targetView)
-            createEndStyle(init)
+            createEndStyle(init, drawSource, drawTarget)
             connections += jsPlumbInstance.connect(init).also {
                 it.canvas.style.zIndex = zIndex.toString()
             }

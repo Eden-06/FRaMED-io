@@ -65,8 +65,8 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
         }
     }
 
-    override fun createConnection(source: Long, target: Long, type: ConnectionInfo): ConnectionLinker<*> {
 
+    override fun createConnection(source: Long, target: Long, type: ConnectionInfo): ConnectionLinker<*> {
         return when (type) {
             AssociationLinker.info -> AssociationLinker(Association(source, target), this).also(associations::add)
             AggregationLinker.info -> AggregationLinker(Aggregation(source, target), this).also(aggregations::add)
