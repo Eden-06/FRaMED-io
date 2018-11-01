@@ -213,31 +213,34 @@ class HtmlRenderer(
     }
 
     fun createEndpoint(shape: Shape) {
-        if (endpointMap.containsKey(shape)) return
+        if (shape in endpointMap) return
         val html = shapeMap[shape]?.view?.html ?: return
         val jsPlumbInstance = shapeMap[shape]?.jsPlumbInstance ?: return
 
-        endpointMap[shape] = jsPlumbInstance.addEndpoint(html, jsPlumbEndpointOptions {
+        //TODO Endpoints in flat preview? This disables them.
+        if (jsPlumbInstance != jsPlumbList.first()) return
+
+        endpointMap[shape] = EndpointItem(jsPlumbInstance.addEndpoint(html, jsPlumbEndpointOptions {
             anchors = arrayOf("Bottom")
             isSource = true
             isTarget = true
             endpoint = "Dot"
-        })
+        }), jsPlumbInstance)
     }
 
     /**
      * The model removes the endpoint for the given shape
      */
     fun deleteEndpoint(shape: Shape) {
-        val jsPlumbInstance = shapeMap[shape]?.jsPlumbInstance ?: return
-        endpointMap[shape]?.let(jsPlumbInstance::deleteEndpoint)
+        val endpointItem = endpointMap[shape] ?: return
+        endpointItem.jsPlumbInstance.deleteEndpoint(endpointItem.html)
         endpointMap -= shape
     }
 
     /**
      * The map stores the endpoints for all shapes
      */
-    private val endpointMap = mutableMapOf<Shape, HTMLElement>()
+    private val endpointMap = mutableMapOf<Shape, EndpointItem>()
 
     operator fun get(id: Long, jsPlumbInstance: JsPlumbInstance, findParent: Boolean = false): View<*>? = shapeMap
             .filter { it.key.id == id }.values.firstOrNull()?.let {
@@ -522,5 +525,10 @@ class HtmlRenderer(
             val view: View<*>,
             val jsPlumbInstance: JsPlumbInstance,
             val parent: ShapeItem?
+    )
+
+    class EndpointItem(
+            val html: HTMLElement,
+            val jsPlumbInstance: JsPlumbInstance
     )
 }

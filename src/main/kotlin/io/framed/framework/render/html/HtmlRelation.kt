@@ -4,6 +4,7 @@ import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.point
 import io.framed.framework.view.InputView
+import io.framed.framework.view.TextView
 import io.framed.framework.view.View
 import org.w3c.dom.events.MouseEvent
 
@@ -85,6 +86,13 @@ class HtmlRelation(
                     val location = 0
                 }))
             }
+        } else {
+           overlays += listOf(arrayOf("Custom", object {
+               val create = { _: dynamic ->
+                   TextView("Id: ${connection.source.get()}").html
+               }
+               val location = 11
+           }))
         }
 
         if (drawTarget) {
@@ -101,6 +109,13 @@ class HtmlRelation(
                     val location = 1
                 }))
             }
+        } else {
+            overlays += listOf(arrayOf("Custom", object {
+                val create = { _: dynamic ->
+                    TextView("Id: ${connection.target.get()}").html
+                }
+                val location = -10
+            }))
         }
 
         connectInit.overlays = overlays.toTypedArray()
