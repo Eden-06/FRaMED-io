@@ -43,6 +43,7 @@ class HtmlRenderer(
 
         removerList.forEach { it.remove() }
         removerList = emptyList()
+        jsPlumbList = emptyList()
     }
 
     private var draggableViews: List<View<*>> = emptyList()
@@ -217,8 +218,8 @@ class HtmlRenderer(
         val html = shapeMap[shape]?.view?.html ?: return
         val jsPlumbInstance = shapeMap[shape]?.jsPlumbInstance ?: return
 
-        //TODO Endpoints in flat preview? This disables them.
-        if (jsPlumbInstance != jsPlumbList.first()) return
+        // Endpoints in flat preview? The following disables them.
+        // if (jsPlumbInstance != jsPlumbList.first()) return
 
         endpointMap[shape] = EndpointItem(jsPlumbInstance.addEndpoint(html, jsPlumbEndpointOptions {
             anchors = arrayOf("Bottom")
