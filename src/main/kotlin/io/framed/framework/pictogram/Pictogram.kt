@@ -1,6 +1,6 @@
 package io.framed.framework.pictogram
 
-import io.framed.framework.util.EventHandler
+import de.westermann.kobserve.EventHandler
 
 /**
  * @author lars
@@ -12,7 +12,7 @@ abstract class Pictogram {
     var layer: Layer = Layer()
         set(value) {
             field = value
-            onLayerChange.fire(Unit)
+            onLayerChange.emit(Unit)
         }
 
     val onSidebar = EventHandler<SidebarEvent>()

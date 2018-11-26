@@ -1,8 +1,8 @@
 package io.framed.framework.pictogram
 
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.Property
 import io.framed.framework.ConnectionLinker
-import io.framed.framework.util.EventHandler
-import io.framed.framework.util.Property
 
 /**
  * @author lars
@@ -15,25 +15,25 @@ class Connection(
     var labels: Map<TextShape, Double> = emptyMap()
         set(value) {
             field = value
-            onStyleChange.fire(Unit)
+            onStyleChange.emit(Unit)
         }
 
     var lines: List<ConnectionLine> = emptyList()
         set(value) {
             field = value
-            onStyleChange.fire(Unit)
+            onStyleChange.emit(Unit)
         }
 
     var sourceStyle: ConnectionEnd? = null
         set(value) {
             field = value
-            onStyleChange.fire(Unit)
+            onStyleChange.emit(Unit)
         }
 
     var targetStyle: ConnectionEnd? = null
         set(value) {
             field = value
-            onStyleChange.fire(Unit)
+            onStyleChange.emit(Unit)
         }
 
     val onStyleChange = EventHandler<Unit>()

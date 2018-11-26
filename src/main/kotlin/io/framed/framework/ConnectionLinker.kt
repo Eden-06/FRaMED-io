@@ -1,10 +1,10 @@
 package io.framed.framework
 
+import de.westermann.kobserve.Property
 import io.framed.framework.pictogram.Connection
 import io.framed.framework.pictogram.ConnectionInfo
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.History
-import io.framed.framework.util.Property
 
 /**
  * @author lars

@@ -1,13 +1,16 @@
 package io.framed.linker
 
+import de.westermann.kobserve.basic.mapBinding
+import de.westermann.kobserve.basic.property
 import io.framed.framework.Linker
 import io.framed.framework.LinkerInfoItem
 import io.framed.framework.LinkerManager
 import io.framed.framework.PreviewLinker
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.property
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.*
+import io.framed.framework.view.MaterialIcon
+import io.framed.framework.view.contextMenu
+import io.framed.framework.view.sidebar
 import io.framed.model.Event
 import io.framed.model.EventType
 
@@ -17,11 +20,7 @@ class EventLinker(
 ) : PreviewLinker<Event, IconShape, IconShape> {
 
     private val typeProperty = property(model::type).trackHistory()
-    private val symbolProperty = property(typeProperty,
-            getter = {
-                typeProperty.get().symbol
-            }
-    )
+    private val symbolProperty = typeProperty.mapBinding { it.symbol }
 
     override val pictogram: IconShape = iconShape(symbolProperty) {
         style {

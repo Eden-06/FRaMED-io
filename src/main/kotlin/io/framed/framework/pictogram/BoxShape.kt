@@ -1,7 +1,7 @@
 package io.framed.framework.pictogram
 
+import de.westermann.kobserve.EventHandler
 import io.framed.framework.Linker
-import io.framed.framework.util.EventHandler
 import io.framed.framework.util.History
 
 /**
@@ -28,13 +28,13 @@ class BoxShape(
     fun add(shape: Shape) {
         shape.layer = layer
         shapes += shape
-        onAdd.fire(shape)
+        onAdd.emit(shape)
     }
 
     operator fun minusAssign(shape: Shape) = remove(shape)
     fun remove(shape: Shape) {
         shapes -= shape
-        onRemove.fire(shape)
+        onRemove.emit(shape)
     }
 
     fun clear() {
@@ -51,7 +51,7 @@ class BoxShape(
                     it.top = currentTop
                     it.left = 100.00
                     println("SET (${it.top}/${it.left})")
-                    it.onPositionChange.fire(true)
+                    it.onPositionChange.emit(true)
                     currentTop += it.height ?: 50.0
                 }
             }

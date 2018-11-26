@@ -1,5 +1,8 @@
 package io.framed.framework.util
 
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.Property
+
 object History {
     private var list: List<HistoryItem> = emptyList()
     private var pointer: Int = list.size
@@ -70,7 +73,7 @@ object History {
             lastCanUndo = canUndo
             lastCanRedo = canRedo
 
-            onChange.fire(Unit)
+            onChange.emit(Unit)
         }
     }
 

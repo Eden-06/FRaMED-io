@@ -1,8 +1,10 @@
 package io.framed.framework.view
 
-import io.framed.framework.util.EventHandler
-import io.framed.framework.util.Property
-import io.framed.framework.util.Validator
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.Property
+import de.westermann.kobserve.ReadOnlyProperty
+import de.westermann.kobserve.ValidationProperty
+import io.framed.framework.util.eventListener
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -52,26 +54,37 @@ class RawInputView() : View<HTMLInputElement>("input") {
 
     var invalid by ClassDelegate()
 
-    fun bind(property: Property<String>) {
+    fun bind(property: ReadOnlyProperty<String>) {
         var hasFocus = false
         value = property.get()
+
+        readOnly = property !is Property<String>
+
         onChange {
             hasFocus = true
-            invalid = property.set(it) != Validator.Result.VALID
+            if (property is Property<String>) {
+                property.set(it)
+            }
+
+            if (property is ValidationProperty<String>) {
+                invalid = property.valid
+            }
         }
         onFocusLeave {
             hasFocus = false
-            invalid = property.set(value.trim()) != Validator.Result.VALID
+            if (property is Property<String>) {
+                property.set(value.trim())
+            }
+
+            if (property is ValidationProperty<String>) {
+                invalid = property.valid
+            }
         }
 
         property.onChange {
             if (!hasFocus) {
                 value = property.get()
             }
-        }
-
-        if (!property.editable) {
-            readOnly = true
         }
     }
 
@@ -93,7 +106,7 @@ class RawInputView() : View<HTMLInputElement>("input") {
         val changeListener = object : EventListener {
             override fun handleEvent(event: Event) {
                 if (value != lastValue) {
-                    onChange.fire(value)
+                    onChange.emit(value)
                     lastValue = value
                 }
 
@@ -108,7 +121,7 @@ class RawInputView() : View<HTMLInputElement>("input") {
         html.addEventListener("onchange", changeListener)
         html.addEventListener("keyup", changeListener)
 
-        html.addEventListener("focus", onFocusEnter.eventListener)
-        html.addEventListener("blur", onFocusLeave.eventListener)
+        html.addEventListener("focus", onFocusEnter.eventListener())
+        html.addEventListener("blur", onFocusLeave.eventListener())
     }
 }

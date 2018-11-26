@@ -65,7 +65,7 @@ class Dialog : View<HTMLDivElement>("div") {
             }
         }
 
-        k = Root.onKeyUp {
+        k = Root.onKeyUp.addListener {
             when (it.keyCode) {
                 27 -> if (closable) {
                     close()
@@ -75,7 +75,7 @@ class Dialog : View<HTMLDivElement>("div") {
                     it()
                 }
             }
-        }
+        }!!
     }
 
     /**

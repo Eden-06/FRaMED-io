@@ -1,6 +1,5 @@
 package io.framed.framework
 
-import io.framed.framework.pictogram.Pictogram
 import io.framed.framework.pictogram.Shape
 
 /**

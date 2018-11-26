@@ -1,7 +1,8 @@
 package io.framed.framework.view
 
-import io.framed.framework.util.Property
-import io.framed.framework.util.property
+import de.westermann.kobserve.Property
+import de.westermann.kobserve.ReadOnlyProperty
+import de.westermann.kobserve.basic.property
 import org.w3c.dom.HTMLDivElement
 
 /**
@@ -11,7 +12,7 @@ import org.w3c.dom.HTMLDivElement
  */
 class InputView() : View<HTMLDivElement>("div") {
 
-    constructor(property: Property<String>) : this() {
+    constructor(property: ReadOnlyProperty<String>) : this() {
         bind(property)
     }
 
@@ -76,7 +77,7 @@ class InputView() : View<HTMLDivElement>("div") {
         }
 
 
-    fun bind(property: Property<String>) = input.bind(property)
+    fun bind(property: ReadOnlyProperty<String>) = input.bind(property)
 
     private fun updateAutocomplete() {
         autocompleteMap.forEach { (auto, view) ->
@@ -141,7 +142,7 @@ class InputView() : View<HTMLDivElement>("div") {
                     }
                     13 -> { // submit
                         if (index != -1) {
-                            list[index].onMouseDown.fire(js("{}"))
+                            list[index].onMouseDown.emit(js("{}"))
                         }
                     }
                     27 -> { // exit

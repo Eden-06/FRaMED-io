@@ -1,8 +1,13 @@
 package io.framed.linker
 
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.*
+import io.framed.framework.util.RegexValidator
+import io.framed.framework.util.shapeBox
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Attribute
 import io.framed.model.Class
@@ -19,7 +24,9 @@ class CompartmentLinker(
         override val parent: ModelLinker<*, *, *>
 ) : ModelLinker<Compartment, BoxShape, TextShape> {
 
-    override val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
+    override val nameProperty = property(model::name)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .trackHistory()
     override var name by nameProperty
 
     override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
@@ -173,7 +180,7 @@ class CompartmentLinker(
 
         addItem(MaterialIcon.ADD, "Add class") { event ->
             this@CompartmentLinker.classes += ClassLinker(Class(), this@CompartmentLinker).also {
-                setPosition.fire(SetPosition(it, event.position))
+                setPosition.emit(SetPosition(it, event.position))
                 it.focus()
             }
         }

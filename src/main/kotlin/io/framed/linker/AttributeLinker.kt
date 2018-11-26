@@ -1,15 +1,19 @@
 package io.framed.linker
 
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.FunctionProperty
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
 import io.framed.framework.Linker
 import io.framed.framework.LinkerInfoItem
 import io.framed.framework.LinkerManager
 import io.framed.framework.ShapeLinker
-import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
-import io.framed.framework.util.*
-import io.framed.framework.view.contextMenu
+import io.framed.framework.util.RegexValidator
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.MaterialIcon
+import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
 import io.framed.model.Attribute
 
@@ -21,53 +25,58 @@ class AttributeLinker(
         override val parent: ShapeLinker<*, *>
 ) : ShapeLinker<Attribute, TextShape> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
-    private val typeProperty = property(model::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
+    private val nameProperty = property(model::name)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .trackHistory()
+    private val typeProperty = property(model::type)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .trackHistory()
 
-    private val lineProperty = property(nameProperty, typeProperty,
-            getter = {
-                model.name + model.type.let {
-                    if (it.isBlank()) "" else ": $it"
-                }.trim()
-            },
-            setter = { input ->
-                var state = State.NAME
+    private val lineProperty = FunctionProperty(object : FunctionAccessor<String> {
+        override fun set(value: String): Boolean {
+            var state = State.NAME
 
-                var name = ""
-                var type = ""
+            var name = ""
+            var type = ""
 
-                input.forEach { char ->
-                    state = when (state) {
-                        State.NAME -> {
-                            when (char) {
-                                ':' -> {
-                                    State.TYPE
-                                }
-                                '(', ')' -> return@property Validator.Result.ERROR
-                                else -> {
-                                    name += char
-                                    State.NAME
-                                }
+            value.forEach { char ->
+                state = when (state) {
+                    State.NAME -> {
+                        when (char) {
+                            ':' -> {
+                                State.TYPE
+                            }
+                            '(', ')' -> return false
+                            else -> {
+                                name += char
+                                State.NAME
                             }
                         }
-                        State.TYPE -> {
-                            when (char) {
-                                ':', '(', ')' -> return@property Validator.Result.ERROR
-                                else -> {
-                                    type += char
-                                    State.TYPE
-                                }
+                    }
+                    State.TYPE -> {
+                        when (char) {
+                            ':', '(', ')' -> return false
+                            else -> {
+                                type += char
+                                State.TYPE
                             }
                         }
                     }
                 }
-
-                model.name = name.trim()
-                model.type = type.trim()
-
-                Validator.Result.VALID
             }
-    )
+
+            model.name = name.trim()
+            model.type = type.trim()
+
+            return true
+        }
+
+        override fun get(): String {
+            return model.name + model.type.let {
+                if (it.isBlank()) "" else ": $it"
+            }.trim()
+        }
+    }, nameProperty, typeProperty)
 
     private enum class State {
         NAME, TYPE

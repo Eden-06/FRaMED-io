@@ -18,14 +18,14 @@ class HistoryLayer(
         map.entries.forEach { (prop, value) ->
             layer[shape, prop] = value.oldValue
         }
-        layer.onUpdate(shape)?.fire(true)
+        layer.onUpdate(shape)?.emit(true)
     }
 
     override fun redo() {
         map.entries.forEach { (prop, value) ->
             layer[shape, prop] = value.newValue
         }
-        layer.onUpdate(shape)?.fire(true)
+        layer.onUpdate(shape)?.emit(true)
     }
 
     override fun shouldAdd(item: HistoryItem): Boolean {

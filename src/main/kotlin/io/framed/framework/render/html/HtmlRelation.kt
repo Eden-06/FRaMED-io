@@ -1,7 +1,10 @@
 package io.framed.framework.render.html
 
 import io.framed.framework.*
-import io.framed.framework.pictogram.*
+import io.framed.framework.pictogram.Connection
+import io.framed.framework.pictogram.ConnectionLine
+import io.framed.framework.pictogram.ContextEvent
+import io.framed.framework.pictogram.SidebarEvent
 import io.framed.framework.util.point
 import io.framed.framework.view.InputView
 import io.framed.framework.view.TextView
@@ -171,7 +174,7 @@ class HtmlRelation(
             if (connection.hasSidebar) {
                 c.bind("click") { _, event ->
                     event.stopPropagation()
-                    connection.onSidebar.fire(SidebarEvent(connection))
+                    connection.onSidebar.emit(SidebarEvent(connection))
                 }
             }
 
@@ -180,7 +183,7 @@ class HtmlRelation(
                     (event as? MouseEvent)?.let { e ->
                         e.stopPropagation()
                         e.preventDefault()
-                        connection.onContextMenu.fire(ContextEvent(e.point(), connection))
+                        connection.onContextMenu.emit(ContextEvent(e.point(), connection))
                     }
                 }
             }

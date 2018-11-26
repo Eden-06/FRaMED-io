@@ -1,11 +1,16 @@
 package io.framed.framework.render.html
 
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumb
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.jsPlumbEndpointOptions
 import io.framed.framework.pictogram.*
 import io.framed.framework.render.Renderer
-import io.framed.framework.util.*
+import io.framed.framework.util.Dimension
+import io.framed.framework.util.Point
+import io.framed.framework.util.async
+import io.framed.framework.util.point
 import io.framed.framework.view.*
 import org.w3c.dom.HTMLElement
 
@@ -33,7 +38,7 @@ class HtmlRenderer(
         draw()
     }
 
-    private var removerList: List<EventHandler<*>.Remover> = emptyList()
+    private val listenerReferenceMap: MutableMap<Long?, MutableList<ListenerReference<*>>> = mutableMapOf()
     fun reset() {
         jsPlumbList.forEach { it.deleteEveryConnection() }
         jsPlumbList.forEach { it.deleteEveryEndpoint() }
@@ -41,8 +46,8 @@ class HtmlRenderer(
         endpointMap.clear()
         shapeMap = emptyMap()
 
-        removerList.forEach { it.remove() }
-        removerList = emptyList()
+        listenerReferenceMap.values.flatten().forEach { it.remove() }
+        listenerReferenceMap.clear()
         jsPlumbList = emptyList()
     }
 
@@ -142,40 +147,40 @@ class HtmlRenderer(
         navigationView.onContext.clearListeners()
         if (viewModel.container.hasContextMenu) {
             navigationView.onContext {
-                viewModel.container.onContextMenu.fire(ContextEvent(it.point(), viewModel.container))
+                viewModel.container.onContextMenu.emit(ContextEvent(it.point(), viewModel.container))
             }
         }
         navigationView.onMouseDown.clearListeners()
         if (viewModel.container.hasSidebar) {
             navigationView.onMouseDown {
-                viewModel.container.onSidebar.fire(SidebarEvent(viewModel.container))
+                viewModel.container.onSidebar.emit(SidebarEvent(viewModel.container))
             }
         }
 
         val jsPlumbInstance = createJsPlumb(navigationView.container.html)
 
         viewModel.container.shapes.forEach { drawShape(it, navigationView.container, viewModel.container.position, jsPlumbInstance, 0) }
-        removerList += viewModel.container.onAdd.withRemover {
+        viewModel.container.onAdd.reference {
             drawShape(it, navigationView.container, viewModel.container.position, jsPlumbInstance, 0)
-        }
-        removerList += viewModel.container.onRemove.withRemover {
+        }?.let { listenerReferenceMap.getOrPut(null) { mutableListOf() }.add(it) }
+        viewModel.container.onRemove.reference {
             removeShape(it)
-        }
+        }?.let { listenerReferenceMap.getOrPut(null) { mutableListOf() }.add(it) }
 
         viewModel.connections.forEach {
             drawRelation(findInstance(listOf(it.source.get(), it.target.get()))
                     ?: throw IllegalArgumentException("Shapes are not in the same layer!"), it)
         }
-        removerList += viewModel.onConnectionAdd.withRemover {
+        viewModel.onConnectionAdd.reference {
             drawRelation(findInstance(listOf(it.source.get(), it.target.get()))
                     ?: throw IllegalArgumentException("Shapes are not in the same layer!"), it)
-        }
-        removerList += viewModel.onConnectionRemove.withRemover { r ->
+        }?.let { listenerReferenceMap.getOrPut(null) { mutableListOf() }.add(it) }
+        viewModel.onConnectionRemove.reference { r ->
             relations[r]?.let { relation ->
                 relations -= r
                 relation.remove()
             }
-        }
+        }?.let { listenerReferenceMap.getOrPut(null) { mutableListOf() }.add(it) }
     }
 
     private fun findInstance(idList: List<Long>): JsPlumbInstance? {
@@ -286,7 +291,10 @@ class HtmlRenderer(
             }
             shapeMap -= shape
 
-            removerList -= removerList.asSequence().filter { it.tag == shape.id }.onEach { it.remove() }.toList()
+            listenerReferenceMap[shape.id]?.forEach {
+                it.remove()
+            }
+            listenerReferenceMap.remove(shape.id)
         }
     }
 
@@ -340,14 +348,14 @@ class HtmlRenderer(
             view.onContext {
                 it.stopPropagation()
                 it.preventDefault()
-                shape.onContextMenu.fire(ContextEvent(it.point(), shape))
+                shape.onContextMenu.emit(ContextEvent(it.point(), shape))
             }
         }
         if (shape.hasSidebar) {
             view.onMouseDown {
                 if (!it.defaultPrevented) {
                     it.preventDefault()
-                    shape.onSidebar.fire(SidebarEvent(shape))
+                    shape.onSidebar.emit(SidebarEvent(shape))
                 }
             }
             view.onClick { it.stopPropagation() }
@@ -385,7 +393,7 @@ class HtmlRenderer(
         classes += "absolute-view"
         var canDrop: Shape? = null
 
-        removerList += shape.onPositionChange.withRemover(shape.id) { force ->
+        shape.onPositionChange.reference { force ->
             if (force) {
                 left = shape.left ?: 0.0
                 top = shape.top ?: 0.0
@@ -394,7 +402,7 @@ class HtmlRenderer(
 
                 jsPlumbInstance.revalidate(html)
             }
-        }
+        }?.let { listenerReferenceMap.getOrPut(shape.id) { mutableListOf() }.add(it) }
 
         dragType = View.DragType.ABSOLUTE
         onMouseDown { event ->
@@ -473,15 +481,18 @@ class HtmlRenderer(
             it to drawShape(it, this, shape.position, childJsPlumbInstance, shape.id ?: parentId)
         }.toMap()
 
-        removerList += shape.onAdd.withRemover(shape.id) {
+        shape.onAdd.reference {
             map += it to drawShape(it, this, shape.position, childJsPlumbInstance, shape.id ?: parentId)
-        }
-        removerList += shape.onRemove.withRemover(shape.id) { s ->
+        }?.let { listenerReferenceMap.getOrPut(shape.id) { mutableListOf() }.add(it) }
+        shape.onRemove.reference { s ->
             map[s]?.let { v ->
                 remove(v)
             }
-            removerList -= removerList.asSequence().filter { it.tag == s.id }.onEach { it.remove() }.toList()
-        }
+            listenerReferenceMap[s.id]?.forEach {
+                it.remove()
+            }
+            listenerReferenceMap.remove(shape.id)
+        }?.let { listenerReferenceMap.getOrPut(shape.id) { mutableListOf() }.add(it) }
     }
 
     private fun drawTextShape(shape: TextShape, parent: ViewCollection<View<*>, *>): View<*> =

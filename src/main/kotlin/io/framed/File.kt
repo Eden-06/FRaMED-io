@@ -10,7 +10,6 @@ import io.framed.model.Container
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JSON
-import kotlinx.serialization.stringify
 
 @Serializable
 class File(

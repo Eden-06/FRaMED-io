@@ -1,7 +1,7 @@
 package io.framed.framework.view
 
+import de.westermann.kobserve.EventHandler
 import io.framed.framework.util.Dimension
-import io.framed.framework.util.EventHandler
 import io.framed.framework.util.Point
 import io.framed.framework.util.point
 import org.w3c.dom.HTMLDivElement
@@ -52,7 +52,7 @@ class NavigationView : View<HTMLDivElement>("div") {
             field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, value))
 
             if (old != field) {
-                onZoom.fire(field)
+                onZoom.emit(field)
                 updateTransform()
             }
         }
@@ -108,7 +108,7 @@ class NavigationView : View<HTMLDivElement>("div") {
         pan -= (Point(clientWidth, clientHeight) * (-center + 0.5) * (1 / new - 1 / old))
 
         if (old != new) {
-            onZoom.fire(new)
+            onZoom.emit(new)
             updateTransform()
         }
     }
@@ -133,7 +133,7 @@ class NavigationView : View<HTMLDivElement>("div") {
      */
     fun panTo(coordinate: Point) {
         pan = coordinate
-        onPan.fire(coordinate)
+        onPan.emit(coordinate)
         updateTransform()
     }
 
@@ -223,7 +223,7 @@ class NavigationView : View<HTMLDivElement>("div") {
                 selectBox.width = width
                 selectBox.height = height
 
-                onSelect.fire(Dimension(left, top, width, height))
+                onSelect.emit(Dimension(left, top, width, height))
             }
         }
     }
@@ -281,7 +281,7 @@ class NavigationView : View<HTMLDivElement>("div") {
         html.addEventListener("wheel", scrollListener)
 
         onClick {
-            onSelect.fire(null)
+            onSelect.emit(null)
         }
     }
 

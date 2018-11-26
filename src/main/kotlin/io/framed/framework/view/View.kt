@@ -1,5 +1,6 @@
 package io.framed.framework.view
 
+import de.westermann.kobserve.EventHandler
 import io.framed.framework.util.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.KeyboardEvent
@@ -271,27 +272,27 @@ abstract class View<V : HTMLElement>(view: V) {
                 Point(marginLeft, marginTop)
             }
         }
-        onDrag.fire(dragEvent.copy(newPosition = newPosition))
+        onDrag.emit(dragEvent.copy(newPosition = newPosition))
     }
 
     var dragZoom = 1.0
     var draggable by AttributeDelegate(Boolean::class, false)
 
     init {
-        html.addEventListener("click", onClick.eventListener)
-        html.addEventListener("contextmenu", onContext.eventListener)
+        html.addEventListener("click", onClick.eventListener())
+        html.addEventListener("contextmenu", onContext.eventListener())
         onContext {
             it.preventDefault()
         }
-        html.addEventListener("mousedown", onMouseDown.eventListener)
-        html.addEventListener("mousemove", onMouseMove.eventListener)
-        html.addEventListener("mouseup", onMouseUp.eventListener)
-        html.addEventListener("mouseenter", onMouseEnter.eventListener)
-        html.addEventListener("mouseleave", onMouseLeave.eventListener)
-        html.addEventListener("dblclick", onDblClick.eventListener)
-        html.addEventListener("keydown", onKeyDown.eventListener)
-        html.addEventListener("keypress", onKeyPress.eventListener)
-        html.addEventListener("keyup", onKeyUp.eventListener)
+        html.addEventListener("mousedown", onMouseDown.eventListener())
+        html.addEventListener("mousemove", onMouseMove.eventListener())
+        html.addEventListener("mouseup", onMouseUp.eventListener())
+        html.addEventListener("mouseenter", onMouseEnter.eventListener())
+        html.addEventListener("mouseleave", onMouseLeave.eventListener())
+        html.addEventListener("dblclick", onDblClick.eventListener())
+        html.addEventListener("keydown", onKeyDown.eventListener())
+        html.addEventListener("keypress", onKeyPress.eventListener())
+        html.addEventListener("keyup", onKeyUp.eventListener())
 
         var isCurrentlyDragging = false
         var lastDragPosition = Point.ZERO

@@ -1,6 +1,6 @@
 package io.framed.framework.view
 
-import io.framed.framework.util.EventHandler
+import de.westermann.kobserve.EventHandler
 import org.w3c.dom.HTMLSpanElement
 
 class ResizeHandler(val target: View<*>) : View<HTMLSpanElement>("span") {
@@ -12,7 +12,7 @@ class ResizeHandler(val target: View<*>) : View<HTMLSpanElement>("span") {
             target.width += event.delta.x / target.dragZoom
             target.height += event.delta.y / target.dragZoom
 
-            onResize.fire(ResizeEvent(target.width, target.height))
+            onResize.emit(ResizeEvent(target.width, target.height))
         }
     }
 

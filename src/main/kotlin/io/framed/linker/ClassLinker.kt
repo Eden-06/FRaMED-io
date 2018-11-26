@@ -1,9 +1,15 @@
 package io.framed.linker
 
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.*
-import io.framed.framework.view.*
+import io.framed.framework.util.RegexValidator
+import io.framed.framework.util.shapeBox
+import io.framed.framework.util.trackHistory
+import io.framed.framework.view.MaterialIcon
+import io.framed.framework.view.contextMenu
+import io.framed.framework.view.sidebar
 import io.framed.model.Attribute
 import io.framed.model.Class
 import io.framed.model.Method
@@ -13,10 +19,12 @@ import io.framed.model.Method
  */
 class ClassLinker(
         override val model: Class,
-        override val parent: ShapeLinker<*,*>
+        override val parent: ShapeLinker<*, *>
 ) : PreviewLinker<Class, BoxShape, TextShape> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
+    private val nameProperty = property(model::name)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())::validate)
+            .trackHistory()
     var name by nameProperty
 
     val attributes = shapeBox(model::attributes)

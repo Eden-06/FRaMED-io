@@ -1,6 +1,6 @@
 package io.framed.framework.view
 
-import io.framed.framework.util.Property
+import de.westermann.kobserve.ReadOnlyProperty
 import org.w3c.dom.HTMLSpanElement
 import kotlin.dom.clear
 
@@ -11,11 +11,11 @@ import kotlin.dom.clear
  */
 class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
 
-    constructor(property: Property<out Icon?>) : this(property.get()) {
+    constructor(property: ReadOnlyProperty<out Icon?>) : this(property.get()) {
         bind(property)
     }
 
-    fun bind(property: Property<out Icon?>) {
+    fun bind(property: ReadOnlyProperty<out Icon?>) {
         property.onChange {
             icon = property.get()
         }
@@ -42,5 +42,5 @@ class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
 
 fun ViewCollection<in IconView, *>.iconView(icon: Icon? = null, init: IconView.() -> Unit = {})=
         IconView(icon).also(this::append).also(init)
-fun ViewCollection<in IconView, *>.iconView(property: Property<out Icon?>, init: IconView.() -> Unit = {})=
+fun ViewCollection<in IconView, *>.iconView(property: ReadOnlyProperty<out Icon?>, init: IconView.() -> Unit = {})=
         IconView(property).also(this::append).also(init)

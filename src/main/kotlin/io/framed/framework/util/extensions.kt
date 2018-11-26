@@ -1,9 +1,9 @@
 package io.framed.framework.util
 
+import de.westermann.kobserve.EventHandler
 import org.w3c.dom.Document
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.HTMLLinkElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import org.w3c.files.FileReader
@@ -121,4 +121,11 @@ fun loadLocalFile(success: (String) -> Unit) {
     element.click()
 
     document.body?.removeChild(element)
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T> EventHandler<T>.eventListener(): EventListener = object : EventListener {
+    override fun handleEvent(event: Event) {
+        (event as? T)?.let(this@eventListener::emit)
+    }
 }

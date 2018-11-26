@@ -1,7 +1,7 @@
 package io.framed.framework.view
 
-import io.framed.framework.util.EventHandler
-import io.framed.framework.util.Property
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.Property
 import org.w3c.dom.HTMLDivElement
 
 class Tab(
@@ -9,13 +9,13 @@ class Tab(
 ) : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     fun close() {
-        onClose.fire(Unit)
+        onClose.emit(Unit)
     }
 
     fun open() {
         if (!selected) {
             selected = true
-            onOpen.fire(Unit)
+            onOpen.emit(Unit)
         }
     }
 
@@ -37,13 +37,13 @@ class Tab(
         closeView = iconView(MaterialIcon.CLEAR) {
             onClick {
                 it.stopPropagation()
-                onClose.fire(Unit)
+                onClose.emit(Unit)
             }
         }
 
         onClick {
             it.stopPropagation()
-            onOpen.fire(Unit)
+            onOpen.emit(Unit)
         }
     }
 }

@@ -1,9 +1,11 @@
 package io.framed.linker
 
-import io.framed.framework.*
+import de.westermann.kobserve.EventHandler
+import io.framed.framework.ConnectionLinker
+import io.framed.framework.ConnectionManager
+import io.framed.framework.ModelConnection
+import io.framed.framework.ModelLinker
 import io.framed.framework.pictogram.ConnectionInfo
-import io.framed.framework.pictogram.Shape
-import io.framed.framework.util.EventHandler
 import io.framed.framework.util.LinkerConnectionBox
 import io.framed.framework.view.CyclicChooser
 import io.framed.framework.view.iconView

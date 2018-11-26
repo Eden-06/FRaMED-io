@@ -48,7 +48,7 @@ class CyclicChooser<T>(
         positionMap.filterKeys {
             direction.angle in it
         }.values.firstOrNull()?.let {
-            it.onClick.fire(js("{}"))
+            it.onClick.emit(js("{}"))
             close()
         }
     }

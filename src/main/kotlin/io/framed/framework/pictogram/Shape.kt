@@ -1,6 +1,6 @@
 package io.framed.framework.pictogram
 
-import io.framed.framework.util.EventHandler
+import de.westermann.kobserve.EventHandler
 
 /**
  * @author lars
@@ -37,13 +37,13 @@ abstract class Shape : Pictogram() {
     }
 
     init {
-        var remover = layer.onUpdate(this)?.withRemover {force ->
-            onPositionChange.fire(force)
+        var listenerReference = layer.onUpdate(this)?.reference { force ->
+            onPositionChange.emit(force)
         }
         onLayerChange {
-            remover?.remove()
-            remover = layer.onUpdate(this)?.withRemover { force ->
-                onPositionChange.fire(force)
+            listenerReference?.remove()
+            listenerReference = layer.onUpdate(this)?.reference { force ->
+                onPositionChange.emit(force)
             }
         }
     }

@@ -1,7 +1,7 @@
 package io.framed.framework.view
 
-import io.framed.framework.util.EventHandler
-import io.framed.framework.util.Property
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.Property
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -65,7 +65,7 @@ class SelectView<T : Any>(
 
         html.addEventListener("change", object : EventListener {
             override fun handleEvent(event: Event) {
-                onChange.fire(selected)
+                onChange.emit(selected)
             }
         })
     }

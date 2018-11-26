@@ -1,5 +1,9 @@
 package io.framed.linker
 
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.basic.FunctionReadOnlyAccessor
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
@@ -15,7 +19,9 @@ class ContainerLinker(
         override val parent: ModelLinker<*, *, *>? = null
 ) : ModelLinker<Container, BoxShape, TextShape> {
 
-    override val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())).trackHistory()
+    override val nameProperty = property(model::name)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())::validate)
+            .trackHistory()
     override var name by nameProperty
 
     override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
@@ -107,18 +113,18 @@ class ContainerLinker(
     private lateinit var sidebarPreviewGroup: SidebarGroup
 
     private val creationProperty = property(model.metadata::creationDate)
-    private val creationStringProperty = property(creationProperty,
-            getter = {
-                creationProperty.get().toUTCString()
-            }
-    )
+    private val creationStringProperty = property(object : FunctionReadOnlyAccessor<String> {
+        override fun get(): String {
+            return creationProperty.get().toUTCString()
+        }
+    }, creationProperty)
 
     private val modifiedProperty = property(model.metadata::modifiedDate)
-    private val modifiedStringProperty = property(modifiedProperty,
-            getter = {
-                modifiedProperty.get().toUTCString()
-            }
-    )
+    private val modifiedStringProperty = property(object : FunctionReadOnlyAccessor<String> {
+        override fun get(): String {
+            return modifiedProperty.get().toUTCString()
+        }
+    }, modifiedProperty)
 
     private val authorProperty = property(model.metadata::author)
 
@@ -196,13 +202,13 @@ class ContainerLinker(
 
         addItem(MaterialIcon.ADD, "Add class") { event ->
             this@ContainerLinker.classes += ClassLinker(Class(), this@ContainerLinker).also {
-                setPosition.fire(SetPosition(it, event.position))
+                setPosition.emit(SetPosition(it, event.position))
                 it.focus()
             }
         }
         addItem(MaterialIcon.ADD, "Add package") { event ->
             containers += ContainerLinker(Container(), connectionManager, this@ContainerLinker).also {
-                setPosition.fire(SetPosition(it, event.position))
+                setPosition.emit(SetPosition(it, event.position))
                 it.focus()
             }
         }

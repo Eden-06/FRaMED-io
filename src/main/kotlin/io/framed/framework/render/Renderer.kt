@@ -1,7 +1,7 @@
 package io.framed.framework.render
 
+import de.westermann.kobserve.EventHandler
 import io.framed.framework.pictogram.ViewModel
-import io.framed.framework.util.EventHandler
 import io.framed.framework.util.Point
 
 /**

@@ -1,8 +1,7 @@
 package io.framed.framework
 
+import de.westermann.kobserve.EventHandler
 import io.framed.framework.pictogram.ConnectionInfo
-import io.framed.framework.pictogram.Shape
-import io.framed.framework.util.EventHandler
 
 interface ConnectionManager {
 

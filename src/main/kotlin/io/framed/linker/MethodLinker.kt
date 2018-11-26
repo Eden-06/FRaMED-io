@@ -1,15 +1,15 @@
 package io.framed.linker
 
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
 import io.framed.framework.Linker
 import io.framed.framework.LinkerInfoItem
 import io.framed.framework.LinkerManager
 import io.framed.framework.ShapeLinker
-import io.framed.framework.pictogram.ContextEvent
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.RegexValidator
-import io.framed.framework.util.Validator
-import io.framed.framework.util.property
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Method
@@ -23,118 +23,122 @@ class MethodLinker(
         override val parent: ShapeLinker<*, *>
 ) : ShapeLinker<Method, TextShape> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
-
-    private val typeProperty = property(model::type, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
+    private val nameProperty = property(model::name)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .trackHistory()
+    private val typeProperty = property(model::type)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .trackHistory()
 
     private val parameterProperty = property(model::parameters).trackHistory()
 
-    private val lineProperty = property(nameProperty, typeProperty, parameterProperty,
-            getter = {
-                "${model.name}(" + model.parameters.joinToString(", ") { it.toString() } + ")" + model.type.let {
-                    if (it.isBlank()) "" else ": $it"
-                }.trim()
-            },
-            setter = { input ->
+    private val lineProperty = property(object : FunctionAccessor<String> {
+        override fun set(value: String): Boolean {
+            var state = State.NAME
 
-                var state = State.NAME
+            var name = ""
+            var type = ""
+            var param = listOf<Pair<String, String>>()
 
-                var name = ""
-                var type = ""
-                var param = listOf<Pair<String, String>>()
-
-                input.forEach { char ->
-                    state = when (state) {
-                        State.NAME -> {
-                            when (char) {
-                                ':' -> {
-                                    State.TYPE
-                                }
-                                '(' -> {
-                                    param += "" to ""
-                                    State.PARAM_NAME
-                                }
-                                ')' -> return@property Validator.Result.ERROR
-                                else -> {
-                                    name += char
-                                    State.NAME
-                                }
+            value.forEach { char ->
+                state = when (state) {
+                    State.NAME -> {
+                        when (char) {
+                            ':' -> {
+                                State.TYPE
+                            }
+                            '(' -> {
+                                param += "" to ""
+                                State.PARAM_NAME
+                            }
+                            ')' -> return false
+                            else -> {
+                                name += char
+                                State.NAME
                             }
                         }
-                        State.TYPE -> {
-                            when (char) {
-                                '(' -> {
-                                    param += "" to ""
-                                    State.PARAM_NAME
-                                }
-                                ':', ')' -> return@property Validator.Result.ERROR
-                                else -> {
-                                    type += char
-                                    State.TYPE
-                                }
+                    }
+                    State.TYPE -> {
+                        when (char) {
+                            '(' -> {
+                                param += "" to ""
+                                State.PARAM_NAME
+                            }
+                            ':', ')' -> return false
+                            else -> {
+                                type += char
+                                State.TYPE
                             }
                         }
-                        State.PARAM_NAME -> {
-                            when (char) {
-                                ':' -> {
-                                    State.PARAM_TYPE
+                    }
+                    State.PARAM_NAME -> {
+                        when (char) {
+                            ':' -> {
+                                State.PARAM_TYPE
+                            }
+                            ',' -> {
+                                param += "" to ""
+                                State.PARAM_NAME
+                            }
+                            ')' -> {
+                                State.AFTER_PARAM
+                            }
+                            '(' -> return false
+                            else -> {
+                                param = param.dropLast(1) + param.last().let {
+                                    it.first + char to it.second
                                 }
-                                ',' -> {
-                                    param += "" to ""
-                                    State.PARAM_NAME
-                                }
-                                ')' -> {
-                                    State.AFTER_PARAM
-                                }
-                                '(' -> return@property Validator.Result.ERROR
-                                else -> {
-                                    param = param.dropLast(1) + param.last().let {
-                                        it.first + char to it.second
-                                    }
-                                    State.PARAM_NAME
-                                }
+                                State.PARAM_NAME
                             }
                         }
-                        State.PARAM_TYPE -> {
-                            when (char) {
-                                ',' -> {
-                                    param += "" to ""
-                                    State.PARAM_NAME
+                    }
+                    State.PARAM_TYPE -> {
+                        when (char) {
+                            ',' -> {
+                                param += "" to ""
+                                State.PARAM_NAME
+                            }
+                            ')' -> {
+                                State.AFTER_PARAM
+                            }
+                            ':', '(' -> return false
+                            else -> {
+                                param = param.dropLast(1) + param.last().let {
+                                    it.first to it.second + char
                                 }
-                                ')' -> {
-                                    State.AFTER_PARAM
-                                }
-                                ':', '(' -> return@property Validator.Result.ERROR
-                                else -> {
-                                    param = param.dropLast(1) + param.last().let {
-                                        it.first to it.second + char
-                                    }
-                                    State.PARAM_TYPE
-                                }
+                                State.PARAM_TYPE
                             }
                         }
-                        State.AFTER_PARAM -> {
-                            when (char) {
-                                ' ' -> State.AFTER_PARAM
-                                ':' -> State.TYPE
-                                else -> return@property Validator.Result.ERROR
-                            }
+                    }
+                    State.AFTER_PARAM -> {
+                        when (char) {
+                            ' ' -> State.AFTER_PARAM
+                            ':' -> State.TYPE
+                            else -> return false
                         }
                     }
                 }
-
-                model.name = name.trim()
-                model.type = type.trim()
-                model.parameters = param.asSequence().filter { it.first.isNotBlank() || it.first.isNotBlank() }.map {
-                    Parameter().apply {
-                        this.name = it.first.trim()
-                        this.type = it.second.trim()
-                    }
-                }.toList()
-
-                Validator.Result.VALID
             }
-    )
+
+            model.name = name.trim()
+            model.type = type.trim()
+            model.parameters = param.asSequence().filter { it.first.isNotBlank() || it.first.isNotBlank() }.map {
+                Parameter().apply {
+                    this.name = it.first.trim()
+                    this.type = it.second.trim()
+                }
+            }.toList()
+
+            return true
+        }
+
+        override fun get(): String {
+            return "${model.name}(" + model.parameters.joinToString(", ") { it.toString() } + ")" + model.type.let {
+                if (it.isBlank()) "" else ": $it"
+            }.trim()
+        }
+
+    },nameProperty, typeProperty, parameterProperty)
 
     override val pictogram = textShape(lineProperty)
 
@@ -175,12 +179,12 @@ class MethodLinker(
                                 onChange {
                                     param.name = it
                                     redraw = false
-                                    parameterProperty.fire()
+                                    parameterProperty.onChange.emit(Unit)
                                 }
                                 onFocusLeave {
                                     param.name = param.name.trim()
                                     redraw = true
-                                    parameterProperty.fire()
+                                    parameterProperty.onChange.emit(Unit)
                                 }
                             }
                         }
@@ -191,12 +195,12 @@ class MethodLinker(
                                 onChange {
                                     param.type = it
                                     redraw = false
-                                    parameterProperty.fire()
+                                    parameterProperty.onChange.emit(Unit)
                                 }
                                 onFocusLeave {
                                     param.type = param.type.trim()
                                     redraw = true
-                                    parameterProperty.fire()
+                                    parameterProperty.onChange.emit(Unit)
                                 }
                             }
                         }
@@ -205,7 +209,7 @@ class MethodLinker(
                                 onClick {
                                     model.parameters -= param
                                     redraw = true
-                                    parameterProperty.fire()
+                                    parameterProperty.onChange.emit(Unit)
                                 }
                             }
                         }
@@ -220,7 +224,7 @@ class MethodLinker(
             onClick {
                 model.parameters += Parameter()
                 redraw = true
-                parameterProperty.fire()
+                parameterProperty.onChange.emit(Unit)
             }
         }
     }

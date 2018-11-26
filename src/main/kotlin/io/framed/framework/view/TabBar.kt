@@ -1,9 +1,8 @@
 package io.framed.framework.view
 
-import io.framed.framework.util.Property
+import de.westermann.kobserve.Property
 import org.w3c.dom.HTMLDivElement
 import kotlin.math.max
-import kotlin.math.min
 
 class TabBar : ViewCollection<View<*>, HTMLDivElement>("div") {
 

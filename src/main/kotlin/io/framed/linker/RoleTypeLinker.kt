@@ -1,14 +1,17 @@
 package io.framed.linker
 
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
 import io.framed.framework.Linker
 import io.framed.framework.LinkerInfoItem
 import io.framed.framework.LinkerManager
 import io.framed.framework.PreviewLinker
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.RegexValidator
-import io.framed.framework.util.property
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.*
+import io.framed.framework.view.MaterialIcon
+import io.framed.framework.view.contextMenu
+import io.framed.framework.view.sidebar
 import io.framed.model.RoleType
 
 /**
@@ -19,7 +22,9 @@ class RoleTypeLinker(
         override val parent: ContainerLinker
 ) : PreviewLinker<RoleType, BoxShape, TextShape> {
 
-    private val nameProperty = property(model::name, RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())).trackHistory()
+    private val nameProperty = property(model::name)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .trackHistory()
     var name by nameProperty
 
     private lateinit var bodyBox: BoxShape

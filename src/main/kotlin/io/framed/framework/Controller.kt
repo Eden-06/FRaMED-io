@@ -1,12 +1,10 @@
 package io.framed.framework
 
+import de.westermann.kobserve.Property
 import io.framed.framework.pictogram.Layer
-import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.pictogram.ViewModelHandler
 import io.framed.framework.util.Dimension
-import io.framed.framework.util.History
-import io.framed.framework.util.Property
 
 class Controller(
         val linker: ModelLinker<*, *, *>,

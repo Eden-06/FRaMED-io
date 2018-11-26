@@ -1,7 +1,7 @@
 package io.framed.framework.pictogram
 
+import de.westermann.kobserve.Property
 import io.framed.framework.Linker
-import io.framed.framework.util.Property
 
 /**
  * @author lars

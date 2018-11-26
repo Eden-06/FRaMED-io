@@ -1,7 +1,7 @@
 package io.framed.framework.pictogram
 
+import de.westermann.kobserve.EventHandler
 import io.framed.framework.util.Dimension
-import io.framed.framework.util.EventHandler
 import io.framed.framework.util.History
 import io.framed.framework.util.HistoryLayer
 import kotlinx.serialization.Serializable
@@ -38,7 +38,7 @@ class Layer {
             position[id] = dimension
         }
 
-        listener[id]?.fire(true)
+        listener[id]?.emit(true)
     }
 
     operator fun get(shape: Shape, prop: Prop): Double? {
@@ -69,7 +69,7 @@ class Layer {
             Prop.WIDTH -> dimension.copy(width = value)
             Prop.HEIGHT -> dimension.copy(height = value)
         }
-        listener[id]?.fire(false)
+        listener[id]?.emit(false)
 
         History.push(HistoryLayer(this, shape, prop, oldValue, value))
     }

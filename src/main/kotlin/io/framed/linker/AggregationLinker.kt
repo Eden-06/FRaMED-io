@@ -1,13 +1,13 @@
 package io.framed.linker
 
+import de.westermann.kobserve.basic.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.*
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
 import io.framed.model.Aggregation
-import io.framed.model.Association
 
 /**
  * @author lars
@@ -18,7 +18,7 @@ class AggregationLinker(
         override val manager: ConnectionManager
 ) : ConnectionLinker<Aggregation> {
 
-    private val nameProperty = property(model::name, TrueValidator()).trackHistory()
+    private val nameProperty = property(model::name).trackHistory()
     private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
     private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 

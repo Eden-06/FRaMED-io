@@ -14,10 +14,10 @@ class MenuBar : ViewCollection<View<*>, HTMLDivElement>("div") {
             menu.classes += "show"
 
             async {
-                closeListener = Root.onClick { _ ->
+                closeListener = Root.onClick.addListener { _ ->
                     menu.classes -= "show"
                     Root.onClick -= closeListener
-                }
+                }!!
             }
         }
     }

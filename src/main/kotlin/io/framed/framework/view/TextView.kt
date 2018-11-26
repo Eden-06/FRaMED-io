@@ -1,7 +1,8 @@
 package io.framed.framework.view
 
-import io.framed.framework.util.EventHandler
-import io.framed.framework.util.Property
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.Property
+import io.framed.framework.util.eventListener
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -78,7 +79,7 @@ class TextView(
 
         val changeListener = object : EventListener {
             override fun handleEvent(event: Event) {
-                onChange.fire(text)
+                onChange.emit(text)
 
                 (event as? KeyboardEvent)?.let { e ->
                     when (e.keyCode) {
@@ -90,8 +91,8 @@ class TextView(
         html.addEventListener("onchange", changeListener)
         html.addEventListener("keypress", changeListener)
 
-        html.addEventListener("focus", onFocusEnter.eventListener)
-        html.addEventListener("blur", onFocusLeave.eventListener)
+        html.addEventListener("focus", onFocusEnter.eventListener())
+        html.addEventListener("blur", onFocusLeave.eventListener())
     }
 }
 

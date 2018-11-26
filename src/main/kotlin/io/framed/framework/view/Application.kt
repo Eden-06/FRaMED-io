@@ -1,5 +1,6 @@
 package io.framed.framework.view
 
+import de.westermann.kobserve.basic.property
 import io.framed.File
 import io.framed.framework.Controller
 import io.framed.framework.ControllerManager

@@ -1,5 +1,8 @@
 package io.framed.framework.util
 
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.Property
+import de.westermann.kobserve.basic.property
 import io.framed.framework.ConnectionLinker
 import io.framed.framework.ConnectionManager
 import io.framed.framework.ModelConnection
@@ -20,18 +23,18 @@ class LinkerConnectionBox<M : ModelConnection<M>, L : ConnectionLinker<M>>(
             backingField += linker.model
         }
 
-        parent.onConnectionAdd.fire(linker)
+        parent.onConnectionAdd.emit(linker)
 
         linkers += linker
     }
 
     private fun internalRemove(linker: L) {
         backingField -= linker.model
-        parent.onConnectionRemove.fire(linker)
+        parent.onConnectionRemove.emit(linker)
 
         linkers -= linker
 
-        onRemove.fire(Unit)
+        onRemove.emit(Unit)
     }
 
     fun add(linker: L) {

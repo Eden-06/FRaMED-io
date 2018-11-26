@@ -1,5 +1,7 @@
 package io.framed.framework.util
 
+import de.westermann.kobserve.Property
+
 class HistoryProperty<T : Any>(
         private val property: Property<T>,
         private val oldValue: T,

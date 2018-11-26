@@ -1,10 +1,11 @@
 package io.framed.framework
 
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.FunctionProperty
+import io.framed.framework.pictogram.ConnectionInfo
 import io.framed.framework.pictogram.Pictogram
 import io.framed.framework.util.History
-import io.framed.framework.util.Validator
 import io.framed.framework.util.async
-import io.framed.framework.util.property
 
 object LinkerManager {
     private fun setupPictogram(linker: Linker<*, *>, pictogram: Pictogram) {
@@ -32,22 +33,27 @@ object LinkerManager {
     fun setup(linker: ConnectionLinker<*>, info: LinkerInfoConnection) {
         val convert = linker.canConvert()
         if (convert.size > 1) {
-            val infoProperty = property(getter = {
-                info.info
-            }, setter = { connectionInfo ->
-                async {
-                    History.group("Set connection type to ${connectionInfo.name}") {
-                        val source = linker.sourceIdProperty.get()
-                        val target = linker.targetIdProperty.get()
-                        val manager = linker.manager
-                        linker.delete()
+            val infoProperty = FunctionProperty(object : FunctionAccessor<ConnectionInfo> {
+                override fun set(value: ConnectionInfo): Boolean {
+                    async {
+                        History.group("Set connection type to ${value.name}") {
+                            val source = linker.sourceIdProperty.get()
+                            val target = linker.targetIdProperty.get()
+                            val manager = linker.manager
+                            linker.delete()
 
-                        manager.createConnection(source, target, connectionInfo).focus()
+                            manager.createConnection(source, target, value).focus()
+                        }
                     }
+                    return true
                 }
 
-                Validator.Result.VALID
+                override fun get(): ConnectionInfo {
+                    return info.info
+                }
+
             })
+
             linker.sidebar.group("Structure") {
                 select("Type", convert, infoProperty) {
                     it.name

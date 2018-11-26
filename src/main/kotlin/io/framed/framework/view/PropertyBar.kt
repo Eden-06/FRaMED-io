@@ -1,6 +1,6 @@
 package io.framed.framework.view
 
-import io.framed.framework.util.EventHandler
+import de.westermann.kobserve.EventHandler
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.MouseEvent
 import kotlin.math.max
@@ -21,7 +21,7 @@ class PropertyBar : ViewCollection<View<*>, HTMLDivElement>("div") {
             onMouseDown {
                 it.preventDefault()
                 Root.classes += "resize-ew"
-                val move = Root.onMouseMove { e ->
+                val move = Root.onMouseMove.addListener { e ->
                     e.preventDefault()
                     val deltaWidth = e.clientX.toDouble() - this@PropertyBar.offsetLeft - clientWidth
                     val currentWidth = this@PropertyBar.clientWidth.toDouble()
@@ -35,14 +35,14 @@ class PropertyBar : ViewCollection<View<*>, HTMLDivElement>("div") {
                         max(width, 150.0)
                     }
                     this@PropertyBar.width = newWidth
-                    onResize.fire(newWidth)
-                }
-                up = Root.onMouseUp { e ->
+                    onResize.emit(newWidth)
+                }!!
+                up = Root.onMouseUp.addListener { e ->
                     e.preventDefault()
                     Root.classes -= "resize-ew"
                     Root.onMouseMove.removeListener(move)
                     Root.onMouseUp.removeListener(up)
-                }
+                }!!
             }
         }
         content = listView { }

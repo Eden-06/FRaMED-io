@@ -1,6 +1,6 @@
 package io.framed.framework.pictogram
 
-import io.framed.framework.util.EventHandler
+import de.westermann.kobserve.EventHandler
 
 /**
  * @author lars
@@ -13,7 +13,7 @@ class ViewModel(
         get() = container.layer
         set(value) {
             container.layer = value
-            onLayerChange.fire(Unit)
+            onLayerChange.emit(Unit)
         }
 
     var connections: Set<Connection> = emptySet()
@@ -25,11 +25,11 @@ class ViewModel(
     
     operator fun plusAssign(connection: Connection) {
         connections += connection
-        onConnectionAdd.fire(connection)
+        onConnectionAdd.emit(connection)
     }
 
     operator fun minusAssign(connection: Connection) {
         connections -= connection
-        onConnectionRemove.fire(connection)
+        onConnectionRemove.emit(connection)
     }
 }
