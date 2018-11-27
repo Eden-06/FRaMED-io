@@ -245,8 +245,10 @@ abstract class View<V : HTMLElement>(view: V) {
     val onKeyUp = EventHandler<KeyboardEvent>()
     val onDblClick = EventHandler<MouseEvent>()
 
-    var isMouseDown by ClassDelegate("mouse-down")
-    var selectedView by ClassDelegate("selected-view")
+    val isMouseDownProperty by ClassDelegate("mouse-down")
+    var isMouseDown by isMouseDownProperty
+    val selectedViewProperty by ClassDelegate()
+    var selectedView by selectedViewProperty
 
     var dragType = DragType.NONE
     val onDrag = EventHandler<DragEvent>()

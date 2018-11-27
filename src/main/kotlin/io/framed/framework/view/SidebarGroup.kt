@@ -8,7 +8,8 @@ class SidebarGroup(
         val name: String
 ) : ViewCollection<View<*>, HTMLDivElement>("div") {
 
-    var collapsed by ClassDelegate()
+    val collapsedProperty by ClassDelegate()
+    var collapsed by collapsedProperty
 
     fun input(label: String, property: ReadOnlyProperty<String>, autocomplete: List<String> = emptyList()): InputView {
         val i = InputView(property)

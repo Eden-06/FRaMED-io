@@ -21,7 +21,8 @@ class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
         }
     }
 
-    var inactive by ClassDelegate()
+    val inactiveProperty by ClassDelegate()
+    var inactive by inactiveProperty
 
     /**
      * The icon to display.
@@ -40,7 +41,8 @@ class IconView(icon: Icon? = null) : View<HTMLSpanElement>("span") {
     }
 }
 
-fun ViewCollection<in IconView, *>.iconView(icon: Icon? = null, init: IconView.() -> Unit = {})=
+fun ViewCollection<in IconView, *>.iconView(icon: Icon? = null, init: IconView.() -> Unit = {}) =
         IconView(icon).also(this::append).also(init)
-fun ViewCollection<in IconView, *>.iconView(property: ReadOnlyProperty<out Icon?>, init: IconView.() -> Unit = {})=
+
+fun ViewCollection<in IconView, *>.iconView(property: ReadOnlyProperty<out Icon?>, init: IconView.() -> Unit = {}) =
         IconView(property).also(this::append).also(init)

@@ -18,7 +18,7 @@ class TextView(
         value: String = ""
 ) : View<HTMLSpanElement>("span") {
 
-    constructor(text: Property<String>):this() {
+    constructor(text: Property<String>) : this() {
         bind(text)
     }
 
@@ -39,7 +39,12 @@ class TextView(
     /**
      * If the content is editable, prevents the insertion of line breaks.
      */
-    var singleLine: Boolean by ClassDelegate()
+    val singleLineProperty by ClassDelegate()
+
+    /**
+     * If the content is editable, prevents the insertion of line breaks.
+     */
+    var singleLine by singleLineProperty
 
     /**
      * Fires on every user change to the content

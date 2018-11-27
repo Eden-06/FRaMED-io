@@ -52,7 +52,8 @@ class RawInputView() : View<HTMLInputElement>("input") {
      */
     val onFocusEnter = EventHandler<FocusEvent>()
 
-    var invalid by ClassDelegate()
+    val invalidProperty by ClassDelegate()
+    var invalid by invalidProperty
 
     fun bind(property: ReadOnlyProperty<String>) {
         var hasFocus = false

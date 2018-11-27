@@ -16,9 +16,12 @@ class Button : View<HTMLButtonElement>("button") {
             html.textContent = value
         }
 
-    var primary by ClassDelegate()
-    var alert by ClassDelegate()
-    var error by ClassDelegate()
+    val primaryProperty by ClassDelegate()
+    var primary by primaryProperty
+    val alertProperty by ClassDelegate()
+    var alert by alertProperty
+    val errorProperty by ClassDelegate()
+    var error by errorProperty
 }
 
 fun ListView.button(init: Button.() -> Unit): Button {

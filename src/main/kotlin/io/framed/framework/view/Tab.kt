@@ -27,7 +27,8 @@ class Tab(
             closeView.visible = value
         }
 
-    var selected by ClassDelegate()
+    val selectedProperty by ClassDelegate()
+    var selected by selectedProperty
 
     val onClose = EventHandler<Unit>()
     val onOpen = EventHandler<Unit>()

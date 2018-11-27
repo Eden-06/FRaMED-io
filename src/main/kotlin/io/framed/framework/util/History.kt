@@ -2,10 +2,13 @@ package io.framed.framework.util
 
 import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
+import de.westermann.kobserve.basic.mapBinding
+import de.westermann.kobserve.basic.property
 
 object History {
     private var list: List<HistoryItem> = emptyList()
-    private var pointer: Int = list.size
+    private val pointerProperty = property(list.size)
+    private var pointer by pointerProperty
 
     private var allowPush = true
 
@@ -34,8 +37,8 @@ object History {
         }
     }
 
-    val canUndo: Boolean
-        get() = pointer > 0
+    val canUndoProperty = pointerProperty.mapBinding { it > 0 }
+    val canUndo by canUndoProperty
 
     fun undo() {
         if (!canUndo) {
@@ -49,8 +52,8 @@ object History {
         }
     }
 
-    val canRedo: Boolean
-        get() = pointer < list.size
+    val canRedoProperty = pointerProperty.mapBinding { it < list.size }
+    val canRedo by canRedoProperty
 
     fun redo() {
         if (!canRedo) {

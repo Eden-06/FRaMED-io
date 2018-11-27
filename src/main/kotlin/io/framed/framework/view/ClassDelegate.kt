@@ -1,7 +1,9 @@
 package io.framed.framework.view
 
+import de.westermann.kobserve.Property
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.property
 import io.framed.framework.util.toDashCase
-import org.w3c.dom.Element
 import kotlin.reflect.KProperty
 
 /**
@@ -10,26 +12,44 @@ import kotlin.reflect.KProperty
  * @author lars
  */
 class ClassDelegate(
-        private val paramName: String? = null,
-        private val element: Element? = null
+        className: String? = null
 ) {
 
-    @Suppress("UNCHECKED_CAST")
-    private fun getAttribute(element: Element, property: KProperty<*>) = element.classList.contains(getParamName(property).toDashCase())
 
-    private fun getParamName(property: KProperty<*>): String = paramName ?: property.name.toDashCase()
+    private lateinit var container: View<*>
+    private lateinit var paramName: String
 
-    operator fun getValue(container: Any, property: KProperty<*>) = element?.let {
-        getAttribute(it, property)
-    } ?: false
+    val classProperty = property(object : FunctionAccessor<Boolean> {
+        override fun set(value: Boolean): Boolean {
+            container.html.classList.toggle(paramName, value)
+            return true
+        }
 
-    operator fun getValue(container: View<*>, property: KProperty<*>) = getAttribute(container.html, property)
+        override fun get(): Boolean {
+            return container.html.classList.contains(paramName)
+        }
 
-    operator fun setValue(container: Any, property: KProperty<*>, value: Boolean) {
-        element?.classList?.toggle(getParamName(property), value)
+    })
+
+    operator fun getValue(container: View<*>, property: KProperty<*>): Property<Boolean> {
+        if (!this::container.isInitialized) {
+            this.container = container
+        }
+
+        if (!this::paramName.isInitialized) {
+            var name = property.name.toDashCase()
+            if (name.endsWith("-property")) {
+                name = name.replace("-property", "")
+            }
+            paramName = name
+        }
+
+        return classProperty
     }
 
-    operator fun setValue(container: View<*>, property: KProperty<*>, value: Boolean) {
-        container.html.classList.toggle(getParamName(property), value)
+    init {
+        if (className != null) {
+            this.paramName = className
+        }
     }
 }

@@ -92,7 +92,8 @@ class InputView() : View<HTMLDivElement>("div") {
     var size by property(input::size)
     fun sizeMatchText() = input.sizeMatchText()
 
-    private var focusClass by ClassDelegate("focus")
+    private val focusClassProperty by ClassDelegate("focus")
+    private var focusClass by focusClassProperty
 
     init {
         updateAutocomplete()

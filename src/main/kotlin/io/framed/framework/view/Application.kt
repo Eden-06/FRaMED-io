@@ -1,6 +1,7 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.not
 import io.framed.File
 import io.framed.framework.Controller
 import io.framed.framework.ControllerManager
@@ -20,9 +21,6 @@ import kotlin.math.roundToInt
  * @author lars
  */
 object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
-
-    private lateinit var actionUndo: IconView
-    private lateinit var actionRedo: IconView
 
     lateinit var tabBar: TabBar
     lateinit var workspace: ListView
@@ -66,17 +64,16 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }
         }
         separator(ToolBar.Side.LEFT)
-        actionUndo = action(ToolBar.Side.LEFT, MaterialIcon.UNDO) { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.UNDO) { _ ->
             if (History.canUndo) {
                 History.undo()
             }
-        }
-        actionRedo = action(ToolBar.Side.LEFT, MaterialIcon.REDO) { _ ->
+        }.inactiveProperty.bind(!History.canUndoProperty)
+        action(ToolBar.Side.LEFT, MaterialIcon.REDO) { _ ->
             if (History.canRedo) {
                 History.redo()
             }
-        }
-        updateUndoRedo()
+        }.inactiveProperty.bind(!History.canRedoProperty)
 
         // Right block
         action(ToolBar.Side.RIGHT, MaterialIcon.PALETTE) { _ ->
@@ -165,17 +162,9 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         tab.open()
     }
 
-    private fun updateUndoRedo() {
-        actionUndo.inactive = !History.canUndo
-        actionRedo.inactive = !History.canRedo
-    }
 
     init {
         Root += this
-
-        History.onChange {
-            updateUndoRedo()
-        }
 
         renderer.onZoom {
             zoom = it
