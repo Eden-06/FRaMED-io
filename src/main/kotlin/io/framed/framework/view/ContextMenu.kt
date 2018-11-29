@@ -15,7 +15,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
     private val listView = ListView()
 
     private val titleView = TextView().also {
-        it.visible = false
+        it.display = false
     }
 
     lateinit var lastEvent: ContextEvent
@@ -28,7 +28,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
         get() = titleView.text
         set(value) {
             titleView.text = value
-            titleView.visible = value.isNotBlank()
+            titleView.display = value.isNotBlank()
         }
 
     /**

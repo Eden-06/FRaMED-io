@@ -182,8 +182,8 @@ class ContainerLinker(
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
         val h = event.target == pictogram
-        sidebarActionsGroup.visible = !h
-        sidebarPreviewGroup.visible = h
+        sidebarActionsGroup.display = !h
+        sidebarPreviewGroup.display = h
     }
 
     private lateinit var contextStepIn: ListView
@@ -256,9 +256,9 @@ class ContainerLinker(
     }
 
     override fun ContextMenu.onOpen(event: ContextEvent) {
-        contextStepIn.visible = event.target == pictogram
-        contextStepOut.visible = event.target != pictogram && parent != null
-        contextDelete.visible = parent != null
+        contextStepIn.display = event.target == pictogram
+        contextStepOut.display = event.target != pictogram && parent != null
+        contextDelete.display = parent != null
     }
 
     override val setPosition = EventHandler<SetPosition>()

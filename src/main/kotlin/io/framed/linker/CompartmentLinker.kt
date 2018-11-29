@@ -157,15 +157,15 @@ class CompartmentLinker(
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
-        sidebarPreviewGroup.visible = event.target == pictogram
+        sidebarPreviewGroup.display = event.target == pictogram
     }
 
     private lateinit var contextStepIn: ListView
     private lateinit var contextStepOut: ListView
 
     override fun ContextMenu.onOpen(event: ContextEvent) {
-        contextStepIn.visible = event.target == pictogram
-        contextStepOut.visible = event.target != pictogram
+        contextStepIn.display = event.target == pictogram
+        contextStepOut.display = event.target != pictogram
     }
 
     override val contextMenu = contextMenu {

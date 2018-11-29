@@ -100,7 +100,6 @@ class RawInputView() : View<HTMLInputElement>("input") {
         }
     }
 
-
     private var lastValue: String = value
 
     init {

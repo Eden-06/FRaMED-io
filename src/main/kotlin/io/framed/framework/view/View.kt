@@ -1,6 +1,8 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.property
 import io.framed.framework.util.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.KeyboardEvent
@@ -37,8 +39,7 @@ abstract class View<V : HTMLElement>(view: V) {
         }
     }
 
-    /**
-
+    /*
     data class DropEvent(
     val target: HTMLElement,
     val element: HTMLElement,
@@ -56,6 +57,9 @@ abstract class View<V : HTMLElement>(view: V) {
     val indirect: DragOverEvent
     get() = copy(direct = false)
     }
+    */
+
+    /**
      * Fires on onClick.
      */
     val onClick = EventHandler<MouseEvent>()
@@ -195,27 +199,35 @@ abstract class View<V : HTMLElement>(view: V) {
     val id by AttributeDelegate(String::class, "")
 
     /**
-     * Show or hide this view. Does only work for view who are visible by default.
+     * Show or hide this view. Does only work for view who are display by default.
      */
-    var visible: Boolean
-        get() = html.style.display != "none"
-        set(value) {
+    val displayProperty = property(object : FunctionAccessor<Boolean> {
+        override fun set(value: Boolean): Boolean {
             if (value) {
                 html.style.removeProperty("display")
             } else {
                 html.style.display = "none"
             }
+            return true
         }
 
-    var hiddenVisibility: Boolean
-        get() = html.style.visibility == "hidden"
-        set(value) {
+        override fun get(): Boolean = html.style.display != "none"
+    })
+    var display: Boolean by displayProperty
+
+    val hiddenProperty = property(object : FunctionAccessor<Boolean> {
+        override fun set(value: Boolean): Boolean {
             if (value) {
                 html.style.visibility = "hidden"
             } else {
                 html.style.removeProperty("visibility")
             }
+            return true
         }
+
+        override fun get(): Boolean = html.style.visibility == "hidden"
+    })
+    var hidden: Boolean by hiddenProperty
 
     /**
      * Request focus to this view.

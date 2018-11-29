@@ -22,7 +22,7 @@ class Dialog : View<HTMLDivElement>("div") {
         get() = titleView.text
         set(value) {
             titleView.text = value
-            titleView.visible = value.isNotBlank()
+            titleView.display = value.isNotBlank()
         }
 
     var primaryListener: (() -> Unit)? = null
@@ -50,7 +50,7 @@ class Dialog : View<HTMLDivElement>("div") {
      * Open the dialog.
      */
     fun open() {
-        listView.hiddenVisibility = true
+        listView.hidden = true
         Root += this
 
         async {
@@ -60,7 +60,7 @@ class Dialog : View<HTMLDivElement>("div") {
             async {
                 listView.top = (clientHeight - listView.clientHeight) / 2.0
                 async {
-                    listView.hiddenVisibility = false
+                    listView.hidden = false
                 }
             }
         }

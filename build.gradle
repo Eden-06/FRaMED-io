@@ -30,21 +30,19 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
-    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$serialization_version"
-    compile "de.westermann:KObserve-js:0.5.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$serialization_version"
+    implementation "de.westermann:KObserve-js:0.5.1"
 }
 
-
 clean.doFirst() {
-    delete("${ web_path}/website")
-    delete("${ web_path}/node_modules")
-    delete("${ web_path}/package-lock.json")
+    delete("${web_path}/website")
+    delete("${web_path}/node_modules")
+    delete("${web_path}/package-lock.json")
     delete("out")
 }
 
 compileKotlin2Js {
-    //kotlinOptions.moduleKind = "amd"
     kotlinOptions.sourceMap = true
 }
 
@@ -73,7 +71,7 @@ build.doLast() {
         includeEmptyDirs = false
 
         from zipTree(artifact)
-        into "${ web_path}"
+        into "${web_path}"
         include { fileTreeElement ->
             def path = fileTreeElement.path
             !path.contains("META-INF") && !path.endsWith("sass")
@@ -84,11 +82,11 @@ build.doLast() {
 task run(type: NodeTask) {
     dependsOn build
     dependsOn npmInstall
-    script = file("${ web_path}/index.js")
+    script = file("${web_path}/index.js")
 }
 
 node {
-    workDir = file("${project.buildDir}/${ web_path}")
-    npmWorkDir = file("${project.buildDir}/${ web_path}")
-    nodeModulesDir = file("${project.projectDir}/${ web_path}/node_modules")
+    workDir = file("${project.buildDir}/${web_path}")
+    npmWorkDir = file("${project.buildDir}/${web_path}")
+    nodeModulesDir = file("${project.projectDir}/${web_path}/node_modules")
 }

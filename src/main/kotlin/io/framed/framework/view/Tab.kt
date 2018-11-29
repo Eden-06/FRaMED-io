@@ -22,9 +22,9 @@ class Tab(
     private val closeView: IconView
 
     var closable
-        get() = closeView.visible
+        get() = closeView.display
         set(value) {
-            closeView.visible = value
+            closeView.display = value
         }
 
     val selectedProperty by ClassDelegate()

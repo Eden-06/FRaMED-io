@@ -52,11 +52,11 @@ class InputView() : View<HTMLDivElement>("div") {
     private var autocompleteListView: ListView = ListView().also {
         html.appendChild(it.html)
         it.classes += "autocomplete"
-        it.visible = false
+        it.display = false
     }
     private var autocompleteMap: List<Pair<String, TextView>> = emptyList()
     val autocompleteVisible: List<TextView>
-        get() = autocompleteMap.map { it.second }.filter { it.visible }
+        get() = autocompleteMap.map { it.second }.filter { it.display }
 
     var autocomplete: List<String> = emptyList()
         set(value) {
@@ -82,7 +82,7 @@ class InputView() : View<HTMLDivElement>("div") {
     private fun updateAutocomplete() {
         autocompleteMap.forEach { (auto, view) ->
             view.selectedView = false
-            view.visible = auto.contains(value, ignoreCase = true)
+            view.display = auto.contains(value, ignoreCase = true)
         }
     }
 
@@ -106,12 +106,12 @@ class InputView() : View<HTMLDivElement>("div") {
 
         onFocusEnter {
             if (autocomplete.isNotEmpty()) {
-                autocompleteListView.visible = true
+                autocompleteListView.display = true
             }
             focusClass = true
         }
         onFocusLeave { _ ->
-            autocompleteListView.visible = false
+            autocompleteListView.display = false
             autocompleteMap.forEach { it.second.selectedView = false }
             focusClass = false
         }
@@ -150,7 +150,7 @@ class InputView() : View<HTMLDivElement>("div") {
                         if (index != -1) {
                             list[index].selectedView = false
                         }
-                        autocompleteListView.visible = false
+                        autocompleteListView.display = false
                     }
                 }
             }
