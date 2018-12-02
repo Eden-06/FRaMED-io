@@ -15,21 +15,9 @@ class ClassDelegate(
         className: String? = null
 ) {
 
-
     private lateinit var container: View<*>
     private lateinit var paramName: String
-
-    val classProperty = property(object : FunctionAccessor<Boolean> {
-        override fun set(value: Boolean): Boolean {
-            container.html.classList.toggle(paramName, value)
-            return true
-        }
-
-        override fun get(): Boolean {
-            return container.html.classList.contains(paramName)
-        }
-
-    })
+    private lateinit var classProperty: Property<Boolean>
 
     operator fun getValue(container: View<*>, property: KProperty<*>): Property<Boolean> {
         if (!this::container.isInitialized) {
@@ -42,6 +30,14 @@ class ClassDelegate(
                 name = name.replace("-property", "")
             }
             paramName = name
+        }
+
+        if (!this::classProperty.isInitialized) {
+            classProperty = property(container.html.classList.contains(paramName))
+
+            classProperty.onChange {
+                container.html.classList.toggle(paramName, classProperty.value)
+            }
         }
 
         return classProperty

@@ -41,9 +41,6 @@ abstract class HtmlShape(
             }
             view.onClick { it.stopPropagation() }
         }
-        view.onDrag {
-            if (it.direct) parent.toForeground(view)
-        }
     }
 
     fun style(view: View<*>, style: Style) {
@@ -85,6 +82,7 @@ abstract class HtmlShape(
         onMouseDown { event ->
             event.stopPropagation()
             htmlRenderer.selectView(this, event.ctrlKey, false)
+            parent.toForeground(view)
         }
         onClick { event ->
             event.stopPropagation()
@@ -111,6 +109,11 @@ abstract class HtmlShape(
                 htmlRenderer.viewModel.handler.dropShape(shape.id ?: return@onMouseUp, target.id ?: return@onMouseUp)
             }
             htmlRenderer.checkDrop()
+        }
+        selectedViewProperty.onChange {
+            if (selectedView) {
+                parent.toForeground(view)
+            }
         }
         htmlRenderer.draggableViews += this
 
