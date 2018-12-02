@@ -1,6 +1,7 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.ListenerReference
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.MouseEvent
 import kotlin.math.max
@@ -16,36 +17,46 @@ class PropertyBar : ViewCollection<View<*>, HTMLDivElement>("div") {
         listView {
             classes += "property-bar-resizer"
 
-            var up: ((MouseEvent) -> Unit) = {}
+            var up: ListenerReference<*>? = null
 
             onMouseDown {
                 it.preventDefault()
                 Root.classes += "resize-ew"
-                val move = Root.onMouseMove.addListener { e ->
+                val move = Root.onMouseMove.reference { e ->
                     e.preventDefault()
                     val deltaWidth = e.clientX.toDouble() - this@PropertyBar.offsetLeft - clientWidth
                     val currentWidth = this@PropertyBar.clientWidth.toDouble()
                     val width = currentWidth - deltaWidth
 
-                    val newWidth = if (width < 50) {
+                    val newWidth = if (width < if (this@PropertyBar.width <= REDUCED_WIDTH) GROW_WIDTH else SHRINK_WIDTH) {
                         this@PropertyBar.classes += "hide"
-                        8.0
+                        REDUCED_WIDTH
                     } else {
                         this@PropertyBar.classes -= "hide"
-                        max(width, 150.0)
+                        max(width, MIN_WIDTH)
                     }
+
                     this@PropertyBar.width = newWidth
                     onResize.emit(newWidth)
                 }!!
-                up = Root.onMouseUp.addListener { e ->
+
+                up = Root.onMouseUp.reference { e ->
                     e.preventDefault()
                     Root.classes -= "resize-ew"
-                    Root.onMouseMove.removeListener(move)
-                    Root.onMouseUp.removeListener(up)
+                    move.remove()
+                    up?.remove()
                 }!!
             }
         }
         content = listView { }
+    }
+
+    companion object {
+        const val MIN_WIDTH = 150.0
+        const val REDUCED_WIDTH = 8.0
+
+        const val SHRINK_WIDTH = 50
+        const val GROW_WIDTH = 60
     }
 }
 

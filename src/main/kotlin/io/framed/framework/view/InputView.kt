@@ -75,14 +75,18 @@ class InputView() : View<HTMLDivElement>("div") {
 
             updateAutocomplete()
         }
-
+    var autocompleteMatch: Boolean = true
+        set(value) {
+            field = value
+            updateAutocomplete()
+        }
 
     fun bind(property: ReadOnlyProperty<String>) = input.bind(property)
 
     private fun updateAutocomplete() {
         autocompleteMap.forEach { (auto, view) ->
             view.selectedView = false
-            view.display = auto.contains(value, ignoreCase = true)
+            view.display = !autocompleteMatch || auto.contains(value, ignoreCase = true)
         }
     }
 

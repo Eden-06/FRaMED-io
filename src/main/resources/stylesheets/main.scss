@@ -45,6 +45,7 @@ input {
     width: 100%;
     position: absolute;
     z-index: 10;
+    line-height: 2rem;
     &:empty {
       display: none;
     }

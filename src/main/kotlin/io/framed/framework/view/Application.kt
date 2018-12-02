@@ -1,5 +1,6 @@
 package io.framed.framework.view
 
+import de.westermann.kobserve.basic.FunctionAccessor
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.not
 import io.framed.File
@@ -40,11 +41,27 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
     val zoomProperty = property(this::zoomBackingField)
     var zoom by zoomProperty
 
+    val zoomStringProperty = property(object : FunctionAccessor<String> {
+        override fun set(value: String): Boolean {
+            value.replace("%", "").trim().toIntOrNull()?.let {
+                zoom = it / 100.0
+            }
+            return true
+        }
+
+        override fun get(): String = "${(zoom * 100).roundToInt()}%"
+
+    }, zoomProperty)
+
     private val toolBar = toolBar {
 
         custom(ToolBar.Side.LEFT) {
-            selectView(NavigationView.zoomSteps, zoomProperty) { current: Double ->
-                "${(current * 100).roundToInt()}%"
+            inputView(zoomStringProperty) {
+                autocomplete = NavigationView.zoomSteps.map {
+                    "${(it * 100).roundToInt()}%"
+                }
+                autocompleteMatch = false
+                size = 5
             }
         }
 
@@ -125,7 +142,7 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     val propertyBar = propertyBar {
         onResize {
-            workspace.right = clientWidth - it
+            workspaceContainer.right = clientWidth - it
         }
     }
 
