@@ -9,11 +9,18 @@ abstract class Pictogram {
 
     abstract val id: Long?
 
-    var layer: Layer = Layer()
+    private lateinit var internalLayer: Layer
+    var layer: Layer
+        get() = internalLayer
         set(value) {
-            field = value
-            onLayerChange.emit(Unit)
+            if (!hasLayer || internalLayer != value) {
+                internalLayer = value
+                onLayerChange.emit(Unit)
+            }
         }
+
+    val hasLayer: Boolean
+        get() = this::internalLayer.isInitialized
 
     val onSidebar = EventHandler<SidebarEvent>()
     val onContextMenu = EventHandler<ContextEvent>()

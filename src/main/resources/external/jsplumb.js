@@ -5196,7 +5196,7 @@
         // ensure that, if the current model exists, it is a DOM element and not a selector.
         // if it does not exist and `candidate` is supplied, the offset parent of that element will be set as the Container.
         // this is used to do a better default behaviour for the case that the user has not set a model:
-        // createEndpoint, makeSource, makeTarget and connect all call this model with the offsetParent of the
+        // createEndpointInternal, makeSource, makeTarget and connect all call this model with the offsetParent of the
         // element in question (for connect it is the source element). So if no model is set, it is inferred
         // to be the offsetParent of the first element the user tries to connect.
         var _ensureContainer = function (candidate) {

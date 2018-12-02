@@ -44,6 +44,7 @@ clean.doFirst() {
 
 compileKotlin2Js {
     kotlinOptions.sourceMap = true
+    kotlinOptions.sourceMapEmbedSources = "always"
 }
 
 jar {

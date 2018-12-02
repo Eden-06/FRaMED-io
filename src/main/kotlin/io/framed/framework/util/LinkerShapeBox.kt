@@ -1,6 +1,5 @@
 package io.framed.framework.util
 
-import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.basic.property
 import io.framed.framework.ConnectionManager
@@ -22,14 +21,14 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
     protected abstract fun backingAdd(model: M)
     protected abstract fun backingRemove(model: M)
 
-    fun updatePreview() {
+    fun addAllPreviews() {
         previewBox?.let { box ->
             linkers.forEach { linker ->
                 if (linker is PreviewLinker<*, *, *>) {
-                    if (box.position == BoxShape.Position.ABSOLUTE) {
-                        box += linker.flatPreview
+                    box += if (box.position == BoxShape.Position.ABSOLUTE) {
+                        linker.flatPreview
                     } else {
-                        box += linker.listPreview
+                        linker.listPreview
                     }
                 }
             }
@@ -45,10 +44,10 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
 
         previewBox?.let { box ->
             if (linker is PreviewLinker<*, *, *>) {
-                if (box.position == BoxShape.Position.ABSOLUTE) {
-                    box += linker.flatPreview
+                box += if (box.position == BoxShape.Position.ABSOLUTE) {
+                    linker.flatPreview
                 } else {
-                    box += linker.listPreview
+                    linker.listPreview
                 }
             }
         }
@@ -66,8 +65,6 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
             }
         }
         linkers -= linker
-
-        onRemove.emit(Unit)
     }
 
     fun add(linker: L) {
@@ -99,14 +96,8 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
         internalAdd(linker)
     }
 
-    fun redraw() {
-        linkers.forEach(this::remove)
-    }
-
     operator fun plusAssign(linker: L) = add(linker)
     operator fun minusAssign(linker: L) = remove(linker)
-
-    val onRemove = EventHandler<Unit>()
 
     class SetShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
             kProperty: KMutableProperty0<Set<M>>,

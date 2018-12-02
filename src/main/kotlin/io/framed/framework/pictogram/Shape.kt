@@ -1,6 +1,7 @@
 package io.framed.framework.pictogram
 
 import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.ListenerReference
 
 /**
  * @author lars
@@ -36,10 +37,9 @@ abstract class Shape : Pictogram() {
         init(style)
     }
 
+    private var listenerReference: ListenerReference<Boolean>? = null
+
     init {
-        var listenerReference = layer.onUpdate(this)?.reference { force ->
-            onPositionChange.emit(force)
-        }
         onLayerChange {
             listenerReference?.remove()
             listenerReference = layer.onUpdate(this)?.reference { force ->

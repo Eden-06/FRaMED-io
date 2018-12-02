@@ -18,23 +18,33 @@ class BoxShape(
     var position = Position.VERTICAL
     var resizeable = false
 
-    var shapes: List<Shape> = emptyList()
-        private set
+    val shapes: List<Shape>
+        get() = internalShapes
+
+    private var internalShapes: List<Shape> = emptyList()
 
     val onAdd = EventHandler<Shape>()
     val onRemove = EventHandler<Shape>()
 
     operator fun plusAssign(shape: Shape) = add(shape)
     fun add(shape: Shape) {
-        shape.layer = layer
-        shapes += shape
-        onAdd.emit(shape)
+        if (shape !in internalShapes) {
+            internalShapes += shape
+
+            if (hasLayer) {
+                shape.layer = layer
+            }
+
+            onAdd.emit(shape)
+        }
     }
 
     operator fun minusAssign(shape: Shape) = remove(shape)
     fun remove(shape: Shape) {
-        shapes -= shape
-        onRemove.emit(shape)
+        if (shape in internalShapes) {
+            internalShapes -= shape
+            onRemove.emit(shape)
+        }
     }
 
     fun clear() {

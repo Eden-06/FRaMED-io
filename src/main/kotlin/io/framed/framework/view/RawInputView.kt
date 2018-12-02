@@ -4,6 +4,7 @@ import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.ValidationProperty
+import de.westermann.kobserve.basic.property
 import io.framed.framework.util.eventListener
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
@@ -32,10 +33,20 @@ class RawInputView() : View<HTMLInputElement>("input") {
             }
         }
 
+    val readOnlyProperty = property(false).also { property ->
+        property.onChange {
+            if (property.value) {
+                html.setAttribute("readonly", "true")
+            } else {
+                html.removeAttribute("readonly")
+            }
+        }
+    }
+
     /**
      * Set input to readonly.
      */
-    var readOnly: Boolean by AttributeDelegate(Boolean::class, false)
+    var readOnly: Boolean by readOnlyProperty
 
     /**
      * Fires on every user change to the content
@@ -68,7 +79,7 @@ class RawInputView() : View<HTMLInputElement>("input") {
             }
 
             if (property is ValidationProperty<String>) {
-                invalid = property.valid
+                invalid = !property.valid
             }
         }
         onFocusLeave {
@@ -78,7 +89,7 @@ class RawInputView() : View<HTMLInputElement>("input") {
             }
 
             if (property is ValidationProperty<String>) {
-                invalid = property.valid
+                invalid = !property.valid
             }
         }
 

@@ -1,7 +1,7 @@
 package io.framed.linker
 
 import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.basic.FunctionReadOnlyAccessor
+import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
@@ -113,18 +113,10 @@ class ContainerLinker(
     private lateinit var sidebarPreviewGroup: SidebarGroup
 
     private val creationProperty = property(model.metadata::creationDate)
-    private val creationStringProperty = property(object : FunctionReadOnlyAccessor<String> {
-        override fun get(): String {
-            return creationProperty.get().toUTCString()
-        }
-    }, creationProperty)
+    private val creationStringProperty = creationProperty.mapBinding { it.toUTCString() }
 
     private val modifiedProperty = property(model.metadata::modifiedDate)
-    private val modifiedStringProperty = property(object : FunctionReadOnlyAccessor<String> {
-        override fun get(): String {
-            return modifiedProperty.get().toUTCString()
-        }
-    }, modifiedProperty)
+    private val modifiedStringProperty = modifiedProperty.mapBinding { it.toUTCString() }
 
     private val authorProperty = property(model.metadata::author)
 
@@ -139,11 +131,11 @@ class ContainerLinker(
         }
 
         autoLayoutBox.clear()
-        this@ContainerLinker.classes.updatePreview()
-        containers.updatePreview()
-        compartments.updatePreview()
-        roleTypes.updatePreview()
-        events.updatePreview()
+        this@ContainerLinker.classes.addAllPreviews()
+        containers.addAllPreviews()
+        compartments.addAllPreviews()
+        roleTypes.addAllPreviews()
+        events.addAllPreviews()
 
         parent?.redraw(this@ContainerLinker)
     }
@@ -208,6 +200,24 @@ class ContainerLinker(
         }
         addItem(MaterialIcon.ADD, "Add package") { event ->
             containers += ContainerLinker(Container(), connectionManager, this@ContainerLinker).also {
+                setPosition.emit(SetPosition(it, event.position))
+                it.focus()
+            }
+        }
+        addItem(MaterialIcon.ADD, "Add event") { event ->
+            events += EventLinker(Event(), this@ContainerLinker).also {
+                setPosition.emit(SetPosition(it, event.position))
+                it.focus()
+            }
+        }
+        addItem(MaterialIcon.ADD, "Add role type") { event ->
+            roleTypes += RoleTypeLinker(RoleType(), this@ContainerLinker).also {
+                setPosition.emit(SetPosition(it, event.position))
+                it.focus()
+            }
+        }
+        addItem(MaterialIcon.ADD, "Add compartment") { event ->
+            compartments += CompartmentLinker(Compartment(), connectionManager, this@ContainerLinker).also {
                 setPosition.emit(SetPosition(it, event.position))
                 it.focus()
             }
@@ -295,11 +305,9 @@ class ContainerLinker(
 
                         connectionList.forEach {
                             if (it.sourceId == oldId) {
-                                println("set source")
                                 it.sourceId = newId
                             }
                             if (it.targetId == oldId) {
-                                println("set target")
                                 it.targetId = newId
                             }
                             connectionManager.add(it)

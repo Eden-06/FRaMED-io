@@ -265,10 +265,9 @@ class NavigationView : View<HTMLDivElement>("div") {
                     else -> Point(e.deltaX, e.deltaY)
                 }
 
-
                 if (!touchpadControl || e.ctrlKey) {
                     e.point() - Point(offsetLeft, offsetTop) / Point(clientWidth, clientHeight)
-                    zoomBy(delta.y / 150, (e.point() - Point(offsetLeft, offsetTop)) / Point(clientWidth, clientHeight))
+                    zoomBy(delta.y / 150 * zoom, (e.point() - Point(offsetLeft, offsetTop)) / Point(clientWidth, clientHeight))
                 } else {
                     panBy(-delta)
                 }

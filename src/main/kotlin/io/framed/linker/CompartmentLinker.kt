@@ -134,7 +134,7 @@ class CompartmentLinker(
         }
 
         autoLayoutBox.clear()
-        this@CompartmentLinker.classes.updatePreview()
+        this@CompartmentLinker.classes.addAllPreviews()
 
         parent.redraw(this@CompartmentLinker)
     }
