@@ -6,7 +6,13 @@
   z-index: 1;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .14);
   overflow: hidden;
+
+  width: intrinsic;
+  width: -moz-max-content;
+  width: -webkit-max-content;
+  width: max-content;
 }
+
 .resize-handler {
   position: absolute;
   width: 0.5rem;
@@ -20,6 +26,7 @@
   border-style: solid;
   border-color: transparent rgba($text-color, 0.3) rgba($text-color, 0.3) transparent;
   border-width: 0.4rem;
+
   &:hover {
     background: rgba($text-color, 0.8);
   }
@@ -33,6 +40,7 @@
   height: 100%;
 
   background-color: $primary-background;
+
   * {
     font-family: "RobotoMono Nerd Font", Roboto, Arial, sans-serif;
   }
@@ -61,6 +69,7 @@
     display: block;
     color: $uml-text;
     width: 100%;
+
     &:focus {
       background: $primary-background;
       color: $text-color;
@@ -75,6 +84,7 @@
 
 .drop-target {
   outline: solid 2px $toolbar-color;
+
   &:after {
     content: '';
     top: 0;
@@ -93,9 +103,11 @@
   &.focus {
     z-index: 1;
   }
+
   input {
     background-color: rgba($primary-background, .6);
     text-align: center;
+
     &:hover, &:focus {
       padding: .5rem;
       background-color: rgba($primary-background, .9);
