@@ -16,5 +16,20 @@ object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
         onMouseMove {
             mousePosition = it.point()
         }
+
+        onKeyDown { event ->
+            val found = shortcuts.filterKeys { it.match(event) }
+            if (found.isNotEmpty()) {
+                event.stopPropagation()
+                event.preventDefault()
+                found.values.forEach { println(5);it() }
+            }
+        }
+    }
+
+    private var shortcuts: Map<Shortcut, () -> Unit> = emptyMap()
+
+    fun shortcut(shortcut: Shortcut, action: () -> Unit) {
+        shortcuts += shortcut to action
     }
 }

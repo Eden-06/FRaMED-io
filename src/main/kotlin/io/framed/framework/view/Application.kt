@@ -80,12 +80,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }
         }
         separator(ToolBar.Side.LEFT)
-        action(ToolBar.Side.LEFT, MaterialIcon.UNDO, "Undo") { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.UNDO, "Undo", Shortcut('Z', Shortcut.Modifier.CTRL)) { _ ->
             if (History.canUndo) {
                 History.undo()
             }
         }.inactiveProperty.bind(!History.canUndoProperty)
-        action(ToolBar.Side.LEFT, MaterialIcon.REDO, "Redo") { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.REDO, "Redo", Shortcut('Z', Shortcut.Modifier.CTRL, Shortcut.Modifier.SHIFT)) { _ ->
             if (History.canRedo) {
                 History.redo()
             }

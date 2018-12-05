@@ -11,12 +11,13 @@ class ToolBar : ViewCollection<View<*>, HTMLDivElement>("div") {
         classes += "right-bar"
     }
 
-    fun action(side: Side, icon: Icon, tooltip: String? = null, onAction: (IconView) -> Unit): IconView = when (side) {
+    fun action(side: Side, icon: Icon, tooltip: String? = null, shortcut: Shortcut? = null, onAction: (IconView) -> Unit): IconView = when (side) {
         Side.LEFT -> leftBar
         Side.RIGHT -> rightBar
     }.iconView(icon) {
-        this.tooltip = tooltip
+        this.tooltip = tooltip + (shortcut?.let { " ($it)" } ?: "")
         onClick { onAction(this) }
+        shortcut?.let { Root.shortcut(it) { onAction(this) } }
     }
 
     fun custom(side: Side, init: ListView.() -> Unit) = when (side) {
