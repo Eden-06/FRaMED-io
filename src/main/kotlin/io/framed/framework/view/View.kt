@@ -296,9 +296,9 @@ abstract class View<V : HTMLElement>(view: V) {
             field = value
 
             if (value == null) {
-                html.removeAttribute("data-tooltip")
+                html.removeAttribute("title")
             } else {
-                html.setAttribute("data-tooltip", value)
+                html.setAttribute("title", value)
             }
         }
 
