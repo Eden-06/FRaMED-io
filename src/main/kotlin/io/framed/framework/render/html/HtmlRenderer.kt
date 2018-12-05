@@ -2,6 +2,7 @@ package io.framed.framework.render.html
 
 import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.ListenerReference
+import de.westermann.kobserve.basic.property
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.ContextEvent
 import io.framed.framework.pictogram.Shape
@@ -15,6 +16,7 @@ import io.framed.framework.view.ListView
 import io.framed.framework.view.NavigationView
 import io.framed.framework.view.Root
 import io.framed.framework.view.View
+import kotlin.math.abs
 
 /**
  * @author lars
@@ -25,6 +27,13 @@ class HtmlRenderer(
     lateinit var viewModel: ViewModel
 
     var layerChangeListener: ListenerReference<Unit>? = null
+
+    val snapTypeProperty = property(SnapType.GRID).also {
+        it.onChange {
+            incrementSnap = null
+        }
+    }
+    var snapType by snapTypeProperty
 
     override fun render(viewModel: ViewModel) {
         layerChangeListener?.remove()
@@ -83,6 +92,87 @@ class HtmlRenderer(
         }
     }
 
+    fun stopDragView() {
+        navigationView.clearLine()
+    }
+
+    private var incrementSnap: Pair<View<*>, Point>? = null
+    fun directDragView(event: View.DragEvent, view: View<*>): View.DragEvent {
+        var delta = event.delta
+
+        navigationView.clearLine()
+
+        when (snapType) {
+            SnapType.GRID -> {
+                if (incrementSnap?.first != view) incrementSnap = null
+                val currentCenter = Point(view.left, view.top)
+
+                var (_, center) = incrementSnap ?: view to currentCenter
+                center += delta
+
+                val gridSize = NavigationView.gridSize
+
+                // Test x
+                val tx = center.x % gridSize
+                val dx = if (tx <= gridSize / 2) -tx else gridSize - tx
+
+                if (abs(dx) < 8) {
+                    val pos = center.x + dx
+                    delta = Point(pos - currentCenter.x, delta.y)
+
+                    navigationView.vLine(pos)
+                }
+
+                // Test y
+                val ty = center.y % gridSize
+                val dy = if (ty <= gridSize / 2) -ty else gridSize - ty
+
+                if (abs(dy) < 8) {
+                    val pos = center.y + dy
+                    delta = Point(delta.x, pos - currentCenter.y)
+
+                    navigationView.hLine(pos)
+                }
+
+                incrementSnap = view to center
+            }
+            SnapType.CENTER -> {
+                if (incrementSnap?.first != view) incrementSnap = null
+                val currentCenter = Point(view.left + view.width / 2, view.top + view.height / 2)
+
+                var (_, center) = incrementSnap ?: view to currentCenter
+                center += delta
+
+                val otherViews = (draggableViews - view - selectedViews).associate { it to Point(it.left + it.width / 2, it.top + it.height / 2) }
+
+                // Test x center
+                val foundX = otherViews.filterValues { abs(it.x - center.x) < 16 }
+                if (foundX.isNotEmpty()) {
+                    val (_, min) = foundX.minBy { abs(it.value.x - center.x) } ?: foundX.entries.first()
+                    delta = Point(min.x - currentCenter.x, delta.y)
+
+                    navigationView.vLine(min.x)
+                }
+
+                // Test y center
+                val foundY = otherViews.filterValues { abs(it.y - center.y) < 16 }
+                if (foundY.isNotEmpty()) {
+                    val (_, min) = foundY.minBy { abs(it.value.y - center.y) } ?: foundY.entries.first()
+                    delta = Point(delta.x, min.y - currentCenter.y)
+
+                    navigationView.hLine(min.y)
+                }
+                incrementSnap = view to center
+            }
+
+            SnapType.NONE -> {
+                incrementSnap = null
+            }
+        }
+
+
+        return event.copy(delta = delta)
+    }
 
     fun updateViewBox() {
         val box = navigationView.viewBox
@@ -203,4 +293,8 @@ class HtmlRenderer(
     override fun panTo(point: Point) {
         navigationView.panTo(point)
     }
+}
+
+enum class SnapType {
+    NONE, GRID, CENTER
 }

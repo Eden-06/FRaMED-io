@@ -1,14 +1,19 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.basic.property
 import io.framed.framework.util.Dimension
 import io.framed.framework.util.Point
+import io.framed.framework.util.async
 import io.framed.framework.util.point
+import org.w3c.dom.CanvasRenderingContext2D
+import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.events.WheelEvent
+import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.math.abs
 import kotlin.math.max
@@ -28,6 +33,18 @@ class NavigationView : View<HTMLDivElement>("div") {
      * touchpad control: zoom with scroll + ctrl, pan with scroll or mouse.
      */
     var touchpadControl: Boolean = false
+
+    private val background = (document.createElement("canvas") as HTMLCanvasElement).also { background ->
+        html.appendChild(background)
+    }
+    private val context: CanvasRenderingContext2D = background.getContext("2d")!! as CanvasRenderingContext2D
+
+    val renderGridProperty = property(true).also {
+        it.onChange {
+            updateTransform()
+        }
+    }
+    var renderGrid by renderGridProperty
 
     /**
      * Html model to apply transformations.
@@ -105,7 +122,7 @@ class NavigationView : View<HTMLDivElement>("div") {
         this.zoom = zoom
         val new = this.zoom
 
-        pan -= (Point(clientWidth, clientHeight) * (-center + 0.5) * (1 / new - 1 / old))
+        pan -= Point(clientWidth, clientHeight) * (-center + 0.5) * (1 / new - 1 / old)
 
         if (old != new) {
             onZoom.emit(new)
@@ -142,14 +159,106 @@ class NavigationView : View<HTMLDivElement>("div") {
      */
     private fun updateTransform() {
         transformBox.html.style.transform = "scale($zoom) translate(${pan.asPx})"
+
+        if (renderGrid) drawGrid() else context.clearRect(0.0, 0.0, clientWidth.toDouble(), clientHeight.toDouble())
     }
 
-    fun mouseToCanvas(mouse: Point): Point {
+    private var hLine: Double? = null
+    private var vLine: Double? = null
+
+    fun resize() {
+        background.width = clientWidth
+        background.height = clientHeight
+
+        updateTransform()
+    }
+
+    private fun drawGrid() {
+        context.clearRect(0.0, 0.0, clientWidth.toDouble(), clientHeight.toDouble())
+
+        context.beginPath()
+        context.lineWidth = 0.3
+        context.strokeStyle = "rgba(0, 0, 0, 0.3)"
+
+        val topLeft = realToSystem(Point.ZERO)
+
+        val size = gridSize * zoom
+
+        val startX = size - (topLeft.x * zoom) % size
+        val xCount = clientWidth / size.toInt() + 1
+        for (x in -1..xCount) {
+            context.moveTo(startX + x * size, 0.0)
+            context.lineTo(startX + x * size, clientHeight.toDouble())
+        }
+
+        val startY = size - (topLeft.y * zoom) % size
+        val yCount = clientHeight / size.toInt() + 1
+        for (y in -1..yCount) {
+            context.moveTo(0.0, startY + y * size)
+            context.lineTo(clientWidth.toDouble(), startY + y * size)
+        }
+        context.stroke()
+
+        val p = systemToReal(Point(vLine ?: 0.0, hLine ?: 0.0))
+        if (vLine != null) {
+            context.beginPath()
+            context.lineWidth = 1.0
+            context.strokeStyle = "#2196F3"
+
+            context.moveTo(p.x * clientWidth, 0.0)
+            context.lineTo(p.x * clientWidth, clientHeight.toDouble())
+            context.stroke()
+        }
+        if (hLine != null) {
+            context.beginPath()
+            context.lineWidth = 1.0
+            context.strokeStyle = "#2196F3"
+
+            context.moveTo(0.0, p.y * clientHeight)
+            context.lineTo(clientWidth.toDouble(), p.y * clientHeight)
+            context.stroke()
+        }
+    }
+
+    fun clearLine() {
+        hLine = null
+        vLine = null
+        updateTransform()
+    }
+
+    fun hLine(y: Double) {
+        hLine = y
+        updateTransform()
+    }
+
+    fun vLine(x: Double) {
+        vLine = x
+        updateTransform()
+    }
+
+    /**
+     * Calculate the coordinate system point of the given screen point.
+     *
+     * @param point Screen point in percent.
+     * @return The corresponding point on the coordinate system.
+     */
+    fun realToSystem(point: Point): Point {
         val client = Point(clientWidth, clientHeight)
-        val c = (mouse - Point(offsetLeft, offsetTop)) / client - 0.5
-
-        return client / 2.0 + c * client / zoom - pan
+        return client / 2.0 + (point - 0.5) * client / zoom - pan
     }
+
+    /**
+     * Calculate the on screen point of the given coordinate system point.
+     *
+     * @param point Coordinate system point.
+     * @return The corresponding point on the screen in percent.
+     */
+    fun systemToReal(point: Point): Point {
+        val client = Point(clientWidth, clientHeight)
+        return ((point + pan - client / 2.0) * zoom / client) + 0.5
+    }
+
+    fun mouseToCanvas(mouse: Point): Point = realToSystem((mouse - Point(offsetLeft, offsetTop)) / Point(clientWidth, clientHeight))
 
     /**
      * Move reference position for pan.
@@ -282,6 +391,16 @@ class NavigationView : View<HTMLDivElement>("div") {
         onClick {
             onSelect.emit(null)
         }
+
+        async {
+            resize()
+        }
+
+        window.addEventListener("resize", object : EventListener {
+            override fun handleEvent(event: Event) {
+                resize()
+            }
+        })
     }
 
     companion object {
@@ -290,5 +409,6 @@ class NavigationView : View<HTMLDivElement>("div") {
          * List of zoom steps for stepped zooming.
          */
         val zoomSteps = listOf(0.1, 0.3, 0.5, 0.67, 0.8, 0.9, 1.0, 1.1, 1.2, 1.33, 1.5, 1.7, 2.0, 2.4, 3.0, 4.0)
+        val gridSize = 40
     }
 }

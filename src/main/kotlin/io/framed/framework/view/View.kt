@@ -286,7 +286,7 @@ abstract class View<V : HTMLElement>(view: V) {
                 Point(marginLeft, marginTop)
             }
         }
-        onDrag.emit(dragEvent.copy(newPosition = newPosition))
+        onDrag.emit(dragEvent)
     }
 
     var dragZoom = 1.0
@@ -392,8 +392,7 @@ abstract class View<V : HTMLElement>(view: V) {
 
     data class DragEvent(
             val delta: Point,
-            val direct: Boolean,
-            val newPosition: Point = Point.ZERO
+            val direct: Boolean
     ) {
         val indirect: DragEvent
             get() = copy(direct = false)

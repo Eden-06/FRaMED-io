@@ -7,6 +7,7 @@ import io.framed.framework.util.async
 import io.framed.framework.util.point
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
+import kotlin.math.max
 
 abstract class HtmlShape(
         private val htmlRenderer: HtmlRenderer,
@@ -78,7 +79,7 @@ abstract class HtmlShape(
 
         }?.let(listeners::add)
 
-        dragType = View.DragType.ABSOLUTE
+        dragType = View.DragType.CUSTOM
         onMouseDown { event ->
             event.stopPropagation()
             htmlRenderer.selectView(this, event.ctrlKey, false)
@@ -91,24 +92,37 @@ abstract class HtmlShape(
             event.stopPropagation()
             htmlRenderer.selectView(this, event.ctrlKey, true)
         }
-        onDrag { event ->
+        onDrag { e ->
+            var event = e
+            if (event.direct) {
+                event = htmlRenderer.directDragView(event, view)
+                canDrop = htmlRenderer.checkDrop(shape)
+            }
+
+            val newLeft = left + event.delta.x
+            val newTop = top + event.delta.y
+
+            left = minLeft?.let { max(it, newLeft) } ?: newLeft
+            top = minTop?.let { max(it, newTop) } ?: newTop
+
+            jsPlumbInstance.revalidate(html)
+
+            shape.left = left
+            shape.top = top
+
             if (event.direct) {
                 (htmlRenderer.selectedViews - this).forEach {
                     it.performDrag(event.indirect)
                 }
             }
-            jsPlumbInstance.revalidate(html)
 
-            shape.left = event.newPosition.x
-            shape.top = event.newPosition.y
-
-            canDrop = htmlRenderer.checkDrop(shape)
         }
         onMouseUp {
             canDrop?.let { target ->
                 htmlRenderer.viewModel.handler.dropShape(shape.id ?: return@onMouseUp, target.id ?: return@onMouseUp)
             }
             htmlRenderer.checkDrop()
+            htmlRenderer.stopDragView()
         }
         selectedViewProperty.onChange {
             if (selectedView) {
