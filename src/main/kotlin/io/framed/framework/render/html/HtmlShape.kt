@@ -5,6 +5,7 @@ import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.async
 import io.framed.framework.util.point
+import io.framed.framework.view.Root
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import kotlin.math.max
@@ -84,6 +85,12 @@ abstract class HtmlShape(
             event.stopPropagation()
             htmlRenderer.selectView(this, event.ctrlKey, false)
             parent.toForeground(view)
+
+            var reference: ListenerReference<*>? =null
+            reference = Root.onMouseUp.reference {
+                reference?.remove()
+                htmlRenderer.stopDragView()
+            }
         }
         onClick { event ->
             event.stopPropagation()
@@ -95,7 +102,7 @@ abstract class HtmlShape(
         onDrag { e ->
             var event = e
             if (event.direct) {
-                event = htmlRenderer.directDragView(event, view)
+                event = htmlRenderer.directDragView(event, view, parent)
                 canDrop = htmlRenderer.checkDrop(shape)
             }
 
@@ -122,7 +129,6 @@ abstract class HtmlShape(
                 htmlRenderer.viewModel.handler.dropShape(shape.id ?: return@onMouseUp, target.id ?: return@onMouseUp)
             }
             htmlRenderer.checkDrop()
-            htmlRenderer.stopDragView()
         }
         selectedViewProperty.onChange {
             if (selectedView) {

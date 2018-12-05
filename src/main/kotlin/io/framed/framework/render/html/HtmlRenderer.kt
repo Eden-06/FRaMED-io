@@ -12,10 +12,7 @@ import io.framed.framework.render.Renderer
 import io.framed.framework.util.Dimension
 import io.framed.framework.util.Point
 import io.framed.framework.util.point
-import io.framed.framework.view.ListView
-import io.framed.framework.view.NavigationView
-import io.framed.framework.view.Root
-import io.framed.framework.view.View
+import io.framed.framework.view.*
 import kotlin.math.abs
 
 /**
@@ -94,13 +91,18 @@ class HtmlRenderer(
 
     fun stopDragView() {
         navigationView.clearLine()
+        draggableViews.forEach { it.classes -= "snap-view" }
     }
 
     private var incrementSnap: Pair<View<*>, Point>? = null
-    fun directDragView(event: View.DragEvent, view: View<*>): View.DragEvent {
+    fun directDragView(event: View.DragEvent, view: View<*>, parent: ViewCollection<View<*>, *>): View.DragEvent {
         var delta = event.delta
 
-        navigationView.clearLine()
+        val drawSnapLine = parent == navigationView.container
+
+        if (drawSnapLine) navigationView.clearLine()
+
+        draggableViews.forEach { it.classes -= "snap-view" }
 
         when (snapType) {
             SnapType.GRID -> {
@@ -120,7 +122,7 @@ class HtmlRenderer(
                     val pos = center.x + dx
                     delta = Point(pos - currentCenter.x, delta.y)
 
-                    navigationView.vLine(pos)
+                    if (drawSnapLine) navigationView.vLine(pos)
                 }
 
                 // Test y
@@ -131,7 +133,7 @@ class HtmlRenderer(
                     val pos = center.y + dy
                     delta = Point(delta.x, pos - currentCenter.y)
 
-                    navigationView.hLine(pos)
+                    if (drawSnapLine) navigationView.hLine(pos)
                 }
 
                 incrementSnap = view to center
@@ -148,19 +150,23 @@ class HtmlRenderer(
                 // Test x center
                 val foundX = otherViews.filterValues { abs(it.x - center.x) < 16 }
                 if (foundX.isNotEmpty()) {
-                    val (_, min) = foundX.minBy { abs(it.value.x - center.x) } ?: foundX.entries.first()
+                    val (v, min) = foundX.minBy { abs(it.value.x - center.x) } ?: foundX.entries.first()
                     delta = Point(min.x - currentCenter.x, delta.y)
 
-                    navigationView.vLine(min.x)
+                    if (drawSnapLine) navigationView.vLine(min.x)
+
+                    v.classes += "snap-view"
                 }
 
                 // Test y center
                 val foundY = otherViews.filterValues { abs(it.y - center.y) < 16 }
                 if (foundY.isNotEmpty()) {
-                    val (_, min) = foundY.minBy { abs(it.value.y - center.y) } ?: foundY.entries.first()
+                    val (v, min) = foundY.minBy { abs(it.value.y - center.y) } ?: foundY.entries.first()
                     delta = Point(delta.x, min.y - currentCenter.y)
 
-                    navigationView.hLine(min.y)
+                    if (drawSnapLine) navigationView.hLine(min.y)
+
+                    v.classes += "snap-view"
                 }
                 incrementSnap = view to center
             }

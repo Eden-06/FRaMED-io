@@ -203,7 +203,7 @@ class NavigationView : View<HTMLDivElement>("div") {
         if (vLine != null) {
             context.beginPath()
             context.lineWidth = 1.0
-            context.strokeStyle = "#2196F3"
+            context.strokeStyle = "#FFC107"
 
             context.moveTo(p.x * clientWidth, 0.0)
             context.lineTo(p.x * clientWidth, clientHeight.toDouble())
@@ -212,7 +212,7 @@ class NavigationView : View<HTMLDivElement>("div") {
         if (hLine != null) {
             context.beginPath()
             context.lineWidth = 1.0
-            context.strokeStyle = "#2196F3"
+            context.strokeStyle = "#FFC107"
 
             context.moveTo(0.0, p.y * clientHeight)
             context.lineTo(clientWidth.toDouble(), p.y * clientHeight)

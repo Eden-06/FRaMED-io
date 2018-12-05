@@ -269,21 +269,20 @@ abstract class View<V : HTMLElement>(view: V) {
     var minLeft: Double? = null
 
     fun performDrag(dragEvent: DragEvent) {
-        val newPosition = when (dragType) {
+        when (dragType) {
             View.DragType.NONE -> throw IllegalStateException()
-            View.DragType.CUSTOM -> Point(dragEvent.delta.x, dragEvent.delta.y)
+            View.DragType.CUSTOM -> {
+            }
             View.DragType.ABSOLUTE -> {
                 val newLeft = left + dragEvent.delta.x
                 val newTop = top + dragEvent.delta.y
 
                 left = minLeft?.let { max(it, newLeft) } ?: newLeft
                 top = minTop?.let { max(it, newTop) } ?: newTop
-                Point(left, top)
             }
             View.DragType.MARGIN -> {
                 marginLeft += dragEvent.delta.x
                 marginTop += dragEvent.delta.y
-                Point(marginLeft, marginTop)
             }
         }
         onDrag.emit(dragEvent)
