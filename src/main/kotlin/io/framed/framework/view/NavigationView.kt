@@ -160,7 +160,7 @@ class NavigationView : View<HTMLDivElement>("div") {
     private fun updateTransform() {
         transformBox.html.style.transform = "scale($zoom) translate(${pan.asPx})"
 
-        if (renderGrid) drawGrid() else context.clearRect(0.0, 0.0, clientWidth.toDouble(), clientHeight.toDouble())
+        drawGrid()
     }
 
     private var hLine: Double? = null
@@ -176,28 +176,30 @@ class NavigationView : View<HTMLDivElement>("div") {
     private fun drawGrid() {
         context.clearRect(0.0, 0.0, clientWidth.toDouble(), clientHeight.toDouble())
 
-        context.beginPath()
-        context.lineWidth = 0.3
-        context.strokeStyle = "rgba(0, 0, 0, 0.3)"
+        if (renderGrid) {
+            context.beginPath()
+            context.lineWidth = 0.3
+            context.strokeStyle = "rgba(0, 0, 0, 0.3)"
 
-        val topLeft = realToSystem(Point.ZERO)
+            val topLeft = realToSystem(Point.ZERO)
 
-        val size = gridSize * zoom
+            val size = gridSize * zoom
 
-        val startX = size - (topLeft.x * zoom) % size
-        val xCount = clientWidth / size.toInt() + 1
-        for (x in -1..xCount) {
-            context.moveTo(startX + x * size, 0.0)
-            context.lineTo(startX + x * size, clientHeight.toDouble())
+            val startX = size - (topLeft.x * zoom) % size
+            val xCount = clientWidth / size.toInt() + 1
+            for (x in -1..xCount) {
+                context.moveTo(startX + x * size, 0.0)
+                context.lineTo(startX + x * size, clientHeight.toDouble())
+            }
+
+            val startY = size - (topLeft.y * zoom) % size
+            val yCount = clientHeight / size.toInt() + 1
+            for (y in -1..yCount) {
+                context.moveTo(0.0, startY + y * size)
+                context.lineTo(clientWidth.toDouble(), startY + y * size)
+            }
+            context.stroke()
         }
-
-        val startY = size - (topLeft.y * zoom) % size
-        val yCount = clientHeight / size.toInt() + 1
-        for (y in -1..yCount) {
-            context.moveTo(0.0, startY + y * size)
-            context.lineTo(clientWidth.toDouble(), startY + y * size)
-        }
-        context.stroke()
 
         val p = systemToReal(Point(vLine ?: 0.0, hLine ?: 0.0))
         if (vLine != null) {

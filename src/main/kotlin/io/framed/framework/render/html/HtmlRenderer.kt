@@ -150,23 +150,31 @@ class HtmlRenderer(
                 // Test x center
                 val foundX = otherViews.filterValues { abs(it.x - center.x) < 16 }
                 if (foundX.isNotEmpty()) {
-                    val (v, min) = foundX.minBy { abs(it.value.x - center.x) } ?: foundX.entries.first()
+                    val (_, min) = foundX.minBy { abs(it.value.x - center.x) } ?: foundX.entries.first()
                     delta = Point(min.x - currentCenter.x, delta.y)
 
                     if (drawSnapLine) navigationView.vLine(min.x)
 
-                    v.classes += "snap-view"
+                    foundX.filterValues {
+                        it.x == min.x
+                    }.keys.forEach {
+                        it.classes += "snap-view"
+                    }
                 }
 
                 // Test y center
                 val foundY = otherViews.filterValues { abs(it.y - center.y) < 16 }
                 if (foundY.isNotEmpty()) {
-                    val (v, min) = foundY.minBy { abs(it.value.y - center.y) } ?: foundY.entries.first()
+                    val (_, min) = foundY.minBy { abs(it.value.y - center.y) } ?: foundY.entries.first()
                     delta = Point(delta.x, min.y - currentCenter.y)
 
                     if (drawSnapLine) navigationView.hLine(min.y)
 
-                    v.classes += "snap-view"
+                    foundY.filterValues {
+                        it.y == min.y
+                    }.keys.forEach {
+                        it.classes += "snap-view"
+                    }
                 }
                 incrementSnap = view to center
             }

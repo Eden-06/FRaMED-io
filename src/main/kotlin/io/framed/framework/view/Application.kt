@@ -65,14 +65,14 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         }
 
         //Left block
-        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_IN) { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_IN, "Zoom in") { _ ->
             val nextStep = NavigationView.zoomSteps.asSequence().filter { it > zoom }.min()
                     ?: NavigationView.zoomSteps.max()
             if (nextStep != null) {
                 renderer.zoom = nextStep
             }
         }
-        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_OUT) { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_OUT, "Zoom out") { _ ->
             val nextStep = NavigationView.zoomSteps.asSequence().filter { it < zoom }.max()
                     ?: NavigationView.zoomSteps.min()
             if (nextStep != null) {
@@ -80,12 +80,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }
         }
         separator(ToolBar.Side.LEFT)
-        action(ToolBar.Side.LEFT, MaterialIcon.UNDO) { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.UNDO, "Undo") { _ ->
             if (History.canUndo) {
                 History.undo()
             }
         }.inactiveProperty.bind(!History.canUndoProperty)
-        action(ToolBar.Side.LEFT, MaterialIcon.REDO) { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.REDO, "Redo") { _ ->
             if (History.canRedo) {
                 History.redo()
             }
@@ -108,15 +108,15 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }.open()
         }
         */
-        action(ToolBar.Side.RIGHT, MaterialIcon.GRID_ON) {
+        action(ToolBar.Side.RIGHT, MaterialIcon.GRID_ON, "Toggle grid") {
             renderer.navigationView.renderGrid = !renderer.navigationView.renderGrid
         }.inactiveProperty.bind(!renderer.navigationView.renderGridProperty)
 
-        action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_STYLE) {
+        action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_STYLE, "Toggle snap to grid") {
             renderer.snapType = if (renderer.snapType == SnapType.GRID) SnapType.NONE else SnapType.GRID
         }.inactiveProperty.bind(renderer.snapTypeProperty.mapBinding { it != SnapType.GRID })
 
-        action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_INNER) {
+        action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_INNER, "Toggle snap to view center") {
             renderer.snapType = if (renderer.snapType == SnapType.CENTER) SnapType.NONE else SnapType.CENTER
         }.inactiveProperty.bind(renderer.snapTypeProperty.mapBinding { it != SnapType.CENTER })
     }

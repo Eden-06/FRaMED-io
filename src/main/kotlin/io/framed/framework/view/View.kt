@@ -291,6 +291,17 @@ abstract class View<V : HTMLElement>(view: V) {
     var dragZoom = 1.0
     var draggable by AttributeDelegate(Boolean::class, false)
 
+    var tooltip: String? = null
+        set(value) {
+            field = value
+
+            if (value == null) {
+                html.removeAttribute("data-tooltip")
+            } else {
+                html.setAttribute("data-tooltip", value)
+            }
+        }
+
     init {
         html.addEventListener("click", onClick.eventListener())
         html.addEventListener("contextmenu", onContext.eventListener())

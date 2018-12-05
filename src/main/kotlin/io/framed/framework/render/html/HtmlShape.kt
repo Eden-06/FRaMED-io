@@ -3,6 +3,7 @@ package io.framed.framework.render.html
 import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.*
+import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import io.framed.framework.util.point
 import io.framed.framework.view.Root
@@ -85,6 +86,8 @@ abstract class HtmlShape(
             event.stopPropagation()
             htmlRenderer.selectView(this, event.ctrlKey, false)
             parent.toForeground(view)
+
+            htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, parent)
 
             var reference: ListenerReference<*>? =null
             reference = Root.onMouseUp.reference {

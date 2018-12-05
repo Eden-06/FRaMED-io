@@ -572,3 +572,37 @@ table {
     }
   }
 }
+
+*[data-tooltip] {
+  position: relative;
+  &:hover::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: solid 6px transparent;
+    border-bottom-color: rgba($text-color,0.7);
+    border-left-color: rgba($text-color,0.7);
+    transform: rotate(135deg);
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    margin-top: 1px;
+  }
+  &:hover::after {
+    content: attr(data-tooltip);
+    color: $primary-background;
+    font-size: 0.9rem;
+    background-color: rgba($text-color,0.7);
+    position: absolute;
+    top: 100%;
+    margin-top: 7px;
+    right: -7px;
+    display: block;
+    white-space: nowrap;
+    line-height: 1.6rem;
+    height: 1.6rem;
+    padding: 0 0.6rem;
+  }
+}
