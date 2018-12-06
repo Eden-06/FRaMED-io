@@ -115,11 +115,11 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             renderer.navigationView.renderGrid = !renderer.navigationView.renderGrid
         }.inactiveProperty.bind(!renderer.navigationView.renderGridProperty)
 
-        action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_STYLE, "Toggle snap to grid") {
+        action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_INNER, "Toggle snap to grid") {
             renderer.snapToGrid = !renderer.snapToGrid
         }.inactiveProperty.bind(!renderer.snapToGridProperty)
 
-        action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_INNER, "Toggle snap to view") {
+        action(ToolBar.Side.RIGHT, MaterialIcon.FILTER_CENTER_FOCUS, "Toggle snap to view") {
             renderer.snapToView = !renderer.snapToView
         }.inactiveProperty.bind(!renderer.snapToViewProperty)
     }
