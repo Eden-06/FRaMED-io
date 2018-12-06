@@ -26,9 +26,14 @@ class HtmlRenderer(
 
     var layerChangeListener: ListenerReference<Unit>? = null
 
-    val snapToGridProperty = property(true).also {
-        it.onChange {
+    val snapToGridProperty = property(true).also { property ->
+        property.onChange {
             incrementSnap = null
+            if (property.value) {
+                resizerList.forEach { it.stepSize = NavigationView.gridSize }
+            } else {
+                resizerList.forEach { it.stepSize = null }
+            }
         }
     }
     var snapToGrid by snapToGridProperty
@@ -56,6 +61,7 @@ class HtmlRenderer(
     lateinit var htmlShape: HtmlShapeContainer
     lateinit var htmlConnections: HtmlConnections
 
+    var resizerList: List<ResizeHandler> = emptyList()
     var draggableViews: List<View<*>> = emptyList()
     val selectedViews: List<View<*>>
         get() = draggableViews.filter { it.selectedView }
@@ -253,6 +259,7 @@ class HtmlRenderer(
             htmlShape.remove()
         }
         draggableViews = emptyList()
+        resizerList = emptyList()
 
         htmlConnections = HtmlConnections(this, viewModel)
 

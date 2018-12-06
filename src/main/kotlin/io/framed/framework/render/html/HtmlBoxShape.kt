@@ -2,10 +2,7 @@ package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
-import io.framed.framework.view.View
-import io.framed.framework.view.ViewCollection
-import io.framed.framework.view.listView
-import io.framed.framework.view.resizeable
+import io.framed.framework.view.*
 
 class HtmlBoxShape(
         htmlRenderer: HtmlRenderer,
@@ -25,7 +22,8 @@ class HtmlBoxShape(
         }
 
         if (shape.resizeable) {
-            this.resizeable { event ->
+            val size = if (htmlRenderer.snapToGrid) NavigationView.gridSize else null
+            htmlRenderer.resizerList += this.resizeable(size) { event ->
                 jsPlumbInstance.revalidate(html)
 
                 shape.width = event.width
