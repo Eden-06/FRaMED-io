@@ -22,13 +22,17 @@ object History {
         if (allowPush) if (createGroup > 0) {
             val top = group.lastOrNull()
 
-            if (top == null || top.shouldAdd(historyItem)) {
+            if (top != null && top.canApply(historyItem)) {
+                top.apply(historyItem)
+            } else {
                 group += historyItem
             }
         } else {
             val top = list.getOrNull(pointer - 1)
 
-            if (top == null || top.shouldAdd(historyItem)) {
+            if (top != null && top.canApply(historyItem)) {
+                top.apply(historyItem)
+            } else {
                 list = list.subList(0, pointer) + historyItem
                 pointer = list.size
 
@@ -116,5 +120,6 @@ fun <T : Any> Property<T>.trackHistory(): Property<T> {
         History.push(this, oldValue)
         oldValue = get()
     }
+
     return this
 }

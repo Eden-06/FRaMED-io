@@ -10,6 +10,7 @@ import io.framed.framework.LinkerManager
 import io.framed.framework.ShapeLinker
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
+import io.framed.framework.util.History
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.MaterialIcon
@@ -65,8 +66,10 @@ class AttributeLinker(
                 }
             }
 
-            model.name = name.trim()
-            model.type = type.trim()
+            History.group("Change property") {
+                nameProperty.value = name.trim()
+                typeProperty.value = type.trim()
+            }
 
             return true
         }

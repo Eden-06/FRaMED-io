@@ -63,20 +63,25 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         }
 
         //Left block
-        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_IN, "Zoom in") { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_IN, "Zoom in", Shortcut('+', Shortcut.Modifier.CTRL)) { _ ->
             val nextStep = NavigationView.zoomSteps.asSequence().filter { it > zoom }.min()
                     ?: NavigationView.zoomSteps.max()
             if (nextStep != null) {
                 renderer.zoom = nextStep
             }
         }
-        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_OUT, "Zoom out") { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_OUT, "Zoom out", Shortcut('-', Shortcut.Modifier.CTRL)) { _ ->
             val nextStep = NavigationView.zoomSteps.asSequence().filter { it < zoom }.max()
                     ?: NavigationView.zoomSteps.min()
             if (nextStep != null) {
                 renderer.zoom = nextStep
             }
         }
+
+        Root.shortcut(Shortcut('0', Shortcut.Modifier.CTRL)) {
+            renderer.zoom = 1.0
+        }
+
         separator(ToolBar.Side.LEFT)
         action(ToolBar.Side.LEFT, MaterialIcon.UNDO, "Undo", Shortcut('Z', Shortcut.Modifier.CTRL)) { _ ->
             if (History.canUndo) {

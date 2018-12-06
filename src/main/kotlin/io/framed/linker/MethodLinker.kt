@@ -9,6 +9,7 @@ import io.framed.framework.LinkerManager
 import io.framed.framework.ShapeLinker
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
+import io.framed.framework.util.History
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
@@ -120,14 +121,16 @@ class MethodLinker(
                 }
             }
 
-            model.name = name.trim()
-            model.type = type.trim()
-            model.parameters = param.asSequence().filter { it.first.isNotBlank() || it.first.isNotBlank() }.map {
-                Parameter().apply {
-                    this.name = it.first.trim()
-                    this.type = it.second.trim()
-                }
-            }.toList()
+            History.group("Change property") {
+                nameProperty.value = name.trim()
+                typeProperty.value = type.trim()
+                parameterProperty.value = param.asSequence().filter { it.first.isNotBlank() || it.first.isNotBlank() }.map {
+                    Parameter().apply {
+                        this.name = it.first.trim()
+                        this.type = it.second.trim()
+                    }
+                }.toList()
+            }
 
             return true
         }
@@ -138,7 +141,7 @@ class MethodLinker(
             }.trim()
         }
 
-    },nameProperty, typeProperty, parameterProperty)
+    }, nameProperty, typeProperty, parameterProperty)
 
     override val pictogram = textShape(lineProperty)
 

@@ -28,13 +28,14 @@ class HistoryLayer(
         layer.onUpdate(shape)?.emit(true)
     }
 
-    override fun shouldAdd(item: HistoryItem): Boolean {
-        if (item is HistoryLayer && item.shape.id == shape.id) {
-            push(item.map)
+    override fun canApply(item: HistoryItem): Boolean {
+        return item is HistoryLayer && item.shape.id == shape.id
+    }
 
-            return false
+    override fun apply(item: HistoryItem) {
+        if (canApply(item)) {
+            push((item as HistoryLayer).map)
         }
-        return true
     }
 
     private fun push(newMap: Map<Layer.Prop, Value>) {

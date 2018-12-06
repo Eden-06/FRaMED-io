@@ -19,11 +19,14 @@ class HistoryProperty<T : Any>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun shouldAdd(item: HistoryItem): Boolean {
-        if (item is HistoryProperty<*> && item.property == property) {
-            newValue = item.newValue as T
-            return false
+    override fun canApply(item: HistoryItem): Boolean {
+        return item is HistoryProperty<*> && item.property == property
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun apply(item: HistoryItem) {
+        if (canApply(item)) {
+            newValue = (item as HistoryProperty<T>).newValue
         }
-        return true
     }
 }

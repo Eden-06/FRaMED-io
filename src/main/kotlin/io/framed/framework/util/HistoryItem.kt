@@ -8,5 +8,6 @@ interface HistoryItem {
 
     fun redo()
 
-    fun shouldAdd(item: HistoryItem): Boolean = true
+    fun canApply(item: HistoryItem): Boolean = false
+    fun apply(item: HistoryItem) {}
 }
