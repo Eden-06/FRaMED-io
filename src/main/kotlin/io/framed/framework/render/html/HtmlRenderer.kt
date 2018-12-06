@@ -9,11 +9,14 @@ import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.SidebarEvent
 import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.render.Renderer
-import io.framed.framework.util.Dimension
-import io.framed.framework.util.Point
-import io.framed.framework.util.point
+import io.framed.framework.util.*
 import io.framed.framework.view.*
+import org.w3c.dom.Document
+import org.w3c.dom.get
+import org.w3c.dom.set
 import kotlin.math.abs
+import kotlin.browser.document
+import kotlin.browser.window
 
 /**
  * @author lars
@@ -25,7 +28,7 @@ class HtmlRenderer(
 
     private var layerChangeListener: ListenerReference<Unit>? = null
 
-    val snapToGridProperty = property(true).also { property ->
+    val snapToGridProperty = property(window.localStorage["snap-to-grid"]?.toBoolean() ?: true).also { property ->
         property.onChange { _ ->
             incrementSnap = null
             if (property.value) {
@@ -33,13 +36,16 @@ class HtmlRenderer(
             } else {
                 resizerList.forEach { it.stepSize = null }
             }
+
+            window.localStorage["snap-to-grid"]= property.value.toString()
         }
     }
     var snapToGrid by snapToGridProperty
 
-    val snapToViewProperty = property(true).also {
-        it.onChange {
+    val snapToViewProperty = property(window.localStorage["snap-to-view"]?.toBoolean() ?: true).also { property ->
+        property.onChange {
             incrementSnap = null
+            window.localStorage["snap-to-view"]= property.value.toString()
         }
     }
     var snapToView by snapToViewProperty

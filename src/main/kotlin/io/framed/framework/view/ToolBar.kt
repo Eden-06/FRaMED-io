@@ -30,7 +30,7 @@ class ToolBar : ViewCollection<View<*>, HTMLDivElement>("div") {
         Side.LEFT -> leftBar
         Side.RIGHT -> rightBar
     }.let { bar ->
-        bar.last().classes += "separator"
+        if (!bar.isEmpty) bar.last().classes += "separator"
     }
 
     enum class Side {

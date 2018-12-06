@@ -2,13 +2,8 @@ package io.framed.framework.view
 
 import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.basic.property
-import io.framed.framework.util.Dimension
-import io.framed.framework.util.Point
-import io.framed.framework.util.async
-import io.framed.framework.util.point
-import org.w3c.dom.CanvasRenderingContext2D
-import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.HTMLDivElement
+import io.framed.framework.util.*
+import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.MouseEvent
@@ -40,9 +35,10 @@ class NavigationView : View<HTMLDivElement>("div") {
     }
     private val context: CanvasRenderingContext2D = background.getContext("2d")!! as CanvasRenderingContext2D
 
-    val renderGridProperty = property(true).also {
-        it.onChange {
+    val renderGridProperty = property(window.localStorage["show-grid"]?.toBoolean() ?: true).also { property ->
+        property.onChange {
             updateTransform()
+            window.localStorage["show-grid"] = property.value.toString()
         }
     }
     var renderGrid by renderGridProperty

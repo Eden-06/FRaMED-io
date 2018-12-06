@@ -87,10 +87,16 @@ abstract class HtmlShape(
             htmlRenderer.selectView(this, event.ctrlKey, false)
             parent.toForeground(view)
 
-            htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, parent)
+            var markView = true
+            async(200) {
+                if (markView) {
+                    htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, parent)
+                }
+            }
 
-            var reference: ListenerReference<*>? =null
+            var reference: ListenerReference<*>? = null
             reference = Root.onMouseUp.reference {
+                markView = false
                 reference?.remove()
                 htmlRenderer.stopDragView()
             }
