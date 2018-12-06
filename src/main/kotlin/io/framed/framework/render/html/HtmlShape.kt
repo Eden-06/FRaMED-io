@@ -27,7 +27,7 @@ abstract class HtmlShape(
 
     val listeners = mutableListOf<ListenerReference<*>>()
 
-    fun events(view: View<*>, shape: Shape, parent: ViewCollection<View<*>, *>) {
+    fun events(view: View<*>, shape: Shape) {
         if (shape.hasContextMenu) {
             view.onContext {
                 it.stopPropagation()

@@ -14,20 +14,19 @@ import io.framed.framework.util.Point
 import io.framed.framework.util.point
 import io.framed.framework.view.*
 import kotlin.math.abs
-import kotlin.math.min
 
 /**
  * @author lars
  */
 class HtmlRenderer(
-        val workspace: ListView
+        private val workspace: ListView
 ) : Renderer {
     lateinit var viewModel: ViewModel
 
-    var layerChangeListener: ListenerReference<Unit>? = null
+    private var layerChangeListener: ListenerReference<Unit>? = null
 
     val snapToGridProperty = property(true).also { property ->
-        property.onChange {
+        property.onChange { _ ->
             incrementSnap = null
             if (property.value) {
                 resizerList.forEach { it.stepSize = NavigationView.gridSize }
@@ -123,7 +122,6 @@ class HtmlRenderer(
         incrementSnap = view to center
 
         val gridSize = NavigationView.gridSize
-        val threshold = gridSize / 2
 
         if (snapToGrid) {
 
@@ -131,7 +129,7 @@ class HtmlRenderer(
             val tx = center.x % gridSize
             val dx = if (tx <= gridSize / 2) -tx else gridSize - tx
 
-            if (abs(dx) < threshold) {
+            if (abs(dx) < gridSize) {
                 val pos = center.x + dx
                 delta = Point(pos - currentCenter.x, delta.y)
             }
@@ -140,13 +138,14 @@ class HtmlRenderer(
             val ty = center.y % gridSize
             val dy = if (ty <= gridSize / 2) -ty else gridSize - ty
 
-            if (abs(dy) < threshold) {
+            if (abs(dy) < gridSize) {
                 val pos = center.y + dy
                 delta = Point(delta.x, pos - currentCenter.y)
             }
 
         }
         if (snapToView) {
+            val threshold = gridSize / 2
             val otherViews = (draggableViews - view - selectedViews)
                     .filter { it in parent }
                     .flatMap {

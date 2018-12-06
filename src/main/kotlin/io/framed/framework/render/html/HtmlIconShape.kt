@@ -18,7 +18,7 @@ class HtmlIconShape(
 
     override val view: View<*> = container.iconView(shape.property) {
         style(this, shape.style)
-        events(this, shape, container)
+        events(this, shape)
 
         if (position == BoxShape.Position.ABSOLUTE) {
             absolutePosition(this, shape, container, jsPlumbInstance)

@@ -15,7 +15,7 @@ class HtmlBoxShape(
 
     override val view: ViewCollection<View<*>, *> = container.listView {
         style(this, shape.style)
-        events(this, shape, container)
+        events(this, shape)
 
         if (shape.position == BoxShape.Position.ABSOLUTE) {
             this.html.style.position = "relative"

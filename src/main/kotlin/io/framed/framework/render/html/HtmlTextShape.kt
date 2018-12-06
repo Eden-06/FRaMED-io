@@ -14,7 +14,7 @@ class HtmlTextShape(
 
     override val view: View<*> = container.inputView(shape.property) {
         style(this, shape.style)
-        events(this, shape, container)
+        events(this, shape)
 
         autocomplete = shape.autocomplete
 
