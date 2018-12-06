@@ -18,6 +18,7 @@ import kotlin.browser.window
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 /**
  * Represents a canvas object.
@@ -178,7 +179,6 @@ class NavigationView : View<HTMLDivElement>("div") {
 
         if (renderGrid) {
             context.beginPath()
-            context.lineWidth = 0.3
             context.strokeStyle = "rgba(0, 0, 0, 0.3)"
 
             val topLeft = realToSystem(Point.ZERO)
@@ -187,18 +187,25 @@ class NavigationView : View<HTMLDivElement>("div") {
 
             val startX = size - (topLeft.x * zoom) % size
             val xCount = clientWidth / size.toInt() + 1
+            val startXr = ((realToSystem(Point(startX / clientWidth, 0.0)).x) / gridSize).roundToInt()
             for (x in -1..xCount) {
+                context.beginPath()
+                context.lineWidth = if ((startXr + x) % gridStep == 0) 0.3 else 0.15
                 context.moveTo(startX + x * size, 0.0)
                 context.lineTo(startX + x * size, clientHeight.toDouble())
+                context.stroke()
             }
 
             val startY = size - (topLeft.y * zoom) % size
             val yCount = clientHeight / size.toInt() + 1
+            val startYr = ((realToSystem(Point(0.0, startY / clientHeight)).y) / gridSize).roundToInt()
             for (y in -1..yCount) {
+                context.beginPath()
+                context.lineWidth = if ((startYr + y) % gridStep == 0) 0.3 else 0.15
                 context.moveTo(0.0, startY + y * size)
                 context.lineTo(clientWidth.toDouble(), startY + y * size)
+                context.stroke()
             }
-            context.stroke()
         }
 
         val p = systemToReal(Point(vLine ?: 0.0, hLine ?: 0.0))
@@ -411,6 +418,7 @@ class NavigationView : View<HTMLDivElement>("div") {
          * List of zoom steps for stepped zooming.
          */
         val zoomSteps = listOf(0.1, 0.3, 0.5, 0.67, 0.8, 0.9, 1.0, 1.1, 1.2, 1.33, 1.5, 1.7, 2.0, 2.4, 3.0, 4.0)
-        val gridSize = 40
+        const val gridSize = 16
+        const val gridStep = 4
     }
 }

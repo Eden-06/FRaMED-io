@@ -1,14 +1,12 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.basic.FunctionAccessor
-import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.not
 import io.framed.File
 import io.framed.framework.Controller
 import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
-import io.framed.framework.render.html.SnapType
 import io.framed.framework.util.*
 import io.framed.linker.ConnectionManagerLinker
 import io.framed.linker.ContainerLinker
@@ -113,12 +111,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         }.inactiveProperty.bind(!renderer.navigationView.renderGridProperty)
 
         action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_STYLE, "Toggle snap to grid") {
-            renderer.snapType = if (renderer.snapType == SnapType.GRID) SnapType.NONE else SnapType.GRID
-        }.inactiveProperty.bind(renderer.snapTypeProperty.mapBinding { it != SnapType.GRID })
+            renderer.snapToGrid = !renderer.snapToGrid
+        }.inactiveProperty.bind(!renderer.snapToGridProperty)
 
-        action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_INNER, "Toggle snap to view center") {
-            renderer.snapType = if (renderer.snapType == SnapType.CENTER) SnapType.NONE else SnapType.CENTER
-        }.inactiveProperty.bind(renderer.snapTypeProperty.mapBinding { it != SnapType.CENTER })
+        action(ToolBar.Side.RIGHT, MaterialIcon.BORDER_INNER, "Toggle snap to view") {
+            renderer.snapToView = !renderer.snapToView
+        }.inactiveProperty.bind(!renderer.snapToViewProperty)
     }
 
     private val menuBar = menuBar {

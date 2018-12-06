@@ -57,4 +57,6 @@ abstract class ViewCollection<V : View<*>, T : HTMLElement>(view: T) : View<T>(v
         children = emptyList()
         html.clear()
     }
+
+    operator fun contains(view: V) = children.contains(view)
 }

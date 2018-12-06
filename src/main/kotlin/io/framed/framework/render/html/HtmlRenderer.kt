@@ -14,6 +14,7 @@ import io.framed.framework.util.Point
 import io.framed.framework.util.point
 import io.framed.framework.view.*
 import kotlin.math.abs
+import kotlin.math.min
 
 /**
  * @author lars
@@ -25,12 +26,19 @@ class HtmlRenderer(
 
     var layerChangeListener: ListenerReference<Unit>? = null
 
-    val snapTypeProperty = property(SnapType.GRID).also {
+    val snapToGridProperty = property(true).also {
         it.onChange {
             incrementSnap = null
         }
     }
-    var snapType by snapTypeProperty
+    var snapToGrid by snapToGridProperty
+
+    val snapToViewProperty = property(true).also {
+        it.onChange {
+            incrementSnap = null
+        }
+    }
+    var snapToView by snapToViewProperty
 
     override fun render(viewModel: ViewModel) {
         layerChangeListener?.remove()
@@ -99,91 +107,98 @@ class HtmlRenderer(
         var delta = event.delta
 
         val drawSnapLine = parent == navigationView.container
-
         if (drawSnapLine) navigationView.clearLine()
-
         draggableViews.forEach { it.classes -= "snap-view" }
 
-        when (snapType) {
-            SnapType.GRID -> {
-                if (incrementSnap?.first != view) incrementSnap = null
-                val currentCenter = Point(view.left, view.top)
+        if (incrementSnap?.first != view) incrementSnap = null
+        val currentCenter = Point(view.left, view.top)
 
-                var (_, center) = incrementSnap ?: view to currentCenter
-                center += delta
+        val center = (incrementSnap?.second ?: currentCenter) + delta
+        incrementSnap = view to center
 
-                val gridSize = NavigationView.gridSize
+        val gridSize = NavigationView.gridSize
+        val threshold = gridSize / 2
 
-                // Test x
-                val tx = center.x % gridSize
-                val dx = if (tx <= gridSize / 2) -tx else gridSize - tx
+        if (snapToGrid) {
 
-                if (abs(dx) < 8) {
-                    val pos = center.x + dx
-                    delta = Point(pos - currentCenter.x, delta.y)
+            // Test x
+            val tx = center.x % gridSize
+            val dx = if (tx <= gridSize / 2) -tx else gridSize - tx
 
-                    if (drawSnapLine) navigationView.vLine(pos)
-                }
-
-                // Test y
-                val ty = center.y % gridSize
-                val dy = if (ty <= gridSize / 2) -ty else gridSize - ty
-
-                if (abs(dy) < 8) {
-                    val pos = center.y + dy
-                    delta = Point(delta.x, pos - currentCenter.y)
-
-                    if (drawSnapLine) navigationView.hLine(pos)
-                }
-
-                incrementSnap = view to center
-            }
-            SnapType.CENTER -> {
-                if (incrementSnap?.first != view) incrementSnap = null
-                val currentCenter = Point(view.left + view.width / 2, view.top + view.height / 2)
-
-                var (_, center) = incrementSnap ?: view to currentCenter
-                center += delta
-
-                val otherViews = (draggableViews - view - selectedViews).associate { it to Point(it.left + it.width / 2, it.top + it.height / 2) }
-
-                // Test x center
-                val foundX = otherViews.filterValues { abs(it.x - center.x) < 16 }
-                if (foundX.isNotEmpty()) {
-                    val (_, min) = foundX.minBy { abs(it.value.x - center.x) } ?: foundX.entries.first()
-                    delta = Point(min.x - currentCenter.x, delta.y)
-
-                    if (drawSnapLine) navigationView.vLine(min.x)
-
-                    foundX.filterValues {
-                        it.x == min.x
-                    }.keys.forEach {
-                        it.classes += "snap-view"
-                    }
-                }
-
-                // Test y center
-                val foundY = otherViews.filterValues { abs(it.y - center.y) < 16 }
-                if (foundY.isNotEmpty()) {
-                    val (_, min) = foundY.minBy { abs(it.value.y - center.y) } ?: foundY.entries.first()
-                    delta = Point(delta.x, min.y - currentCenter.y)
-
-                    if (drawSnapLine) navigationView.hLine(min.y)
-
-                    foundY.filterValues {
-                        it.y == min.y
-                    }.keys.forEach {
-                        it.classes += "snap-view"
-                    }
-                }
-                incrementSnap = view to center
+            if (abs(dx) < threshold) {
+                val pos = center.x + dx
+                delta = Point(pos - currentCenter.x, delta.y)
             }
 
-            SnapType.NONE -> {
-                incrementSnap = null
+            // Test y
+            val ty = center.y % gridSize
+            val dy = if (ty <= gridSize / 2) -ty else gridSize - ty
+
+            if (abs(dy) < threshold) {
+                val pos = center.y + dy
+                delta = Point(delta.x, pos - currentCenter.y)
+            }
+
+        }
+        if (snapToView) {
+            val otherViews = (draggableViews - view - selectedViews)
+                    .filter { it in parent }
+                    .flatMap {
+                        listOf(
+                                it to Point(it.left, it.top),
+                                it to Point(it.left + it.width, it.top),
+                                it to Point(it.left, it.top + it.height),
+                                it to Point(it.left + it.width, it.top + it.height),
+                                it to Point(it.left + it.width / 2, it.top + it.height / 2)
+                        )
+                    }
+
+            // Test x center
+            val foundX = otherViews
+                    .flatMap {
+                        listOf(
+                                SnapHelper(it.first, it.second, abs(it.second.x - (center.x)), currentCenter.x),
+                                SnapHelper(it.first, it.second, abs(it.second.x - (center.x + view.width / 2)), currentCenter.x + view.width / 2),
+                                SnapHelper(it.first, it.second, abs(it.second.x - (center.x + view.width)), currentCenter.x + view.width)
+                        )
+                    }
+                    .filter { it.delta < threshold }
+            if (foundX.isNotEmpty()) {
+                val (_, min, _, source) = foundX.minBy { it.delta } ?: foundX.first()
+                delta = Point(min.x - source, delta.y)
+
+                if (drawSnapLine) navigationView.vLine(min.x)
+
+                foundX.filter {
+                    it.targetPoint.x == min.x
+                }.forEach {
+                    it.view.classes += "snap-view"
+                }
+            }
+
+            // Test y center
+            val foundY = otherViews
+                    .flatMap {
+                        listOf(
+                                SnapHelper(it.first, it.second, abs(it.second.y - (center.y)), currentCenter.y),
+                                SnapHelper(it.first, it.second, abs(it.second.y - (center.y + view.height / 2)), currentCenter.y + view.height / 2),
+                                SnapHelper(it.first, it.second, abs(it.second.y - (center.y + view.height)), currentCenter.y + view.height)
+                        )
+                    }
+                    .filter { it.delta < threshold }
+            if (foundY.isNotEmpty()) {
+                val (_, min, _, source) = foundY.minBy { it.delta } ?: foundY.first()
+                delta = Point(delta.x, min.y - source)
+
+                if (drawSnapLine) navigationView.hLine(min.y)
+
+                foundY.filter {
+                    it.targetPoint.y == min.y
+                }.forEach {
+                    it.view.classes += "snap-view"
+                }
             }
         }
-
 
         return event.copy(delta = delta)
     }
@@ -309,6 +324,9 @@ class HtmlRenderer(
     }
 }
 
-enum class SnapType {
-    NONE, GRID, CENTER
-}
+data class SnapHelper(
+        val view: View<*>,
+        val targetPoint: Point,
+        val delta: Double,
+        val sourcePoint: Double
+)
