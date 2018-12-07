@@ -22,7 +22,6 @@ object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
             if (found.isNotEmpty()) {
                 event.stopPropagation()
                 event.preventDefault()
-                found.values.forEach { println(5);it() }
             }
         }
     }
@@ -30,6 +29,8 @@ object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
     private var shortcuts: Map<Shortcut, () -> Unit> = emptyMap()
 
     fun shortcut(shortcut: Shortcut, action: () -> Unit) {
-        shortcuts += shortcut to action
+        if (shortcut !in shortcuts) {
+            shortcuts += shortcut to action
+        }
     }
 }

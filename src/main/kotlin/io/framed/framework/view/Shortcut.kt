@@ -10,8 +10,6 @@ data class Shortcut(
     constructor(letter: Char, vararg modifiers: Modifier) : this(letter.toUpperCase(), modifiers.toSet())
 
     fun match(event: KeyboardEvent): Boolean {
-        //println("${event.key.first().toUpperCase()} | ${event.ctrlKey} | ${event.altKey} | ${event.shiftKey}")
-        //println("${letter} | ${Modifier.CTRL in modifiers} | ${Modifier.ALT in modifiers} | ${Modifier.SHIFT in modifiers}")
         return event.key.first().toUpperCase() == letter &&
                 event.ctrlKey == Modifier.CTRL in modifiers &&
                 event.altKey == Modifier.ALT in modifiers &&

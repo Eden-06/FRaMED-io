@@ -58,7 +58,11 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                     "${(it * 100).roundToInt()}%"
                 }
                 autocompleteMatch = false
-                size = 5
+                size = 4
+                onFocusLeave {
+                    value = zoomStringProperty.value
+                }
+                input.html.style.textAlign = "center"
             }
         }
 
@@ -126,12 +130,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     private val menuBar = menuBar {
         menu("File") {
-            item("Open") {
+            item(null, "Open", Shortcut('O', Shortcut.Modifier.CTRL)) {
                 loadLocalFile { content ->
                     File.fromJSON(content)
                 }
             }
-            item("Save") {
+            item(null, "Save", Shortcut('S', Shortcut.Modifier.CTRL)) {
                 ControllerManager.root?.let { root ->
                     val linker = (root.linker as ContainerLinker)
                     val connections = linker.connectionManager as ConnectionManagerLinker
@@ -141,17 +145,29 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                     triggerDownload("${file.name}.json", file.toJSON())
                 }
             }
-            item("Reset") {
+            item(null, "Reset") {
 
             }
         }
+        menu("Edit") {
+            item(MaterialIcon.UNDO, "Undo", Shortcut('Z', Shortcut.Modifier.CTRL)) {
+                if (History.canUndo) {
+                    History.undo()
+                }
+            }.bindCssClass("inactive", !History.canUndoProperty)
+            item(MaterialIcon.REDO, "Redo", Shortcut('Z', Shortcut.Modifier.CTRL, Shortcut.Modifier.SHIFT)) {
+                if (History.canRedo) {
+                    History.redo()
+                }
+            }.bindCssClass("inactive", !History.canRedoProperty)
+        }
         menu("Foo") {
-            item("Bar 1") {}
+            item(null, "Bar 1") {}
             menu("Bar 2") {
-                item("Lorem") {}
-                item("Ipson") {}
+                item(null, "Lorem") {}
+                item(null, "Ipson") {}
             }
-            item("Bar 3") {}
+            item(null, "Bar 3") {}
         }
     }
 

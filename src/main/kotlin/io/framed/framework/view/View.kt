@@ -1,6 +1,7 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.basic.FunctionAccessor
 import de.westermann.kobserve.basic.property
 import io.framed.framework.util.*
@@ -241,6 +242,13 @@ abstract class View<V : HTMLElement>(view: V) {
      */
     open fun blur() {
         html.blur()
+    }
+
+    fun bindCssClass(cssClass: String, property: ReadOnlyProperty<Boolean>) {
+        classes[cssClass] = property.value
+        property.onChange {
+            classes[cssClass] = property.value
+        }
     }
 
     val dimension: Dimension

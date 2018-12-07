@@ -28,9 +28,11 @@ input {
   border-radius: $border-radius;
   outline: none;
   border: solid 1px $border-color;
+
   &:focus {
     border-color: $toolbar-color;
   }
+
   &.invalid {
     border-color: $error-primary !important;
     background: $error-secondary !important;
@@ -39,6 +41,7 @@ input {
 
 .input-view {
   position: relative;
+
   .autocomplete {
     background: $primary-background;
     border: solid 1px $border-color;
@@ -46,15 +49,19 @@ input {
     position: absolute;
     z-index: 10;
     line-height: 2rem;
+
     &:empty {
       display: none;
     }
+
     .text-view {
       display: block;
       padding: 0.2rem 0.5rem;
+
       &:hover {
         background: rgba($text-color, 0.1);
       }
+
       &.selected-view {
         background: rgba($toolbar-color, 0.1);
       }
@@ -69,9 +76,11 @@ select {
   border-radius: $border-radius;
   outline: none;
   border: solid 1px $border-color;
+
   &:focus {
     border-color: $toolbar-color;
   }
+
   &.invalid {
     border-color: $error-primary !important;
     background: $error-secondary !important;
@@ -107,8 +116,10 @@ select {
   z-index: 3;
   border-bottom: solid 1px $border-color-light;
   padding-left: 0.5rem;
+
   & > div {
     float: left;
+
     & > .icon-view {
       display: none;
     }
@@ -118,13 +129,15 @@ select {
       top: -1px;
     }
 
-    &:hover >  div {
+    &:hover > div {
       display: none;
     }
-    &.show >  div {
+
+    &.show > div {
       display: block;
     }
   }
+
   @include no-select();
 }
 
@@ -140,6 +153,7 @@ select {
   padding: 0 0.4rem;
   z-index: 1;
 }
+
 .tab {
   height: $tab-bar-height;
   line-height: $tab-bar-height;
@@ -147,19 +161,23 @@ select {
   padding: 0 0.6rem;
   background: $tertiary-background;
   border-right: solid 1px $border-color-light;
+
   &:first-child {
     border-left: solid 1px $border-color-light;
   }
+
   .text-view {
     padding-right: 0.4rem;
     float: left;
     margin-top: -0.05rem;
   }
+
   .icon-view {
     font-size: 0.8rem;
     float: left;
     margin-top: -0.02rem;
   }
+
   &.selected {
     background: $primary-background;
   }
@@ -185,21 +203,37 @@ select {
 
 .menu {
   position: relative;
+
   span:not(.icon-view) {
     display: block;
     padding: 0 0.8rem;
+
     &:hover {
       background: rgba($text-color, 0.1);
     }
   }
-  .icon-view {
+
+  .list-view > .text-view {
+    padding-left: 2rem;
+  }
+
+  .icon-view:first-child {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1.9rem;
+    text-align: center;
+  }
+
+  .icon-view:last-child {
     position: absolute;
     top: 0;
     right: 0.2rem;
   }
+
   & > div {
     background: $primary-background;
-    min-width: 10rem;
+    min-width: 12rem;
     position: absolute;
     z-index: 5;
     display: none;
@@ -207,15 +241,40 @@ select {
 
     padding: 0.4rem 0;
     box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+
+
+    & > div {
+      position: relative;
+
+      &:after {
+        content: attr(data-hint);
+        position: absolute;
+        right: 0.6rem;
+        top: 0.1rem;
+        font-size: 0.75rem;
+        color: rgba($text-color, 0.4)
+      }
+
+      &.inactive span {
+        opacity: 0.3;
+      }
+    }
   }
+
   &:hover > div {
     display: block;
   }
-  .menu > div {
+
+  .menu {
+    & > .text-view {
+      padding-left: 2rem;
+    }
+    & > div {
     left: 100%;
     top: 0;
     margin-left: -1rem;
     margin-top: -1px;
+    }
   }
 }
 
@@ -251,21 +310,26 @@ select {
   & > .separator {
     border-right: solid 1px $border-color-light
   }
+
   & > * {
     float: left;
   }
+
   & > .icon-view {
     font-size: 1.25rem;
   }
+
   & > span {
     height: $toolbar-height;
     line-height: $toolbar-height;
     padding: 0 .6rem;
     display: block;
+
     &:hover {
       background: $toolbar-hover
     }
   }
+
   & > select {
     margin: 0.5rem;
   }
@@ -283,6 +347,7 @@ select {
   z-index: 1;
   box-shadow: 0 0 4px rgba(0, 0, 0, .14);
   border-left: solid 1px $border-color-light;
+
   &.hide {
     overflow-y: hidden;
   }
@@ -297,6 +362,7 @@ select {
   z-index: 2;
   background: transparent;
   cursor: ew-resize;
+
   &:hover, &.mouse-down {
     background: rgba($text-color, .1);
   }
@@ -309,6 +375,7 @@ select {
   width: 100%;
   height: 100%;
   z-index: 100;
+
   & > div {
     position: absolute;
     background: $primary-background;
@@ -317,11 +384,13 @@ select {
     box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
     border-radius: $border-radius;
     min-width: 12rem;
+
     & > span {
       padding: 0.5rem;
       display: block;
       border-bottom: solid 1px $border-color-light;
     }
+
     & > div {
       line-height: 2.2rem;
 
@@ -332,6 +401,7 @@ select {
         text-align: center;
         float: left;
       }
+
       .text-view {
         padding-right: 1rem;
         display: inline-block;
@@ -340,9 +410,11 @@ select {
       &:hover {
         background: $main-hover
       }
+
       &:first-of-type {
         margin-top: 0.4rem
       }
+
       &:last-of-type {
         margin-bottom: 0.4rem
       }
@@ -386,9 +458,11 @@ table {
       span {
         padding: 0.2rem;
       }
+
       input, select {
         width: 100%;
       }
+
       .group-header {
         font-size: 1.1rem;
         overflow: hidden;
@@ -398,6 +472,7 @@ table {
         margin-right: 1rem;
         @include no-select;
       }
+
       .collapse-icon {
         margin-top: -0.1rem;
         font-size: 1.2rem;
@@ -414,11 +489,13 @@ table {
           top: 0.03rem
         }
       }
+
       .button {
         width: 100%;
         background: $dialog-background;
       }
     }
+
     &.collapsed {
       & > div:not(:first-child) {
         //display: none;
@@ -427,6 +504,7 @@ table {
         overflow: hidden;
         opacity: 0;
       }
+
       & > div:first-child {
         margin-bottom: 0;
       }
@@ -437,14 +515,17 @@ table {
     padding: 0;
     margin: 0;
     width: 100%;
+
     tr {
       padding: 0;
       margin: 0;
+
       td {
         padding: 0;
         margin: 0;
       }
     }
+
     input {
       width: 100%;
     }
@@ -485,6 +566,7 @@ table {
   padding: 0 0.3rem;
   white-space: nowrap;
   text-align: right;
+
   .button {
     display: inline-block;
     margin: 0.5rem 0.3rem;
@@ -511,10 +593,12 @@ table {
     background: $toolbar-color;
     color: $toolbar-text;
   }
+
   &.alert {
     background: $alert-primary;
     color: $alert-text;
   }
+
   &.error {
     background: $error-primary;
     color: $error-text;
@@ -556,6 +640,7 @@ table {
       padding: 0.5rem;
       overflow: hidden;
       text-align: center;
+
       * {
         white-space: nowrap;
       }
@@ -575,6 +660,7 @@ table {
 
 *[data-tooltip] {
   position: relative;
+
   &:hover::before {
     content: '';
     display: block;
@@ -582,19 +668,20 @@ table {
     width: 0;
     height: 0;
     border: solid 6px transparent;
-    border-bottom-color: rgba($text-color,0.7);
-    border-left-color: rgba($text-color,0.7);
+    border-bottom-color: rgba($text-color, 0.7);
+    border-left-color: rgba($text-color, 0.7);
     transform: rotate(135deg);
     top: 100%;
     left: 50%;
     margin-left: -6px;
     margin-top: 1px;
   }
+
   &:hover::after {
     content: attr(data-tooltip);
     color: $primary-background;
     font-size: 0.9rem;
-    background-color: rgba($text-color,0.7);
+    background-color: rgba($text-color, 0.7);
     position: absolute;
     top: 100%;
     margin-top: 7px;

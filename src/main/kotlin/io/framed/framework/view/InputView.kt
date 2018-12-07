@@ -16,7 +16,7 @@ class InputView() : View<HTMLDivElement>("div") {
         bind(property)
     }
 
-    private val input = RawInputView().also {
+    val input = RawInputView().also {
         html.appendChild(it.html)
     }
 
