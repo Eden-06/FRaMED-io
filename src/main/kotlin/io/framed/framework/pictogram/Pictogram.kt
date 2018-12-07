@@ -29,6 +29,8 @@ abstract class Pictogram {
     var hasSidebar = false
     var hasContextMenu = false
 
+    var delete: (() -> Unit)? = null
+
     override fun toString(): String {
         return "${this::class.simpleName}($id)"
     }

@@ -246,6 +246,19 @@ select {
     & > div {
       position: relative;
 
+      &.separator {
+        margin-bottom: 0.4rem;
+        &:before {
+          content: '';
+          position: absolute;
+          top: 100%;
+          width: 100%;
+          display: block;
+          margin-top: 0.2rem;
+          border-bottom: solid 1px $border-color-light;
+        }
+      }
+
       &:after {
         content: attr(data-hint);
         position: absolute;

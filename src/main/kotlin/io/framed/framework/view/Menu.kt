@@ -26,6 +26,12 @@ class Menu(
         }
     }
 
+    fun separator() {
+        if (!content.isEmpty) {
+            content.last().classes += "separator"
+        }
+    }
+
     val onContentClick = content.onClick
     val onLabelClick = label.onClick
 

@@ -71,6 +71,7 @@ class ClassLinker(
         }
 
         resizeable = true
+        this.delete = this@ClassLinker::delete
     }
 
     override val listPreview: TextShape = textShape(nameProperty)

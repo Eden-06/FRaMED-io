@@ -37,7 +37,7 @@ class HtmlRenderer(
                 resizerList.forEach { it.stepSize = null }
             }
 
-            window.localStorage["snap-to-grid"]= property.value.toString()
+            window.localStorage["snap-to-grid"] = property.value.toString()
         }
     }
     var snapToGrid by snapToGridProperty
@@ -45,7 +45,7 @@ class HtmlRenderer(
     val snapToViewProperty = property(window.localStorage["snap-to-view"]?.toBoolean() ?: true).also { property ->
         property.onChange {
             incrementSnap = null
-            window.localStorage["snap-to-view"]= property.value.toString()
+            window.localStorage["snap-to-view"] = property.value.toString()
         }
     }
     var snapToView by snapToViewProperty
@@ -71,6 +71,8 @@ class HtmlRenderer(
     val selectedViews: List<View<*>>
         get() = draggableViews.filter { it.selectedView }
 
+    val selectedViewSizeProperty = property(0)
+
     val navigationView = NavigationView().also { navigationView ->
         workspace += navigationView
 
@@ -82,6 +84,7 @@ class HtmlRenderer(
                     it.selectedView = (it.dimension in dimension)
                 }
             }
+            selectedViewSizeProperty.value = selectedViews.size
         }
 
         navigationView.onZoom { zoom ->
@@ -104,6 +107,18 @@ class HtmlRenderer(
             } else {
                 (selectedViews - view).forEach { it.selectedView = false }
                 view.selectedView = true
+            }
+        }
+        selectedViewSizeProperty.value = selectedViews.size
+    }
+
+    fun deleteSelected() {
+        if (selectedViews.isNotEmpty()) {
+            History.group("Delete views") {
+                shapeMap.filterValues { it.view in selectedViews }.keys.forEach {
+                    println("delete")
+                    it.delete?.invoke()
+                }
             }
         }
     }

@@ -87,6 +87,8 @@ class ContainerLinker(
         onLayerChange {
             updatePreviewType()
         }
+
+        this.delete = this@ContainerLinker::delete
     }
 
     override val listPreview = textShape(nameProperty)

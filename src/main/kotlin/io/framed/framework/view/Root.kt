@@ -22,6 +22,7 @@ object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
             if (found.isNotEmpty()) {
                 event.stopPropagation()
                 event.preventDefault()
+                found.values.forEach { it() }
             }
         }
     }

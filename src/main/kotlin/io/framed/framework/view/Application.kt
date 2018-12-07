@@ -1,6 +1,7 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.not
 import io.framed.File
@@ -67,14 +68,14 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         }
 
         //Left block
-        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_IN, "Zoom in", Shortcut('+', Shortcut.Modifier.CTRL)) { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_IN, "Zoom in", Shortcut("+", Shortcut.Modifier.CTRL)) { _ ->
             val nextStep = NavigationView.zoomSteps.asSequence().filter { it > zoom }.min()
                     ?: NavigationView.zoomSteps.max()
             if (nextStep != null) {
                 renderer.zoom = nextStep
             }
         }
-        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_OUT, "Zoom out", Shortcut('-', Shortcut.Modifier.CTRL)) { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_OUT, "Zoom out", Shortcut("-", Shortcut.Modifier.CTRL)) { _ ->
             val nextStep = NavigationView.zoomSteps.asSequence().filter { it < zoom }.max()
                     ?: NavigationView.zoomSteps.min()
             if (nextStep != null) {
@@ -82,17 +83,17 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }
         }
 
-        Root.shortcut(Shortcut('0', Shortcut.Modifier.CTRL)) {
+        Root.shortcut(Shortcut("0", Shortcut.Modifier.CTRL)) {
             renderer.zoom = 1.0
         }
 
         separator(ToolBar.Side.LEFT)
-        action(ToolBar.Side.LEFT, MaterialIcon.UNDO, "Undo", Shortcut('Z', Shortcut.Modifier.CTRL)) { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.UNDO, "Undo", Shortcut("Z", Shortcut.Modifier.CTRL)) { _ ->
             if (History.canUndo) {
                 History.undo()
             }
         }.inactiveProperty.bind(!History.canUndoProperty)
-        action(ToolBar.Side.LEFT, MaterialIcon.REDO, "Redo", Shortcut('Z', Shortcut.Modifier.CTRL, Shortcut.Modifier.SHIFT)) { _ ->
+        action(ToolBar.Side.LEFT, MaterialIcon.REDO, "Redo", Shortcut("Z", Shortcut.Modifier.CTRL, Shortcut.Modifier.SHIFT)) { _ ->
             if (History.canRedo) {
                 History.redo()
             }
@@ -130,12 +131,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     private val menuBar = menuBar {
         menu("File") {
-            item(null, "Open", Shortcut('O', Shortcut.Modifier.CTRL)) {
+            item(null, "Open", Shortcut("O", Shortcut.Modifier.CTRL)) {
                 loadLocalFile { content ->
                     File.fromJSON(content)
                 }
             }
-            item(null, "Save", Shortcut('S', Shortcut.Modifier.CTRL)) {
+            item(null, "Save", Shortcut("S", Shortcut.Modifier.CTRL)) {
                 ControllerManager.root?.let { root ->
                     val linker = (root.linker as ContainerLinker)
                     val connections = linker.connectionManager as ConnectionManagerLinker
@@ -150,16 +151,31 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }
         }
         menu("Edit") {
-            item(MaterialIcon.UNDO, "Undo", Shortcut('Z', Shortcut.Modifier.CTRL)) {
+            item(MaterialIcon.UNDO, "Undo", Shortcut("Z", Shortcut.Modifier.CTRL)) {
                 if (History.canUndo) {
                     History.undo()
                 }
             }.bindCssClass("inactive", !History.canUndoProperty)
-            item(MaterialIcon.REDO, "Redo", Shortcut('Z', Shortcut.Modifier.CTRL, Shortcut.Modifier.SHIFT)) {
+            item(MaterialIcon.REDO, "Redo", Shortcut("Z", Shortcut.Modifier.CTRL, Shortcut.Modifier.SHIFT)) {
                 if (History.canRedo) {
                     History.redo()
                 }
             }.bindCssClass("inactive", !History.canRedoProperty)
+
+            separator()
+
+            item(MaterialIcon.CONTENT_CUT, "Cut", Shortcut("X", Shortcut.Modifier.CTRL)) {
+                //TODO
+            }.bindCssClass("inactive", renderer.selectedViewSizeProperty.mapBinding { it == 0 })
+            item(MaterialIcon.CONTENT_COPY, "Copy", Shortcut("C", Shortcut.Modifier.CTRL)) {
+                //TODO
+            }.bindCssClass("inactive", renderer.selectedViewSizeProperty.mapBinding { it == 0 })
+            item(MaterialIcon.CONTENT_PASTE, "Paste", Shortcut("V", Shortcut.Modifier.CTRL)) {
+                //TODO
+            }.bindCssClass("inactive", property(true))
+            item(MaterialIcon.DELETE, "Delete", Shortcut("Delete")) {
+                renderer.deleteSelected()
+            }.bindCssClass("inactive", renderer.selectedViewSizeProperty.mapBinding { it == 0 })
         }
         menu("Foo") {
             item(null, "Bar 1") {}

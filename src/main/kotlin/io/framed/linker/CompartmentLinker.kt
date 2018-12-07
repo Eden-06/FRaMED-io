@@ -99,6 +99,7 @@ class CompartmentLinker(
             }
         }
         resizeable = true
+        this.delete = this@CompartmentLinker::delete
 
         onLayerChange {
             updatePreviewType()
