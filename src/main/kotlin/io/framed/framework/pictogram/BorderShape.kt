@@ -7,16 +7,9 @@ import io.framed.framework.util.History
 /**
  * @author lars
  */
-class BoxShape(
+class BorderShape(
         override val id: Long?
 ) : Shape() {
-
-    enum class Position {
-        ABSOLUTE, HORIZONTAL, VERTICAL, BORDER
-    }
-
-    var position = Position.VERTICAL
-    var resizeable = false
 
     val shapes: List<Shape>
         get() = internalShapes
@@ -53,21 +46,6 @@ class BoxShape(
 
     operator fun Shape.unaryPlus() = add(this)
 
-    fun autoLayout() {
-        if (position == Position.ABSOLUTE) {
-            History.group("Auto layout shape $id") {
-                var currentTop = 0.0
-                shapes.forEach {
-                    it.top = currentTop
-                    it.left = 100.00
-                    println("SET (${it.top}/${it.left})")
-                    it.onPositionChange.emit(true)
-                    currentTop += it.height ?: 50.0
-                }
-            }
-        }
-    }
-
     init {
         onLayerChange {
             shapes.forEach { shape ->
@@ -77,8 +55,5 @@ class BoxShape(
     }
 }
 
-fun Linker<*, *>.boxShape(position: BoxShape.Position = BoxShape.Position.VERTICAL, init: BoxShape.() -> Unit) =
-        BoxShape(id).also(init).also { it.position = position }
-
-fun BoxShape.boxShape(position: BoxShape.Position = BoxShape.Position.VERTICAL, init: BoxShape.() -> Unit) =
-        BoxShape(null).also(init).also(this::add).also { it.position = position }
+fun BoxShape.borderShape(init: BorderShape.() -> Unit) =
+        BorderShape(id).also(init).also(this::add)

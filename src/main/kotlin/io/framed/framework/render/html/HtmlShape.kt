@@ -6,12 +6,17 @@ import io.framed.framework.pictogram.*
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import io.framed.framework.util.point
+import io.framed.framework.view.NavigationView
 import io.framed.framework.view.Root
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
+import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
 
-abstract class HtmlShape(
+abstract class HtmlShape (
+        open val shape: Shape,
         private val htmlRenderer: HtmlRenderer,
         val container: ViewCollection<View<*>, *>,
         open val jsPlumbInstance: JsPlumbInstance?,
@@ -152,6 +157,93 @@ abstract class HtmlShape(
         }
     }
 
+    fun borderPosition(view: View<*>, shape: Shape, parent: ViewCollection<View<*>, *>, jsPlumbInstance: JsPlumbInstance, parentHtmlBoxShape: HtmlBoxShape) = with(view) {
+        left = shape.left ?: 0.0
+        top = shape.top ?: 0.0
+        classes += "border-view"
+
+        async {
+            marginLeft = -clientWidth / 2.0
+            marginTop = -clientHeight / 2.0
+        }
+
+        shape.onPositionChange.reference { force ->
+            if (force) async {
+                left = shape.left ?: 0.0
+                top = shape.top ?: 0.0
+                shape.width?.let { width = it } ?: autoWidth()
+                shape.height?.let { height = it } ?: autoHeight()
+
+                jsPlumbInstance.revalidate(html)
+            }
+
+        }?.let(listeners::add)
+
+        val resizer = parentHtmlBoxShape.resizer
+        if (resizer != null) {
+            resizer.onResize {
+                onDrag.emit(View.DragEvent(Point.ZERO, false))
+            }
+        }
+
+        dragType = View.DragType.CUSTOM
+        onMouseDown { event ->
+            event.stopPropagation()
+
+            var markView = true
+            async(200) {
+                if (markView) {
+                    htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, parent)
+                }
+            }
+
+            var reference: ListenerReference<*>? = null
+            reference = Root.onMouseUp.reference {
+                markView = false
+                reference?.remove()
+                htmlRenderer.stopDragView()
+            }
+        }
+        onClick { event ->
+            event.stopPropagation()
+        }
+        onDblClick { event ->
+            event.stopPropagation()
+        }
+        onDrag { event ->
+            var newLeft = left + event.delta.x
+            var newTop = top + event.delta.y
+
+            val size = if (htmlRenderer.snapToGrid) NavigationView.gridSize else null
+            if (size != null) {
+                newLeft = ((newLeft + size / 2) / size).roundToInt() * size.toDouble()
+                newTop = ((newTop + size / 2) / size).roundToInt() * size.toDouble()
+            }
+
+            val parentWidth = parent.clientWidth
+            val parentHeight = parent.clientHeight
+
+            val xDiff = min(abs(newLeft), abs(parentWidth - newLeft))
+            val yDiff = min(abs(newTop), abs(parentHeight - newTop))
+
+            if (xDiff < yDiff) {
+                newLeft = if (newLeft <= parentWidth / 2) 0.0 else parentWidth.toDouble()
+                newTop = min(parentHeight.toDouble(), max(0.0, newTop))
+            } else {
+                newLeft = min(parentWidth.toDouble(), max(0.0, newLeft))
+                newTop = if (newTop <= parentHeight / 2) 0.0 else parentHeight.toDouble()
+            }
+
+            left = newLeft
+            top = newTop
+
+            jsPlumbInstance.revalidate(html)
+
+            shape.left = left
+            shape.top = top
+        }
+    }
+
     companion object {
         fun create(
                 htmlRenderer: HtmlRenderer,
@@ -161,7 +253,13 @@ abstract class HtmlShape(
                 jsPlumbInstance: JsPlumbInstance,
                 parent: HtmlShape?
         ): HtmlShape = when (shape) {
-            is BoxShape -> HtmlBoxShape(htmlRenderer, shape, container, position, jsPlumbInstance, parent)
+            is BoxShape -> {
+                if (shape.position == BoxShape.Position.BORDER) {
+                    HtmlBorderShape(htmlRenderer, shape, container, position, jsPlumbInstance, parent)
+                } else {
+                    HtmlBoxShape(htmlRenderer, shape, container, position, jsPlumbInstance, parent)
+                }
+            }
             is TextShape -> HtmlTextShape(htmlRenderer, shape, container, parent)
             is IconShape -> HtmlIconShape(htmlRenderer, shape, container, position, jsPlumbInstance, parent)
             else -> throw UnsupportedOperationException()

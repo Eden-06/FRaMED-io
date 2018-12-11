@@ -42,7 +42,7 @@ class HtmlRenderer(
     }
     var snapToGrid by snapToGridProperty
 
-    val snapToViewProperty = property(window.localStorage["snap-to-view"]?.toBoolean() ?: true).also { property ->
+    val snapToViewProperty = property(window.localStorage["snap-to-view"]?.toBoolean() ?: false).also { property ->
         property.onChange {
             incrementSnap = null
             window.localStorage["snap-to-view"] = property.value.toString()

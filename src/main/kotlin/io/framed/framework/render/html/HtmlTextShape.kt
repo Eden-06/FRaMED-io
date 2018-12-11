@@ -7,10 +7,10 @@ import io.framed.framework.view.inputView
 
 class HtmlTextShape(
         htmlRenderer: HtmlRenderer,
-        val shape: TextShape,
+        override val shape: TextShape,
         container: ViewCollection<View<*>, *>,
         parent: HtmlShape?
-) : HtmlShape(htmlRenderer, container, null, parent) {
+) : HtmlShape(shape, htmlRenderer, container, null, parent) {
 
     override val view: View<*> = container.inputView(shape.property) {
         style(this, shape.style)

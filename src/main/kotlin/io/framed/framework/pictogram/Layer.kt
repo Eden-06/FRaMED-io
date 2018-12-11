@@ -109,7 +109,7 @@ class Layer {
     }
 }
 
-inline fun <reified T : Any> Pictogram.data(default: T) = PictogramData<T>(T::class, this, default)
+inline fun <reified T : Any> Pictogram.data(default: T) = PictogramData(T::class, this, default)
 
 @Suppress("UNCHECKED_CAST")
 class PictogramData<T : Any>(

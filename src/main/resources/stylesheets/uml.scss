@@ -5,12 +5,39 @@
   position: absolute;
   z-index: 1;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .14);
+
+  width: intrinsic;
+  width: -moz-max-content;
+  width: -webkit-max-content;
+  width: max-content;
+}
+
+.border-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%
+}
+
+.border-view {
+  display: inline-block;
+  position: absolute;
+  z-index: 1;
   overflow: hidden;
 
   width: intrinsic;
   width: -moz-max-content;
   width: -webkit-max-content;
   width: max-content;
+
+  @include no-select();
+}
+
+.content-view {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 .resize-handler {
@@ -82,24 +109,26 @@
   }
 }
 
-.selected-view {
+.selected-view > .content-view{
   outline: solid 2px $toolbar-color;
 }
 
 .snap-view {
-  outline: solid 2px #FFC107;
+  & > .content-view, &.icon-view {
+    outline: solid 2px #FFC107;
 
-  &:after {
-    content: '';
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    &:after {
+      content: '';
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
 
-    background: rgba(#FFC107, 0.2);
-    display: block;
-    position: absolute;
-    z-index: 5;
+      background: rgba(#FFC107, 0.2);
+      display: block;
+      position: absolute;
+      z-index: 5;
+    }
   }
 }
 

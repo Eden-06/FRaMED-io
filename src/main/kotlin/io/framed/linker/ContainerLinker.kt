@@ -70,6 +70,11 @@ class ContainerLinker(
         roleTypes.previewBox = autoLayoutBox
         events.previewBox = autoLayoutBox
 
+        boxShape(BoxShape.Position.BORDER) {
+            iconShape(property(MaterialIcon.AIRLINE_SEAT_FLAT))
+            iconShape(property(MaterialIcon.ARCHIVE))
+        }
+
         style {
             background = linearGradient("to bottom") {
                 add(color("#fffbd9"), 0.0)

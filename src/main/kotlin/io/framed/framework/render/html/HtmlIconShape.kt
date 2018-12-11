@@ -9,12 +9,12 @@ import io.framed.framework.view.iconView
 
 class HtmlIconShape(
         htmlRenderer: HtmlRenderer,
-        val shape: IconShape,
+        override val shape: IconShape,
         container: ViewCollection<View<*>, *>,
         val position: BoxShape.Position,
         override val jsPlumbInstance: JsPlumbInstance,
         parent: HtmlShape?
-) : HtmlShape(htmlRenderer, container, jsPlumbInstance, parent) {
+) : HtmlShape(shape, htmlRenderer, container, jsPlumbInstance, parent) {
 
     override val view: View<*> = container.iconView(shape.property) {
         style(this, shape.style)
@@ -22,6 +22,8 @@ class HtmlIconShape(
 
         if (position == BoxShape.Position.ABSOLUTE) {
             absolutePosition(this, shape, container, jsPlumbInstance)
+        } else if (position == BoxShape.Position.BORDER) {
+            borderPosition(this, shape, container, jsPlumbInstance, parent?.parent!! as HtmlBoxShape)
         }
     }
 }
