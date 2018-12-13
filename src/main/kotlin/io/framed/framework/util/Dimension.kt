@@ -74,4 +74,6 @@ data class Dimension(
         return (n.left <= other.x && (n.left + widthNotNull) >= other.x)
                 && (n.top <= other.y && (n.top + heightNotNull) >= other.y)
     }
+
+    operator fun plus(point: Point) = copy(left + point.x, top + point.y)
 }

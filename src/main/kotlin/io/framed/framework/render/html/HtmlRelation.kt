@@ -1,5 +1,6 @@
 package io.framed.framework.render.html
 
+import de.westermann.kobserve.ListenerReference
 import io.framed.framework.*
 import io.framed.framework.pictogram.Connection
 import io.framed.framework.pictogram.ConnectionLine
@@ -20,12 +21,20 @@ class HtmlRelation(
         val renderer: HtmlRenderer
 ) {
 
+    private val references: MutableList<ListenerReference<*>> = mutableListOf()
     private var connections: List<JsPlumbConnection> = emptyList()
-    fun remove() {
+    fun remove(complete: Boolean = false) {
         connections.forEach {
             jsPlumbInstance.deleteConnection(it)
         }
         connections = emptyList()
+
+        if (complete) {
+            references.forEach {
+                it.remove()
+            }
+            references.clear()
+        }
     }
 
     private val views = connection.labels.map { (shape, position) ->
@@ -90,12 +99,12 @@ class HtmlRelation(
                 }))
             }
         } else {
-           overlays += listOf(arrayOf("Custom", object {
-               val create = { _: dynamic ->
-                   TextView("Id: ${connection.source.get()}").html
-               }
-               val location = 11
-           }))
+            overlays += listOf(arrayOf("Custom", object {
+                val create = { _: dynamic ->
+                    TextView("Id: ${connection.source.get()}").html
+                }
+                val location = 11
+            }))
         }
 
         if (drawTarget) {
@@ -127,14 +136,8 @@ class HtmlRelation(
     fun draw(sourceId: Long, targetId: Long) {
         remove()
 
-        val directSourceView = renderer[sourceId, jsPlumbInstance]
-        val directTargetView = renderer[targetId, jsPlumbInstance]
-
-        val drawSource = directSourceView != null
-        val drawTarget = directTargetView != null
-
-        val sourceView = directSourceView ?: renderer[sourceId, jsPlumbInstance, true] ?: return
-        val targetView = directTargetView ?: renderer[targetId, jsPlumbInstance, true] ?: return
+        val sourceView = renderer[sourceId, jsPlumbInstance] ?: return
+        val targetView = renderer[targetId, jsPlumbInstance] ?: return
 
         val zIndex = listOfNotNull(sourceView.zIndex, targetView.zIndex).max() ?: 0
 
@@ -164,7 +167,7 @@ class HtmlRelation(
         }
         connection.lines.lastOrNull()?.let { line ->
             val init = createJsPlumbConnection(line, sourceView, targetView)
-            createEndStyle(init, drawSource, drawTarget)
+            createEndStyle(init, true, true)
             connections += jsPlumbInstance.connect(init).also {
                 it.canvas.style.zIndex = zIndex.toString()
             }
@@ -193,14 +196,14 @@ class HtmlRelation(
     init {
         draw()
 
-        connection.source.onChange {
+        connection.source.onChange.reference {
             draw()
-        }
-        connection.target.onChange {
+        }?.let(references::add)
+        connection.target.onChange.reference {
             draw()
-        }
-        connection.onStyleChange {
+        }?.let(references::add)
+        connection.onStyleChange.reference {
             draw()
-        }
+        }?.let(references::add)
     }
 }

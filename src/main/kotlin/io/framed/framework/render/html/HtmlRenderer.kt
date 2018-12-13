@@ -163,8 +163,10 @@ class HtmlRenderer(
                 val pos = center.y + dy
                 delta = Point(delta.x, pos - currentCenter.y)
             }
-
+        } else {
+            delta = center - currentCenter
         }
+
         if (snapToView) {
             val threshold = gridSize / 2
             val otherViews = (draggableViews - view - selectedViews)
@@ -292,23 +294,8 @@ class HtmlRenderer(
         htmlConnections.init()
     }
 
-    operator fun get(id: Long, jsPlumbInstance: JsPlumbInstance, findParent: Boolean = false): View<*>? = shapeMap
-            .filter { it.key.id == id }.values.firstOrNull()?.let {
-        if (findParent) {
-            var item: HtmlShape? = it
-            while (item != null) {
-                if (item.jsPlumbInstance == jsPlumbInstance) {
-                    return@let item
-                }
-                item = item.parent
-            }
-            null
-        } else {
-            if (it.jsPlumbInstance == jsPlumbInstance) {
-                it
-            } else null
-        }
-    }?.view
+    operator fun get(id: Long, jsPlumbInstance: JsPlumbInstance): View<*>? = shapeMap
+            .filter { it.key.id == id && it.value.jsPlumbInstance == jsPlumbInstance }.values.firstOrNull()?.view
 
     fun getShapeById(id: String): Shape? = shapeMap.entries.find { (_, item) ->
         item.view.id == id
@@ -324,7 +311,7 @@ class HtmlRenderer(
         if (shape != null) {
             val mouse = navigationView.mouseToCanvas(Root.mousePosition)
             val targets = shapeMap.filter { (s, view) ->
-                mouse in view.view.dimension && shape != s
+                mouse in (view.view.dimension + Point(view.view.offsetLeft - workspace.offsetLeft, view.view.offsetTop - workspace.offsetTop)) && shape != s
             }.filterKeys { target ->
                 viewModel.handler.canDropShape(shape.id ?: return null, target.id ?: return null)
             }

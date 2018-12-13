@@ -1,5 +1,6 @@
 package io.framed.framework.render.html
 
+import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.*
@@ -10,17 +11,19 @@ import io.framed.framework.view.NavigationView
 import io.framed.framework.view.Root
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
+import org.w3c.dom.HTMLElement
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-abstract class HtmlShape (
+abstract class HtmlShape(
+        val htmlRenderer: HtmlRenderer,
         open val shape: Shape,
-        private val htmlRenderer: HtmlRenderer,
+        val parent: HtmlContentShape?,
+        val parentContainer: HtmlShapeContainer?,
         val container: ViewCollection<View<*>, *>,
-        open val jsPlumbInstance: JsPlumbInstance?,
-        val parent: HtmlShape?
+        open val jsPlumbInstance: JsPlumbInstance?
 ) {
     abstract val view: View<*>
     open fun remove() {
@@ -68,7 +71,13 @@ abstract class HtmlShape (
         }
     }
 
-    fun absolutePosition(view: View<*>, shape: Shape, parent: ViewCollection<View<*>, *>, jsPlumbInstance: JsPlumbInstance) = with(view) {
+    fun absolutePosition(
+            view: View<*>,
+            parent: ViewCollection<View<*>, *>,
+            jsPlumbInstance: JsPlumbInstance,
+            jsPlumbView: HTMLElement,
+            onMove: EventHandler<Shape>? = null
+    ) = with(view) {
         left = shape.left ?: 0.0
         top = shape.top ?: 0.0
         classes += "absolute-view"
@@ -81,7 +90,8 @@ abstract class HtmlShape (
                 shape.width?.let { width = it } ?: autoWidth()
                 shape.height?.let { height = it } ?: autoHeight()
 
-                jsPlumbInstance.revalidate(html)
+                jsPlumbInstance.revalidate(jsPlumbView)
+                onMove?.emit(shape)
             }
 
         }?.let(listeners::add)
@@ -126,7 +136,8 @@ abstract class HtmlShape (
             left = minLeft?.let { max(it, newLeft) } ?: newLeft
             top = minTop?.let { max(it, newTop) } ?: newTop
 
-            jsPlumbInstance.revalidate(html)
+            jsPlumbInstance.revalidate(jsPlumbView)
+            onMove?.emit(shape)
 
             shape.left = left
             shape.top = top
@@ -157,7 +168,13 @@ abstract class HtmlShape (
         }
     }
 
-    fun borderPosition(view: View<*>, shape: Shape, parent: ViewCollection<View<*>, *>, jsPlumbInstance: JsPlumbInstance, parentHtmlBoxShape: HtmlBoxShape) = with(view) {
+    fun borderPosition(
+            view: View<*>,
+            parent: ViewCollection<View<*>, *>,
+            jsPlumbInstance: JsPlumbInstance,
+            jsPlumbView: HTMLElement,
+            parentHtmlBoxShape: HtmlBoxShape
+    ) = with(view) {
         left = shape.left ?: 0.0
         top = shape.top ?: 0.0
         classes += "border-view"
@@ -174,7 +191,7 @@ abstract class HtmlShape (
                 shape.width?.let { width = it } ?: autoWidth()
                 shape.height?.let { height = it } ?: autoHeight()
 
-                jsPlumbInstance.revalidate(html)
+                jsPlumbInstance.revalidate(jsPlumbView)
             }
 
         }?.let(listeners::add)
@@ -210,7 +227,8 @@ abstract class HtmlShape (
         onDblClick { event ->
             event.stopPropagation()
         }
-        onDrag { event ->
+        onDrag { e ->
+            val event = htmlRenderer.directDragView(e, view, parent)
             var newLeft = left + event.delta.x
             var newTop = top + event.delta.y
 
@@ -237,32 +255,10 @@ abstract class HtmlShape (
             left = newLeft
             top = newTop
 
-            jsPlumbInstance.revalidate(html)
+            jsPlumbInstance.revalidate(jsPlumbView)
 
             shape.left = left
             shape.top = top
-        }
-    }
-
-    companion object {
-        fun create(
-                htmlRenderer: HtmlRenderer,
-                shape: Shape,
-                container: ViewCollection<View<*>, *>,
-                position: BoxShape.Position,
-                jsPlumbInstance: JsPlumbInstance,
-                parent: HtmlShape?
-        ): HtmlShape = when (shape) {
-            is BoxShape -> {
-                if (shape.position == BoxShape.Position.BORDER) {
-                    HtmlBorderShape(htmlRenderer, shape, container, position, jsPlumbInstance, parent)
-                } else {
-                    HtmlBoxShape(htmlRenderer, shape, container, position, jsPlumbInstance, parent)
-                }
-            }
-            is TextShape -> HtmlTextShape(htmlRenderer, shape, container, parent)
-            is IconShape -> HtmlIconShape(htmlRenderer, shape, container, position, jsPlumbInstance, parent)
-            else -> throw UnsupportedOperationException()
         }
     }
 }

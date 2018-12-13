@@ -109,10 +109,11 @@
   }
 }
 
-.selected-view > .content-view{
-  outline: solid 2px $toolbar-color;
+.selected-view {
+  & > .content-view, &.icon-view{
+    outline: solid 2px $toolbar-color;
+  }
 }
-
 .snap-view {
   & > .content-view, &.icon-view {
     outline: solid 2px #FFC107;

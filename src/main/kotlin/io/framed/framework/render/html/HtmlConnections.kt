@@ -154,7 +154,7 @@ class HtmlConnections(
         viewModel.onConnectionRemove.reference { r ->
             relations[r]?.let { relation ->
                 relations -= r
-                relation.remove()
+                relation.remove(true)
             }
         }?.let(listeners::add)
     }

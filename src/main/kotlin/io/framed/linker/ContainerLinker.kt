@@ -46,6 +46,7 @@ class ContainerLinker(
         get() = classes.linkers + containers.linkers + roleTypes.linkers + events.linkers + compartments.linkers
 
     private lateinit var autoLayoutBox: BoxShape
+    private lateinit var borderBox: BoxShape
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
@@ -70,10 +71,7 @@ class ContainerLinker(
         roleTypes.previewBox = autoLayoutBox
         events.previewBox = autoLayoutBox
 
-        boxShape(BoxShape.Position.BORDER) {
-            iconShape(property(MaterialIcon.AIRLINE_SEAT_FLAT))
-            iconShape(property(MaterialIcon.ARCHIVE))
-        }
+        borderBox = boxShape(BoxShape.Position.BORDER) {}
 
         style {
             background = linearGradient("to bottom") {
@@ -230,7 +228,7 @@ class ContainerLinker(
             }
         }
 
-        contextDelete = addItem(MaterialIcon.DELETE, "Delete") { _ ->
+        contextDelete = addItem(MaterialIcon.DELETE, "Delete") {
             delete()
         }
     }
@@ -245,6 +243,7 @@ class ContainerLinker(
 
             else -> super.remove(linker)
         }
+        checkBorder()
     }
 
 
@@ -257,6 +256,7 @@ class ContainerLinker(
             is Event -> events += EventLinker(model, this)
             else -> super.add(model)
         }
+        checkBorder()
     }
 
 
@@ -270,6 +270,7 @@ class ContainerLinker(
 
             else -> super.remove(linker)
         }
+        checkBorder()
     }
 
     override fun ContextMenu.onOpen(event: ContextEvent) {
@@ -331,6 +332,51 @@ class ContainerLinker(
         }
     }
 
+    private var borderShapes: List<Shape> = emptyList()
+
+    private fun checkBorder() {
+        val directIdList = shapeLinkers.map { it.id }
+        var neededBorderViews = connectionManager.connections
+                .mapNotNull {
+                    val s = it.sourceIdProperty.value
+                    val t = it.targetIdProperty.value
+
+                    if (s in directIdList && t !in directIdList) {
+                        s
+                    } else if (s !in directIdList && t in directIdList) {
+                        t
+                    } else {
+                        null
+                    }
+                }
+                .distinct()
+
+        borderShapes.forEach {
+            if (it.id !in neededBorderViews) {
+                borderBox -= it
+                borderShapes -= it
+            } else {
+                neededBorderViews -= it.id!!
+            }
+        }
+
+        neededBorderViews.forEach {
+            val shape = iconShape(property<Icon?>(null), id = it) {
+                style {
+                    background = color(255, 255, 255)
+                    border {
+                        style = Border.BorderStyle.SOLID
+                        width = box(1.0)
+                        color = box(color(0, 0, 0, 0.3))
+                    }
+                    padding = box(10.0)
+                }
+            }
+            borderBox += shape
+            borderShapes += shape
+        }
+    }
+
     /**
      * The model initializes a new instance of the linker
      */
@@ -343,6 +389,10 @@ class ContainerLinker(
 
         LinkerManager.setup(this)
         connectionManager.addModel(this)
+
+        connectionManager.onConnectionAdd { checkBorder() }
+        connectionManager.onConnectionRemove { checkBorder() }
+        checkBorder()
     }
 
     companion object : LinkerInfoItem {

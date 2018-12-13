@@ -20,5 +20,6 @@ fun BoxShape.iconShape(
 
 fun Linker<*, *>.iconShape(
         property: ReadOnlyProperty<out Icon?>,
+        id: Long = this.id,
         init: IconShape.() -> Unit = {}
 ) = IconShape(property, id).also(init)

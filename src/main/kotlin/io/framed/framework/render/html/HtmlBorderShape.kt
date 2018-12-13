@@ -9,11 +9,12 @@ import io.framed.framework.view.*
 class HtmlBorderShape(
         htmlRenderer: HtmlRenderer,
         override val shape: BoxShape,
+        parent: HtmlContentShape?,
+        parentContainer: HtmlShapeContainer?,
         container: ViewCollection<View<*>, *>,
         val position: BoxShape.Position,
-        override val jsPlumbInstance: JsPlumbInstance,
-        parent: HtmlShape?
-) : HtmlShape(shape, htmlRenderer, container, jsPlumbInstance, parent) {
+        override val jsPlumbInstance: JsPlumbInstance
+) : HtmlContentShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
 
     val realContainer: ViewCollection<View<*>, *> = (parent as HtmlBoxShape).positionView
 
@@ -22,7 +23,7 @@ class HtmlBorderShape(
         realContainer.toBackground(this)
     }
 
-    val content = HtmlShapeContainer(
+    override val content = HtmlShapeContainer(
             htmlRenderer,
             shape,
             view,

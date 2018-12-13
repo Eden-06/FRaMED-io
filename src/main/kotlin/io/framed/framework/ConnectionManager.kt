@@ -17,11 +17,6 @@ interface ConnectionManager {
     val onConnectionAdd: EventHandler<ConnectionLinker<*>>
     val onConnectionRemove: EventHandler<ConnectionLinker<*>>
 
-    /*
-    fun getShapeById(id: Long): Shape? {
-        return shapes.find { it.id == id }?.pictogram
-    }
-    */
     fun getLinkerById(id: Long): ShapeLinker<*, *>? = shapes.find { it.id == id }
 
     fun createConnection(source: Long, target: Long)

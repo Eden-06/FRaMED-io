@@ -1,8 +1,11 @@
 package io.framed.framework.render.html
 
+import de.westermann.kobserve.EventHandler
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
+import io.framed.framework.pictogram.IconShape
 import io.framed.framework.pictogram.Shape
+import io.framed.framework.pictogram.TextShape
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 
@@ -11,7 +14,7 @@ class HtmlShapeContainer(
         private val containerShape: BoxShape,
         private val container: ViewCollection<View<*>, *>,
         jsPlumbInstanceParent: JsPlumbInstance? = null,
-        private val parent: HtmlShape? = null
+        private val parent: HtmlContentShape? = null
 ) {
 
     val jsPlumbInstance = if (containerShape.position == BoxShape.Position.ABSOLUTE || jsPlumbInstanceParent == null) {
@@ -20,12 +23,31 @@ class HtmlShapeContainer(
 
     private val shapeMap: MutableMap<Shape, HtmlShape> = mutableMapOf()
 
+    fun create(shape: Shape): HtmlShape = when (shape) {
+        is BoxShape -> {
+            if (shape.position == BoxShape.Position.BORDER) {
+                HtmlBorderShape(htmlRenderer, shape, parent, this, container, containerShape.position, jsPlumbInstance)
+            } else {
+                HtmlBoxShape(htmlRenderer, shape, parent, this, container, containerShape.position, jsPlumbInstance)
+            }
+        }
+        is TextShape -> HtmlTextShape(htmlRenderer, shape, parent, this, container, jsPlumbInstance)
+        is IconShape -> HtmlIconShape(htmlRenderer, shape, parent, this, container, containerShape.position, jsPlumbInstance)
+        else -> throw UnsupportedOperationException()
+    }.also {
+        it.view.html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
+    }
+
     private fun add(shape: Shape) {
         if (shape !in shapeMap) {
-            val html = HtmlShape.create(htmlRenderer, shape, container, containerShape.position, jsPlumbInstance, parent)
+            val html = create(shape)
             shapeMap += shape to html
             if (shape.id != null) {
                 htmlRenderer.shapeMap += shape to html
+            }
+
+            if (html is HtmlContentShape) {
+                onParentMove(html.content.onParentMove::emit)
             }
 
             htmlRenderer.htmlConnections.addShape(shape)
@@ -34,10 +56,17 @@ class HtmlShapeContainer(
     }
 
     private fun remove(shape: Shape) {
-        shapeMap.remove(shape)?.remove()
+        shapeMap.remove(shape)?.let { html ->
+            if (html is HtmlContentShape) {
+                onParentMove.removeListener(html.content.onParentMove::emit)
+            }
+            html.remove()
+        }
         htmlRenderer.shapeMap -= shape
         htmlRenderer.htmlConnections.deleteShape(shape)
     }
+
+    val onParentMove = EventHandler<Shape>()
 
     init {
         containerShape.shapes.forEach(this::add)

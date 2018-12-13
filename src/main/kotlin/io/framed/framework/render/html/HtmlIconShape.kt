@@ -1,5 +1,6 @@
 package io.framed.framework.render.html
 
+import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.IconShape
@@ -10,20 +11,38 @@ import io.framed.framework.view.iconView
 class HtmlIconShape(
         htmlRenderer: HtmlRenderer,
         override val shape: IconShape,
+        parent: HtmlContentShape?,
+        parentContainer: HtmlShapeContainer?,
         container: ViewCollection<View<*>, *>,
         val position: BoxShape.Position,
-        override val jsPlumbInstance: JsPlumbInstance,
-        parent: HtmlShape?
-) : HtmlShape(shape, htmlRenderer, container, jsPlumbInstance, parent) {
+        override val jsPlumbInstance: JsPlumbInstance
+) : HtmlShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
 
     override val view: View<*> = container.iconView(shape.property) {
         style(this, shape.style)
         events(this, shape)
+    }
 
+    override fun remove() {
+        super.remove()
+        reference?.remove()
+    }
+
+    var reference: ListenerReference<*>? = null
+
+    init {
         if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(this, shape, container, jsPlumbInstance)
+            absolutePosition(view, container, jsPlumbInstance, view.html)
         } else if (position == BoxShape.Position.BORDER) {
-            borderPosition(this, shape, container, jsPlumbInstance, parent?.parent!! as HtmlBoxShape)
+            borderPosition(view, container, jsPlumbInstance, view.html, parent?.parent as HtmlBoxShape)
+
+            parentContainer?.onParentMove?.reference {
+                jsPlumbInstance.revalidate(view.html)
+            }?.let { reference = it }
+
+            shape.property.onChange.reference {
+                view.zIndex = if (shape.property.value == null) -1 else null
+            }?.trigger(Unit)
         }
     }
 }

@@ -1,5 +1,6 @@
 package io.framed.framework.render.html
 
+import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.view.*
@@ -7,11 +8,12 @@ import io.framed.framework.view.*
 class HtmlBoxShape(
         htmlRenderer: HtmlRenderer,
         override val shape: BoxShape,
+        parent: HtmlContentShape?,
+        parentContainer: HtmlShapeContainer?,
         container: ViewCollection<View<*>, *>,
         val position: BoxShape.Position,
-        override val jsPlumbInstance: JsPlumbInstance,
-        parent: HtmlShape?
-) : HtmlShape(shape, htmlRenderer, container, jsPlumbInstance, parent) {
+        override val jsPlumbInstance: JsPlumbInstance
+) : HtmlContentShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
 
     var resizer: ResizeHandler? = null
 
@@ -29,12 +31,6 @@ class HtmlBoxShape(
             shape.height?.let { height = it }
         }
 
-        if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(this, shape, container, jsPlumbInstance)
-        } else if (position == BoxShape.Position.BORDER) {
-            borderPosition(this, shape, container, jsPlumbInstance, parent?.parent!! as HtmlBoxShape)
-        }
-
         if (shape.position == BoxShape.Position.ABSOLUTE) {
             this.html.style.height = "100%"
         }
@@ -50,8 +46,7 @@ class HtmlBoxShape(
         }
     }
 
-
-    val content = HtmlShapeContainer(
+    override val content = HtmlShapeContainer(
             htmlRenderer,
             shape,
             view,
@@ -63,5 +58,20 @@ class HtmlBoxShape(
         super.remove()
         content.remove()
         container -= positionView
+        reference?.remove()
+    }
+
+    var reference: ListenerReference<*>? = null
+
+    init {
+        if (position == BoxShape.Position.ABSOLUTE) {
+            absolutePosition(positionView, container, jsPlumbInstance, view.html, content.onParentMove)
+        } else if (position == BoxShape.Position.BORDER) {
+            borderPosition(positionView, container, jsPlumbInstance, view.html, parent?.parent as HtmlBoxShape)
+
+            parentContainer?.onParentMove?.reference {
+                jsPlumbInstance.revalidate(view.html)
+            }?.let { reference = it }
+        }
     }
 }

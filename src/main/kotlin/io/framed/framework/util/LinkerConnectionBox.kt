@@ -23,17 +23,17 @@ class LinkerConnectionBox<M : ModelConnection<M>, L : ConnectionLinker<M>>(
             backingField += linker.model
         }
 
-        parent.onConnectionAdd.emit(linker)
-
         linkers += linker
+
+        parent.onConnectionAdd.emit(linker)
     }
 
     private fun internalRemove(linker: L) {
         backingField -= linker.model
-        parent.onConnectionRemove.emit(linker)
 
         linkers -= linker
 
+        parent.onConnectionRemove.emit(linker)
         onRemove.emit(Unit)
     }
 
