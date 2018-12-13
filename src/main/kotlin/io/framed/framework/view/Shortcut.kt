@@ -20,9 +20,19 @@ data class Shortcut(
                 event.shiftKey == Modifier.SHIFT in modifiers
     }
 
+    private fun formatLetter(): String {
+        val lower = letter.toLowerCase()
+
+        return when (lower) {
+            "+" -> "Plus"
+            "-" -> "Minus"
+            else -> lower.capitalize()
+        }
+    }
+
     override fun toString(): String =
             (modifiers.sortedBy { it.priority }.map { it.name.toLowerCase().capitalize() } +
-                    listOf(letter.toLowerCase().capitalize()))
+                    listOf(formatLetter()))
                     .joinToString("+")
 
     enum class Modifier(val priority: Int) {

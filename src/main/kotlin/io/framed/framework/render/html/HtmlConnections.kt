@@ -8,6 +8,7 @@ import io.framed.framework.pictogram.Connection
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.util.async
+import io.framed.framework.view.View
 import org.w3c.dom.HTMLElement
 
 class HtmlConnections(
@@ -65,7 +66,7 @@ class HtmlConnections(
         return instance
     }
 
-    fun findInstance(idList: List<Long>): JsPlumbInstance? {
+    private fun findInstance(idList: List<Long>): JsPlumbInstance? {
         val list = htmlRenderer.shapeMap.filterKeys { it.id in idList }.values.mapNotNull {
             it.jsPlumbInstance
         }.distinct()
@@ -144,6 +145,23 @@ class HtmlConnections(
     var relations: Map<Connection, HtmlRelation> = emptyMap()
     fun drawRelation(jsPlumbInstance: JsPlumbInstance, relation: Connection) {
         relations += relation to HtmlRelation(relation, jsPlumbInstance, htmlRenderer)
+    }
+
+    fun limitSide(view: View<*>, anchor: Set<RelationSide>) {
+        relations.values.forEach {
+            var changed = false
+            if (it.sourceView == view && it.sourceAnchor != anchor) {
+                it.sourceAnchor = anchor
+                changed = true
+            }
+            if (it.targetView == view && it.targetAnchor != anchor) {
+                it.targetAnchor = anchor
+                changed = true
+            }
+            if  (changed) {
+                it.draw()
+            }
+        }
     }
 
     init {

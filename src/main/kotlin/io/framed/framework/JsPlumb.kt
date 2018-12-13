@@ -119,6 +119,7 @@ external interface JsPlumbConnectInit {
      * List of anchors.
      */
     var anchor: Array<Any>
+    var anchors: Array<Array<Any>>
 
     /**
      * Connector data.

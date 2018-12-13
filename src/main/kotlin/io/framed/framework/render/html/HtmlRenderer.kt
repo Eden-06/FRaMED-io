@@ -238,7 +238,7 @@ class HtmlRenderer(
         return event.copy(delta = delta)
     }
 
-    fun updateViewBox() {
+    private fun updateViewBox() {
         val box = navigationView.viewBox
 
         viewModel.container.left = box.left
@@ -247,7 +247,7 @@ class HtmlRenderer(
         viewModel.container.height = box.height
     }
 
-    fun loadViewBox() {
+    private fun loadViewBox() {
         val left = viewModel.container.left
         val top = viewModel.container.top
         val width = viewModel.container.width

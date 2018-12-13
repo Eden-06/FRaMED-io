@@ -53,7 +53,7 @@ class HtmlRelation(
         source = sourceView.html
         target = targetView.html
 
-        anchor = arrayOf("Top", "Left", "Bottom", "Right")
+        anchors = arrayOf(sourceAnchorString, targetAnchorString) as Array<Array<Any>>
 
         connector = when (line.type) {
             ConnectionLine.Type.STRAIGHT -> {
@@ -133,11 +133,31 @@ class HtmlRelation(
         connectInit.overlays = overlays.toTypedArray()
     }
 
+    var sourceAnchor: Set<RelationSide> = ALL_SIDES
+    private val sourceAnchorString: Array<String>
+        get() = sourceAnchor.map { it.jsPlumb }.toTypedArray()
+
+    var targetAnchor: Set<RelationSide> = ALL_SIDES
+    private val targetAnchorString: Array<String>
+        get() = targetAnchor.map { it.jsPlumb }.toTypedArray()
+
+    lateinit var sourceView: View<*>
+    lateinit var targetView: View<*>
+
     fun draw(sourceId: Long, targetId: Long) {
         remove()
 
-        val sourceView = renderer[sourceId, jsPlumbInstance] ?: return
-        val targetView = renderer[targetId, jsPlumbInstance] ?: return
+        val sourceViewNew = renderer[sourceId, jsPlumbInstance] ?: return
+        val targetViewNew = renderer[targetId, jsPlumbInstance] ?: return
+
+        if (!this::sourceView.isInitialized || sourceView != sourceViewNew) {
+            sourceView = sourceViewNew
+            sourceAnchor = ALL_SIDES
+        }
+        if (!this::targetView.isInitialized || targetView != targetViewNew) {
+            targetView = targetViewNew
+            targetAnchor = ALL_SIDES
+        }
 
         val zIndex = listOfNotNull(sourceView.zIndex, targetView.zIndex).max() ?: 0
 
@@ -146,7 +166,7 @@ class HtmlRelation(
             source = sourceView.html
             target = targetView.html
 
-            anchor = arrayOf("Top", "Left", "Bottom", "Right")
+            anchors = arrayOf(sourceAnchorString, targetAnchorString) as Array<Array<Any>>
             connector = arrayOf("Flowchart", object {
                 val cornerRadius = 5
             })
@@ -158,6 +178,7 @@ class HtmlRelation(
             }
         }).also {
             it.canvas.style.zIndex = zIndex.toString()
+            console.log(it)
         }
 
         connection.lines.dropLast(1).forEach { line ->
@@ -206,4 +227,15 @@ class HtmlRelation(
             draw()
         }?.let(references::add)
     }
+
+    companion object {
+        val ALL_SIDES = setOf(RelationSide.TOP, RelationSide.LEFT, RelationSide.BOTTOM, RelationSide.RIGHT)
+    }
+}
+
+enum class RelationSide(val jsPlumb: String) {
+    TOP("Top"),
+    LEFT("Left"),
+    BOTTOM("Bottom"),
+    RIGHT("Right")
 }

@@ -260,6 +260,16 @@ abstract class HtmlShape(
 
             jsPlumbInstance.revalidate(jsPlumbView)
 
+            val anchor = when {
+                newTop <= 0.0 -> setOf(RelationSide.TOP)
+                newLeft <= 0.0 -> setOf(RelationSide.LEFT)
+                newTop >= height -> setOf(RelationSide.BOTTOM)
+                newLeft >= width -> setOf(RelationSide.RIGHT)
+                else -> HtmlRelation.ALL_SIDES
+            }
+
+            htmlRenderer.htmlConnections.limitSide(view, anchor)
+
             shape.left = left
             shape.top = top
         }
