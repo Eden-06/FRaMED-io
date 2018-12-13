@@ -11,11 +11,9 @@ import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.render.Renderer
 import io.framed.framework.util.*
 import io.framed.framework.view.*
-import org.w3c.dom.Document
 import org.w3c.dom.get
 import org.w3c.dom.set
 import kotlin.math.abs
-import kotlin.browser.document
 import kotlin.browser.window
 
 /**
@@ -112,11 +110,20 @@ class HtmlRenderer(
         selectedViewSizeProperty.value = selectedViews.size
     }
 
+    fun selectAll() {
+        draggableViews.forEach { it.selectedView = true }
+        selectedViewSizeProperty.value = selectedViews.size
+    }
+
+    fun deselectAll() {
+        selectedViews.forEach { it.selectedView = false }
+        selectedViewSizeProperty.value = selectedViews.size
+    }
+
     fun deleteSelected() {
         if (selectedViews.isNotEmpty()) {
             History.group("Delete views") {
-                shapeMap.filterValues { it.view in selectedViews }.keys.forEach {
-                    println("delete")
+                shapeMap.filterValues { it.viewList.any { it in selectedViews } }.keys.forEach {
                     it.delete?.invoke()
                 }
             }

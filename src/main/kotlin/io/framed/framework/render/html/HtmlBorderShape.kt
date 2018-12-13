@@ -31,6 +31,8 @@ class HtmlBorderShape(
             this
     )
 
+    override val viewList: List<View<*>> = listOf(view)
+
     override fun remove() {
         super.remove()
         content.remove()

@@ -63,6 +63,8 @@ class HtmlBoxShape(
 
     var reference: ListenerReference<*>? = null
 
+    override val viewList: List<View<*>> = listOf(view, positionView)
+
     init {
         if (position == BoxShape.Position.ABSOLUTE) {
             absolutePosition(positionView, container, jsPlumbInstance, view.html, content.onParentMove)

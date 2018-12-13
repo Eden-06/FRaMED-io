@@ -176,6 +176,11 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             item(MaterialIcon.DELETE, "Delete", Shortcut("Delete")) {
                 renderer.deleteSelected()
             }.bindCssClass("inactive", renderer.selectedViewSizeProperty.mapBinding { it == 0 })
+
+            separator()
+            item(null, "Select all", Shortcut("A", Shortcut.Modifier.CTRL)) {
+                renderer.selectAll()
+            }
         }
         menu("Foo") {
             item(null, "Bar 1") {}

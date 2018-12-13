@@ -26,4 +26,6 @@ class HtmlTextShape(
             focus()
         }
     }
+
+    override val viewList: List<View<*>> = listOf(view)
 }

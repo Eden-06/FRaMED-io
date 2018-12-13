@@ -26,6 +26,8 @@ abstract class HtmlShape(
         open val jsPlumbInstance: JsPlumbInstance?
 ) {
     abstract val view: View<*>
+    abstract val viewList: List<View<*>>
+
     open fun remove() {
         container -= view
 
@@ -182,6 +184,7 @@ abstract class HtmlShape(
         async {
             marginLeft = -clientWidth / 2.0
             marginTop = -clientHeight / 2.0
+            onDrag.emit(View.DragEvent(Point.ZERO, false))
         }
 
         shape.onPositionChange.reference { force ->

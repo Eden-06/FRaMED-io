@@ -28,6 +28,8 @@ class HtmlIconShape(
         reference?.remove()
     }
 
+    override val viewList: List<View<*>> = listOf(view)
+
     var reference: ListenerReference<*>? = null
 
     init {
