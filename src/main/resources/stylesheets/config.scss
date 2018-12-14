@@ -66,6 +66,8 @@ $top-height: $menu-bar-height + $toolbar-height;
 $sidebar-width: 16rem;
 $border-radius: 0.2rem;
 
+$animationTime: 200ms;
+
 @mixin no-select {
   -webkit-touch-callout: none;
   -webkit-user-select: none;

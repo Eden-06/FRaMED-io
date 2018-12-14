@@ -330,6 +330,7 @@ select {
 
   & > .icon-view {
     font-size: 1.25rem;
+    transition: color $animationTime;
   }
 
   & > span {
@@ -461,7 +462,7 @@ table {
       opacity: 1;
       max-height: 100px;
       clear: both;
-      transition: margin-bottom 200ms, max-height 200ms, opacity 200ms;
+      transition: margin-bottom $animationTime, max-height $animationTime, opacity $animationTime;
       position: relative;
 
       &:last-child {
@@ -493,7 +494,7 @@ table {
         right: 0;
         top: 0.2rem;
         transform: rotate(0);
-        transition: transform 0.2s, top 0.2s;
+        transition: transform $animationTime, top $animationTime;
 
         @include no-select;
 

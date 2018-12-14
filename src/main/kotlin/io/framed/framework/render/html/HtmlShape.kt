@@ -263,8 +263,8 @@ abstract class HtmlShape(
             val anchor = when {
                 newTop <= 0.0 -> setOf(RelationSide.TOP)
                 newLeft <= 0.0 -> setOf(RelationSide.LEFT)
-                newTop >= height -> setOf(RelationSide.BOTTOM)
-                newLeft >= width -> setOf(RelationSide.RIGHT)
+                newTop >= parentHeight -> setOf(RelationSide.BOTTOM)
+                newLeft >= parentWidth -> setOf(RelationSide.RIGHT)
                 else -> HtmlRelation.ALL_SIDES
             }
 
@@ -273,5 +273,7 @@ abstract class HtmlShape(
             shape.left = left
             shape.top = top
         }
+
+        htmlRenderer.draggableViews += this
     }
 }
