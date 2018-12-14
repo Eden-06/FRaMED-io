@@ -18,7 +18,7 @@ object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
         }
 
         onKeyDown { event ->
-            val found = shortcuts.filterKeys { it.match(event) }
+            val found = shortcutMap.filterKeys { it.match(event) }
             if (found.isNotEmpty()) {
                 event.stopPropagation()
                 event.preventDefault()
@@ -27,11 +27,16 @@ object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
         }
     }
 
-    private var shortcuts: Map<Shortcut, () -> Unit> = emptyMap()
+    private var shortcutMap: Map<Shortcut, () -> Unit> = emptyMap()
+
+    val shortcuts: Set<Shortcut>
+        get() = shortcutMap.keys
 
     fun shortcut(shortcut: Shortcut, action: () -> Unit) {
-        if (shortcut !in shortcuts) {
-            shortcuts += shortcut to action
+        if (shortcut !in shortcutMap) {
+            shortcutMap += shortcut to action
         }
     }
+
+
 }

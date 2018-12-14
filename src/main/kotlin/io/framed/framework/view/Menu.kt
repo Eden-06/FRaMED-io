@@ -21,7 +21,7 @@ class Menu(
         }
         textView(name)
         if (shortcut != null) {
-            Root.shortcut(shortcut, onAction)
+            Root.shortcut(shortcut.description(name), onAction)
             html.dataset["hint"] = shortcut.toString()
         }
     }

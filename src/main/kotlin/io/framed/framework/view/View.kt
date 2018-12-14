@@ -40,36 +40,6 @@ abstract class View<V : HTMLElement>(view: V) {
         }
     }
 
-    /*
-    data class DropEvent(
-    val target: HTMLElement,
-    val element: HTMLElement,
-    val direct: Boolean
-    ) {
-    val indirect: DropEvent
-    get() = copy(direct = false)
-    }
-
-    data class DragOverEvent(
-    val target: HTMLElement,
-    val element: HTMLElement,
-    val direct: Boolean
-    ) {
-    val indirect: DragOverEvent
-    get() = copy(direct = false)
-    }
-    */
-
-    /**
-     * Fires on onClick.
-     */
-    val onClick = EventHandler<MouseEvent>()
-
-    /**
-     * Fires on onContextMenu menu open.
-     */
-    val onContext = EventHandler<MouseEvent>()
-
     /**
      * Access css classes of this view.
      */
@@ -253,6 +223,17 @@ abstract class View<V : HTMLElement>(view: V) {
 
     val dimension: Dimension
         get() = Dimension(left, top, width, height)
+
+
+    /**
+     * Fires on onClick.
+     */
+    val onClick = EventHandler<MouseEvent>()
+
+    /**
+     * Fires on onContextMenu menu open.
+     */
+    val onContext = EventHandler<MouseEvent>()
 
     val onMouseDown = EventHandler<MouseEvent>()
     val onMouseMove = EventHandler<MouseEvent>()

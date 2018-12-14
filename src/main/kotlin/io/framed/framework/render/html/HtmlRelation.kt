@@ -178,7 +178,6 @@ class HtmlRelation(
             }
         }).also {
             it.canvas.style.zIndex = zIndex.toString()
-            console.log(it)
         }
 
         connection.lines.dropLast(1).forEach { line ->

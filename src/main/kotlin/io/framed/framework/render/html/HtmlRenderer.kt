@@ -343,6 +343,9 @@ class HtmlRenderer(
     override fun panTo(point: Point) {
         navigationView.panTo(point)
     }
+    override fun panBy(point: Point) {
+        navigationView.panBy(point)
+    }
 }
 
 data class SnapHelper(

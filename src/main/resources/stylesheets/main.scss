@@ -265,7 +265,8 @@ select {
         right: 0.6rem;
         top: 0.1rem;
         font-size: 0.75rem;
-        color: rgba($text-color, 0.4)
+        color: rgba($text-color, 0.4);
+        z-index: -1;
       }
 
       &.inactive span {

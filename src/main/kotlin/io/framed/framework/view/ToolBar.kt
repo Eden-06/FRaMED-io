@@ -17,7 +17,10 @@ class ToolBar : ViewCollection<View<*>, HTMLDivElement>("div") {
     }.iconView(icon) {
         this.tooltip = tooltip + (shortcut?.let { " ($it)" } ?: "")
         onClick { onAction(this) }
-        shortcut?.let { Root.shortcut(it) { onAction(this) } }
+        shortcut?.let { shortcut ->
+            val cut = tooltip?.let { shortcut.description(it) } ?: shortcut
+            Root.shortcut(cut) { onAction(this) }
+        }
     }
 
     fun custom(side: Side, init: ListView.() -> Unit) = when (side) {

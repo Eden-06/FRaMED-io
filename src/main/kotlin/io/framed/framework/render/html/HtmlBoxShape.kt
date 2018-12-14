@@ -21,7 +21,7 @@ class HtmlBoxShape(
         if (shape.resizeable) {
             val size = if (htmlRenderer.snapToGrid) NavigationView.gridSize else null
             htmlRenderer.resizerList += this.resizeable(size) { event ->
-                jsPlumbInstance.revalidate(html)
+                jsPlumbInstance.revalidate(view.html)
 
                 shape.width = event.width
                 shape.height = event.height

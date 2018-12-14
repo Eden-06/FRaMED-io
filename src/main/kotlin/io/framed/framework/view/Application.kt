@@ -83,10 +83,6 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }
         }
 
-        Root.shortcut(Shortcut("0", Shortcut.Modifier.CTRL)) {
-            renderer.zoom = 1.0
-        }
-
         separator(ToolBar.Side.LEFT)
         action(ToolBar.Side.LEFT, MaterialIcon.UNDO, "Undo", Shortcut("Z", Shortcut.Modifier.CTRL)) { _ ->
             if (History.canUndo) {
@@ -131,12 +127,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     private val menuBar = menuBar {
         menu("File") {
-            item(null, "Open", Shortcut("O", Shortcut.Modifier.CTRL)) {
+            item(MaterialIcon.FOLDER_OPEN, "Open", Shortcut("O", Shortcut.Modifier.CTRL)) {
                 loadLocalFile { content ->
                     File.fromJSON(content)
                 }
             }
-            item(null, "Save", Shortcut("S", Shortcut.Modifier.CTRL)) {
+            item(MaterialIcon.SAVE, "Save", Shortcut("S", Shortcut.Modifier.CTRL)) {
                 ControllerManager.root?.let { root ->
                     val linker = (root.linker as ContainerLinker)
                     val connections = linker.connectionManager as ConnectionManagerLinker
@@ -182,13 +178,19 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                 renderer.selectAll()
             }
         }
-        menu("Foo") {
-            item(null, "Bar 1") {}
+        menu("Help") {
+            item(null, "Shortcuts") {
+                Root.shortcuts.forEach {
+                    println(it.toString() + (it.description?.let { ": $it" } ?: ""))
+                }
+            }
+            /*
             menu("Bar 2") {
                 item(null, "Lorem") {}
                 item(null, "Ipson") {}
             }
-            item(null, "Bar 3") {}
+            */
+            item(MaterialIcon.INFO_OUTLINE, "About") {}
         }
     }
 
@@ -234,6 +236,7 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         tab.open()
     }
 
+    const val PAN_WIDTH = 16
 
     init {
         Root += this
@@ -244,9 +247,24 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         zoomProperty.onChange {
             renderer.zoom = zoom
         }
+
+        Root.shortcut(Shortcut("0", Shortcut.Modifier.CTRL).description("Reset zoom")) {
+            renderer.zoom = 1.0
+        }
+        Root.shortcut(Shortcut("ArrowLeft", Shortcut.Modifier.CTRL).description("Move left")) {
+            renderer.panBy(Point(-PAN_WIDTH, 0))
+        }
+        Root.shortcut(Shortcut("ArrowRight", Shortcut.Modifier.CTRL).description("Move right")) {
+            renderer.panBy(Point(PAN_WIDTH, 0))
+        }
+        Root.shortcut(Shortcut("ArrowUp", Shortcut.Modifier.CTRL).description("Move up")) {
+            renderer.panBy(Point(0, -PAN_WIDTH))
+        }
+        Root.shortcut(Shortcut("ArrowDown", Shortcut.Modifier.CTRL).description("Move down")) {
+            renderer.panBy(Point(0, PAN_WIDTH))
+        }
     }
 
     fun init() {
-
     }
 }

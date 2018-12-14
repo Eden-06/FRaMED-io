@@ -10,6 +10,7 @@ import io.framed.framework.util.Point
 interface Renderer {
     fun render(viewModel: ViewModel)
     fun panTo(point: Point)
+    fun panBy(point: Point)
 
     var zoom: Double
     val onZoom: EventHandler<Double>

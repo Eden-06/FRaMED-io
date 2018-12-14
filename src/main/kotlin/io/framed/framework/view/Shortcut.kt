@@ -4,7 +4,8 @@ import org.w3c.dom.events.KeyboardEvent
 
 data class Shortcut(
         val letter: String,
-        val modifiers: Set<Modifier>
+        val modifiers: Set<Modifier>,
+        val description: String? = null
 ) {
 
     constructor(letter: String, vararg modifiers: Modifier) : this(letter, modifiers.toSet())
@@ -14,7 +15,7 @@ data class Shortcut(
         //println("Ctrl: ${event.ctrlKey} == ${Modifier.CTRL in modifiers} -> ${event.ctrlKey == Modifier.CTRL in modifiers}")
         //println("Alt: ${event.altKey} == ${Modifier.ALT in modifiers} -> ${event.altKey == Modifier.ALT in modifiers}")
         //println("Shift: ${event.shiftKey} == ${Modifier.SHIFT in modifiers} -> ${event.shiftKey == Modifier.SHIFT in modifiers}")
-        return  event.key.toUpperCase() == letter.toUpperCase() &&
+        return event.key.toUpperCase() == letter.toUpperCase() &&
                 event.ctrlKey == Modifier.CTRL in modifiers &&
                 event.altKey == Modifier.ALT in modifiers &&
                 event.shiftKey == Modifier.SHIFT in modifiers
@@ -26,9 +27,15 @@ data class Shortcut(
         return when (lower) {
             "+" -> "Plus"
             "-" -> "Minus"
+            "arrowleft" -> "Left"
+            "arrowright" -> "Right"
+            "arrowup" -> "Up"
+            "arrowdown" -> "Down"
             else -> lower.capitalize()
         }
     }
+
+    fun description(description: String) = this.copy(description = description)
 
     override fun toString(): String =
             (modifiers.sortedBy { it.priority }.map { it.name.toLowerCase().capitalize() } +
