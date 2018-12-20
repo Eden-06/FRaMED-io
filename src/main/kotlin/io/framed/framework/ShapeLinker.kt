@@ -1,6 +1,7 @@
 package io.framed.framework
 
 import io.framed.framework.pictogram.Shape
+import io.framed.framework.pictogram.SidebarEvent
 
 /**
  * @author lars
@@ -8,7 +9,13 @@ import io.framed.framework.pictogram.Shape
 interface ShapeLinker<M : ModelElement<M>, P : Shape> : Linker<M, P> {
     val parent: ShapeLinker<*, *>?
 
-    override fun delete(): Unit = parent?.remove(this) ?: Unit
+    override fun delete() {
+        parent?.let { parent ->
+            parent.remove(this)
+            parent.sidebar.onOpen(SidebarEvent.NONE)
+            parent.sidebar.open()
+        }
+    }
 
     fun remove(linker: ShapeLinker<*, *>): Unit = throw UnsupportedOperationException()
     fun add(model: ModelElement<*>): Unit = throw  UnsupportedOperationException()

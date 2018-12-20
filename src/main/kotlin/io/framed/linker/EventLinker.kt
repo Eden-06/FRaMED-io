@@ -33,7 +33,6 @@ class EventLinker(
             }
             padding = box(10.0)
         }
-        this.delete = this@EventLinker::delete
     }
 
     override val listPreview: IconShape = iconShape(symbolProperty) {

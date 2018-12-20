@@ -27,6 +27,7 @@ class HtmlConnections(
 
         listeners.forEach { it.remove() }
         listeners.clear()
+        anchors.clear()
     }
 
     private var jsPlumbList: List<JsPlumbInstance> = emptyList()
@@ -147,19 +148,15 @@ class HtmlConnections(
         relations += relation to HtmlRelation(relation, jsPlumbInstance, htmlRenderer)
     }
 
+    val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
+
     fun limitSide(view: View<*>, anchor: Set<RelationSide>) {
-        relations.values.forEach {
-            var changed = false
-            if (it.sourceView == view && it.sourceAnchor != anchor) {
-                it.sourceAnchor = anchor
-                changed = true
-            }
-            if (it.targetView == view && it.targetAnchor != anchor) {
-                it.targetAnchor = anchor
-                changed = true
-            }
-            if  (changed) {
-                it.draw()
+        if (anchors[view] != anchor) {
+            anchors[view] = anchor
+            relations.values.forEach {
+                if (it.sourceView == view || it.targetView == view) {
+                    it.draw()
+                }
             }
         }
     }

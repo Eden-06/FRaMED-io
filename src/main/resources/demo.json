@@ -4,263 +4,154 @@
     "name": "Economy",
     "classes": [
       {
-        "id": 1,
-        "name": "Account",
-        "attributes": [
-          {
-            "id": 2,
-            "name": "amount",
-            "type": "Money"
-          },
-          {
-            "id": 3,
-            "name": "id",
-            "type": "String"
-          }
-        ],
-        "methods": [
-          {
-            "id": 4,
-            "name": "doSomething",
-            "type": "void",
-            "parameters": [
-              {
-                "id": 5,
-                "name": "foo",
-                "type": "bar"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": 6,
+        "id": 3,
         "name": "Bank",
         "attributes": [
           {
-            "id": 7,
+            "id": 5,
             "name": "name",
             "type": "String"
           }
         ],
         "methods": [
-          {
-            "id": 8,
-            "name": "insolvency",
-            "type": "void",
-            "parameters": [
-            ]
-          }
         ]
-      }
-    ],
-    "containers": [
+      },
       {
-        "id": 11,
-        "name": "Library",
-        "classes": [
-          {
-            "id": 12,
-            "name": "Book",
-            "attributes": [
-              {
-                "id": 13,
-                "name": "isbn",
-                "type": "String"
-              }
-            ],
-            "methods": [
-            ]
-          },
-          {
-            "id": 14,
-            "name": "Shelf",
-            "attributes": [
-            ],
-            "methods": [
-              {
-                "id": 15,
-                "name": "add",
-                "type": "void",
-                "parameters": [
-                  {
-                    "id": 16,
-                    "name": "book",
-                    "type": "Book"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "containers": [],
-        "compartments": [],
-        "roleTypes": [],
-        "events": [],
-        "metadata": {
-          "creationDate": "Sun, 07 Oct 2018 21:35:15 GMT",
-          "modifiedDate": "Sun, 07 Oct 2018 21:35:15 GMT",
-          "author": ""
-        }
-      }
-    ],
-    "roleTypes": [
-      {
-        "id": 9,
-        "name": "RoleType"
-      }
-    ],
-    "events": [
-      {
-        "id": 10,
-        "type": "MESSAGE",
-        "desc": "terminate contract"
-      }
-    ],
-    "compartments": [
-      {
-        "id": 15,
-        "name": "Compartment",
+        "id": 4,
+        "name": "Account",
         "attributes": [
           {
-            "id": 16,
-            "name": "amount",
-            "type": "Money"
+            "id": 6,
+            "name": "name",
+            "type": "String"
           },
           {
-            "id": 17,
-            "name": "id",
-            "type": "String"
+            "id": 7,
+            "name": "amount",
+            "type": "Money"
           }
         ],
         "methods": [
-          {
-            "id": 18,
-            "name": "insolvency",
-            "type": "void",
-            "parameters": [
-            ]
-          }
-        ],
-        "classes": [
-          {
-            "id": 19,
-            "name": "Account",
-            "attributes": [
-              {
-                "id": 20,
-                "name": "amount",
-                "type": "Money"
-              },
-              {
-                "id": 21,
-                "name": "id",
-                "type": "String"
-              }
-            ],
-            "methods": [
-              {
-                "id": 22,
-                "name": "doSomething",
-                "type": "void",
-                "parameters": [
-                  {
-                    "id": 23,
-                    "name": "foo",
-                    "type": "bar"
-                  }
-                ]
-              }
-            ]
-          }
         ]
       }
     ],
+    "compartments": [
+    ],
+    "containers": [
+    ],
+    "roleTypes": [
+    ],
+    "events": [
+    ],
     "metadata": {
-      "creationDate": "Sun, 07 Oct 2018 21:35:15 GMT",
-      "modifiedDate": "Sun, 07 Oct 2018 21:35:15 GMT",
+      "creationDate": "Thu Dec 20 2018 13:37:38 GMT+0100 (CET)",
+      "modifiedDate": "Thu Dec 20 2018 13:37:38 GMT+0100 (CET)",
       "author": ""
     }
   },
   "connections": {
     "associations": [
       {
-        "sourceId": 6,
-        "targetId": 1,
-        "id": 18,
-        "name": "customers",
-        "sourceCardinality": "1..*",
-        "targetCardinality": "1"
-      },
-      {
-        "sourceId": 12,
-        "targetId": 14,
-        "id": 17,
+        "sourceId": 3,
+        "targetId": 4,
+        "id": 8,
         "name": "",
-        "sourceCardinality": "",
-        "targetCardinality": ""
+        "sourceCardinality": "*",
+        "targetCardinality": "*"
       }
     ],
-    "aggregations": [],
-    "compositions": [],
-    "inheritances": []
+    "aggregations": [
+    ],
+    "compositions": [
+    ],
+    "inheritances": [
+    ]
   },
   "layer": {
-    "0": {
-      "position": {
-        "9": {
-          "left": 545,
-          "top": 307,
-          "width": null,
-          "height": null
-        },
-        "11": {
-          "left": 95,
-          "top": 297,
-          "width": null,
-          "height": null
-        },
-        "6": {
-          "left": 76,
-          "top": 90,
-          "width": null,
-          "height": null
-        },
-        "1": {
-          "left": 542,
-          "top": 104,
-          "width": null,
-          "height": null
-        },
-        "10": {
-          "left": 440,
-          "top": 312,
-          "width": null,
-          "height": null
-        }
-      },
+    0:
+    {
       "data": {
-        "11": {
-          "isFlatPreview": "true"
+        0:
+        {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "autosize": true,
+          "data": {
+          }
+        },
+        1:
+        {
+          "left": 309,
+          "top": 155.00000000000003,
+          "width": 0,
+          "height": 0,
+          "autosize": true,
+          "data": {
+          }
+        },
+        2:
+        {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "autosize": true,
+          "data": {
+          }
+        },
+        3:
+        {
+          "left": 64,
+          "top": 64,
+          "width": 292,
+          "height": 99,
+          "autosize": true,
+          "data": {
+          }
+        },
+        4:
+        {
+          "left": 64,
+          "top": 256,
+          "width": 292,
+          "height": 123,
+          "autosize": true,
+          "data": {
+          }
+        },
+        5:
+        {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "autosize": true,
+          "data": {
+          }
+        },
+        6:
+        {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "autosize": true,
+          "data": {
+          }
+        },
+        7:
+        {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "autosize": true,
+          "data": {
+          }
         }
       }
-    },
-    "11": {
-      "position": {
-        "14": {
-          "left": 87,
-          "top": 100,
-          "width": null,
-          "height": null
-        },
-        "12": {
-          "left": 516,
-          "top": 161,
-          "width": null,
-          "height": null
-        }
-      },
-      "data": {}
     }
   }
 }

@@ -7,7 +7,7 @@ class HistoryModelLinker(
         val oldModel: ModelLinker<*, *, *>,
         val newModel: ModelLinker<*, *, *>
 ) : HistoryItem {
-    override val description: String = "Switch tab"
+    override val description: String = "CheckBox tab"
 
     override fun undo() {
         ControllerManager.display(oldModel)

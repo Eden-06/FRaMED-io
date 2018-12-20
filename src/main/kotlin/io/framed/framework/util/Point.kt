@@ -34,6 +34,9 @@ data class Point(
     fun min(): Double = min(x, y)
     fun max(): Double = max(x, y)
 
+    val isZero: Boolean
+        get() = x == 0.0 && y == 0.0
+
     companion object {
         val ZERO = Point(0.0, 0.0)
     }

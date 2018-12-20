@@ -18,6 +18,9 @@ object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
         }
 
         onKeyDown { event ->
+            if ((event.target as? HTMLElement)?.tagName == "INPUT") {
+                return@onKeyDown
+            }
             val found = shortcutMap.filterKeys { it.match(event) }
             if (found.isNotEmpty()) {
                 event.stopPropagation()
@@ -37,6 +40,4 @@ object Root : ViewCollection<View<*>, HTMLElement>(document.body!!) {
             shortcutMap += shortcut to action
         }
     }
-
-
 }

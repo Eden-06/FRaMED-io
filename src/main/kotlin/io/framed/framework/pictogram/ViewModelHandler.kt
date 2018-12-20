@@ -8,4 +8,9 @@ interface ViewModelHandler {
 
     fun canDropShape(shape: Long, target: Long): Boolean
     fun dropShape(shape: Long, target: Long)
+
+    fun delete(shapes: List<Long>)
+    fun copy(shapes: List<Long>)
+    fun cut(shapes: List<Long>)
+    fun paste(target: Long)
 }

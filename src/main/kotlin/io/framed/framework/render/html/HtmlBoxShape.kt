@@ -3,6 +3,7 @@ package io.framed.framework.render.html
 import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
+import io.framed.framework.util.async
 import io.framed.framework.view.*
 
 class HtmlBoxShape(
@@ -17,18 +18,50 @@ class HtmlBoxShape(
 
     var resizer: ResizeHandler? = null
 
+    fun updateAutosize() {
+        if (shape.autosize) {
+            positionView.autoWidth()
+            positionView.autoHeight()
+
+            async {
+                shape.width = positionView.clientWidth.toDouble()
+                shape.height = positionView.clientHeight.toDouble()
+            }
+        }
+    }
+
     val positionView = container.listView {
         if (shape.resizeable) {
             val size = if (htmlRenderer.snapToGrid) NavigationView.gridSize else null
             htmlRenderer.resizerList += this.resizeable(size) { event ->
                 jsPlumbInstance.revalidate(view.html)
 
+                shape.autosize = false
                 shape.width = event.width
                 shape.height = event.height
             }.also { resizer = it }
 
-            shape.width?.let { width = it }
-            shape.height?.let { height = it }
+            shape.autosizeProperty.onChange {
+                if (shape.autosize) {
+                    autoWidth()
+                    autoHeight()
+
+                    async {
+                        shape.width = clientWidth.toDouble()
+                        shape.height = clientHeight.toDouble()
+                    }
+                } else {
+                    shape.width = clientWidth.toDouble()
+                    shape.height = clientHeight.toDouble()
+                    width = shape.width
+                    height = shape.height
+                }
+            }
+
+            if (!shape.autosize) {
+                width = shape.width
+                height = shape.height
+            }
         }
 
         if (shape.position == BoxShape.Position.ABSOLUTE) {
@@ -67,9 +100,9 @@ class HtmlBoxShape(
 
     init {
         if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(positionView, container, jsPlumbInstance, view.html, content.onParentMove)
+            absolutePosition(positionView, view.html, content.onParentMove)
         } else if (position == BoxShape.Position.BORDER) {
-            borderPosition(positionView, container, jsPlumbInstance, view.html, parent?.parent as HtmlBoxShape)
+            borderPosition(positionView, view.html, parent?.parent as HtmlBoxShape)
 
             parentContainer?.onParentMove?.reference {
                 jsPlumbInstance.revalidate(view.html)

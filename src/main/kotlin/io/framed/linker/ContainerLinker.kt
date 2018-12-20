@@ -1,14 +1,12 @@
 package io.framed.linker
 
-import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.basic.mapBinding
-import de.westermann.kobserve.basic.property
-import de.westermann.kobserve.basic.validate
+import de.westermann.kobserve.basic.*
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.*
 import io.framed.model.*
+import kotlin.math.roundToInt
 
 /**
  * @author lars
@@ -87,11 +85,9 @@ class ContainerLinker(
 
         resizeable = true
 
-        onLayerChange {
+        layerProperty.onChange {
             updatePreviewType()
         }
-
-        this.delete = this@ContainerLinker::delete
     }
 
     override val listPreview = textShape(nameProperty)
@@ -112,10 +108,20 @@ class ContainerLinker(
         }
     }
 
-    private var isFlatPreview by pictogram.data(false)
+    private val isFlatPreviewStringProperty = pictogram.data("flat-preview")
+    private val isFlatPreviewProperty = property(object : FunctionAccessor<Boolean> {
+        override fun set(value: Boolean): Boolean {
+            isFlatPreviewStringProperty.value = value.toString()
+            return true
+        }
+
+        override fun get(): Boolean = isFlatPreviewStringProperty.value?.toBoolean() ?: false
+    }, isFlatPreviewStringProperty)
+    private var isFlatPreview by isFlatPreviewProperty
 
     private lateinit var sidebarActionsGroup: SidebarGroup
     private lateinit var sidebarPreviewGroup: SidebarGroup
+    private lateinit var sidebarViewGroup: SidebarGroup
 
     private val creationProperty = property(model.metadata::creationDate)
     private val creationStringProperty = creationProperty.mapBinding { it.toUTCString() }
@@ -145,6 +151,13 @@ class ContainerLinker(
         parent?.redraw(this@ContainerLinker)
     }
 
+    private val positionProperty = pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
+        "x=${left.roundToInt()}, y=${top.roundToInt()}"
+    }
+    private val sizeProperty = pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
+        "width=${width.roundToInt()}, height=${height.roundToInt()}"
+    }
+
     override val sidebar = sidebar {
         title("Container")
         group("General") {
@@ -167,6 +180,11 @@ class ContainerLinker(
                 autoLayoutBox.autoLayout()
             }
         }
+        sidebarViewGroup = group("View") {
+            input("Position", positionProperty)
+            input("Size", sizeProperty)
+            checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
+        }
 
         group("Metadata") {
             input("Creation date", creationStringProperty)
@@ -180,6 +198,7 @@ class ContainerLinker(
     override fun Sidebar.onOpen(event: SidebarEvent) {
         val h = event.target == pictogram
         sidebarActionsGroup.display = !h
+        sidebarViewGroup.display = h
         sidebarPreviewGroup.display = h
     }
 
@@ -194,36 +213,51 @@ class ContainerLinker(
             ControllerManager.display(this@ContainerLinker)
         }
         contextStepOut = addItem(MaterialIcon.ARROW_BACK, "Step out") {
-            parent?.let(ControllerManager::display)
+            parent?.let { ControllerManager.display(it) }
         }
 
         addItem(MaterialIcon.ADD, "Add class") { event ->
-            this@ContainerLinker.classes += ClassLinker(Class(), this@ContainerLinker).also {
-                setPosition.emit(SetPosition(it, event.position))
+            val linker = ClassLinker(Class(), this@ContainerLinker)
+            this@ContainerLinker.classes += linker
+            linker.also {
+                it.pictogram.left = event.diagram.x
+                it.pictogram.top = event.diagram.y
                 it.focus()
             }
         }
         addItem(MaterialIcon.ADD, "Add package") { event ->
-            containers += ContainerLinker(Container(), connectionManager, this@ContainerLinker).also {
-                setPosition.emit(SetPosition(it, event.position))
+            val linker = ContainerLinker(Container(), connectionManager, this@ContainerLinker)
+            containers += linker
+            linker.also {
+                it.pictogram.left = event.diagram.x
+                it.pictogram.top = event.diagram.y
                 it.focus()
             }
         }
         addItem(MaterialIcon.ADD, "Add event") { event ->
-            events += EventLinker(Event(), this@ContainerLinker).also {
-                setPosition.emit(SetPosition(it, event.position))
+            val linker = EventLinker(Event(), this@ContainerLinker)
+            events += linker
+            linker.also {
+                it.pictogram.left = event.diagram.x
+                it.pictogram.top = event.diagram.y
                 it.focus()
             }
         }
         addItem(MaterialIcon.ADD, "Add role type") { event ->
-            roleTypes += RoleTypeLinker(RoleType(), this@ContainerLinker).also {
-                setPosition.emit(SetPosition(it, event.position))
+            val linker = RoleTypeLinker(RoleType(), this@ContainerLinker)
+            roleTypes += linker
+            linker.also {
+                it.pictogram.left = event.diagram.x
+                it.pictogram.top = event.diagram.y
                 it.focus()
             }
         }
         addItem(MaterialIcon.ADD, "Add compartment") { event ->
-            compartments += CompartmentLinker(Compartment(), connectionManager, this@ContainerLinker).also {
-                setPosition.emit(SetPosition(it, event.position))
+            val linker = CompartmentLinker(Compartment(), connectionManager, this@ContainerLinker)
+            compartments += linker
+            linker.also {
+                it.pictogram.left = event.diagram.x
+                it.pictogram.top = event.diagram.y
                 it.focus()
             }
         }
@@ -278,8 +312,6 @@ class ContainerLinker(
         contextStepOut.display = event.target != pictogram && parent != null
         contextDelete.display = parent != null
     }
-
-    override val setPosition = EventHandler<SetPosition>()
 
     override fun dropShape(element: Long, target: Long) {
         val elementLinker = getLinkerById(element) ?: throw IllegalArgumentException()

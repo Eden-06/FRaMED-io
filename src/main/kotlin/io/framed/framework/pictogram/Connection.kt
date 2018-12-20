@@ -10,8 +10,8 @@ import io.framed.framework.ConnectionLinker
 class Connection(
         val source: Property<Long>,
         val target: Property<Long>,
-        override val id: Long
-) : Pictogram() {
+        id: Long
+) : Pictogram(id) {
     var labels: Map<TextShape, Double> = emptyMap()
         set(value) {
             field = value

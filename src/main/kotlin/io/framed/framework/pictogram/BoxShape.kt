@@ -7,9 +7,7 @@ import io.framed.framework.util.History
 /**
  * @author lars
  */
-class BoxShape(
-        override val id: Long?
-) : Shape() {
+class BoxShape(id: Long?) : Shape(id) {
 
     enum class Position {
         ABSOLUTE, HORIZONTAL, VERTICAL, BORDER
@@ -30,11 +28,7 @@ class BoxShape(
     fun add(shape: Shape) {
         if (shape !in internalShapes) {
             internalShapes += shape
-
-            if (hasLayer) {
-                shape.layer = layer
-            }
-
+            shape.layerProperty.bind(layerProperty)
             onAdd.emit(shape)
         }
     }
@@ -43,6 +37,9 @@ class BoxShape(
     fun remove(shape: Shape) {
         if (shape in internalShapes) {
             internalShapes -= shape
+            if (shape.layerProperty.isBound) {
+                shape.layerProperty.unbind()
+            }
             onRemove.emit(shape)
         }
     }
@@ -60,18 +57,8 @@ class BoxShape(
                 shapes.forEach {
                     it.top = currentTop
                     it.left = 100.00
-                    println("SET (${it.top}/${it.left})")
-                    it.onPositionChange.emit(true)
-                    currentTop += it.height ?: 50.0
+                    currentTop += it.height
                 }
-            }
-        }
-    }
-
-    init {
-        onLayerChange {
-            shapes.forEach { shape ->
-                shape.layer = layer
             }
         }
     }

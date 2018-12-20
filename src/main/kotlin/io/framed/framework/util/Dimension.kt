@@ -12,34 +12,27 @@ import kotlin.math.min
 data class Dimension(
         val left: Double,
         val top: Double,
-        val width: Double? = null,
-        val height: Double? = null
+        val width: Double = 0.0,
+        val height: Double = 0.0
 ) {
 
-    constructor(position: Point, size: Point? = null) : this(position.x, position.y, size?.x, size?.y)
+    constructor(position: Point, size: Point = Point.ZERO) : this(position.x, position.y, size.x, size.y)
 
     @Transient
     val position: Point
         get() = Point(left, top)
 
     @Transient
-    val size: Point?
-        get() = if (width != null && height != null) Point(width, height) else null
-
-    @Transient
-    val widthNotNull: Double
-        get() = width ?: 0.0
-    @Transient
-    val heightNotNull: Double
-        get() = height ?: 0.0
+    val size: Point
+        get() = Point(width, height)
 
     @Transient
     val right: Double
-        get() = left + widthNotNull
+        get() = left + width
 
     @Transient
     val bottom: Double
-        get() = top + heightNotNull
+        get() = top + height
 
     @Transient
     val edges: Set<Point>
@@ -55,13 +48,8 @@ data class Dimension(
         get() {
             val l = min(left, right)
             val t = min(top, bottom)
-            return Dimension(l, t, abs(widthNotNull), abs(heightNotNull))
+            return Dimension(l, t, abs(width), abs(width))
         }
-
-    /*
-    operator fun contains(other: Dimension): Boolean =
-            other.edges.any { contains(it) }
-            */
 
     operator fun contains(other: Dimension): Boolean = !(other.left > right ||
             other.right < left ||
@@ -71,9 +59,13 @@ data class Dimension(
 
     operator fun contains(other: Point): Boolean {
         val n = normalized
-        return (n.left <= other.x && (n.left + widthNotNull) >= other.x)
-                && (n.top <= other.y && (n.top + heightNotNull) >= other.y)
+        return (n.left <= other.x && (n.left + width) >= other.x)
+                && (n.top <= other.y && (n.top + height) >= other.y)
     }
 
     operator fun plus(point: Point) = copy(left + point.x, top + point.y)
+
+    companion object {
+        val ZERO = Dimension(0.0, 0.0)
+    }
 }

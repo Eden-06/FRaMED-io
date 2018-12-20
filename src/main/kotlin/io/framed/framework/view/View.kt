@@ -27,11 +27,6 @@ abstract class View<V : HTMLElement>(view: V) {
     constructor(tagName: String) : this(createView<V>(tagName))
 
     /**
-     * @param type The reflected model of the html element.
-     */
-    constructor(type: KClass<V>) : this(createView(type))
-
-    /**
      * The representing html element.
      */
     val html: V = view.also { view ->
@@ -291,6 +286,10 @@ abstract class View<V : HTMLElement>(view: V) {
             }
         }
 
+    fun click() {
+        html.click()
+    }
+
     init {
         html.addEventListener("click", onClick.eventListener())
         html.addEventListener("contextmenu", onContext.eventListener())
@@ -358,22 +357,6 @@ abstract class View<V : HTMLElement>(view: V) {
     }
 
     companion object {
-
-        /**
-         * Create html element by generic model.
-         */
-        @Suppress("UNCHECKED_CAST")
-        inline fun <reified V : HTMLElement> createView(): V = createView(V::class)
-
-        /**
-         * Create html element by reflected model class.
-         */
-        @Suppress("UNCHECKED_CAST")
-        fun <V : HTMLElement> createView(type: KClass<V>): V =
-                document.createElement(
-                        type.simpleName?.replace("HTML|Element".toRegex(), "")?.toLowerCase()
-                                ?: "div"
-                ) as V
 
         /**
          * Create html element by tag name.

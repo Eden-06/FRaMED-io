@@ -9,8 +9,8 @@ import io.framed.framework.view.Icon
  */
 class IconShape(
         val property: ReadOnlyProperty<out Icon?>,
-        override val id: Long?
-) : Shape() {
+        id: Long?
+) : Shape(id) {
 
 }
 

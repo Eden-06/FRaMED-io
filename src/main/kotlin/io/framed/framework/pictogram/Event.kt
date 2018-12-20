@@ -8,6 +8,7 @@ import io.framed.framework.util.Point
 
 data class ContextEvent(
         val position: Point,
+        val diagram: Point,
         val target: Pictogram
 )
 
@@ -18,8 +19,6 @@ data class SidebarEvent(
     val isNone = this == NONE
 
     companion object {
-        val NONE = SidebarEvent(object : Pictogram() {
-            override val id: Long = -1
-        })
+        val NONE = SidebarEvent(object : Pictogram(-1) {})
     }
 }

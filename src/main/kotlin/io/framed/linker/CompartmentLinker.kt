@@ -1,6 +1,8 @@
 package io.framed.linker
 
 import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.join
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
@@ -13,6 +15,7 @@ import io.framed.model.Attribute
 import io.framed.model.Class
 import io.framed.model.Compartment
 import io.framed.model.Method
+import kotlin.math.roundToInt
 
 /**
  * @author Sebastian
@@ -99,9 +102,8 @@ class CompartmentLinker(
             }
         }
         resizeable = true
-        this.delete = this@CompartmentLinker::delete
 
-        onLayerChange {
+        layerProperty.onChange {
             updatePreviewType()
         }
     }
@@ -122,7 +124,16 @@ class CompartmentLinker(
         }
     }
 
-    private var isFlatPreview by pictogram.data(false)
+    private val isFlatPreviewStringProperty = pictogram.data("flat-preview")
+    private val isFlatPreviewProperty = property(object : FunctionAccessor<Boolean> {
+        override fun set(value: Boolean): Boolean {
+            isFlatPreviewStringProperty.value = value.toString()
+            return true
+        }
+
+        override fun get(): Boolean = isFlatPreviewStringProperty.value?.toBoolean() ?: false
+    }, isFlatPreviewStringProperty)
+    private var isFlatPreview by isFlatPreviewProperty
 
     private fun updatePreviewType() {
         val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.ABSOLUTE
@@ -140,6 +151,14 @@ class CompartmentLinker(
         parent.redraw(this@CompartmentLinker)
     }
 
+    private val positionProperty = pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
+        "x=${left.roundToInt()}, y=${top.roundToInt()}"
+    }
+    private val sizeProperty = pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
+        "width=${width.roundToInt()}, height=${height.roundToInt()}"
+    }
+
+    private lateinit var sidebarViewGroup: SidebarGroup
     private lateinit var sidebarPreviewGroup: SidebarGroup
     override val sidebar = sidebar {
         title("Compartment")
@@ -155,10 +174,17 @@ class CompartmentLinker(
                 autoLayoutBox.autoLayout()
             }
         }
+        sidebarViewGroup = group("View") {
+            input("Position", positionProperty)
+            input("Size", sizeProperty)
+            checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
+        }
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
-        sidebarPreviewGroup.display = event.target == pictogram
+        val h = event.target == pictogram
+        sidebarViewGroup.display = h
+        sidebarPreviewGroup.display = h
     }
 
     private lateinit var contextStepIn: ListView
@@ -180,8 +206,11 @@ class CompartmentLinker(
         }
 
         addItem(MaterialIcon.ADD, "Add class") { event ->
-            this@CompartmentLinker.classes += ClassLinker(Class(), this@CompartmentLinker).also {
-                setPosition.emit(SetPosition(it, event.position))
+            val linker = ClassLinker(Class(), this@CompartmentLinker)
+            this@CompartmentLinker.classes += linker
+            linker.also {
+                it.pictogram.left = event.diagram.x
+                it.pictogram.top = event.diagram.y
                 it.focus()
             }
         }
@@ -210,8 +239,6 @@ class CompartmentLinker(
             else -> super.remove(linker)
         }
     }
-
-    override val setPosition = EventHandler<SetPosition>()
 
     override fun dropShape(element: Long, target: Long) {
         throw UnsupportedOperationException()

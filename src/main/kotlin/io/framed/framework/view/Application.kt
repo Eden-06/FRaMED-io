@@ -100,7 +100,7 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         action(ToolBar.Side.RIGHT, MaterialIcon.PALETTE) { _ ->
             val isDark = document.getCookie("theme") == "dark"
             dialog {
-                title = "Switch to ${if (isDark) "light" else "dark"} theme"
+                title = "CheckBox to ${if (isDark) "light" else "dark"} theme"
                 contentView.textView("To onChange the theme the page must be reloaded. All unsaved changes will go lost.")
                 closable = true
                 addButton("Reload", true) {
@@ -127,23 +127,17 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     private val menuBar = menuBar {
         menu("File") {
+            item(null, "New…") {
+                ControllerManager.file = File.empty()
+            }
             item(MaterialIcon.FOLDER_OPEN, "Open", Shortcut("O", Shortcut.Modifier.CTRL)) {
                 loadLocalFile { content ->
-                    File.fromJSON(content)
+                    ControllerManager.file = File.fromJSON(content)
                 }
             }
             item(MaterialIcon.SAVE, "Save", Shortcut("S", Shortcut.Modifier.CTRL)) {
-                ControllerManager.root?.let { root ->
-                    val linker = (root.linker as ContainerLinker)
-                    val connections = linker.connectionManager as ConnectionManagerLinker
-
-                    val file = File(linker.model, connections.modelConnections, ControllerManager.layers)
-
-                    triggerDownload("${file.name}.json", file.toJSON())
-                }
-            }
-            item(null, "Reset") {
-
+                val file = ControllerManager.file
+                triggerDownload("${file.name}.json", file.toJSON())
             }
         }
         menu("Edit") {
@@ -184,12 +178,6 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                     println(it.toString() + (it.description?.let { ": $it" } ?: ""))
                 }
             }
-            /*
-            menu("Bar 2") {
-                item(null, "Lorem") {}
-                item(null, "Ipson") {}
-            }
-            */
             item(MaterialIcon.INFO_OUTLINE, "About") {}
         }
     }
@@ -207,12 +195,20 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
     private lateinit var controller: Controller
 
-    fun loadController(controller: Controller) {
-        if (this::controller.isInitialized) {
+    fun loadController(controller: Controller, clear: Boolean = false) {
+        if (this::controller.isInitialized && !clear) {
             if (this.controller == controller) {
                 return
             }
             History.push(HistoryModelLinker(this.controller.linker, controller.linker))
+        }
+
+        if (clear) {
+            controllers.values.forEach {
+                it.close()
+            }
+            controllers = emptyMap()
+            History.clear()
         }
 
         this.controller = controller

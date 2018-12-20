@@ -30,7 +30,7 @@ input {
   border: solid 1px $border-color;
 
   &:focus {
-    border-color: $toolbar-color;
+    border-color: $primary-color;
   }
 
   &.invalid {
@@ -63,7 +63,7 @@ input {
       }
 
       &.selected-view {
-        background: rgba($toolbar-color, 0.1);
+        background: rgba($primary-color, 0.1);
       }
     }
   }
@@ -78,7 +78,7 @@ select {
   border: solid 1px $border-color;
 
   &:focus {
-    border-color: $toolbar-color;
+    border-color: $primary-color;
   }
 
   &.invalid {
@@ -248,6 +248,7 @@ select {
 
       &.separator {
         margin-bottom: 0.4rem;
+
         &:before {
           content: '';
           position: absolute;
@@ -283,11 +284,12 @@ select {
     & > .text-view {
       padding-left: 2rem;
     }
+
     & > div {
-    left: 100%;
-    top: 0;
-    margin-left: -1rem;
-    margin-top: -1px;
+      left: 100%;
+      top: 0;
+      margin-left: -1rem;
+      margin-top: -1px;
     }
   }
 }
@@ -408,6 +410,7 @@ select {
 
     & > div {
       line-height: 2.2rem;
+      clear: both;
 
       .icon-view {
         width: 1.8rem;
@@ -605,8 +608,8 @@ table {
   box-shadow: 0 1px 4px rgba(0, 0, 0, .14);
 
   &.primary {
-    background: $toolbar-color;
-    color: $toolbar-text;
+    background: $primary-color;
+    color: $primary-color-text;
   }
 
   &.alert {
@@ -706,5 +709,63 @@ table {
     line-height: 1.6rem;
     height: 1.6rem;
     padding: 0 0.6rem;
+  }
+}
+
+.check-box {
+  @include no-select();
+
+  &.type-switch {
+    label {
+      position: relative;
+      display: block;
+      cursor: pointer;
+      text-align: left;
+      padding: 0.2rem 3rem 0.2rem 0;
+      margin: 0 0.2rem;
+
+      &:before, &:after {
+        content: "";
+        position: absolute;
+        margin: 0;
+        outline: 0;
+        top: 50%;
+        transform: translate(0, -50%);
+        transition: all 0.3s ease;
+      }
+
+      &:before {
+        right: 1px;
+        width: 34px;
+        height: 14px;
+        background-color: #9E9E9E;
+        border-radius: 8px;
+      }
+
+      &:after {
+        right: 0;
+        width: 20px;
+        height: 20px;
+        background-color: #FAFAFA;
+        border-radius: 50%;
+        box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.14), 0 2px 2px 0 rgba(0, 0, 0, 0.098), 0 1px 5px 0 rgba(0, 0, 0, 0.084);
+        transform: translate(-80%, -50%);
+      }
+    }
+
+    input {
+      display: none;
+
+      &:checked + label {
+        &:before {
+          background-color: $primary-light-color;
+        }
+
+        &:after {
+          background-color: $primary-color;
+          transform: translate(0, -50%);
+        }
+      }
+    }
   }
 }

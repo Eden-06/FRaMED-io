@@ -21,8 +21,6 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     fun getLinkerById(id: Long): ShapeLinker<*, *>? =
             shapeLinkers.find { it.id == id }
 
-    val setPosition: EventHandler<SetPosition>
-
     fun redraw(linker: ShapeLinker<*, *>)
 
     fun canDropShape(element: Long, target: Long): Boolean {
@@ -33,4 +31,18 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     }
 
     fun dropShape(element: Long, target: Long)
+
+
+    fun delete(shapes: List<Long>) {
+        shapeLinkers.filter { it.id in shapes }.forEach { it.delete() }
+    }
+    fun copy(shapes: List<Long>) {
+        throw NotImplementedError("The current container does not support copy!")
+    }
+    fun cut(shapes: List<Long>) {
+        throw NotImplementedError("The current container does not support cut!")
+    }
+    fun paste(target: Long) {
+        throw NotImplementedError("The current container does not support paste!")
+    }
 }

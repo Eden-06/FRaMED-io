@@ -56,8 +56,6 @@ class RoleTypeLinker(
                 radius = box(20.0)
             }
         }
-
-        this.delete = this@RoleTypeLinker::delete
     }
 
     override val listPreview: TextShape = textShape(nameProperty)

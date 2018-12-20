@@ -19,7 +19,6 @@ class ContextMenu : View<HTMLDivElement>("div") {
     }
 
     lateinit var lastEvent: ContextEvent
-    fun getLastEvent(): ContextEvent = lastEvent
 
     /**
      * Header content of the content menu. Blank title will remove the header.
@@ -43,7 +42,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
         l += IconView(icon)
         l += TextView(name)
         l.onClick {
-            callback(getLastEvent())
+            callback(lastEvent)
         }
         listView += l
         return l

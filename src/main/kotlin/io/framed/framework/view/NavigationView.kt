@@ -89,7 +89,11 @@ class NavigationView : View<HTMLDivElement>("div") {
         set(value) {
             val client = Point(clientWidth, clientHeight)
 
-            val size = value.size ?: client
+            var size = value.size
+            if (size.isZero) {
+                size = client
+            }
+
             val p = value.position
 
             zoom = (client / size).min()
@@ -179,6 +183,12 @@ class NavigationView : View<HTMLDivElement>("div") {
 
             val topLeft = realToSystem(Point.ZERO)
 
+            val gridStep = when {
+                zoom <= 0.2 -> 1
+                zoom <= 0.8 -> gridStep / 2
+                else -> gridStep
+            }
+            val gridSize = gridSize * (NavigationView.gridStep / gridStep)
             val size = gridSize * zoom
 
             val startX = size - (topLeft.x * zoom) % size

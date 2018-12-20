@@ -15,7 +15,7 @@ object History {
     private var createGroup = 0
     private var group: List<HistoryItem> = emptyList()
 
-    fun <V : Any> push(property: Property<V>, oldValue: V, newValue: V = property.get()) =
+    fun <V> push(property: Property<V>, oldValue: V, newValue: V = property.get()) =
             push(HistoryProperty(property, oldValue, newValue))
 
     fun push(historyItem: HistoryItem) {
@@ -39,6 +39,11 @@ object History {
                 checkOnChange()
             }
         }
+    }
+
+    fun clear() {
+        list = emptyList()
+        pointer = 0
     }
 
     val canUndoProperty = pointerProperty.mapBinding { it > 0 }
@@ -113,7 +118,7 @@ object History {
     }
 }
 
-fun <T : Any> Property<T>.trackHistory(): Property<T> {
+fun <P : Property<T>, T> P.trackHistory(): P {
     var oldValue = get()
 
     onChange {

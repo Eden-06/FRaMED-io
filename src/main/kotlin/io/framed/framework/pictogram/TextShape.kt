@@ -9,8 +9,8 @@ import io.framed.framework.Linker
 class TextShape(
         val property: Property<String>,
         val autocomplete: List<String>,
-        override val id: Long?
-) : Shape() {
+        id: Long?
+) : Shape(id) {
 
 }
 

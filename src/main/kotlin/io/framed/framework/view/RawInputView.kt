@@ -67,35 +67,28 @@ class RawInputView() : View<HTMLInputElement>("input") {
     var invalid by invalidProperty
 
     fun bind(property: ReadOnlyProperty<String>) {
-        var hasFocus = false
         value = property.get()
 
         readOnly = property !is Property<String>
 
         onChange {
-            hasFocus = true
             if (property is Property<String>) {
                 property.set(it)
             }
-
-            if (property is ValidationProperty<String>) {
-                invalid = !property.valid
-            }
         }
         onFocusLeave {
-            hasFocus = false
             if (property is Property<String>) {
                 property.set(value.trim())
-            }
-
-            if (property is ValidationProperty<String>) {
-                invalid = !property.valid
             }
         }
 
         property.onChange {
-            if (!hasFocus) {
-                value = property.get()
+            value = property.get()
+        }
+
+        if (property is ValidationProperty<String>) {
+            property.validProperty.onChange {
+                invalid = !property.valid
             }
         }
     }
@@ -133,6 +126,6 @@ class RawInputView() : View<HTMLInputElement>("input") {
         html.addEventListener("keyup", changeListener)
 
         html.addEventListener("focus", onFocusEnter.eventListener())
-        html.addEventListener("blur", onFocusLeave.eventListener())
+        html.addEventListener("focusout", onFocusLeave.eventListener())
     }
 }

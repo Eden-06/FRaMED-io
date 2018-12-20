@@ -1,31 +1,41 @@
 package io.framed.framework
 
+import io.framed.File
 import io.framed.framework.pictogram.Layer
 import io.framed.framework.view.Application
+import io.framed.linker.ConnectionManagerLinker
+import io.framed.linker.ContainerLinker
 
 object ControllerManager {
 
-    var controllers: List<Controller> = emptyList()
-    var layers: Map<Long, Layer> = emptyMap()
+    private lateinit var rootLinker: ContainerLinker
 
-    val root: Controller?
-    get() = controllers.find { it.linker.parent == null }
+    var file: File
+        get() = File(
+                rootLinker.model,
+                (rootLinker.connectionManager as ConnectionManagerLinker).modelConnections,
+                layers
+        )
+        set(value) {
+            rootLinker = ContainerLinker(value.root, ConnectionManagerLinker(value.connections))
 
-    fun register(linker: ModelLinker<*, *, *>): Controller {
-        val layer = layers[linker.id] ?: run {
-            val layer = Layer()
-            layers += linker.id to layer
-            layer
+            layers.clear()
+            controllers.clear()
+            layers.putAll(value.layer)
+
+            display(rootLinker, true)
         }
-        val controller = Controller(linker, layer)
-        controllers += controller
 
-        return controller
-    }
+    private val controllers: MutableMap<Long, Controller> = mutableMapOf()
+    private val layers: MutableMap<Long, Layer> = mutableMapOf()
 
-    operator fun get(linker: ModelLinker<*, *, *>) = controllers.find { it.linker == linker }
-
-    fun display(linker: ModelLinker<*,*,*>) {
-        Application.loadController(get(linker) ?: register(linker))
+    fun display(linker: ModelLinker<*, *, *>, clear: Boolean = false) {
+        val controller = controllers.getOrPut(linker.id) {
+            val layer = layers.getOrPut(linker.id) {
+                Layer()
+            }
+            Controller(linker, layer)
+        }
+        Application.loadController(controller, clear)
     }
 }

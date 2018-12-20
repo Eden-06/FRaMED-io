@@ -1,11 +1,12 @@
 package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumbInstance
-import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.TextShape
+import io.framed.framework.util.async
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.inputView
+import kotlin.browser.document
 
 class HtmlTextShape(
         htmlRenderer: HtmlRenderer,
@@ -24,6 +25,17 @@ class HtmlTextShape(
 
         onMouseDown {
             focus()
+        }
+        onFocusEnter {
+            val downEvent = document.createEvent("MouseEvents")
+            downEvent.initEvent("mousedown", true, true);
+            html.dispatchEvent(downEvent)
+            val upEvent = document.createEvent("MouseEvents")
+            upEvent.initEvent("mouseup", true, true);
+            html.dispatchEvent(upEvent)
+        }
+        onFocusLeave {
+            value = shape.property.value
         }
     }
 

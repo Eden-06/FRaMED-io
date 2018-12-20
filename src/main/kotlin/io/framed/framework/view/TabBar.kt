@@ -20,7 +20,7 @@ class TabBar : ViewCollection<View<*>, HTMLDivElement>("div") {
                 remove(tab)
                 tabs -= tab
 
-                if (index >= 0) {
+                if (index >= 0 && index < tabs.size) {
                     tabs[index].open()
                 }
             } else {

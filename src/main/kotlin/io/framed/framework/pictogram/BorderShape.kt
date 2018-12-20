@@ -7,9 +7,7 @@ import io.framed.framework.util.History
 /**
  * @author lars
  */
-class BorderShape(
-        override val id: Long?
-) : Shape() {
+class BorderShape(id: Long?) : Shape(id) {
 
     val shapes: List<Shape>
         get() = internalShapes
@@ -23,11 +21,7 @@ class BorderShape(
     fun add(shape: Shape) {
         if (shape !in internalShapes) {
             internalShapes += shape
-
-            if (hasLayer) {
-                shape.layer = layer
-            }
-
+            shape.layerProperty.bind(layerProperty)
             onAdd.emit(shape)
         }
     }
@@ -36,6 +30,7 @@ class BorderShape(
     fun remove(shape: Shape) {
         if (shape in internalShapes) {
             internalShapes -= shape
+            shape.layerProperty.unbind()
             onRemove.emit(shape)
         }
     }
@@ -45,14 +40,6 @@ class BorderShape(
     }
 
     operator fun Shape.unaryPlus() = add(this)
-
-    init {
-        onLayerChange {
-            shapes.forEach { shape ->
-                shape.layer = layer
-            }
-        }
-    }
 }
 
 fun BoxShape.borderShape(init: BorderShape.() -> Unit) =

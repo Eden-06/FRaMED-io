@@ -1,5 +1,6 @@
 package io.framed.linker
 
+import de.westermann.kobserve.basic.join
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
@@ -7,12 +8,11 @@ import io.framed.framework.pictogram.*
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.MaterialIcon
-import io.framed.framework.view.contextMenu
-import io.framed.framework.view.sidebar
+import io.framed.framework.view.*
 import io.framed.model.Attribute
 import io.framed.model.Class
 import io.framed.model.Method
+import kotlin.math.roundToInt
 
 /**
  * @author lars
@@ -71,7 +71,6 @@ class ClassLinker(
         }
 
         resizeable = true
-        this.delete = this@ClassLinker::delete
     }
 
     override val listPreview: TextShape = textShape(nameProperty)
@@ -93,11 +92,31 @@ class ClassLinker(
         }
     }
 
+    private val positionProperty = pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
+        "x=${left.roundToInt()}, y=${top.roundToInt()}"
+    }
+    private val sizeProperty = pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
+        "width=${width.roundToInt()}, height=${height.roundToInt()}"
+    }
+
+    private lateinit var sidebarViewGroup: SidebarGroup
+
     override val sidebar = sidebar {
         title("Class")
         group("General") {
             input("Name", nameProperty)
         }
+        sidebarViewGroup = group("View") {
+            input("Position", positionProperty)
+            input("Size", sizeProperty)
+            checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
+        }
+
+    }
+
+    override fun Sidebar.onOpen(event: SidebarEvent) {
+        val h = event.target == pictogram
+        sidebarViewGroup.display = h
     }
 
     override val contextMenu = contextMenu {

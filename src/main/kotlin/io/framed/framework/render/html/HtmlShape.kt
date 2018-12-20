@@ -42,7 +42,8 @@ abstract class HtmlShape(
             view.onContext {
                 it.stopPropagation()
                 it.preventDefault()
-                shape.onContextMenu.emit(ContextEvent(it.point(), shape))
+                val diagram = htmlRenderer.navigationView.mouseToCanvas(it.point())
+                shape.onContextMenu.emit(ContextEvent(it.point(), diagram, shape))
             }
         }
         if (shape.hasSidebar) {
@@ -75,39 +76,71 @@ abstract class HtmlShape(
 
     fun absolutePosition(
             view: View<*>,
-            parent: ViewCollection<View<*>, *>,
-            jsPlumbInstance: JsPlumbInstance,
             jsPlumbView: HTMLElement,
             onMove: EventHandler<Shape>? = null
     ) = with(view) {
-        left = shape.left ?: 0.0
-        top = shape.top ?: 0.0
         classes += "absolute-view"
         var canDrop: Shape? = null
 
-        shape.onPositionChange.reference { force ->
-            if (force) async {
-                left = shape.left ?: 0.0
-                top = shape.top ?: 0.0
-                shape.width?.let { width = it } ?: autoWidth()
-                shape.height?.let { height = it } ?: autoHeight()
+        left = shape.left
+        top = shape.top
 
-                jsPlumbInstance.revalidate(jsPlumbView)
-                onMove?.emit(shape)
+        if (shape.autosize) {
+            autoWidth()
+            autoHeight()
+
+            async {
+                shape.width = clientWidth.toDouble()
+                shape.height = clientHeight.toDouble()
+            }
+        } else {
+            width = shape.width
+            height = shape.height
+        }
+
+        shape.leftProperty.onChange.reference {
+            left = shape.left
+
+            jsPlumbInstance?.revalidate(jsPlumbView)
+            onMove?.emit(shape)
+        }?.let(listeners::add)
+        shape.topProperty.onChange.reference {
+            top = shape.top
+
+            jsPlumbInstance?.revalidate(jsPlumbView)
+            onMove?.emit(shape)
+        }?.let(listeners::add)
+        shape.widthProperty.onChange.reference {
+            if (shape.autosize) {
+                autoWidth()
+            } else {
+                width = shape.width
             }
 
+            jsPlumbInstance?.revalidate(jsPlumbView)
+            onMove?.emit(shape)
+        }?.let(listeners::add)
+        shape.heightProperty.onChange.reference {
+            if (shape.autosize) {
+                autoHeight()
+            } else {
+                height = shape.height
+            }
+
+            jsPlumbInstance?.revalidate(jsPlumbView)
+            onMove?.emit(shape)
         }?.let(listeners::add)
 
         dragType = View.DragType.CUSTOM
         onMouseDown { event ->
             event.stopPropagation()
             htmlRenderer.selectView(this, event.ctrlKey, false)
-            parent.toForeground(view)
+            container.toForeground(view)
 
             var markView = true
             async(200) {
                 if (markView) {
-                    htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, parent)
+                    htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, container)
                 }
             }
 
@@ -128,21 +161,15 @@ abstract class HtmlShape(
         onDrag { e ->
             var event = e
             if (event.direct) {
-                event = htmlRenderer.directDragView(event, view, parent)
+                event = htmlRenderer.directDragView(event, view, container)
                 canDrop = htmlRenderer.checkDrop(shape)
             }
 
             val newLeft = left + event.delta.x
             val newTop = top + event.delta.y
 
-            left = minLeft?.let { max(it, newLeft) } ?: newLeft
-            top = minTop?.let { max(it, newTop) } ?: newTop
-
-            jsPlumbInstance.revalidate(jsPlumbView)
-            onMove?.emit(shape)
-
-            shape.left = left
-            shape.top = top
+            shape.left = minLeft?.let { max(it, newLeft) } ?: newLeft
+            shape.top = minTop?.let { max(it, newTop) } ?: newTop
 
             if (event.direct) {
                 (htmlRenderer.selectedViews - this).forEach {
@@ -159,12 +186,12 @@ abstract class HtmlShape(
         }
         selectedViewProperty.onChange {
             if (selectedView) {
-                parent.toForeground(view)
+                container.toForeground(view)
             }
         }
         htmlRenderer.draggableViews += this
 
-        if (parent != htmlRenderer.navigationView.container) {
+        if (container != htmlRenderer.navigationView.container) {
             minTop = 0.0
             minLeft = 0.0
         }
@@ -172,13 +199,9 @@ abstract class HtmlShape(
 
     fun borderPosition(
             view: View<*>,
-            parent: ViewCollection<View<*>, *>,
-            jsPlumbInstance: JsPlumbInstance,
             jsPlumbView: HTMLElement,
             parentHtmlBoxShape: HtmlBoxShape
     ) = with(view) {
-        left = shape.left ?: 0.0
-        top = shape.top ?: 0.0
         classes += "border-view"
 
         async {
@@ -187,16 +210,49 @@ abstract class HtmlShape(
             onDrag.emit(View.DragEvent(Point.ZERO, false))
         }
 
-        shape.onPositionChange.reference { force ->
-            if (force) async {
-                left = shape.left ?: 0.0
-                top = shape.top ?: 0.0
-                shape.width?.let { width = it } ?: autoWidth()
-                shape.height?.let { height = it } ?: autoHeight()
+        left = shape.left
+        top = shape.top
 
-                jsPlumbInstance.revalidate(jsPlumbView)
+        if (shape.autosize) {
+            autoWidth()
+            autoHeight()
+
+            async {
+                shape.width = clientWidth.toDouble()
+                shape.height = clientHeight.toDouble()
+            }
+        } else {
+            width = shape.width
+            height = shape.height
+        }
+
+        shape.leftProperty.onChange.reference {
+            left = shape.left
+
+            jsPlumbInstance?.revalidate(jsPlumbView)
+        }?.let(listeners::add)
+        shape.topProperty.onChange.reference {
+            top = shape.top
+
+            jsPlumbInstance?.revalidate(jsPlumbView)
+        }?.let(listeners::add)
+        shape.widthProperty.onChange.reference {
+            if (shape.autosize) {
+                autoWidth()
+            } else {
+                width = shape.width
             }
 
+            jsPlumbInstance?.revalidate(jsPlumbView)
+        }?.let(listeners::add)
+        shape.heightProperty.onChange.reference {
+            if (shape.autosize) {
+                autoHeight()
+            } else {
+                height = shape.height
+            }
+
+            jsPlumbInstance?.revalidate(jsPlumbView)
         }?.let(listeners::add)
 
         val resizer = parentHtmlBoxShape.resizer
@@ -213,7 +269,7 @@ abstract class HtmlShape(
             var markView = true
             async(200) {
                 if (markView) {
-                    htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, parent)
+                    htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, container)
                 }
             }
 
@@ -231,7 +287,7 @@ abstract class HtmlShape(
             event.stopPropagation()
         }
         onDrag { e ->
-            val event = htmlRenderer.directDragView(e, view, parent)
+            val event = htmlRenderer.directDragView(e, view, container)
             var newLeft = left + event.delta.x
             var newTop = top + event.delta.y
 
@@ -241,8 +297,8 @@ abstract class HtmlShape(
                 newTop = ((newTop + size / 2) / size).roundToInt() * size.toDouble()
             }
 
-            val parentWidth = parent.clientWidth
-            val parentHeight = parent.clientHeight
+            val parentWidth = container.clientWidth
+            val parentHeight = container.clientHeight
 
             val xDiff = min(abs(newLeft), abs(parentWidth - newLeft))
             val yDiff = min(abs(newTop), abs(parentHeight - newTop))
@@ -255,10 +311,8 @@ abstract class HtmlShape(
                 newTop = if (newTop <= parentHeight / 2) 0.0 else parentHeight.toDouble()
             }
 
-            left = newLeft
-            top = newTop
-
-            jsPlumbInstance.revalidate(jsPlumbView)
+            shape.left = newLeft
+            shape.top = newTop
 
             val anchor = when {
                 newTop <= 0.0 -> setOf(RelationSide.TOP)
@@ -269,9 +323,6 @@ abstract class HtmlShape(
             }
 
             htmlRenderer.htmlConnections.limitSide(view, anchor)
-
-            shape.left = left
-            shape.top = top
         }
 
         htmlRenderer.draggableViews += this

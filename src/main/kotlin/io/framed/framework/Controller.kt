@@ -4,11 +4,10 @@ import de.westermann.kobserve.Property
 import io.framed.framework.pictogram.Layer
 import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.pictogram.ViewModelHandler
-import io.framed.framework.util.Dimension
 
 class Controller(
         val linker: ModelLinker<*, *, *>,
-        val layer: Layer
+        private val layer: Layer
 ) {
 
     val handler = object : ViewModelHandler {
@@ -25,6 +24,13 @@ class Controller(
 
         override fun dropShape(shape: Long, target: Long) = linker.dropShape(shape, target)
 
+        override fun delete(shapes: List<Long>) = linker.delete(shapes)
+
+        override fun copy(shapes: List<Long>) = linker.copy(shapes)
+
+        override fun cut(shapes: List<Long>) = linker.cut(shapes)
+
+        override fun paste(target: Long) = linker.paste(target)
     }
 
     val viewModel: ViewModel = ViewModel(linker.container, handler).also { viewModel ->
@@ -41,10 +47,6 @@ class Controller(
         linker.connectionManager.onConnectionRemove {
             viewModel -= it.pictogram
         }
-        linker.setPosition { event: SetPosition ->
-            layer[event.linker.pictogram] = Dimension(event.position)
-        }
-
         linker.connectionManager.init()
     }
 }

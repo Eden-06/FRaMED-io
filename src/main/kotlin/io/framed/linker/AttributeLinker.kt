@@ -30,7 +30,7 @@ class AttributeLinker(
             .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
             .trackHistory()
     private val typeProperty = property(model::type)
-            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .validate(RegexValidator("([a-zA-Z]([a-zA-Z0-9])*)?".toRegex())::validate)
             .trackHistory()
 
     private val lineProperty = FunctionProperty(object : FunctionAccessor<String> {
@@ -69,9 +69,11 @@ class AttributeLinker(
             History.group("Change property") {
                 nameProperty.value = name.trim()
                 typeProperty.value = type.trim()
+
+                println("Set properties: '$name' | '$type'")
             }
 
-            return true
+            return nameProperty.valid && typeProperty.valid
         }
 
         override fun get(): String {

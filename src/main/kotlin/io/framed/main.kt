@@ -1,5 +1,6 @@
 package io.framed
 
+import io.framed.framework.ControllerManager
 import io.framed.framework.LinkerManager
 import io.framed.framework.util.loadAjaxFile
 import io.framed.framework.view.Application
@@ -40,6 +41,7 @@ fun init() {
     Application.init()
 
     loadAjaxFile("demo.json") {
-        File.fromJSON(it)
+        ControllerManager.file = File.fromJSON(it)
     }
+    //ControllerManager.file = File.empty()
 }

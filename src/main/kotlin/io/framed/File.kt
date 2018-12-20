@@ -27,14 +27,17 @@ class File(
     }
 
     companion object {
-
         fun fromJSON(content: String): File {
             val file = JSON.parse(File.serializer(), content)
-
             ModelElement.lastId = file.root.maxId() + 1
 
-            ControllerManager.layers = file.layer
-            ControllerManager.display(ContainerLinker(file.root, ConnectionManagerLinker(file.connections)))
+            return file
+        }
+
+        fun empty(): File {
+            val file = File(Container(), Connections(), emptyMap())
+            ModelElement.lastId = file.root.maxId() + 1
+
             return file
         }
     }

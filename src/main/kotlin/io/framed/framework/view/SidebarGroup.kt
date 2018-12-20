@@ -43,6 +43,12 @@ class SidebarGroup(
         return b
     }
 
+    fun checkBox(label: String, property: Property<Boolean>, type: CheckBox.Type): CheckBox {
+        return CheckBox(label, property).also(this::append).also {
+            it.type = type
+        }
+    }
+
     fun custom(init: ListView.() -> Unit): ListView {
         val view = ListView()
         append(view)

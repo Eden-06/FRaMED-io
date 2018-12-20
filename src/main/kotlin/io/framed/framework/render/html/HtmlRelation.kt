@@ -53,7 +53,7 @@ class HtmlRelation(
         source = sourceView.html
         target = targetView.html
 
-        anchors = arrayOf(sourceAnchorString, targetAnchorString) as Array<Array<Any>>
+        anchors = arrayOf(sourceAnchorString, targetAnchorString)
 
         connector = when (line.type) {
             ConnectionLine.Type.STRAIGHT -> {
@@ -133,13 +133,13 @@ class HtmlRelation(
         connectInit.overlays = overlays.toTypedArray()
     }
 
-    var sourceAnchor: Set<RelationSide> = ALL_SIDES
-    private val sourceAnchorString: Array<String>
-        get() = sourceAnchor.map { it.jsPlumb }.toTypedArray()
+    @Suppress("UNCHECKED_CAST")
+    private val sourceAnchorString: Array<Any>
+        get() = (renderer.htmlConnections.anchors[sourceView]?.map { it.jsPlumb }?.toTypedArray() ?: ALL_SIDES_STRING) as Array<Any>
 
-    var targetAnchor: Set<RelationSide> = ALL_SIDES
-    private val targetAnchorString: Array<String>
-        get() = targetAnchor.map { it.jsPlumb }.toTypedArray()
+    @Suppress("UNCHECKED_CAST")
+    private val targetAnchorString: Array<Any>
+        get() = (renderer.htmlConnections.anchors[targetView]?.map { it.jsPlumb }?.toTypedArray() ?: ALL_SIDES_STRING) as Array<Any>
 
     lateinit var sourceView: View<*>
     lateinit var targetView: View<*>
@@ -152,11 +152,9 @@ class HtmlRelation(
 
         if (!this::sourceView.isInitialized || sourceView != sourceViewNew) {
             sourceView = sourceViewNew
-            sourceAnchor = ALL_SIDES
         }
         if (!this::targetView.isInitialized || targetView != targetViewNew) {
             targetView = targetViewNew
-            targetAnchor = ALL_SIDES
         }
 
         val zIndex = listOfNotNull(sourceView.zIndex, targetView.zIndex).max() ?: 0
@@ -166,7 +164,7 @@ class HtmlRelation(
             source = sourceView.html
             target = targetView.html
 
-            anchors = arrayOf(sourceAnchorString, targetAnchorString) as Array<Array<Any>>
+            anchors = arrayOf(sourceAnchorString, targetAnchorString)
             connector = arrayOf("Flowchart", object {
                 val cornerRadius = 5
             })
@@ -206,7 +204,8 @@ class HtmlRelation(
                     (event as? MouseEvent)?.let { e ->
                         e.stopPropagation()
                         e.preventDefault()
-                        connection.onContextMenu.emit(ContextEvent(e.point(), connection))
+                        val diagram = renderer.navigationView.mouseToCanvas(e.point())
+                        connection.onContextMenu.emit(ContextEvent(e.point(), diagram, connection))
                     }
                 }
             }
@@ -229,6 +228,9 @@ class HtmlRelation(
 
     companion object {
         val ALL_SIDES = setOf(RelationSide.TOP, RelationSide.LEFT, RelationSide.BOTTOM, RelationSide.RIGHT)
+        val ALL_SIDES_STRING = ALL_SIDES.map {
+            it.jsPlumb
+        }.toTypedArray()
     }
 }
 

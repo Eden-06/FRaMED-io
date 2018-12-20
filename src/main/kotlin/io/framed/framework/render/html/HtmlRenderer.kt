@@ -123,9 +123,9 @@ class HtmlRenderer(
     fun deleteSelected() {
         if (selectedViews.isNotEmpty()) {
             History.group("Delete views") {
-                shapeMap.filterValues { it.viewList.any { it in selectedViews } }.keys.forEach {
-                    it.delete?.invoke()
-                }
+                viewModel.handler.delete(shapeMap.filterValues {
+                    it.viewList.any { it in selectedViews }
+                }.keys.mapNotNull { it.id }.distinct())
             }
         }
     }
@@ -239,39 +239,36 @@ class HtmlRenderer(
     }
 
     private fun updateViewBox() {
-        val box = navigationView.viewBox
-
-        viewModel.container.left = box.left
-        viewModel.container.top = box.top
-        viewModel.container.width = box.width
-        viewModel.container.height = box.height
+        val dimension = navigationView.viewBox
+        if (viewModel.container.left != dimension.left) {
+            viewModel.container.left = dimension.left
+        }
+        if (viewModel.container.top != dimension.top) {
+            viewModel.container.top = dimension.top
+        }
+        if (viewModel.container.width != dimension.width) {
+            viewModel.container.width = dimension.width
+        }
+        if (viewModel.container.height != dimension.height) {
+            viewModel.container.height = dimension.height
+        }
     }
 
     private fun loadViewBox() {
-        val left = viewModel.container.left
-        val top = viewModel.container.top
-        val width = viewModel.container.width
-        val height = viewModel.container.height
-
-        if (left != null && top != null) {
-            navigationView.viewBox = Dimension(left, top, width, height)
-        }
+        val dimension = Dimension(viewModel.container.left, viewModel.container.top, viewModel.container.width, viewModel.container.height)
+        navigationView.viewBox = dimension
     }
 
     fun draw() {
         loadViewBox()
-
-        viewModel.container.onPositionChange.clearListeners()
-        viewModel.container.onPositionChange { force ->
-            if (force) loadViewBox()
-        }
 
         navigationView.container.clear()
 
         navigationView.onContext.clearListeners()
         if (viewModel.container.hasContextMenu) {
             navigationView.onContext {
-                viewModel.container.onContextMenu.emit(ContextEvent(it.point(), viewModel.container))
+                val diagram = navigationView.mouseToCanvas(it.point())
+                viewModel.container.onContextMenu.emit(ContextEvent(it.point(), diagram, viewModel.container))
             }
         }
         navigationView.onMouseDown.clearListeners()
@@ -299,6 +296,8 @@ class HtmlRenderer(
         )
 
         htmlConnections.init()
+
+        viewModel.container.onSidebar.emit(SidebarEvent(viewModel.container))
     }
 
     operator fun get(id: Long, jsPlumbInstance: JsPlumbInstance): View<*>? = shapeMap
@@ -343,6 +342,7 @@ class HtmlRenderer(
     override fun panTo(point: Point) {
         navigationView.panTo(point)
     }
+
     override fun panBy(point: Point) {
         navigationView.panBy(point)
     }
