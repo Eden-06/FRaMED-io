@@ -41,7 +41,7 @@ fun init() {
     Application.init()
 
     loadAjaxFile("demo.json") {
-        ControllerManager.file = File.fromJSON(it)
+        ControllerManager.file = File.fromJSON(it) ?: File.empty()
     }
     //ControllerManager.file = File.empty()
 }

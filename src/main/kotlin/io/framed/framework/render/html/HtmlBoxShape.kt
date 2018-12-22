@@ -3,6 +3,7 @@ package io.framed.framework.render.html
 import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
+import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import io.framed.framework.view.*
 
@@ -15,8 +16,6 @@ class HtmlBoxShape(
         val position: BoxShape.Position,
         override val jsPlumbInstance: JsPlumbInstance
 ) : HtmlContentShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
-
-    var resizer: ResizeHandler? = null
 
     fun updateAutosize() {
         if (shape.autosize) {
@@ -32,14 +31,58 @@ class HtmlBoxShape(
 
     val positionView = container.listView {
         if (shape.resizeable) {
-            val size = if (htmlRenderer.snapToGrid) NavigationView.gridSize else null
-            htmlRenderer.resizerList += this.resizeable(size) { event ->
-                jsPlumbInstance.revalidate(view.html)
+            resizer = resizeable {
+                var markView: Boolean
+                onResizeStart {
+                    markView = true
+                    async(200) {
+                        if (markView) {
+                            val snap = htmlRenderer.snapPoint(
+                                    Point(this@listView.left + this@listView.width, this@listView.top + this@listView.height),
+                                    SnapDirection.BOTH,
+                                    container,
+                                    listOf(this@listView)
+                            )
 
-                shape.autosize = false
-                shape.width = event.width
-                shape.height = event.height
-            }.also { resizer = it }
+                            htmlRenderer.navigationView.clearLines()
+                            if (snap.snapToViewX) {
+                                htmlRenderer.navigationView.vLines(setOf(snap.point.x))
+                            }
+                            if (snap.snapToViewY) {
+                                htmlRenderer.navigationView.hLines(setOf(snap.point.y))
+                            }
+                        }
+                    }
+                }
+                onResize { event ->
+                    val snap = htmlRenderer.snapPoint(
+                            event.position + event.size,
+                            SnapDirection.BOTH,
+                            container,
+                            listOf(this@listView)
+                    )
+                    val snappedSize = snap.point - event.position
+
+                    shape.autosize = false
+                    shape.width = snappedSize.x
+                    shape.height = snappedSize.y
+                    this@listView.width = snappedSize.x
+                    this@listView.height = snappedSize.y
+                    jsPlumbInstance.revalidate(view.html)
+
+                    htmlRenderer.navigationView.clearLines()
+                    if (snap.snapToViewX) {
+                        htmlRenderer.navigationView.vLines(setOf(snap.point.x))
+                    }
+                    if (snap.snapToViewY) {
+                        htmlRenderer.navigationView.hLines(setOf(snap.point.y))
+                    }
+                }
+                onResizeStop {
+                    markView = false
+                    htmlRenderer.navigationView.clearLines()
+                }
+            }
 
             shape.autosizeProperty.onChange {
                 if (shape.autosize) {
@@ -65,7 +108,7 @@ class HtmlBoxShape(
         }
 
         if (shape.position == BoxShape.Position.ABSOLUTE) {
-            this.html.style.height = "100%"
+            html.style.height = "100%"
         }
     }
 
@@ -75,7 +118,7 @@ class HtmlBoxShape(
         events(this, shape)
 
         if (shape.position == BoxShape.Position.ABSOLUTE) {
-            this.html.style.position = "relative"
+            html.style.position = "relative"
         }
     }
 

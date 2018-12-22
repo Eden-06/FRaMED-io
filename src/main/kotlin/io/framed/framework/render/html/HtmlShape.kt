@@ -7,10 +7,7 @@ import io.framed.framework.pictogram.*
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import io.framed.framework.util.point
-import io.framed.framework.view.NavigationView
-import io.framed.framework.view.Root
-import io.framed.framework.view.View
-import io.framed.framework.view.ViewCollection
+import io.framed.framework.view.*
 import org.w3c.dom.HTMLElement
 import kotlin.math.abs
 import kotlin.math.max
@@ -37,12 +34,15 @@ abstract class HtmlShape(
 
     val listeners = mutableListOf<ListenerReference<*>>()
 
+    var resizer: ResizeHandler? = null
+
     fun events(view: View<*>, shape: Shape) {
         if (shape.hasContextMenu) {
             view.onContext {
                 it.stopPropagation()
                 it.preventDefault()
                 val diagram = htmlRenderer.navigationView.mouseToCanvas(it.point())
+                htmlRenderer
                 shape.onContextMenu.emit(ContextEvent(it.point(), diagram, shape))
             }
         }
@@ -52,6 +52,9 @@ abstract class HtmlShape(
                     it.preventDefault()
                     shape.onSidebar.emit(SidebarEvent(shape))
                 }
+            }
+            resizer?.onMouseDown?.addListener {
+                shape.onSidebar.emit(SidebarEvent(shape))
             }
             view.onClick { it.stopPropagation() }
         }
@@ -288,14 +291,11 @@ abstract class HtmlShape(
         }
         onDrag { e ->
             val event = htmlRenderer.directDragView(e, view, container)
-            var newLeft = left + event.delta.x
-            var newTop = top + event.delta.y
 
-            val size = if (htmlRenderer.snapToGrid) NavigationView.gridSize else null
-            if (size != null) {
-                newLeft = ((newLeft + size / 2) / size).roundToInt() * size.toDouble()
-                newTop = ((newTop + size / 2) / size).roundToInt() * size.toDouble()
-            }
+            var (newLeft, newTop) = htmlRenderer.snapPoint(Point(
+                    left + event.delta.x,
+                    top + event.delta.y
+            )).point
 
             val parentWidth = container.clientWidth
             val parentHeight = container.clientHeight

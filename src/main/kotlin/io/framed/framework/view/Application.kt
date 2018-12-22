@@ -132,7 +132,10 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }
             item(MaterialIcon.FOLDER_OPEN, "Open", Shortcut("O", Shortcut.Modifier.CTRL)) {
                 loadLocalFile { content ->
-                    ControllerManager.file = File.fromJSON(content)
+                    val file = File.fromJSON(content)
+                    if (file != null) {
+                        ControllerManager.file = file
+                    }
                 }
             }
             item(MaterialIcon.SAVE, "Save", Shortcut("S", Shortcut.Modifier.CTRL)) {

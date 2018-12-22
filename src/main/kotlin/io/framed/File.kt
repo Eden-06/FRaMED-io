@@ -1,15 +1,15 @@
 package io.framed
 
-import io.framed.framework.ControllerManager
 import io.framed.framework.ModelElement
 import io.framed.framework.pictogram.Layer
-import io.framed.linker.ConnectionManagerLinker
-import io.framed.linker.ContainerLinker
+import io.framed.framework.view.dialog
+import io.framed.framework.view.textView
 import io.framed.model.Connections
 import io.framed.model.Container
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JSON
+import kotlinx.serialization.json.JsonParsingException
 
 @Serializable
 class File(
@@ -27,11 +27,24 @@ class File(
     }
 
     companion object {
-        fun fromJSON(content: String): File {
-            val file = JSON.parse(File.serializer(), content)
-            ModelElement.lastId = file.root.maxId() + 1
+        fun fromJSON(content: String): File? {
+            return try {
+                val file = JSON.parse(File.serializer(), content)
+                ModelElement.lastId = file.root.maxId() + 1
 
-            return file
+                file
+            } catch (e: JsonParsingException) {
+                println("Error while opening file!")
+                dialog {
+                    title = "Error while opening file"
+                    contentView.textView("The selected file is malformated and cannot be parsed.")
+                    closable = true
+                    addButton("Abort", true) {
+
+                    }
+                }.open()
+                null
+            }
         }
 
         fun empty(): File {

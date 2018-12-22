@@ -3,6 +3,7 @@ package io.framed.framework.util
 import org.w3c.dom.events.MouseEvent
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 
 /**
  * @author lars
@@ -43,6 +44,10 @@ data class Point(
 
     val asPx: String
         get() = "${x}px, ${y}px"
+
+    fun distance(): Double = sqrt(x * x + y * y)
+
+    infix fun distance(other: Point) = (this - other).distance()
 }
 
 fun MouseEvent.point(): Point = Point(clientX, clientY)

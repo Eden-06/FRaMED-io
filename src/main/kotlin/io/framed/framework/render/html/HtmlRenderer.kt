@@ -15,6 +15,7 @@ import org.w3c.dom.get
 import org.w3c.dom.set
 import kotlin.math.abs
 import kotlin.browser.window
+import kotlin.math.roundToInt
 
 /**
  * @author lars
@@ -29,12 +30,6 @@ class HtmlRenderer(
     val snapToGridProperty = property(window.localStorage["snap-to-grid"]?.toBoolean() ?: true).also { property ->
         property.onChange { _ ->
             incrementSnap = null
-            if (property.value) {
-                resizerList.forEach { it.stepSize = NavigationView.gridSize }
-            } else {
-                resizerList.forEach { it.stepSize = null }
-            }
-
             window.localStorage["snap-to-grid"] = property.value.toString()
         }
     }
@@ -64,7 +59,6 @@ class HtmlRenderer(
     lateinit var htmlShape: HtmlShapeContainer
     lateinit var htmlConnections: HtmlConnections
 
-    var resizerList: List<ResizeHandler> = emptyList()
     var draggableViews: List<View<*>> = emptyList()
     val selectedViews: List<View<*>>
         get() = draggableViews.filter { it.selectedView }
@@ -131,7 +125,7 @@ class HtmlRenderer(
     }
 
     fun stopDragView() {
-        navigationView.clearLine()
+        navigationView.clearLines()
         draggableViews.forEach { it.classes -= "snap-view" }
     }
 
@@ -139,8 +133,6 @@ class HtmlRenderer(
     fun directDragView(event: View.DragEvent, view: View<*>, parent: ViewCollection<View<*>, *>): View.DragEvent {
         var delta = event.delta
 
-        val drawSnapLine = parent == navigationView.container
-        if (drawSnapLine) navigationView.clearLine()
         draggableViews.forEach { it.classes -= "snap-view" }
 
         if (incrementSnap?.first != view) incrementSnap = null
@@ -149,93 +141,147 @@ class HtmlRenderer(
         val center = (incrementSnap?.second ?: currentCenter) + delta
         incrementSnap = view to center
 
-        val gridSize = NavigationView.gridSize
+        val ignore = selectedViews
+        val otherViews = (draggableViews - ignore)
+                .filter { it in parent }
+                .flatMap {
+                    listOf(
+                            it to Point(it.left, it.top),
+                            it to Point(it.left + it.width / 2, it.top + it.height / 2),
+                            it to Point(it.left + it.width, it.top + it.height)
+                    )
+                }
 
-        if (snapToGrid) {
+        val points = listOf(
+                center,
+                Point(center.x + view.width / 2, center.y + view.height / 2),
+                Point(center.x + view.width, center.y + view.height)
+        ).map { it to snapPoint(it, SnapDirection.BOTH, parent, ignore, otherViews) }
 
-            // Test x
-            val tx = center.x % gridSize
-            val dx = if (tx <= gridSize / 2) -tx else gridSize - tx
-
-            if (abs(dx) < gridSize) {
-                val pos = center.x + dx
-                delta = Point(pos - currentCenter.x, delta.y)
+        val (sourceX, snapX) = points.minBy { (point, result) ->
+            if (result.snapToViewX) {
+                abs(point.x - result.point.x)
+            } else {
+                Double.MAX_VALUE
             }
-
-            // Test y
-            val ty = center.y % gridSize
-            val dy = if (ty <= gridSize / 2) -ty else gridSize - ty
-
-            if (abs(dy) < gridSize) {
-                val pos = center.y + dy
-                delta = Point(delta.x, pos - currentCenter.y)
+        } ?: points.first()
+        val (sourceY, snapY) = points.minBy { (point, result) ->
+            if (result.snapToViewY) {
+                abs(point.y - result.point.y)
+            } else {
+                Double.MAX_VALUE
             }
-        } else {
-            delta = center - currentCenter
+        } ?: points.first()
+
+        val snap = Point(snapX.point.x, snapY.point.y)
+        val source = Point(sourceX.x, sourceY.y)
+
+        delta = snap - source + (center - currentCenter)
+
+        var vLines = emptySet<Double>()
+        var hLines = emptySet<Double>()
+
+        val newPoints = listOf(
+                snap,
+                Point(snap.x + view.width / 2, snap.y + view.height / 2),
+                Point(snap.x + view.width, snap.y + view.height)
+        )
+        for (it in newPoints) {
+            otherViews.forEach { (v, p) ->
+                if (it.x == p.x) {
+                    v.classes += "snap-view"
+                    vLines += p.x
+                }
+                if (it.y == p.y) {
+                    v.classes += "snap-view"
+                    hLines += p.y
+                }
+            }
         }
 
-        if (snapToView) {
-            val threshold = gridSize / 2
-            val otherViews = (draggableViews - view - selectedViews)
-                    .filter { it in parent }
-                    .flatMap {
-                        listOf(
-                                it to Point(it.left, it.top),
-                                it to Point(it.left + it.width, it.top),
-                                it to Point(it.left, it.top + it.height),
-                                it to Point(it.left + it.width, it.top + it.height),
-                                it to Point(it.left + it.width / 2, it.top + it.height / 2)
-                        )
-                    }
-
-            // Test x center
-            val foundX = otherViews
-                    .flatMap {
-                        listOf(
-                                SnapHelper(it.first, it.second, abs(it.second.x - (center.x)), currentCenter.x),
-                                SnapHelper(it.first, it.second, abs(it.second.x - (center.x + view.width / 2)), currentCenter.x + view.width / 2),
-                                SnapHelper(it.first, it.second, abs(it.second.x - (center.x + view.width)), currentCenter.x + view.width)
-                        )
-                    }
-                    .filter { it.delta < threshold }
-            if (foundX.isNotEmpty()) {
-                val (_, min, _, source) = foundX.minBy { it.delta } ?: foundX.first()
-                delta = Point(min.x - source, delta.y)
-
-                if (drawSnapLine) navigationView.vLine(min.x)
-
-                foundX.filter {
-                    it.targetPoint.x == min.x
-                }.forEach {
-                    it.view.classes += "snap-view"
-                }
-            }
-
-            // Test y center
-            val foundY = otherViews
-                    .flatMap {
-                        listOf(
-                                SnapHelper(it.first, it.second, abs(it.second.y - (center.y)), currentCenter.y),
-                                SnapHelper(it.first, it.second, abs(it.second.y - (center.y + view.height / 2)), currentCenter.y + view.height / 2),
-                                SnapHelper(it.first, it.second, abs(it.second.y - (center.y + view.height)), currentCenter.y + view.height)
-                        )
-                    }
-                    .filter { it.delta < threshold }
-            if (foundY.isNotEmpty()) {
-                val (_, min, _, source) = foundY.minBy { it.delta } ?: foundY.first()
-                delta = Point(delta.x, min.y - source)
-
-                if (drawSnapLine) navigationView.hLine(min.y)
-
-                foundY.filter {
-                    it.targetPoint.y == min.y
-                }.forEach {
-                    it.view.classes += "snap-view"
-                }
-            }
+        val drawSnapLine = parent == navigationView.container
+        if (drawSnapLine) {
+            navigationView.vLines(vLines)
+            navigationView.hLines(hLines)
         }
 
         return event.copy(delta = delta)
+    }
+
+    fun snapPoint(
+            point: Point,
+            direction: SnapDirection = SnapDirection.BOTH,
+            parent: ViewCollection<View<*>, *>? = null,
+            ignore: List<View<*>> = emptyList(),
+            snapableViews: List<Pair<View<*>, Point>>? = null
+    ): SnapResult {
+        var p = point
+        var snapToViewX = false
+        var snapToViewY = false
+
+        val gridSize = navigationView.gridSize
+
+        if (snapToGrid) {
+            p = Point(
+                    if (direction != SnapDirection.VERTICAL) {
+                        ((p.x + gridSize / 2) / gridSize).roundToInt() * gridSize.toDouble()
+                    } else p.x,
+                    if (direction != SnapDirection.HORIZONTAL) {
+                        ((p.y + gridSize / 2) / gridSize).roundToInt() * gridSize.toDouble()
+                    } else p.y
+            )
+        }
+
+        if (this.snapToView && parent != null) {
+            val threshold = gridSize / 2
+
+            val otherViews = snapableViews ?: (draggableViews - ignore)
+                    .filter { (it in parent) }
+                    .flatMap {
+                        listOf(
+                                it to Point(it.left, it.top),
+                                it to Point(it.left + it.width / 2, it.top + it.height / 2),
+                                it to Point(it.left + it.width, it.top + it.height)
+                        )
+                    }
+
+            var newPx = p.x
+            var newPy = p.y
+
+            if (direction != SnapDirection.VERTICAL) {
+                // Test x center
+                val foundX = otherViews
+                        .map { (view, px) ->
+                            SnapHelper(view, px, abs(px.x - p.x))
+                        }
+                        .filter { it.delta < threshold }
+                if (foundX.isNotEmpty()) {
+                    val (_, min, _) = foundX.minBy { it.delta } ?: foundX.first()
+                    newPx = min.x
+
+                    snapToViewX = true
+                }
+            }
+
+            if (direction != SnapDirection.HORIZONTAL) {
+                // Test y center
+                val foundY = otherViews
+                        .map { (view, py) ->
+                            SnapHelper(view, py, abs(py.y - p.y))
+                        }
+                        .filter { it.delta < threshold }
+                if (foundY.isNotEmpty()) {
+                    val (_, min, _) = foundY.minBy { it.delta } ?: foundY.first()
+                    newPy = min.y
+
+                    snapToViewY = true
+                }
+            }
+
+            p = Point(newPx, newPy)
+        }
+
+        return SnapResult(p, snapToViewX, snapToViewY)
     }
 
     private fun updateViewBox() {
@@ -285,7 +331,6 @@ class HtmlRenderer(
             htmlShape.remove()
         }
         draggableViews = emptyList()
-        resizerList = emptyList()
 
         htmlConnections = HtmlConnections(this, viewModel)
 
@@ -351,6 +396,15 @@ class HtmlRenderer(
 data class SnapHelper(
         val view: View<*>,
         val targetPoint: Point,
-        val delta: Double,
-        val sourcePoint: Double
+        val delta: Double
+)
+
+enum class SnapDirection {
+    HORIZONTAL, VERTICAL, BOTH
+}
+
+data class SnapResult(
+        val point: Point,
+        val snapToViewX: Boolean,
+        val snapToViewY: Boolean
 )

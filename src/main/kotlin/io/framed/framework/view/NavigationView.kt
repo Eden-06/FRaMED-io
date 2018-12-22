@@ -164,8 +164,8 @@ class NavigationView : View<HTMLDivElement>("div") {
         drawGrid()
     }
 
-    private var hLine: Double? = null
-    private var vLine: Double? = null
+    private var hLine: Set<Double> = emptySet()
+    private var vLine: Set<Double> = emptySet()
 
     fun resize() {
         background.width = clientWidth
@@ -173,6 +173,16 @@ class NavigationView : View<HTMLDivElement>("div") {
 
         updateTransform()
     }
+
+    val gridStep: Int
+        get() = when {
+            zoom <= 0.2 -> 1
+            zoom <= 0.8 -> GRID_STEP / 2
+            else -> GRID_STEP
+        }
+
+    val gridSize: Int
+        get() = GRID_SIZE * (GRID_STEP / gridStep)
 
     private fun drawGrid() {
         context.clearRect(0.0, 0.0, clientWidth.toDouble(), clientHeight.toDouble())
@@ -183,12 +193,6 @@ class NavigationView : View<HTMLDivElement>("div") {
 
             val topLeft = realToSystem(Point.ZERO)
 
-            val gridStep = when {
-                zoom <= 0.2 -> 1
-                zoom <= 0.8 -> gridStep / 2
-                else -> gridStep
-            }
-            val gridSize = gridSize * (NavigationView.gridStep / gridStep)
             val size = gridSize * zoom
 
             val startX = size - (topLeft.x * zoom) % size
@@ -214,40 +218,40 @@ class NavigationView : View<HTMLDivElement>("div") {
             }
         }
 
-        val p = systemToReal(Point(vLine ?: 0.0, hLine ?: 0.0))
-        if (vLine != null) {
+        for (px in vLine) {
             context.beginPath()
             context.lineWidth = 1.0
             context.strokeStyle = "#FFC107"
-
-            context.moveTo(p.x * clientWidth, 0.0)
-            context.lineTo(p.x * clientWidth, clientHeight.toDouble())
+            val p = systemToReal(Point(px, 0.0)).x
+            context.moveTo(p * clientWidth, 0.0)
+            context.lineTo(p * clientWidth, clientHeight.toDouble())
             context.stroke()
         }
-        if (hLine != null) {
+
+        for (py in hLine) {
             context.beginPath()
             context.lineWidth = 1.0
             context.strokeStyle = "#FFC107"
-
-            context.moveTo(0.0, p.y * clientHeight)
-            context.lineTo(clientWidth.toDouble(), p.y * clientHeight)
+            val p = systemToReal(Point(0.0, py)).y
+            context.moveTo(0.0, p * clientHeight)
+            context.lineTo(clientWidth.toDouble(), p * clientHeight)
             context.stroke()
         }
     }
 
-    fun clearLine() {
-        hLine = null
-        vLine = null
+    fun clearLines() {
+        hLine = emptySet()
+        vLine = emptySet()
         updateTransform()
     }
 
-    fun hLine(y: Double) {
-        hLine = y
+    fun hLines(lines: Set<Double>) {
+        hLine = lines
         updateTransform()
     }
 
-    fun vLine(x: Double) {
-        vLine = x
+    fun vLines(lines: Set<Double>) {
+        vLine = lines
         updateTransform()
     }
 
@@ -424,7 +428,7 @@ class NavigationView : View<HTMLDivElement>("div") {
          * List of zoom steps for stepped zooming.
          */
         val zoomSteps = listOf(0.1, 0.3, 0.5, 0.67, 0.8, 0.9, 1.0, 1.1, 1.2, 1.33, 1.5, 1.7, 2.0, 2.4, 3.0, 4.0)
-        const val gridSize = 16
-        const val gridStep = 4
+        const val GRID_SIZE = 16
+        const val GRID_STEP = 4
     }
 }
