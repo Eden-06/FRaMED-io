@@ -384,16 +384,17 @@ class ContainerLinker(
                 .distinct()
 
         borderShapes.forEach {
-            if (it.id !in neededBorderViews) {
+            val id = it.id?.unaryMinus() ?: return@forEach
+            if ((id) !in neededBorderViews) {
                 borderBox -= it
                 borderShapes -= it
             } else {
-                neededBorderViews -= it.id!!
+                neededBorderViews -= id
             }
         }
 
         neededBorderViews.forEach {
-            val shape = iconShape(property<Icon?>(null), id = it) {
+            val shape = iconShape(property<Icon?>(null), id = -it) {
                 style {
                     background = color(255, 255, 255)
                     border {

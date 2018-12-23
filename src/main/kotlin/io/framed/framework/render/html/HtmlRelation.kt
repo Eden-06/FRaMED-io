@@ -147,8 +147,14 @@ class HtmlRelation(
     fun draw(sourceId: Long, targetId: Long) {
         remove()
 
+        println("Draw relation $sourceId -> $targetId")
+
         val sourceViewNew = renderer[sourceId, jsPlumbInstance] ?: return
+        println("Found source!")
+        console.log(sourceViewNew.html)
         val targetViewNew = renderer[targetId, jsPlumbInstance] ?: return
+        println("Found target!")
+        console.log(targetViewNew.html)
 
         if (!this::sourceView.isInitialized || sourceView != sourceViewNew) {
             sourceView = sourceViewNew
@@ -204,7 +210,7 @@ class HtmlRelation(
                     (event as? MouseEvent)?.let { e ->
                         e.stopPropagation()
                         e.preventDefault()
-                        val diagram = renderer.navigationView.mouseToCanvas(e.point())
+                        val diagram = renderer.snapPoint(renderer.navigationView.mouseToCanvas(e.point())).point
                         connection.onContextMenu.emit(ContextEvent(e.point(), diagram, connection))
                     }
                 }

@@ -1,8 +1,8 @@
 package io.framed.framework.render.html
 
+import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.TextShape
-import io.framed.framework.util.async
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.inputView
@@ -40,4 +40,17 @@ class HtmlTextShape(
     }
 
     override val viewList: List<View<*>> = listOf(view)
+
+    override fun remove() {
+        super.remove()
+        reference?.remove()
+    }
+
+    var reference: ListenerReference<*>? = null
+
+    init {
+        parentContainer?.onParentMove?.reference {
+            jsPlumbInstance.revalidate(view.html)
+        }?.let { reference = it }
+    }
 }

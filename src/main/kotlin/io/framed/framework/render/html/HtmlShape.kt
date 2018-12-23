@@ -3,16 +3,21 @@ package io.framed.framework.render.html
 import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
-import io.framed.framework.pictogram.*
+import io.framed.framework.pictogram.ContextEvent
+import io.framed.framework.pictogram.Shape
+import io.framed.framework.pictogram.SidebarEvent
+import io.framed.framework.pictogram.Style
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import io.framed.framework.util.point
-import io.framed.framework.view.*
+import io.framed.framework.view.ResizeHandler
+import io.framed.framework.view.Root
+import io.framed.framework.view.View
+import io.framed.framework.view.ViewCollection
 import org.w3c.dom.HTMLElement
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.roundToInt
 
 abstract class HtmlShape(
         val htmlRenderer: HtmlRenderer,
@@ -41,7 +46,7 @@ abstract class HtmlShape(
             view.onContext {
                 it.stopPropagation()
                 it.preventDefault()
-                val diagram = htmlRenderer.navigationView.mouseToCanvas(it.point())
+                val diagram = htmlRenderer.snapPoint(htmlRenderer.navigationView.mouseToCanvas(it.point())).point
                 htmlRenderer
                 shape.onContextMenu.emit(ContextEvent(it.point(), diagram, shape))
             }

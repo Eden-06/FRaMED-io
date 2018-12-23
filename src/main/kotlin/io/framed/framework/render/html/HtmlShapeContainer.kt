@@ -6,7 +6,6 @@ import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.IconShape
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.TextShape
-import io.framed.framework.util.async
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 
@@ -19,6 +18,8 @@ class HtmlShapeContainer(
 ) {
 
     val jsPlumbInstance = if (containerShape.position == BoxShape.Position.ABSOLUTE || jsPlumbInstanceParent == null) {
+        println("Create js plumb for")
+        console.log(container.html)
         htmlRenderer.htmlConnections.createJsPlumb(container.html)
     } else jsPlumbInstanceParent
 
@@ -44,6 +45,7 @@ class HtmlShapeContainer(
             val html = create(shape)
             shapeMap += shape to html
             if (shape.id != null) {
+                println("Add shape with id ${shape.id}")
                 htmlRenderer.shapeMap += shape to html
             }
 
@@ -64,6 +66,7 @@ class HtmlShapeContainer(
             }
             html.remove()
         }
+        println("Remove shape with id ${shape.id}")
         htmlRenderer.shapeMap -= shape
         htmlRenderer.htmlConnections.deleteShape(shape)
         checkParentAutosize()

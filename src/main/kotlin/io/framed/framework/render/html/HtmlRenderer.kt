@@ -9,12 +9,15 @@ import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.SidebarEvent
 import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.render.Renderer
-import io.framed.framework.util.*
+import io.framed.framework.util.Dimension
+import io.framed.framework.util.History
+import io.framed.framework.util.Point
+import io.framed.framework.util.point
 import io.framed.framework.view.*
 import org.w3c.dom.get
 import org.w3c.dom.set
-import kotlin.math.abs
 import kotlin.browser.window
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
@@ -178,31 +181,33 @@ class HtmlRenderer(
 
         delta = snap - source + (center - currentCenter)
 
-        var vLines = emptySet<Double>()
-        var hLines = emptySet<Double>()
+        if (snapToView) {
+            var vLines = emptySet<Double>()
+            var hLines = emptySet<Double>()
 
-        val newPoints = listOf(
-                snap,
-                Point(snap.x + view.width / 2, snap.y + view.height / 2),
-                Point(snap.x + view.width, snap.y + view.height)
-        )
-        for (it in newPoints) {
-            otherViews.forEach { (v, p) ->
-                if (it.x == p.x) {
-                    v.classes += "snap-view"
-                    vLines += p.x
-                }
-                if (it.y == p.y) {
-                    v.classes += "snap-view"
-                    hLines += p.y
+            val newPoints = listOf(
+                    snap,
+                    Point(snap.x + view.width / 2, snap.y + view.height / 2),
+                    Point(snap.x + view.width, snap.y + view.height)
+            )
+            for (it in newPoints) {
+                otherViews.forEach { (v, p) ->
+                    if (it.x == p.x) {
+                        v.classes += "snap-view"
+                        vLines += p.x
+                    }
+                    if (it.y == p.y) {
+                        v.classes += "snap-view"
+                        hLines += p.y
+                    }
                 }
             }
-        }
 
-        val drawSnapLine = parent == navigationView.container
-        if (drawSnapLine) {
-            navigationView.vLines(vLines)
-            navigationView.hLines(hLines)
+            val drawSnapLine = parent == navigationView.container
+            if (drawSnapLine) {
+                navigationView.vLines(vLines)
+                navigationView.hLines(hLines)
+            }
         }
 
         return event.copy(delta = delta)
@@ -232,7 +237,7 @@ class HtmlRenderer(
             )
         }
 
-        if (this.snapToView && parent != null) {
+        if (snapToView && parent != null) {
             val threshold = gridSize / 2
 
             val otherViews = snapableViews ?: (draggableViews - ignore)
@@ -313,7 +318,7 @@ class HtmlRenderer(
         navigationView.onContext.clearListeners()
         if (viewModel.container.hasContextMenu) {
             navigationView.onContext {
-                val diagram = navigationView.mouseToCanvas(it.point())
+                val diagram = snapPoint(navigationView.mouseToCanvas(it.point())).point
                 viewModel.container.onContextMenu.emit(ContextEvent(it.point(), diagram, viewModel.container))
             }
         }
@@ -346,7 +351,8 @@ class HtmlRenderer(
     }
 
     operator fun get(id: Long, jsPlumbInstance: JsPlumbInstance): View<*>? = shapeMap
-            .filter { it.key.id == id && it.value.jsPlumbInstance == jsPlumbInstance }.values.firstOrNull()?.view
+            .filter { it.key.id?.let(::abs) == id && it.value.jsPlumbInstance == jsPlumbInstance }
+            .values.sortedBy { it.shape.id }.firstOrNull()?.view
 
     fun getShapeById(id: String): Shape? = shapeMap.entries.find { (_, item) ->
         item.view.id == id

@@ -10,6 +10,7 @@ import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.util.async
 import io.framed.framework.view.View
 import org.w3c.dom.HTMLElement
+import kotlin.math.abs
 
 class HtmlConnections(
         val htmlRenderer: HtmlRenderer,
@@ -85,11 +86,25 @@ class HtmlConnections(
             if (viewModel.handler.canConnectionStart(shape.id ?: return@async)) {
                 createEndpointInternal(shape)
             }
+
+            val id = abs(shape.id)
+            for ((conn, html) in relations) {
+                if (conn.source.value == id || conn.target.value == id) {
+                    html.draw()
+                }
+            }
         }
     }
 
     fun deleteShape(shape: Shape) {
         deleteEndpointInternal(shape)
+
+        val id = abs(shape.id ?: return)
+        for ((conn, html) in relations) {
+            if (conn.source.value == id || conn.target.value == id) {
+                html.draw()
+            }
+        }
     }
 
     fun updateEndpoints(source: Shape? = null) {
@@ -112,7 +127,7 @@ class HtmlConnections(
         }
     }
 
-    fun createEndpointInternal(shape: Shape) {
+    private fun createEndpointInternal(shape: Shape) {
         if (shape in endpointMap) return
 
         val html = htmlRenderer.shapeMap[shape]?.view?.html ?: return
@@ -132,7 +147,7 @@ class HtmlConnections(
     /**
      * The model removes the endpoint for the given shape
      */
-    fun deleteEndpointInternal(shape: Shape) {
+    private fun deleteEndpointInternal(shape: Shape) {
         val endpointItem = endpointMap[shape] ?: return
         endpointItem.jsPlumbInstance.deleteEndpoint(endpointItem.html)
         endpointMap -= shape
@@ -141,10 +156,10 @@ class HtmlConnections(
     /**
      * The map stores the endpoints for all shapes
      */
-    val endpointMap = mutableMapOf<Shape, EndpointItem>()
+    private val endpointMap = mutableMapOf<Shape, EndpointItem>()
 
     var relations: Map<Connection, HtmlRelation> = emptyMap()
-    fun drawRelation(jsPlumbInstance: JsPlumbInstance, relation: Connection) {
+    private fun drawRelation(jsPlumbInstance: JsPlumbInstance, relation: Connection) {
         relations += relation to HtmlRelation(relation, jsPlumbInstance, htmlRenderer)
     }
 
@@ -163,7 +178,9 @@ class HtmlConnections(
 
     init {
         viewModel.onConnectionAdd.reference {
-            drawRelation(findInstance(listOf(it.source.get(), it.target.get())) ?: return@reference, it)
+            async {
+                drawRelation(findInstance(listOf(it.source.get(), it.target.get())) ?: return@async, it)
+            }
         }?.let(listeners::add)
 
         viewModel.onConnectionRemove.reference { r ->

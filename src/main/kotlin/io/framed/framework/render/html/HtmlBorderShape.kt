@@ -1,10 +1,10 @@
 package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumbInstance
-import io.framed.framework.pictogram.Box
 import io.framed.framework.pictogram.BoxShape
-import io.framed.framework.util.async
-import io.framed.framework.view.*
+import io.framed.framework.view.View
+import io.framed.framework.view.ViewCollection
+import io.framed.framework.view.listView
 
 class HtmlBorderShape(
         htmlRenderer: HtmlRenderer,
@@ -16,7 +16,7 @@ class HtmlBorderShape(
         override val jsPlumbInstance: JsPlumbInstance
 ) : HtmlContentShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
 
-    val realContainer: ViewCollection<View<*>, *> = (parent as HtmlBoxShape).positionView
+    private val realContainer: ViewCollection<View<*>, *> = (parent as HtmlBoxShape).positionView
 
     override val view: ViewCollection<View<*>, *> = realContainer.listView {
         classes += "border-box"

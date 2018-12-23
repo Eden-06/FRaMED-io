@@ -5,7 +5,10 @@ import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
-import io.framed.framework.view.*
+import io.framed.framework.view.View
+import io.framed.framework.view.ViewCollection
+import io.framed.framework.view.listView
+import io.framed.framework.view.resizeable
 
 class HtmlBoxShape(
         htmlRenderer: HtmlRenderer,
@@ -44,12 +47,14 @@ class HtmlBoxShape(
                                     listOf(this@listView)
                             )
 
-                            htmlRenderer.navigationView.clearLines()
-                            if (snap.snapToViewX) {
-                                htmlRenderer.navigationView.vLines(setOf(snap.point.x))
-                            }
-                            if (snap.snapToViewY) {
-                                htmlRenderer.navigationView.hLines(setOf(snap.point.y))
+                            if (htmlRenderer.snapToView) {
+                                htmlRenderer.navigationView.clearLines()
+                                if (snap.snapToViewX) {
+                                    htmlRenderer.navigationView.vLines(setOf(snap.point.x))
+                                }
+                                if (snap.snapToViewY) {
+                                    htmlRenderer.navigationView.hLines(setOf(snap.point.y))
+                                }
                             }
                         }
                     }
@@ -70,12 +75,14 @@ class HtmlBoxShape(
                     this@listView.height = snappedSize.y
                     jsPlumbInstance.revalidate(view.html)
 
-                    htmlRenderer.navigationView.clearLines()
-                    if (snap.snapToViewX) {
-                        htmlRenderer.navigationView.vLines(setOf(snap.point.x))
-                    }
-                    if (snap.snapToViewY) {
-                        htmlRenderer.navigationView.hLines(setOf(snap.point.y))
+                    if (htmlRenderer.snapToView) {
+                        htmlRenderer.navigationView.clearLines()
+                        if (snap.snapToViewX) {
+                            htmlRenderer.navigationView.vLines(setOf(snap.point.x))
+                        }
+                        if (snap.snapToViewY) {
+                            htmlRenderer.navigationView.hLines(setOf(snap.point.y))
+                        }
                     }
                 }
                 onResizeStop {
@@ -92,12 +99,14 @@ class HtmlBoxShape(
                     async {
                         shape.width = clientWidth.toDouble()
                         shape.height = clientHeight.toDouble()
+                        jsPlumbInstance.revalidate(view.html)
                     }
                 } else {
                     shape.width = clientWidth.toDouble()
                     shape.height = clientHeight.toDouble()
                     width = shape.width
                     height = shape.height
+                    jsPlumbInstance.revalidate(view.html)
                 }
             }
 
