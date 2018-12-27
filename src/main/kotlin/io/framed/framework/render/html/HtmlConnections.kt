@@ -13,11 +13,16 @@ import org.w3c.dom.HTMLElement
 import kotlin.math.abs
 
 class HtmlConnections(
-        val htmlRenderer: HtmlRenderer,
-        val viewModel: ViewModel
+        private val htmlRenderer: HtmlRenderer,
+        private val viewModel: ViewModel
 ) {
 
     val listeners = mutableListOf<ListenerReference<*>>()
+    private val endpointMap = mutableMapOf<Shape, EndpointItem>()
+    private var relations: Map<Connection, HtmlRelation> = emptyMap()
+    val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
+    private var jsPlumbList: List<JsPlumbInstance> = emptyList()
+
 
     fun remove() {
         jsPlumbList.forEach {
@@ -28,10 +33,10 @@ class HtmlConnections(
 
         listeners.forEach { it.remove() }
         listeners.clear()
+        relations = emptyMap()
+        endpointMap.clear()
         anchors.clear()
     }
-
-    private var jsPlumbList: List<JsPlumbInstance> = emptyList()
 
     fun createJsPlumb(container: HTMLElement): JsPlumbInstance {
         val instance = JsPlumb.getInstance().apply {
@@ -153,17 +158,9 @@ class HtmlConnections(
         endpointMap -= shape
     }
 
-    /**
-     * The map stores the endpoints for all shapes
-     */
-    private val endpointMap = mutableMapOf<Shape, EndpointItem>()
-
-    var relations: Map<Connection, HtmlRelation> = emptyMap()
     private fun drawRelation(jsPlumbInstance: JsPlumbInstance, relation: Connection) {
         relations += relation to HtmlRelation(relation, jsPlumbInstance, htmlRenderer)
     }
-
-    val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
 
     fun limitSide(view: View<*>, anchor: Set<RelationSide>) {
         if (anchors[view] != anchor) {

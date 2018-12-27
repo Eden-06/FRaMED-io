@@ -48,11 +48,6 @@ class HtmlRenderer(
 
     override fun render(viewModel: ViewModel) {
         layerChangeListener?.remove()
-
-        if (this::htmlConnections.isInitialized) {
-            htmlConnections.remove()
-        }
-
         this.viewModel = viewModel
 
         layerChangeListener = this.viewModel.onLayerChange.reference { draw() }

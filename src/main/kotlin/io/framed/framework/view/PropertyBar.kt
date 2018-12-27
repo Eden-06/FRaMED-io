@@ -3,7 +3,6 @@ package io.framed.framework.view
 import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.ListenerReference
 import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.events.MouseEvent
 import kotlin.math.max
 
 class PropertyBar : ViewCollection<View<*>, HTMLDivElement>("div") {

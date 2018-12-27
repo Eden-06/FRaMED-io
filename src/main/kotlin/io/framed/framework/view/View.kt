@@ -10,7 +10,6 @@ import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.math.max
-import kotlin.reflect.KClass
 
 /**
  * Base class for html views. Each view is represented by a html element.

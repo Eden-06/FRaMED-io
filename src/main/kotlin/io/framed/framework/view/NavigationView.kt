@@ -2,7 +2,10 @@ package io.framed.framework.view
 
 import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.basic.property
-import io.framed.framework.util.*
+import io.framed.framework.util.Dimension
+import io.framed.framework.util.Point
+import io.framed.framework.util.async
+import io.framed.framework.util.point
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener

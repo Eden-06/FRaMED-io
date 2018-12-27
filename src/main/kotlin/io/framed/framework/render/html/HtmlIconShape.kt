@@ -38,13 +38,13 @@ class HtmlIconShape(
         } else if (position == BoxShape.Position.BORDER) {
             borderPosition(view,  view.html, parent?.parent as HtmlBoxShape)
 
-            parentContainer?.onParentMove?.reference {
-                jsPlumbInstance.revalidate(view.html)
-            }?.let { reference = it }
-
             shape.property.onChange.reference {
                 view.zIndex = if (shape.property.value == null) -1 else null
             }?.trigger(Unit)
         }
+
+        parentContainer?.onParentMove?.reference {
+            jsPlumbInstance.revalidate(view.html)
+        }?.let { reference = it }
     }
 }

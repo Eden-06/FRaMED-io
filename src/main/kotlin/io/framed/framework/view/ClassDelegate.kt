@@ -1,7 +1,6 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.Property
-import de.westermann.kobserve.basic.FunctionAccessor
 import de.westermann.kobserve.basic.property
 import io.framed.framework.util.toDashCase
 import kotlin.reflect.KProperty

@@ -1,6 +1,5 @@
 package io.framed.framework
 
-import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Shape

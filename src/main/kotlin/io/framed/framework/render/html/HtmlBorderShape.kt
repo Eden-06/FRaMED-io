@@ -9,8 +9,8 @@ import io.framed.framework.view.listView
 class HtmlBorderShape(
         htmlRenderer: HtmlRenderer,
         override val shape: BoxShape,
-        parent: HtmlContentShape?,
-        parentContainer: HtmlShapeContainer?,
+        parent: HtmlContentShape,
+        parentContainer: HtmlShapeContainer,
         container: ViewCollection<View<*>, *>,
         val position: BoxShape.Position,
         override val jsPlumbInstance: JsPlumbInstance
@@ -37,5 +37,9 @@ class HtmlBorderShape(
         super.remove()
         content.remove()
         realContainer -= view
+    }
+
+    init {
+        events(view, parent.shape)
     }
 }

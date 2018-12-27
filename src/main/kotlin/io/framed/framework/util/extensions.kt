@@ -9,7 +9,6 @@ import org.w3c.files.FileReader
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.browser.document
 import kotlin.browser.window
-import kotlin.js.Date
 
 /**
  * @author lars

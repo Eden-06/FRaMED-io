@@ -1,13 +1,8 @@
 package io.framed.framework.pictogram
 
 import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.ListenerReference
 import de.westermann.kobserve.basic.flatMapBinding
-import de.westermann.kobserve.basic.flatMapReadOnlyBinding
-import de.westermann.kobserve.basic.mapBinding
-import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.listenTo
-import io.framed.framework.util.Dimension
 
 /**
  * @author lars

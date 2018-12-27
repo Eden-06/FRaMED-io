@@ -147,14 +147,8 @@ class HtmlRelation(
     fun draw(sourceId: Long, targetId: Long) {
         remove()
 
-        println("Draw relation $sourceId -> $targetId")
-
         val sourceViewNew = renderer[sourceId, jsPlumbInstance] ?: return
-        println("Found source!")
-        console.log(sourceViewNew.html)
         val targetViewNew = renderer[targetId, jsPlumbInstance] ?: return
-        println("Found target!")
-        console.log(targetViewNew.html)
 
         if (!this::sourceView.isInitialized || sourceView != sourceViewNew) {
             sourceView = sourceViewNew

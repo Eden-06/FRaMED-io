@@ -1,6 +1,7 @@
 package io.framed.framework.render.html
 
 import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.IconShape
@@ -18,8 +19,6 @@ class HtmlShapeContainer(
 ) {
 
     val jsPlumbInstance = if (containerShape.position == BoxShape.Position.ABSOLUTE || jsPlumbInstanceParent == null) {
-        println("Create js plumb for")
-        console.log(container.html)
         htmlRenderer.htmlConnections.createJsPlumb(container.html)
     } else jsPlumbInstanceParent
 
@@ -27,7 +26,7 @@ class HtmlShapeContainer(
 
     fun create(shape: Shape): HtmlShape = when (shape) {
         is BoxShape -> {
-            if (shape.position == BoxShape.Position.BORDER) {
+            if (shape.position == BoxShape.Position.BORDER && parent != null) {
                 HtmlBorderShape(htmlRenderer, shape, parent, this, container, containerShape.position, jsPlumbInstance)
             } else {
                 HtmlBoxShape(htmlRenderer, shape, parent, this, container, containerShape.position, jsPlumbInstance)
@@ -45,7 +44,6 @@ class HtmlShapeContainer(
             val html = create(shape)
             shapeMap += shape to html
             if (shape.id != null) {
-                println("Add shape with id ${shape.id}")
                 htmlRenderer.shapeMap += shape to html
             }
 
@@ -66,7 +64,6 @@ class HtmlShapeContainer(
             }
             html.remove()
         }
-        println("Remove shape with id ${shape.id}")
         htmlRenderer.shapeMap -= shape
         htmlRenderer.htmlConnections.deleteShape(shape)
         checkParentAutosize()
@@ -90,13 +87,19 @@ class HtmlShapeContainer(
 
     val onParentMove = EventHandler<Shape>()
 
+    private val references: MutableList<ListenerReference<*>> = mutableListOf()
+
     init {
         containerShape.shapes.forEach(this::add)
-        containerShape.onAdd(this::add)
-        containerShape.onRemove(this::remove)
+        containerShape.onAdd.reference(this::add)?.let(references::add)
+        containerShape.onRemove.reference(this::remove)?.let(references::add)
     }
 
     fun remove() {
         shapeMap.keys.forEach(this::remove)
+        for (it in references) {
+            it.remove()
+        }
+        references.clear()
     }
 }

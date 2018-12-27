@@ -216,6 +216,7 @@ abstract class HtmlShape(
             marginLeft = -clientWidth / 2.0
             marginTop = -clientHeight / 2.0
             onDrag.emit(View.DragEvent(Point.ZERO, false))
+            jsPlumbInstance?.revalidate(jsPlumbView)
         }
 
         left = shape.left
@@ -300,7 +301,7 @@ abstract class HtmlShape(
             var (newLeft, newTop) = htmlRenderer.snapPoint(Point(
                     left + event.delta.x,
                     top + event.delta.y
-            )).point
+            ), parent = parentHtmlBoxShape.container).point
 
             val parentWidth = container.clientWidth
             val parentHeight = container.clientHeight
@@ -319,13 +320,12 @@ abstract class HtmlShape(
             shape.left = newLeft
             shape.top = newTop
 
-            val anchor = when {
-                newTop <= 0.0 -> setOf(RelationSide.TOP)
-                newLeft <= 0.0 -> setOf(RelationSide.LEFT)
-                newTop >= parentHeight -> setOf(RelationSide.BOTTOM)
-                newLeft >= parentWidth -> setOf(RelationSide.RIGHT)
-                else -> HtmlRelation.ALL_SIDES
-            }
+            var anchor = emptySet<RelationSide>()
+            if (newTop <= 0.0) anchor += RelationSide.TOP
+            if (newLeft <= 0.0) anchor += RelationSide.LEFT
+            if (newTop >= parentHeight) anchor += RelationSide.BOTTOM
+            if (newLeft >= parentWidth) anchor += RelationSide.RIGHT
+            if (anchor.isEmpty()) anchor = HtmlRelation.ALL_SIDES
 
             htmlRenderer.htmlConnections.limitSide(view, anchor)
         }

@@ -9,8 +9,6 @@ import io.framed.framework.Controller
 import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
 import io.framed.framework.util.*
-import io.framed.linker.ConnectionManagerLinker
-import io.framed.linker.ContainerLinker
 import org.w3c.dom.HTMLDivElement
 import kotlin.math.roundToInt
 
