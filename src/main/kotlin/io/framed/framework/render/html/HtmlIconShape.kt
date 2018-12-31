@@ -7,6 +7,7 @@ import io.framed.framework.pictogram.IconShape
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.iconView
+import io.framed.framework.view.listView
 
 class HtmlIconShape(
         htmlRenderer: HtmlRenderer,
@@ -18,8 +19,12 @@ class HtmlIconShape(
         override val jsPlumbInstance: JsPlumbInstance
 ) : HtmlShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
 
-    override val view: View<*> = container.iconView(shape.property) {
-        style(this, shape.style)
+    override val view: View<*> = container.listView {
+        iconView(shape.property) {
+            classes += "icon-shape"
+            style(this, shape.style)
+        }
+
         events(this, shape)
     }
 
@@ -34,9 +39,9 @@ class HtmlIconShape(
 
     init {
         if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(view,  view.html)
+            absolutePosition(view, view.html)
         } else if (position == BoxShape.Position.BORDER) {
-            borderPosition(view,  view.html, parent?.parent as HtmlBoxShape)
+            borderPosition(view, view.html, parent?.parent as HtmlBoxShape)
 
             shape.property.onChange.reference {
                 view.zIndex = if (shape.property.value == null) -1 else null

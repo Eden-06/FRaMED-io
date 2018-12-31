@@ -174,7 +174,7 @@ class HtmlConnections(
         handler.classes += "connection-source"
 
         jsPlumbInstance.makeSource(html, jsPlumbSourceOptionsInit {
-            filter = { event, element ->
+            filter = { event, _ ->
                 val target = event.target as HTMLElement
                 (target == handler.html || target.parentElement == handler.html)
             }
