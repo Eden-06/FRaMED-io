@@ -5,6 +5,7 @@ package io.framed.framework
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
+import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.svg.SVGSVGElement
 
 /**
@@ -98,6 +99,25 @@ external interface JsPlumbInstance {
 
     fun deleteEveryConnection()
     fun deleteEveryEndpoint()
+
+    fun makeTarget(element: HTMLElement, options: JsPlumbTargetOptionsInit)
+    fun makeSource(element: HTMLElement, options: JsPlumbSourceOptionsInit)
+
+    fun isTarget(element: HTMLElement):Boolean
+    fun isSource(element: HTMLElement):Boolean
+
+    fun setTargetEnabled(element: HTMLElement)
+    fun setSourceEnabled(element: HTMLElement)
+
+    fun isTargetEnabled(element: HTMLElement): Boolean
+    fun isSourceEnabled(element: HTMLElement): Boolean
+
+    fun unmakeTarget(element: HTMLElement)
+    fun unmakeSource(element: HTMLElement)
+
+    fun unmakeEveryTarget()
+    fun unmakeEverySource()
+
 }
 
 /**
@@ -239,4 +259,38 @@ external interface JsPlumbDropOptionsInit {
  */
 external interface JsPlumbDragOptionsInit {
     var drag: (dynamic, dynamic) -> Unit
+}
+
+
+/**
+ *
+ */
+external interface JsPlumbTargetOptionsInit {
+    var allowLoopback: Boolean
+}
+
+/**
+ *
+ */
+fun jsPlumbTargetOptionsInit(init: JsPlumbTargetOptionsInit.() -> Unit = {}): JsPlumbTargetOptionsInit {
+    val h = js("{}")
+    init(h)
+    return h
+}
+
+/**
+ *
+ */
+external interface JsPlumbSourceOptionsInit {
+    var filter: (MouseEvent, HTMLElement) -> Boolean
+    var filterExclude: Boolean
+}
+
+/**
+ *
+ */
+fun jsPlumbSourceOptionsInit(init: JsPlumbSourceOptionsInit.() -> Unit = {}): JsPlumbSourceOptionsInit {
+    val h = js("{}")
+    init(h)
+    return h
 }

@@ -32,17 +32,21 @@ object LinkerManager {
 
     fun setup(linker: ConnectionLinker<*>, info: LinkerInfoConnection) {
         val convert = linker.canConvert()
+        var exists = true
         if (convert.size > 1) {
             val infoProperty = FunctionProperty(object : FunctionAccessor<ConnectionInfo> {
                 override fun set(value: ConnectionInfo): Boolean {
-                    async {
-                        History.group("Set connection type to ${value.name}") {
-                            val source = linker.sourceIdProperty.get()
-                            val target = linker.targetIdProperty.get()
-                            val manager = linker.manager
-                            linker.delete()
+                    if (exists) {
+                        exists = false
+                        async {
+                            History.group("Set connection type to ${value.name}") {
+                                val source = linker.sourceIdProperty.get()
+                                val target = linker.targetIdProperty.get()
+                                val manager = linker.manager
+                                linker.delete()
 
-                            manager.createConnection(source, target, value).focus()
+                                manager.createConnection(source, target, value).focus()
+                            }
                         }
                     }
                     return true

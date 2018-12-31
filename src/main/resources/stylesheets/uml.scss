@@ -177,3 +177,23 @@
   z-index: 1;
 }
 */
+
+.connection-source {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 2rem;
+  height: 2rem;
+  background-color: $primary-background;
+  text-align: center;
+  line-height: 2rem;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  padding-left: 0.5rem;
+  font-size: 1.4rem;
+  display: none;
+
+  @include no-select()
+}
+*:hover > .connection-source {
+  display: block;
+}

@@ -1,13 +1,13 @@
-package io.framed.framework.render.html;
+package io.framed.framework.render.html
 
 import de.westermann.kobserve.ListenerReference
-import io.framed.framework.JsPlumb
-import io.framed.framework.JsPlumbInstance
-import io.framed.framework.jsPlumbEndpointOptions
+import io.framed.framework.*
 import io.framed.framework.pictogram.Connection
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.util.async
+import io.framed.framework.view.IconView
+import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.View
 import org.w3c.dom.HTMLElement
 import kotlin.math.abs
@@ -22,7 +22,6 @@ class HtmlConnections(
     private var relations: Map<Connection, HtmlRelation> = emptyMap()
     val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
     private var jsPlumbList: List<JsPlumbInstance> = emptyList()
-
 
     fun remove() {
         jsPlumbList.forEach {
@@ -112,41 +111,87 @@ class HtmlConnections(
         }
     }
 
-    fun updateEndpoints(source: Shape? = null) {
+    private fun updateEndpoints(source: Shape? = null) {
         if (source == null) {
             htmlRenderer.shapeMap.keys.forEach {
-                if (viewModel.handler.canConnectionStart(it.id ?: return)) {
-                    createEndpointInternal(it)
-                } else {
-                    deleteEndpointInternal(it)
-                }
+                setSourceEnabled(
+                        it,
+                        viewModel.handler.canConnectionStart(it.id ?: return)
+                )
+                setTargetEnabled(it, true)
             }
         } else {
             (htmlRenderer.shapeMap.keys - source).forEach {
-                if (viewModel.handler.canConnectionCreate(source.id ?: return, it.id ?: return)) {
-                    createEndpointInternal(it)
-                } else {
-                    deleteEndpointInternal(it)
-                }
+                setTargetEnabled(
+                        it,
+                        viewModel.handler.canConnectionCreate(source.id ?: return, it.id ?: return)
+                )
             }
         }
+    }
+
+    private fun setSourceEnabled(shape: Shape, enabled: Boolean) {
+        val endpointItem = endpointMap[shape] ?: return
+        val jsPlumbInstance = endpointItem.jsPlumbInstance
+        val view = endpointItem.view
+        val html = view.html
+
+        if (jsPlumbInstance.isSourceEnabled(html) != enabled) {
+            //jsPlumbInstance.setSourceEnabled(html)
+        }
+
+        view.classes["source-disabled"] = !enabled
+    }
+
+    private fun setTargetEnabled(shape: Shape, enabled: Boolean) {
+        val endpointItem = endpointMap[shape] ?: return
+        val jsPlumbInstance = endpointItem.jsPlumbInstance
+        val jsPlumbRoot = endpointItem.jsPlumbRoot
+        val view = endpointItem.view
+        val html = view.html
+
+        if (jsPlumbInstance.isTargetEnabled(html) != enabled) {
+            //jsPlumbInstance.setTargetEnabled(html)
+        }
+        if (jsPlumbRoot.isTargetEnabled(html) != enabled) {
+            //jsPlumbRoot.setTargetEnabled(html)
+        }
+
+        view.classes["target-disabled"] = !enabled
     }
 
     private fun createEndpointInternal(shape: Shape) {
         if (shape in endpointMap) return
 
-        val html = htmlRenderer.shapeMap[shape]?.view?.html ?: return
+        val view = htmlRenderer.shapeMap[shape]?.view ?: return
+        val html = view.html
         val jsPlumbInstance = htmlRenderer.shapeMap[shape]?.jsPlumbInstance ?: return
+        val jsPlumbRoot = jsPlumbList.first()
 
-        // Endpoints in flat preview? The following disables them.
-        // if (jsPlumbInstance != jsPlumbList.first()) return
+        val handler = IconView(MaterialIcon.ADD)
+        html.appendChild(handler.html)
+        handler.id = "shape-${shape.id}-${endpointMap.size}"
+        handler.classes += "connection-source"
 
-        endpointMap[shape] = EndpointItem(jsPlumbInstance.addEndpoint(html, jsPlumbEndpointOptions {
-            anchors = arrayOf("Bottom")
-            isSource = true
-            isTarget = true
-            endpoint = "Dot"
-        }), jsPlumbInstance)
+        jsPlumbInstance.makeSource(html, jsPlumbSourceOptionsInit {
+            filter = { event, element ->
+                val target = event.target as HTMLElement
+                (target == handler.html || target.parentElement == handler.html)
+            }
+        })
+        jsPlumbInstance.makeTarget(html, jsPlumbTargetOptionsInit {
+            allowLoopback = false
+        })
+        if (jsPlumbInstance != jsPlumbRoot) {
+            jsPlumbRoot.makeTarget(html, jsPlumbTargetOptionsInit {
+                allowLoopback = false
+            })
+        }
+
+        endpointMap[shape] = EndpointItem(view, handler.html, jsPlumbInstance, jsPlumbRoot)
+
+        setSourceEnabled(shape, true)
+        setTargetEnabled(shape, true)
     }
 
     /**
@@ -154,7 +199,17 @@ class HtmlConnections(
      */
     private fun deleteEndpointInternal(shape: Shape) {
         val endpointItem = endpointMap[shape] ?: return
-        endpointItem.jsPlumbInstance.deleteEndpoint(endpointItem.html)
+        val jsPlumbInstance = endpointItem.jsPlumbInstance
+        val jsPlumbRoot = endpointItem.jsPlumbRoot
+        val view = endpointItem.view
+        val html = view.html
+
+        view.classes -= "source-disabled"
+        view.classes -= "target-disabled"
+
+        jsPlumbInstance.unmakeSource(html)
+        jsPlumbInstance.unmakeTarget(html)
+        jsPlumbRoot.unmakeTarget(html)
         endpointMap -= shape
     }
 
@@ -195,7 +250,9 @@ class HtmlConnections(
     }
 
     class EndpointItem(
-            val html: HTMLElement,
-            val jsPlumbInstance: JsPlumbInstance
+            val view: View<*>,
+            val handler: HTMLElement,
+            val jsPlumbInstance: JsPlumbInstance,
+            val jsPlumbRoot: JsPlumbInstance
     )
 }
