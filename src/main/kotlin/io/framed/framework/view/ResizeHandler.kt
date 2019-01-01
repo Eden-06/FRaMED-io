@@ -23,7 +23,7 @@ class ResizeHandler(
     init {
         target.html.append(html)
 
-        dragType = DragType.CUSTOM
+        allowDrag = true
         onDrag { event ->
             size += event.delta / target.dragZoom
             size = Point(max(size.x, 0.0), max(size.y, 0.0))

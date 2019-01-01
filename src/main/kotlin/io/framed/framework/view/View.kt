@@ -244,21 +244,15 @@ abstract class View<V : HTMLElement>(view: V) {
     val selectedViewProperty by ClassDelegate()
     var selectedView by selectedViewProperty
 
-    var dragType = DragType.NONE
+    var allowDrag = false
     val onDrag = EventHandler<DragEvent>()
 
     var minTop: Double? = null
     var minLeft: Double? = null
 
     fun performDrag(dragEvent: DragEvent) {
-        when (dragType) {
-            View.DragType.NONE -> throw IllegalStateException()
-            View.DragType.CUSTOM -> {
-            }
-            View.DragType.MARGIN -> {
-                marginLeft += dragEvent.delta.x
-                marginTop += dragEvent.delta.y
-            }
+        if (!allowDrag) {
+            throw IllegalStateException()
         }
         onDrag.emit(dragEvent)
     }
@@ -321,7 +315,7 @@ abstract class View<V : HTMLElement>(view: V) {
         onMouseDown {
             isMouseDown = true
 
-            if (dragType != DragType.NONE) {
+            if (allowDrag) {
                 it.stopPropagation()
 
                 Root.onMouseUp += dragEnd
@@ -333,7 +327,7 @@ abstract class View<V : HTMLElement>(view: V) {
         }
 
         onMouseMove {
-            if (isMouseDown && !isCurrentlyDragging && dragType != DragType.NONE) {
+            if (isMouseDown && !isCurrentlyDragging && allowDrag) {
                 it.preventDefault()
                 it.stopPropagation()
 
@@ -354,12 +348,6 @@ abstract class View<V : HTMLElement>(view: V) {
          */
         @Suppress("UNCHECKED_CAST")
         fun <V : HTMLElement> createView(tagName: String): V = document.createElement(tagName) as V
-    }
-
-    enum class DragType {
-        NONE,
-        MARGIN,
-        CUSTOM
     }
 
     data class DragEvent(

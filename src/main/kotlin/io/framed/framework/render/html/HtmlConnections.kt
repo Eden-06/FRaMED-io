@@ -12,6 +12,7 @@ import io.framed.framework.util.async
 import io.framed.framework.view.IconView
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.View
+import io.framed.framework.view.ViewCollection
 import org.w3c.dom.HTMLElement
 import kotlin.math.abs
 
@@ -24,12 +25,12 @@ class HtmlConnections(
     private val endpointMap = mutableMapOf<Shape, EndpointItem>()
     private var relations: Map<Connection, HtmlRelation> = emptyMap()
     val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
-    private var jsPlumbList: List<JsPlumbInstance> = emptyList()
+    private var jsPlumbList: List<Pair<JsPlumbInstance, ViewCollection<View<*>, *>>> = emptyList()
 
     private var isConnecting: Shape? = null
 
     fun remove() {
-        jsPlumbList.forEach {
+        for ((it, _) in jsPlumbList) {
             it.deleteEveryConnection()
             it.deleteEveryEndpoint()
             it.unmakeEverySource()
@@ -38,7 +39,9 @@ class HtmlConnections(
         }
         jsPlumbList = emptyList()
 
-        listeners.forEach { it.remove() }
+        for (it in listeners) {
+            it.remove()
+        }
         listeners.clear()
         relations = emptyMap()
         endpointMap.clear()
@@ -46,9 +49,9 @@ class HtmlConnections(
         isConnecting = null
     }
 
-    fun createJsPlumb(container: HTMLElement): JsPlumbInstance {
+    fun createJsPlumb(container: ViewCollection<View<*>, *>): JsPlumbInstance {
         val instance = JsPlumb.getInstance().apply {
-            setContainer(container)
+            setContainer(container.html)
 
             setZoom(1.0)
             bind("beforeDrop") { info: dynamic ->
@@ -80,7 +83,7 @@ class HtmlConnections(
             }
         }
 
-        jsPlumbList += instance
+        jsPlumbList += instance to container
 
         return instance
     }
@@ -93,7 +96,7 @@ class HtmlConnections(
         return when {
             list.isEmpty() -> null
             list.size == 1 -> list.first()
-            jsPlumbList.first() in list -> jsPlumbList.first()
+            jsPlumbList.first().first in list -> jsPlumbList.first().first
             else -> null
         }
     }
@@ -176,7 +179,7 @@ class HtmlConnections(
         val view = htmlRenderer.shapeMap[shape]?.view ?: return
         val html = view.html
         //val jsPlumbInstance = htmlRenderer.shapeMap[shape]?.jsPlumbInstance ?: return
-        val jsPlumbInstance = jsPlumbList.first()
+        val jsPlumbInstance = jsPlumbList.first().first
 
         val handler = IconView(MaterialIcon.ADD)
         html.appendChild(handler.html)
@@ -235,7 +238,8 @@ class HtmlConnections(
     }
 
     private fun drawRelation(jsPlumbInstance: JsPlumbInstance, relation: Connection) {
-        relations += relation to HtmlRelation(relation, jsPlumbInstance, htmlRenderer)
+        val container = jsPlumbList.find { it.first == jsPlumbInstance }?.second ?: return
+        relations += relation to HtmlRelation(relation, jsPlumbInstance, container, htmlRenderer)
     }
 
     fun limitSide(view: View<*>, anchor: Set<RelationSide>) {

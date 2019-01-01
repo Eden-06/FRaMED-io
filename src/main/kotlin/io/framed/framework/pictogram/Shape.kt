@@ -24,7 +24,7 @@ abstract class Shape(id: Long?) : Pictogram(id) {
     val heightProperty = layerProperty.flatMapBinding { it[id].heightProperty }
     var height by heightProperty
 
-    val onMove = EventHandler<Unit>()
+    var labels = emptyList<TextShape>()
 
     fun data(name: String) = layerProperty.flatMapBinding { it[id].data(name) }
 
@@ -32,12 +32,5 @@ abstract class Shape(id: Long?) : Pictogram(id) {
 
     fun style(init: Style.() -> Unit) {
         init(style)
-    }
-
-    init {
-        onMove.listenTo(leftProperty.onChange)
-        onMove.listenTo(topProperty.onChange)
-        onMove.listenTo(widthProperty.onChange)
-        onMove.listenTo(heightProperty.onChange)
     }
 }

@@ -134,7 +134,7 @@ class HtmlRenderer(
         draggableViews.forEach { it.classes -= "snap-view" }
 
         if (incrementSnap?.first != view) incrementSnap = null
-        val currentCenter = Point(view.left, view.top)
+        val currentCenter = Point(view.left + view.marginLeft, view.top + view.marginTop)
 
         val center = (incrementSnap?.second ?: currentCenter) + delta
         incrementSnap = view to center

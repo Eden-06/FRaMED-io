@@ -7,9 +7,8 @@ import io.framed.framework.pictogram.ConnectionLine
 import io.framed.framework.pictogram.ContextEvent
 import io.framed.framework.pictogram.SidebarEvent
 import io.framed.framework.util.point
-import io.framed.framework.view.InputView
-import io.framed.framework.view.TextView
 import io.framed.framework.view.View
+import io.framed.framework.view.ViewCollection
 import org.w3c.dom.events.MouseEvent
 
 /**
@@ -18,6 +17,7 @@ import org.w3c.dom.events.MouseEvent
 class HtmlRelation(
         val connection: Connection,
         val jsPlumbInstance: JsPlumbInstance,
+        val container: ViewCollection<View<*>,*>,
         val renderer: HtmlRenderer
 ) {
 
@@ -37,12 +37,8 @@ class HtmlRelation(
         }
     }
 
-    private val views = connection.labels.map { (shape, position) ->
-        InputView(shape.property).also {
-            it.dragType = View.DragType.MARGIN
-            it.autocomplete = shape.autocomplete
-            it.sizeMatchText()
-        } to position
+    private val labels = connection.labels.map { (shape, position) ->
+        HtmlLabel(renderer, shape, container) to position
     }
 
     fun draw() {
@@ -73,60 +69,42 @@ class HtmlRelation(
         }
     }
 
-    private fun createEndStyle(connectInit: JsPlumbConnectInit, drawSource: Boolean, drawTarget: Boolean) {
-        var overlays = views.map { (view, position) ->
+    private fun createEndStyle(connectInit: JsPlumbConnectInit) {
+        var overlays = labels.map { (label, position) ->
             arrayOf("Custom", object {
                 val create = { _: dynamic ->
-                    view.html
+                    label.view.html
                 }
                 val cssClass = "front-end-label input-view"
                 val location = position
             })
         }
 
-        if (drawSource) {
-            connection.sourceStyle?.let { style ->
-                overlays += listOf(arrayOf("Arrow", object {
-                    val width = style.width
-                    val length = style.length
-                    val foldback = style.foldback
-                    val paintStyle = jsPlumbPaintStyle {
-                        stroke = style.paintStyle.stroke.toCss()
-                        strokeWidth = style.paintStyle.strokeWidth
-                        fill = style.paintStyle.fill.toCss()
-                    }
-                    val location = 0
-                }))
-            }
-        } else {
-            overlays += listOf(arrayOf("Custom", object {
-                val create = { _: dynamic ->
-                    TextView("Id: ${connection.source.get()}").html
+        connection.sourceStyle?.let { style ->
+            overlays += listOf(arrayOf("Arrow", object {
+                val width = style.width
+                val length = style.length
+                val foldback = style.foldback
+                val paintStyle = jsPlumbPaintStyle {
+                    stroke = style.paintStyle.stroke.toCss()
+                    strokeWidth = style.paintStyle.strokeWidth
+                    fill = style.paintStyle.fill.toCss()
                 }
-                val location = 11
+                val location = 0
             }))
         }
 
-        if (drawTarget) {
-            connection.targetStyle?.let { style ->
-                overlays += listOf(arrayOf("Arrow", object {
-                    val width = style.width
-                    val length = style.length
-                    val foldback = style.foldback
-                    val paintStyle = jsPlumbPaintStyle {
-                        stroke = style.paintStyle.stroke.toCss()
-                        strokeWidth = style.paintStyle.strokeWidth
-                        fill = style.paintStyle.fill.toCss()
-                    }
-                    val location = 1
-                }))
-            }
-        } else {
-            overlays += listOf(arrayOf("Custom", object {
-                val create = { _: dynamic ->
-                    TextView("Id: ${connection.target.get()}").html
+        connection.targetStyle?.let { style ->
+            overlays += listOf(arrayOf("Arrow", object {
+                val width = style.width
+                val length = style.length
+                val foldback = style.foldback
+                val paintStyle = jsPlumbPaintStyle {
+                    stroke = style.paintStyle.stroke.toCss()
+                    strokeWidth = style.paintStyle.strokeWidth
+                    fill = style.paintStyle.fill.toCss()
                 }
-                val location = -10
+                val location = 1
             }))
         }
 
@@ -135,11 +113,13 @@ class HtmlRelation(
 
     @Suppress("UNCHECKED_CAST")
     private val sourceAnchorString: Array<Any>
-        get() = (renderer.htmlConnections.anchors[sourceView]?.map { it.jsPlumb }?.toTypedArray() ?: ALL_SIDES_STRING) as Array<Any>
+        get() = (renderer.htmlConnections.anchors[sourceView]?.map { it.jsPlumb }?.toTypedArray()
+                ?: ALL_SIDES_STRING) as Array<Any>
 
     @Suppress("UNCHECKED_CAST")
     private val targetAnchorString: Array<Any>
-        get() = (renderer.htmlConnections.anchors[targetView]?.map { it.jsPlumb }?.toTypedArray() ?: ALL_SIDES_STRING) as Array<Any>
+        get() = (renderer.htmlConnections.anchors[targetView]?.map { it.jsPlumb }?.toTypedArray()
+                ?: ALL_SIDES_STRING) as Array<Any>
 
     lateinit var sourceView: View<*>
     lateinit var targetView: View<*>
@@ -185,7 +165,7 @@ class HtmlRelation(
         }
         connection.lines.lastOrNull()?.let { line ->
             val init = createJsPlumbConnection(line, sourceView, targetView)
-            createEndStyle(init, true, true)
+            createEndStyle(init)
             connections += jsPlumbInstance.connect(init).also {
                 it.canvas.style.zIndex = zIndex.toString()
             }

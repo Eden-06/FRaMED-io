@@ -33,7 +33,9 @@ abstract class HtmlShape(
     open fun remove() {
         container -= view
 
-        listeners.forEach { it.remove() }
+        for (reference in listeners) {
+            reference.remove()
+        }
         listeners.clear()
     }
 
@@ -139,7 +141,7 @@ abstract class HtmlShape(
             onMove?.emit(shape)
         }?.let(listeners::add)
 
-        dragType = View.DragType.CUSTOM
+        allowDrag = true
         onMouseDown { event ->
             event.stopPropagation()
             htmlRenderer.selectView(this, event.ctrlKey, false)
@@ -265,13 +267,11 @@ abstract class HtmlShape(
         }?.let(listeners::add)
 
         val resizer = parentHtmlBoxShape.resizer
-        if (resizer != null) {
-            resizer.onResize {
-                onDrag.emit(View.DragEvent(Point.ZERO, false))
-            }
+        resizer?.onResize?.addListener {
+            onDrag.emit(View.DragEvent(Point.ZERO, false))
         }
 
-        dragType = View.DragType.CUSTOM
+        allowDrag = true
         onMouseDown { event ->
             event.stopPropagation()
 
