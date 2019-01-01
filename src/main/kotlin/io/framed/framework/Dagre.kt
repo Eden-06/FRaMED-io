@@ -23,13 +23,13 @@ external interface DagreEdge {
     /**
      * The number of ranks to keep between the source and target of the edge.
      */
-    var minlen: int
+    var minlen: Int
     var sourceId: String
     var targetId: String
     /**
      * The weight to assign edges. Higher weight edges are generally made shorter and straighter than lower weight edges.
      */
-    var weight: int
+    var weight: Int
 }
 external interface DagreGraph {
     /**
@@ -61,15 +61,15 @@ external interface DagreGraphOptions {
     /**
      * Number of pixels to use as a margin around the left and right of the graph.
      */
-    var marginx: int
+    var marginx: Int
     /**
      * Number of pixels to use as a margin around the top and bottom of the graph.
      */
-    var marginy: int
+    var marginy: Int
     /**
      * Number of pixels that separate nodes horizontally in the layout.
      */
-    var nodesep: int
+    var nodesep: Int
     /**
      * Direction for rank nodes. Can be TB, BT, LR, or RL, where T = top, B = bottom, L = left, and R = right.
      */
@@ -81,10 +81,10 @@ external interface DagreGraphOptions {
     /**
      * Number of pixels between each rank in the layout.
      */
-    var rankSep: int
+    var rankSep: Int
 }
 external interface DagreNode {
-    var id: int
+    var id: Int
     var options: DagreNodeOptions
 }
 external interface DagreNodeOptions {
@@ -95,8 +95,8 @@ external interface DagreNodeOptions {
 enum class RankerDirection {
     TB, BT, LR, RL
 }
-enum class RankerTechnique {
-    network-simplex,
-    tight-tree,
-    longest-path
+enum class RankerTechnique(val jsName: String) {
+    NETWORK_SIMPLEX("network-simplex"),
+    TIGHT_TREE("tight-tree"),
+    LONGEST_PATH("longest-path")
 }
