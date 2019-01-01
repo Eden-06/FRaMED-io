@@ -9,7 +9,6 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
-import kotlin.math.max
 
 /**
  * Base class for html views. Each view is represented by a html element.
@@ -256,13 +255,6 @@ abstract class View<V : HTMLElement>(view: V) {
             View.DragType.NONE -> throw IllegalStateException()
             View.DragType.CUSTOM -> {
             }
-            View.DragType.ABSOLUTE -> {
-                val newLeft = left + dragEvent.delta.x
-                val newTop = top + dragEvent.delta.y
-
-                left = minLeft?.let { max(it, newLeft) } ?: newLeft
-                top = minTop?.let { max(it, newTop) } ?: newTop
-            }
             View.DragType.MARGIN -> {
                 marginLeft += dragEvent.delta.x
                 marginTop += dragEvent.delta.y
@@ -322,7 +314,7 @@ abstract class View<V : HTMLElement>(view: V) {
             Root.onMouseUp -= dragEnd
             Root.onMouseLeave -= dragEnd
         }
-        dragEnd = { _: MouseEvent ->
+        dragEnd = {
             removeDrag()
         }
 
@@ -366,7 +358,6 @@ abstract class View<V : HTMLElement>(view: V) {
 
     enum class DragType {
         NONE,
-        ABSOLUTE,
         MARGIN,
         CUSTOM
     }

@@ -118,6 +118,7 @@ external interface JsPlumbInstance {
     fun unmakeEveryTarget()
     fun unmakeEverySource()
 
+    fun reset()
 }
 
 /**
