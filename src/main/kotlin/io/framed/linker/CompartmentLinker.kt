@@ -150,14 +150,8 @@ class CompartmentLinker(
         parent.redraw(this@CompartmentLinker)
     }
 
-    private val positionProperty = pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
-        "x=${left.roundToInt()}, y=${top.roundToInt()}"
-    }
-    private val sizeProperty = pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
-        "width=${width.roundToInt()}, height=${height.roundToInt()}"
-    }
-
     private lateinit var sidebarViewGroup: SidebarGroup
+    private lateinit var sidebarFlatViewGroup: SidebarGroup
     private lateinit var sidebarPreviewGroup: SidebarGroup
     override val sidebar = sidebar {
         title("Compartment")
@@ -173,17 +167,32 @@ class CompartmentLinker(
                 autoLayoutBox.autoLayout()
             }
         }
-        sidebarViewGroup = group("View") {
-            input("Position", positionProperty)
-            input("Size", sizeProperty)
+
+        sidebarViewGroup = group("Layout") {
+            input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
+                "x=${left.roundToInt()}, y=${top.roundToInt()}"
+            })
+            input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
+                "width=${width.roundToInt()}, height=${height.roundToInt()}"
+            })
             checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
+        }
+        sidebarFlatViewGroup = group("Preview layout") {
+            input("Position", flatPreview.leftProperty.join(flatPreview.topProperty) { left, top ->
+                "x=${left.roundToInt()}, y=${top.roundToInt()}"
+            })
+            input("Size", flatPreview.widthProperty.join(flatPreview.heightProperty) { width, height ->
+                "width=${width.roundToInt()}, height=${height.roundToInt()}"
+            })
         }
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
-        val h = event.target == pictogram
-        sidebarViewGroup.display = h
-        sidebarPreviewGroup.display = h
+        val isTargetRoot = event.target == pictogram
+        sidebarViewGroup.display = isTargetRoot
+        sidebarPreviewGroup.display = isTargetRoot
+
+        sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
     private lateinit var contextStepIn: ListView
@@ -210,7 +219,7 @@ class CompartmentLinker(
             linker.also {
                 it.pictogram.left = event.diagram.x
                 it.pictogram.top = event.diagram.y
-                it.focus()
+                it.focus(event.target)
             }
         }
 

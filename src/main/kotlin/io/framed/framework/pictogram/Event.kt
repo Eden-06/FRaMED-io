@@ -14,11 +14,4 @@ data class ContextEvent(
 
 data class SidebarEvent(
         val target: Pictogram
-) {
-
-    val isNone = this == NONE
-
-    companion object {
-        val NONE = SidebarEvent(object : Pictogram(-1) {})
-    }
-}
+)

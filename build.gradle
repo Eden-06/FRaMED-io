@@ -45,6 +45,9 @@ clean.doFirst() {
 compileKotlin2Js {
     kotlinOptions.sourceMap = true
     kotlinOptions.sourceMapEmbedSources = "always"
+
+    //kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
+    //kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.contracts.ExperimentalContracts"
 }
 
 jar {

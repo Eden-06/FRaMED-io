@@ -122,6 +122,7 @@ class ContainerLinker(
     private lateinit var sidebarActionsGroup: SidebarGroup
     private lateinit var sidebarPreviewGroup: SidebarGroup
     private lateinit var sidebarViewGroup: SidebarGroup
+    private lateinit var sidebarFlatViewGroup: SidebarGroup
 
     private val creationProperty = property(model.metadata::creationDate)
     private val creationStringProperty = creationProperty.mapBinding { it.toUTCString() }
@@ -151,13 +152,6 @@ class ContainerLinker(
         parent?.redraw(this@ContainerLinker)
     }
 
-    private val positionProperty = pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
-        "x=${left.roundToInt()}, y=${top.roundToInt()}"
-    }
-    private val sizeProperty = pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
-        "width=${width.roundToInt()}, height=${height.roundToInt()}"
-    }
-
     override val sidebar = sidebar {
         title("Container")
         group("General") {
@@ -180,10 +174,22 @@ class ContainerLinker(
                 autoLayoutBox.autoLayout()
             }
         }
-        sidebarViewGroup = group("View") {
-            input("Position", positionProperty)
-            input("Size", sizeProperty)
+        sidebarViewGroup = group("Layout") {
+            input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
+                "x=${left.roundToInt()}, y=${top.roundToInt()}"
+            })
+            input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
+                "width=${width.roundToInt()}, height=${height.roundToInt()}"
+            })
             checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
+        }
+        sidebarFlatViewGroup = group("Preview layout") {
+            input("Position", flatPreview.leftProperty.join(flatPreview.topProperty) { left, top ->
+                "x=${left.roundToInt()}, y=${top.roundToInt()}"
+            })
+            input("Size", flatPreview.widthProperty.join(flatPreview.heightProperty) { width, height ->
+                "width=${width.roundToInt()}, height=${height.roundToInt()}"
+            })
         }
 
         group("Metadata") {
@@ -196,10 +202,12 @@ class ContainerLinker(
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
-        val h = event.target == pictogram
-        sidebarActionsGroup.display = !h
-        sidebarViewGroup.display = h
-        sidebarPreviewGroup.display = h
+        val isTargetRoot = event.target == pictogram
+        sidebarActionsGroup.display = !isTargetRoot
+        sidebarViewGroup.display = isTargetRoot
+        sidebarPreviewGroup.display = isTargetRoot
+
+        sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
     private lateinit var contextStepIn: ListView
@@ -222,7 +230,7 @@ class ContainerLinker(
             linker.also {
                 it.pictogram.left = event.diagram.x
                 it.pictogram.top = event.diagram.y
-                it.focus()
+                it.focus(event.target)
             }
         }
         addItem(MaterialIcon.ADD, "Add package") { event ->
@@ -231,7 +239,7 @@ class ContainerLinker(
             linker.also {
                 it.pictogram.left = event.diagram.x
                 it.pictogram.top = event.diagram.y
-                it.focus()
+                it.focus(event.target)
             }
         }
         addItem(MaterialIcon.ADD, "Add event") { event ->
@@ -240,7 +248,7 @@ class ContainerLinker(
             linker.also {
                 it.pictogram.left = event.diagram.x
                 it.pictogram.top = event.diagram.y
-                it.focus()
+                it.focus(event.target)
             }
         }
         addItem(MaterialIcon.ADD, "Add role type") { event ->
@@ -249,7 +257,7 @@ class ContainerLinker(
             linker.also {
                 it.pictogram.left = event.diagram.x
                 it.pictogram.top = event.diagram.y
-                it.focus()
+                it.focus(event.target)
             }
         }
         addItem(MaterialIcon.ADD, "Add compartment") { event ->
@@ -258,7 +266,7 @@ class ContainerLinker(
             linker.also {
                 it.pictogram.left = event.diagram.x
                 it.pictogram.top = event.diagram.y
-                it.focus()
+                it.focus(event.target)
             }
         }
 

@@ -1,5 +1,6 @@
 package io.framed.linker
 
+import de.westermann.kobserve.basic.join
 import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import io.framed.framework.Linker
@@ -8,11 +9,10 @@ import io.framed.framework.LinkerManager
 import io.framed.framework.PreviewLinker
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.MaterialIcon
-import io.framed.framework.view.contextMenu
-import io.framed.framework.view.sidebar
+import io.framed.framework.view.*
 import io.framed.model.Event
 import io.framed.model.EventType
+import kotlin.math.roundToInt
 
 class EventLinker(
         override val model: Event,
@@ -61,6 +61,9 @@ class EventLinker(
         }
     }
 
+    private lateinit var sidebarViewGroup: SidebarGroup
+    private lateinit var sidebarFlatViewGroup: SidebarGroup
+
     override val sidebar = sidebar {
         title("Event")
 
@@ -69,6 +72,28 @@ class EventLinker(
                 it.printableName
             }
         }
+
+        sidebarViewGroup = group("Layout") {
+            input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
+                "x=${left.roundToInt()}, y=${top.roundToInt()}"
+            })
+            input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
+                "width=${width.roundToInt()}, height=${height.roundToInt()}"
+            })
+        }
+        sidebarFlatViewGroup = group("Preview layout") {
+            input("Position", flatPreview.leftProperty.join(flatPreview.topProperty) { left, top ->
+                "x=${left.roundToInt()}, y=${top.roundToInt()}"
+            })
+            input("Size", flatPreview.widthProperty.join(flatPreview.heightProperty) { width, height ->
+                "width=${width.roundToInt()}, height=${height.roundToInt()}"
+            })
+        }
+    }
+
+    override fun Sidebar.onOpen(event: SidebarEvent) {
+        sidebarViewGroup.display = event.target == pictogram
+        sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
     override val contextMenu = contextMenu {

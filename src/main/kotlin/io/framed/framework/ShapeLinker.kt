@@ -12,7 +12,7 @@ interface ShapeLinker<M : ModelElement<M>, P : Shape> : Linker<M, P> {
     override fun delete() {
         parent?.let { parent ->
             parent.remove(this)
-            parent.sidebar.onOpen(SidebarEvent.NONE)
+            parent.sidebar.onOpen(SidebarEvent(parent.pictogram))
             parent.sidebar.open()
         }
     }

@@ -31,10 +31,10 @@ class HtmlConnections(
 
     fun remove() {
         for ((it, _) in jsPlumbList) {
+            //it.unmakeEverySource()
+            //it.unmakeEveryTarget()
             it.deleteEveryConnection()
             it.deleteEveryEndpoint()
-            it.unmakeEverySource()
-            it.unmakeEveryTarget()
             it.reset()
         }
         jsPlumbList = emptyList()

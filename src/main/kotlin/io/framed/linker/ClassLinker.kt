@@ -92,43 +92,49 @@ class ClassLinker(
         }
     }
 
-    private val positionProperty = pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
-        "x=${left.roundToInt()}, y=${top.roundToInt()}"
-    }
-    private val sizeProperty = pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
-        "width=${width.roundToInt()}, height=${height.roundToInt()}"
-    }
-
     private lateinit var sidebarViewGroup: SidebarGroup
+    private lateinit var sidebarFlatViewGroup: SidebarGroup
 
     override val sidebar = sidebar {
         title("Class")
         group("General") {
             input("Name", nameProperty)
         }
-        sidebarViewGroup = group("View") {
-            input("Position", positionProperty)
-            input("Size", sizeProperty)
+        sidebarViewGroup = group("Layout") {
+            input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
+                "x=${left.roundToInt()}, y=${top.roundToInt()}"
+            })
+            input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
+                "width=${width.roundToInt()}, height=${height.roundToInt()}"
+            })
             checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
+        }
+        sidebarFlatViewGroup = group("Preview layout") {
+            input("Position", flatPreview.leftProperty.join(flatPreview.topProperty) { left, top ->
+                "x=${left.roundToInt()}, y=${top.roundToInt()}"
+            })
+            input("Size", flatPreview.widthProperty.join(flatPreview.heightProperty) { width, height ->
+                "width=${width.roundToInt()}, height=${height.roundToInt()}"
+            })
         }
 
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
-        val h = event.target == pictogram
-        sidebarViewGroup.display = h
+        sidebarViewGroup.display = event.target == pictogram
+        sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
     override val contextMenu = contextMenu {
         title = "Class: $name"
-        addItem(MaterialIcon.ADD, "Add attribute") {
+        addItem(MaterialIcon.ADD, "Add attribute") { event ->
             attributes += AttributeLinker(Attribute(), this@ClassLinker).also { linker ->
-                linker.focus()
+                linker.focus(event.target)
             }
         }
-        addItem(MaterialIcon.ADD, "Add method") {
+        addItem(MaterialIcon.ADD, "Add method") { event ->
             methods += MethodLinker(Method(), this@ClassLinker).also { linker ->
-                linker.focus()
+                linker.focus(event.target)
             }
         }
         addItem(MaterialIcon.DELETE, "Delete") {
