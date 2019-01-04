@@ -39,9 +39,9 @@ class HtmlIconShape(
 
     init {
         if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(view, view.html)
+            absolutePosition(view)
         } else if (position == BoxShape.Position.BORDER) {
-            borderPosition(view, view.html, parent?.parent as HtmlBoxShape)
+            borderPosition(view, parent?.parent as HtmlBoxShape)
 
             shape.property.onChange.reference {
                 view.zIndex = if (shape.property.value == null) -1 else null
@@ -49,7 +49,7 @@ class HtmlIconShape(
         }
 
         parentContainer?.onParentMove?.reference {
-            jsPlumbInstance.revalidate(view.html)
+            revalidate()
         }?.let { reference = it }
     }
 }

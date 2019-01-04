@@ -50,7 +50,7 @@ class HtmlTextShape(
 
     init {
         parentContainer?.onParentMove?.reference {
-            jsPlumbInstance.revalidate(view.html)
+            revalidate()
         }?.let { reference = it }
     }
 }

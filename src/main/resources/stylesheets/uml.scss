@@ -140,6 +140,7 @@
 
 .drop-target {
   outline: solid 2px $primary-color;
+  z-index: 2;
 
   &:after {
     content: '';
@@ -177,11 +178,12 @@
   }
 }
 
-/*
-.jtk-connector, .jtk-endpoint {
+.jtk-connector.jtk-dragging {
   z-index: 1;
 }
-*/
+.jtk-endpoint {
+  visibility: hidden;
+}
 
 .connection-source {
   position: absolute;

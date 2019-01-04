@@ -73,7 +73,7 @@ class HtmlBoxShape(
                     shape.height = snappedSize.y
                     this@listView.width = snappedSize.x
                     this@listView.height = snappedSize.y
-                    jsPlumbInstance.revalidate(view.html)
+                    revalidate()
 
                     if (htmlRenderer.snapToView) {
                         htmlRenderer.navigationView.clearLines()
@@ -99,14 +99,14 @@ class HtmlBoxShape(
                     async {
                         shape.width = clientWidth.toDouble()
                         shape.height = clientHeight.toDouble()
-                        jsPlumbInstance.revalidate(view.html)
+                        revalidate()
                     }
                 } else {
                     shape.width = clientWidth.toDouble()
                     shape.height = clientHeight.toDouble()
                     width = shape.width
                     height = shape.height
-                    jsPlumbInstance.revalidate(view.html)
+                    revalidate()
                 }
             }
 
@@ -152,12 +152,12 @@ class HtmlBoxShape(
 
     init {
         if (position == BoxShape.Position.ABSOLUTE) {
-            absolutePosition(positionView, view.html, content.onParentMove)
+            absolutePosition(positionView, content.onParentMove)
         } else if (position == BoxShape.Position.BORDER) {
-            borderPosition(positionView, view.html, parent?.parent as HtmlBoxShape)
+            borderPosition(positionView, parent?.parent as HtmlBoxShape)
 
             parentContainer?.onParentMove?.reference {
-                jsPlumbInstance.revalidate(view.html)
+                revalidate()
             }?.let { reference = it }
         }
     }

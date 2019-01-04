@@ -127,6 +127,12 @@ class HtmlConnections(
         }
     }
 
+    fun revalidate(html: HTMLElement) {
+        for ((instance, _) in jsPlumbList) {
+            instance.revalidate(html)
+        }
+    }
+
     private fun updateEndpoints(source: Shape? = null) {
         isConnecting = source
         if (source == null) {

@@ -84,9 +84,14 @@ abstract class HtmlShape(
         }
     }
 
+    fun revalidate() {
+        async {
+            htmlRenderer.htmlConnections.revalidate(view.html)
+        }
+    }
+
     fun absolutePosition(
             view: View<*>,
-            jsPlumbView: HTMLElement,
             onMove: EventHandler<Shape>? = null
     ) = with(view) {
         classes += "absolute-view"
@@ -111,17 +116,13 @@ abstract class HtmlShape(
         shape.leftProperty.onChange.reference {
             left = shape.left
 
-            async {
-                jsPlumbInstance?.revalidate(jsPlumbView)
-            }
+                revalidate()
             onMove?.emit(shape)
         }?.let(listeners::add)
         shape.topProperty.onChange.reference {
             top = shape.top
 
-            async {
-                jsPlumbInstance?.revalidate(jsPlumbView)
-            }
+                revalidate()
             onMove?.emit(shape)
         }?.let(listeners::add)
         shape.widthProperty.onChange.reference {
@@ -131,7 +132,7 @@ abstract class HtmlShape(
                 width = shape.width
             }
 
-            jsPlumbInstance?.revalidate(jsPlumbView)
+                revalidate()
             onMove?.emit(shape)
         }?.let(listeners::add)
         shape.heightProperty.onChange.reference {
@@ -141,7 +142,7 @@ abstract class HtmlShape(
                 height = shape.height
             }
 
-            jsPlumbInstance?.revalidate(jsPlumbView)
+                revalidate()
             onMove?.emit(shape)
         }?.let(listeners::add)
 
@@ -213,7 +214,6 @@ abstract class HtmlShape(
 
     fun borderPosition(
             view: View<*>,
-            jsPlumbView: HTMLElement,
             parentHtmlBoxShape: HtmlBoxShape
     ) = with(view) {
         classes += "border-view"
@@ -222,7 +222,8 @@ abstract class HtmlShape(
             marginLeft = -clientWidth / 2.0
             marginTop = -clientHeight / 2.0
             onDrag.emit(View.DragEvent(Point.ZERO, false))
-            jsPlumbInstance?.revalidate(jsPlumbView)
+
+            revalidate()
         }
 
         left = shape.left
@@ -244,12 +245,12 @@ abstract class HtmlShape(
         shape.leftProperty.onChange.reference {
             left = shape.left
 
-            jsPlumbInstance?.revalidate(jsPlumbView)
+            revalidate()
         }?.let(listeners::add)
         shape.topProperty.onChange.reference {
             top = shape.top
 
-            jsPlumbInstance?.revalidate(jsPlumbView)
+            revalidate()
         }?.let(listeners::add)
         shape.widthProperty.onChange.reference {
             if (shape.autosize) {
@@ -258,7 +259,7 @@ abstract class HtmlShape(
                 width = shape.width
             }
 
-            jsPlumbInstance?.revalidate(jsPlumbView)
+            revalidate()
         }?.let(listeners::add)
         shape.heightProperty.onChange.reference {
             if (shape.autosize) {
@@ -267,7 +268,7 @@ abstract class HtmlShape(
                 height = shape.height
             }
 
-            jsPlumbInstance?.revalidate(jsPlumbView)
+            revalidate()
         }?.let(listeners::add)
 
         val resizer = parentHtmlBoxShape.resizer
