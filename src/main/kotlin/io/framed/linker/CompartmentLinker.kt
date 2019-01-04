@@ -150,6 +150,7 @@ class CompartmentLinker(
         parent.redraw(this@CompartmentLinker)
     }
 
+    private lateinit var sidebarActionsGroup: SidebarGroup
     private lateinit var sidebarViewGroup: SidebarGroup
     private lateinit var sidebarFlatViewGroup: SidebarGroup
     private lateinit var sidebarPreviewGroup: SidebarGroup
@@ -157,6 +158,14 @@ class CompartmentLinker(
         title("Compartment")
         group("General") {
             input("Name", nameProperty)
+        }
+        sidebarActionsGroup = group("Actions") {
+            button("Auto layout") {
+                Layouting.autoLayout(
+                        container,
+                        connectionManager.connections.asSequence().map { it.pictogram }.toSet()
+                )
+            }
         }
         sidebarPreviewGroup = group("Preview") {
             button("Toggle preview") {
@@ -194,6 +203,7 @@ class CompartmentLinker(
         val isTargetRoot = event.target == pictogram
         sidebarViewGroup.display = isTargetRoot
         sidebarPreviewGroup.display = isTargetRoot
+        sidebarActionsGroup.display = event.target == container
 
         sidebarFlatViewGroup.display = event.target == flatPreview
     }

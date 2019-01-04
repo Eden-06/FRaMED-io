@@ -121,7 +121,6 @@ class ContainerLinker(
     private var isFlatPreview by isFlatPreviewProperty
 
     private lateinit var sidebarActionsGroup: SidebarGroup
-    private lateinit var sidebarContentGroup: SidebarGroup
     private lateinit var sidebarPreviewGroup: SidebarGroup
     private lateinit var sidebarViewGroup: SidebarGroup
     private lateinit var sidebarFlatViewGroup: SidebarGroup
@@ -173,14 +172,6 @@ class ContainerLinker(
                 Application.renderer.panTo(Point.ZERO)
             }
         }
-        sidebarContentGroup = group("Content") {
-            button("Auto layout") {
-                Layouting.autoLayout(
-                        container,
-                        connectionManager.connections.asSequence().map { it.pictogram }.toSet()
-                )
-            }
-        }
         sidebarPreviewGroup = group("Preview") {
             button("Toggle preview") {
                 isFlatPreview = !isFlatPreview
@@ -226,7 +217,6 @@ class ContainerLinker(
         sidebarViewGroup.display = isTargetRoot
         sidebarPreviewGroup.display = isTargetRoot
 
-        sidebarContentGroup.display = event.target == container
         sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
