@@ -111,13 +111,17 @@ abstract class HtmlShape(
         shape.leftProperty.onChange.reference {
             left = shape.left
 
-            jsPlumbInstance?.revalidate(jsPlumbView)
+            async {
+                jsPlumbInstance?.revalidate(jsPlumbView)
+            }
             onMove?.emit(shape)
         }?.let(listeners::add)
         shape.topProperty.onChange.reference {
             top = shape.top
 
-            jsPlumbInstance?.revalidate(jsPlumbView)
+            async {
+                jsPlumbInstance?.revalidate(jsPlumbView)
+            }
             onMove?.emit(shape)
         }?.let(listeners::add)
         shape.widthProperty.onChange.reference {

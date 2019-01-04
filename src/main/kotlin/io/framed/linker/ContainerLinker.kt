@@ -171,7 +171,10 @@ class ContainerLinker(
                 updatePreviewType()
             }
             button("Auto layout") {
-                autoLayoutBox.autoLayout()
+                Layouting.autoLayout(
+                        autoLayoutBox,
+                        connectionManager.connections.asSequence().map { it.pictogram }.toSet()
+                )
             }
         }
         sidebarViewGroup = group("Layout") {

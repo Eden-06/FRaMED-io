@@ -1,18 +1,25 @@
+package io.framed.framework
+
 /**
  * The class binds the Dagre-library to the middleware.
  */
-external class Dagre {
+class Dagre {
     companion object {
         /**
          * Get a new directed Dagre Graph.
          */
-        fun getGraph(): DagreGraph
+        @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+        fun getGraph(): DagreGraph {
+            return js("new dagre.graphlib.Graph()") as DagreGraph
+        }
+        /**
+         * The method sorts all nodes according to the current options.
+         */
+        @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+        fun layout(graph: DagreGraph) {
+            js("dagre").layout(graph)
+        }
     }
-
-    /**
-     * The method sorts all nodes according to the current options.
-     */
-    fun layout(graph: DagreGraph)
 }
 
 /**
@@ -24,31 +31,46 @@ external interface DagreEdge {
      * The number of ranks to keep between the source and target of the edge.
      */
     var minlen: Int
-    var sourceId: String
-    var targetId: String
+    var sourceId: Long
+    var targetId: Long
     /**
      * The weight to assign edges. Higher weight edges are generally made shorter and straighter than lower weight edges.
      */
     var weight: Int
 }
+/**
+ *
+ */
+fun dagreEdge(init: DagreEdge.() -> Unit = {}): DagreEdge {
+    val e = js("{}")
+    init(e)
+    return e
+}
+@JsName("Graph")
 external interface DagreGraph {
     /**
      * The method sets the general settings for the algorithm.
      */
     fun setGraph(options: DagreGraphOptions)
-
     /**
      * The method adds a new node to the algorithm.
      */
-    fun setNode(node: DagreNode)
+    fun setNode(id: Long, node: DagreNodeOptions)
     /**
      * The method adds a new edge to the algorithm.
      */
-    fun setEdge(edge: DagreEdge)
+    fun setEdge(source: Long, target: Long)
+    /**
+     *
+     */
     /**
      * The method gets all (sorted) nodes from the graph.
      */
-    fun getNodes()
+    fun nodes() : Array<Long>
+    /**
+     *
+     */
+    fun node(id: Long): DagreNodeOptions
 }
 enum class DagreGraphAlign {
     UL, UR, DL, DR
@@ -73,30 +95,61 @@ external interface DagreGraphOptions {
     /**
      * Direction for rank nodes. Can be TB, BT, LR, or RL, where T = top, B = bottom, L = left, and R = right.
      */
-    var rankdir: RankerDirection
+    var rankdir: String
     /**
-     * Type of algorithm to assigns a rank to each node in the input graph. Possible values: network-simplex, tight-tree or longest-path
+     * Type of algorithm to assigns a rank to each node in the input graph. Possible values: `network-simplex`, `tight-tree` or `longest-path`
      */
-    var ranker: RankerTechnique
+    var ranker: String
     /**
      * Number of pixels between each rank in the layout.
      */
     var rankSep: Int
 }
+/**
+ *
+ */
+fun dagreGraphOptions(init: DagreGraphOptions.() -> Unit = {}): DagreGraphOptions {
+    val d = js("{}")
+    init(d)
+    return d
+}
+
+/**
+ *
+ */
 external interface DagreNode {
-    var id: Int
+    var id: Long
     var options: DagreNodeOptions
 }
+/**
+ *
+ */
+fun dagreNode(init: DagreNode.() -> Unit = {}): DagreNode {
+    val n = js("{}")
+    init(n)
+    return n
+}
+
+/**
+ *
+ */
 external interface DagreNodeOptions {
     var width: Double
     var height: Double
-    /// Hier können noch weitere Attribute kommen
+    var label: String
+    @JsName("y")
+    var top: Double
+    @JsName("x")
+    var left: Double
 }
-enum class RankerDirection {
-    TB, BT, LR, RL
+/**
+ *
+ */
+fun dagreNodeOptions(init: DagreNodeOptions.() -> Unit = {}): DagreNodeOptions {
+    val n = js("{}")
+    init(n)
+    return n
 }
-enum class RankerTechnique(val jsName: String) {
-    NETWORK_SIMPLEX("network-simplex"),
-    TIGHT_TREE("tight-tree"),
-    LONGEST_PATH("longest-path")
+fun DagreGraph.setDefaultEdgeLabel() = asDynamic().setDefaultEdgeLabel {
+    js("{}")
 }

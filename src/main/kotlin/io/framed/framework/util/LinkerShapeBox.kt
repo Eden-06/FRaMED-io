@@ -76,7 +76,7 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
         if (addToHistory) {
             History.push(item)
 
-            previewBox?.autoLayout()
+            //TODO add auto layout
         }
     }
 

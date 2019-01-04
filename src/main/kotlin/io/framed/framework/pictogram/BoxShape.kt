@@ -1,6 +1,8 @@
 package io.framed.framework.pictogram
 
 import de.westermann.kobserve.EventHandler
+import io.framed.framework.Dagre
+import io.framed.framework.DagreGraph
 import io.framed.framework.Linker
 import io.framed.framework.util.History
 
@@ -49,19 +51,6 @@ class BoxShape(id: Long?) : Shape(id) {
     }
 
     operator fun Shape.unaryPlus() = add(this)
-
-    fun autoLayout() {
-        if (position == Position.ABSOLUTE) {
-            History.group("Auto layout shape $id") {
-                var currentTop = 0.0
-                shapes.forEach {
-                    it.top = currentTop
-                    it.left = 100.00
-                    currentTop += it.height
-                }
-            }
-        }
-    }
 }
 
 fun Linker<*, *>.boxShape(position: BoxShape.Position = BoxShape.Position.VERTICAL, id: Long = this.id, init: BoxShape.() -> Unit) =
