@@ -621,7 +621,12 @@ table {
     background: $error-primary;
     color: $error-text;
   }
+
+  &::-moz-focus-inner {
+    border: 0;
+  }
 }
+
 
 .icon-view {
   color: $icon-color;

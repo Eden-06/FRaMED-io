@@ -105,6 +105,7 @@ class ContainerLinker(
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
             }
+            padding = box(10.0)
         }
     }
 
@@ -120,6 +121,7 @@ class ContainerLinker(
     private var isFlatPreview by isFlatPreviewProperty
 
     private lateinit var sidebarActionsGroup: SidebarGroup
+    private lateinit var sidebarContentGroup: SidebarGroup
     private lateinit var sidebarPreviewGroup: SidebarGroup
     private lateinit var sidebarViewGroup: SidebarGroup
     private lateinit var sidebarFlatViewGroup: SidebarGroup
@@ -163,6 +165,14 @@ class ContainerLinker(
             }
             button("Reset pan") {
                 Application.renderer.panTo(Point.ZERO)
+            }
+        }
+        sidebarContentGroup = group("Content") {
+            button("Auto layout") {
+                Layouting.autoLayout(
+                        container,
+                        connectionManager.connections.asSequence().map { it.pictogram }.toSet()
+                )
             }
         }
         sidebarPreviewGroup = group("Preview") {
@@ -210,6 +220,7 @@ class ContainerLinker(
         sidebarViewGroup.display = isTargetRoot
         sidebarPreviewGroup.display = isTargetRoot
 
+        sidebarContentGroup.display = event.target == container
         sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
