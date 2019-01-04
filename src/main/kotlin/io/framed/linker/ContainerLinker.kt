@@ -160,6 +160,12 @@ class ContainerLinker(
             input("Name", nameProperty)
         }
         sidebarActionsGroup = group("Actions") {
+            button("Auto layout") {
+                Layouting.autoLayout(
+                        container,
+                        connectionManager.connections.asSequence().map { it.pictogram }.toSet()
+                )
+            }
             button("Reset zoom") {
                 Application.renderer.zoom = 1.0
             }
@@ -216,7 +222,7 @@ class ContainerLinker(
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
         val isTargetRoot = event.target == pictogram
-        sidebarActionsGroup.display = !isTargetRoot
+        sidebarActionsGroup.display = event.target == container
         sidebarViewGroup.display = isTargetRoot
         sidebarPreviewGroup.display = isTargetRoot
 
