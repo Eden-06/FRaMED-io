@@ -143,10 +143,7 @@ class HtmlBoxShape(
         super.remove()
         content.remove()
         container -= positionView
-        reference?.remove()
     }
-
-    var reference: ListenerReference<*>? = null
 
     override val viewList: List<View<*>> = listOf(view, positionView)
 
@@ -155,10 +152,6 @@ class HtmlBoxShape(
             absolutePosition(positionView, content.onParentMove)
         } else if (position == BoxShape.Position.BORDER) {
             borderPosition(positionView, parent?.parent as HtmlBoxShape)
-
-            parentContainer?.onParentMove?.reference {
-                revalidate()
-            }?.let { reference = it }
         }
     }
 }

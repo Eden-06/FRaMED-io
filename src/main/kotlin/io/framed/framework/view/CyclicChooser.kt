@@ -1,5 +1,6 @@
 package io.framed.framework.view
 
+import de.westermann.kobserve.ListenerReference
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import org.w3c.dom.HTMLDivElement
@@ -53,14 +54,16 @@ class CyclicChooser<T>(
         }
     }
 
+    var reference: ListenerReference<*>? = null
+
     fun open() {
         Root += this
-        Root.onKeyDown += this::keyListener
+        reference = Root.onKeyDown.reference(this::keyListener)
     }
 
     private fun close() {
         Root -= this
-        Root.onKeyDown -= this::keyListener
+        reference?.remove()
     }
 
     init {

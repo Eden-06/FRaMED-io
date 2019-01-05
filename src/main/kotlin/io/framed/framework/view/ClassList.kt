@@ -50,4 +50,5 @@ class ClassList(
      */
     fun toggle(clazz: String) = list.toggle(clazz)
 
+    override fun toString(): String = list.value
 }

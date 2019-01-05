@@ -20,6 +20,9 @@ interface Linker<M : ModelElement<M>, P : Pictogram> {
     val sidebar: Sidebar
     val contextMenu: ContextMenu
 
+    val typeName: String
+        get() = this::class.simpleName?.replace("Linker", "") ?: "Unknown"
+
     fun focus(pictogram: Pictogram = this.pictogram) {
         sidebar.onOpen(SidebarEvent(pictogram))
         sidebar.open()

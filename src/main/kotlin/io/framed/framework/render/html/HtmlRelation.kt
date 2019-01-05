@@ -75,7 +75,7 @@ class HtmlRelation(
                 val create = { _: dynamic ->
                     label.view.html
                 }
-                val cssClass = "front-end-label input-view"
+                val cssClass = label.view.classes.toString()
                 val location = position
             })
         }

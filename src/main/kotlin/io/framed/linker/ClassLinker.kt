@@ -22,10 +22,10 @@ class ClassLinker(
         override val parent: ShapeLinker<*, *>
 ) : PreviewLinker<Class, BoxShape, TextShape> {
 
-    private val nameProperty = property(model::name)
+    override val nameProperty = property(model::name)
             .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())::validate)
             .trackHistory()
-    var name by nameProperty
+    override var name by nameProperty
 
     val attributes = shapeBox(model::attributes)
     val methods = shapeBox(model::methods)

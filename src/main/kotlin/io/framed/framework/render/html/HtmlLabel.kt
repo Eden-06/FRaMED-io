@@ -1,6 +1,7 @@
 package io.framed.framework.render.html
 
 import de.westermann.kobserve.ListenerReference
+import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
@@ -9,7 +10,8 @@ import io.framed.framework.view.*
 class HtmlLabel(
         private val htmlRenderer: HtmlRenderer,
         val shape: TextShape,
-        val parent: ViewCollection<View<*>, *>
+        val parent: ViewCollection<View<*>, *>,
+        boundShape: Shape? = null
 ) {
 
     val listeners = mutableListOf<ListenerReference<*>>()
@@ -75,6 +77,17 @@ class HtmlLabel(
                     it.performDrag(event.indirect)
                 }
             }
+        }
+    }
+
+    init {
+        if (boundShape != null) {
+            boundShape.topProperty.onChange.reference {
+                view.top = boundShape.top
+            }?.let(listeners::add)
+            boundShape.leftProperty.onChange.reference {
+                view.left = boundShape.left
+            }?.let(listeners::add)
         }
     }
 }

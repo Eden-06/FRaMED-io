@@ -165,5 +165,5 @@ class InputView() : View<HTMLDivElement>("div") {
 fun ViewCollection<in InputView, *>.inputView(init: InputView.() -> Unit) =
         InputView().also(this::append).also(init)
 
-fun ViewCollection<in InputView, *>.inputView(property: Property<String>, init: InputView.() -> Unit) =
+fun ViewCollection<in InputView, *>.inputView(property: ReadOnlyProperty<String>, init: InputView.() -> Unit) =
         InputView(property).also(this::append).also(init)

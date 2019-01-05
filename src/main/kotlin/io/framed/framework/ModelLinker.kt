@@ -8,8 +8,8 @@ import io.framed.framework.pictogram.Shape
  * @author lars
  */
 interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker<M, P, R> {
-    val nameProperty: Property<String>
-    val name: String
+
+    override val nameProperty: Property<String>
 
     val shapeLinkers: Set<ShapeLinker<*, *>>
 

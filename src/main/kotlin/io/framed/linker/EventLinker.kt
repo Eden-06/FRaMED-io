@@ -1,5 +1,7 @@
 package io.framed.linker
 
+import de.westermann.kobserve.Property
+import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.basic.join
 import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
@@ -21,6 +23,11 @@ class EventLinker(
 
     private val typeProperty = property(model::type).trackHistory()
     private val symbolProperty = typeProperty.mapBinding { it.symbol }
+
+    override val nameProperty: ReadOnlyProperty<String> = symbolProperty.mapBinding {
+        it?.let { it::class.simpleName } ?: "Unknown"
+    }
+    override val name: String by nameProperty
 
     override val pictogram: IconShape = iconShape(symbolProperty) {
         style {
@@ -48,7 +55,7 @@ class EventLinker(
         }
     }
 
-    override val flatPreview =iconShape(symbolProperty) {
+    override val flatPreview = iconShape(symbolProperty) {
         style {
             background = color(255, 255, 255)
             border {

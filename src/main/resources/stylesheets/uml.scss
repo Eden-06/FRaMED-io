@@ -156,7 +156,14 @@
   }
 }
 
-.front-end-label {
+.html-label {
+  position: absolute;
+
+  width: intrinsic;
+  width: -moz-max-content;
+  width: -webkit-max-content;
+  width: max-content;
+
   &.focus {
     z-index: 1;
   }

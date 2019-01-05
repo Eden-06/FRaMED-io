@@ -14,30 +14,20 @@ import io.framed.framework.view.ResizeHandler
 import io.framed.framework.view.Root
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
-import org.w3c.dom.HTMLElement
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
 abstract class HtmlShape(
-        val htmlRenderer: HtmlRenderer,
+        private val htmlRenderer: HtmlRenderer,
         open val shape: Shape,
         val parent: HtmlContentShape?,
-        val parentContainer: HtmlShapeContainer?,
+        parentContainer: HtmlShapeContainer?,
         val container: ViewCollection<View<*>, *>,
         open val jsPlumbInstance: JsPlumbInstance?
 ) {
     abstract val view: View<*>
     abstract val viewList: List<View<*>>
-
-    open fun remove() {
-        container -= view
-
-        for (reference in listeners) {
-            reference.remove()
-        }
-        listeners.clear()
-    }
 
     val listeners = mutableListOf<ListenerReference<*>>()
 
@@ -116,13 +106,13 @@ abstract class HtmlShape(
         shape.leftProperty.onChange.reference {
             left = shape.left
 
-                revalidate()
+            revalidate()
             onMove?.emit(shape)
         }?.let(listeners::add)
         shape.topProperty.onChange.reference {
             top = shape.top
 
-                revalidate()
+            revalidate()
             onMove?.emit(shape)
         }?.let(listeners::add)
         shape.widthProperty.onChange.reference {
@@ -132,7 +122,7 @@ abstract class HtmlShape(
                 width = shape.width
             }
 
-                revalidate()
+            revalidate()
             onMove?.emit(shape)
         }?.let(listeners::add)
         shape.heightProperty.onChange.reference {
@@ -142,7 +132,7 @@ abstract class HtmlShape(
                 height = shape.height
             }
 
-                revalidate()
+            revalidate()
             onMove?.emit(shape)
         }?.let(listeners::add)
 
@@ -336,5 +326,42 @@ abstract class HtmlShape(
         }
 
         htmlRenderer.draggableViews += this
+    }
+
+    open fun remove() {
+        container -= view
+
+        for (reference in listeners) {
+            reference.remove()
+        }
+        listeners.clear()
+
+        for (label in labels) {
+            label.remove()
+        }
+
+        reference?.remove()
+    }
+
+    var labels: Set<HtmlLabel> = emptySet()
+
+    private fun initLabels() {
+        for (label in shape.labels) {
+            val htmlLabel = HtmlLabel(htmlRenderer, label, container, shape)
+            container += htmlLabel.view
+            labels += htmlLabel
+        }
+    }
+
+    private var reference: ListenerReference<*>? = null
+
+    init {
+        parentContainer?.onParentMove?.reference {
+            revalidate()
+        }?.let { reference = it }
+
+        async {
+            initLabels()
+        }
     }
 }

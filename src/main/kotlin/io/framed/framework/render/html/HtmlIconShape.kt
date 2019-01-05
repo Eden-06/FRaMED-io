@@ -28,14 +28,8 @@ class HtmlIconShape(
         events(this, shape)
     }
 
-    override fun remove() {
-        super.remove()
-        reference?.remove()
-    }
-
     override val viewList: List<View<*>> = listOf(view)
 
-    var reference: ListenerReference<*>? = null
 
     init {
         if (position == BoxShape.Position.ABSOLUTE) {
@@ -47,9 +41,5 @@ class HtmlIconShape(
                 view.zIndex = if (shape.property.value == null) -1 else null
             }?.trigger(Unit)
         }
-
-        parentContainer?.onParentMove?.reference {
-            revalidate()
-        }?.let { reference = it }
     }
 }

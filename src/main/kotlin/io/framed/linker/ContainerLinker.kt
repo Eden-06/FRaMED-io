@@ -411,8 +411,8 @@ class ContainerLinker(
             }
         }
 
-        neededBorderViews.forEach {
-            val shape = iconShape(property<Icon?>(null), id = -it) {
+        neededBorderViews.forEach { id ->
+            val shape = iconShape(property<Icon?>(null), id = -id) {
                 style {
                     background = color(255, 255, 255)
                     border {
@@ -422,6 +422,12 @@ class ContainerLinker(
                     }
                     padding = box(10.0)
                 }
+
+                val linker = shapeLinkers.find { it.id == id } as? PreviewLinker<*, *, *> ?: return@iconShape
+
+                val typeName = linker.typeName
+                val name = linker.nameProperty.mapBinding { "$typeName: $it" }
+                labels += textShape(name)
             }
             borderBox += shape
             borderShapes += shape

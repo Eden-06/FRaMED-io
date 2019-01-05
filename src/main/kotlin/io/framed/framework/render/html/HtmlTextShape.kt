@@ -41,16 +41,4 @@ class HtmlTextShape(
 
     override val viewList: List<View<*>> = listOf(view)
 
-    override fun remove() {
-        super.remove()
-        reference?.remove()
-    }
-
-    var reference: ListenerReference<*>? = null
-
-    init {
-        parentContainer?.onParentMove?.reference {
-            revalidate()
-        }?.let { reference = it }
-    }
 }

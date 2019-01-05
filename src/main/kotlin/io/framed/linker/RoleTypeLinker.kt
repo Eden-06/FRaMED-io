@@ -22,10 +22,10 @@ class RoleTypeLinker(
         override val parent: ContainerLinker
 ) : PreviewLinker<RoleType, BoxShape, TextShape> {
 
-    private val nameProperty = property(model::name)
-            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+    override val nameProperty = property(model::name)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())::validate)
             .trackHistory()
-    var name by nameProperty
+    override var name by nameProperty
 
     private lateinit var bodyBox: BoxShape
 
