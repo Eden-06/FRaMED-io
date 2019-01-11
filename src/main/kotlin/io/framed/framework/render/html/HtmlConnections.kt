@@ -8,11 +8,10 @@ import io.framed.framework.jsPlumbTargetOptionsInit
 import io.framed.framework.pictogram.Connection
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.ViewModel
+import io.framed.framework.util.Dimension
 import io.framed.framework.util.async
-import io.framed.framework.view.IconView
-import io.framed.framework.view.MaterialIcon
-import io.framed.framework.view.View
-import io.framed.framework.view.ViewCollection
+import io.framed.framework.util.point
+import io.framed.framework.view.*
 import org.w3c.dom.HTMLElement
 import kotlin.math.abs
 
@@ -209,12 +208,21 @@ class HtmlConnections(
         view.onMouseEnter.reference {
             if (isConnecting != null && isConnecting != shape) {
                 view.classes += "drop-target"
+
+                var reference: ListenerReference<*>? = null
+                reference = Root.onMouseMove.reference { event ->
+                    val left = view.offsetLeft.toDouble()
+                    val top = view.offsetTop.toDouble()
+                    val width = view.clientWidth.toDouble()
+                    val height = view.clientHeight.toDouble()
+                    val dimension = Dimension(left, top, width, height)
+                    if (event.point() !in dimension || event.buttons == 0.toShort()) {
+                        view.classes -= "drop-target"
+                        reference?.remove()
+                    }
+                }
             }
         }?.let(references::add)
-        view.onMouseLeave.reference {
-            view.classes -= "drop-target"
-        }?.let(references::add)
-
         endpointMap[shape] = EndpointItem(view, handler.html, references, jsPlumbInstance)
 
         setSourceEnabled(shape, true)

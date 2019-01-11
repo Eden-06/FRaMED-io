@@ -168,10 +168,7 @@ class CompartmentLinker(
             }
         }
         sidebarPreviewGroup = group("Preview") {
-            button("Toggle preview") {
-                isFlatPreview = !isFlatPreview
-                updatePreviewType()
-            }
+            checkBox("Flat preview", isFlatPreviewProperty, CheckBox.Type.SWITCH)
             button("Auto layout") {
                 Layouting.autoLayout(
                         autoLayoutBox,
@@ -272,6 +269,10 @@ class CompartmentLinker(
 
         LinkerManager.setup(this)
         connectionManager.addModel(this)
+
+        isFlatPreviewProperty.onChange {
+            updatePreviewType()
+        }
     }
 
     companion object : LinkerInfoItem {
