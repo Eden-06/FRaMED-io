@@ -241,8 +241,12 @@ abstract class View<V : HTMLElement>(view: V) {
 
     val isMouseDownProperty by ClassDelegate("mouse-down")
     var isMouseDown by isMouseDownProperty
+
     val selectedViewProperty by ClassDelegate()
     var selectedView by selectedViewProperty
+
+    val highlightedViewProperty by ClassDelegate()
+    var highlightedView by highlightedViewProperty
 
     var allowDrag = false
     val onDrag = EventHandler<DragEvent>()

@@ -33,6 +33,7 @@ class HtmlBoxShape(
     }
 
     val positionView = container.listView {
+        events(this, shape)
         if (shape.resizeable) {
             resizer = resizeable {
                 var markView: Boolean

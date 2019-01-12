@@ -193,8 +193,14 @@ abstract class HtmlShape(
             if (selectedView) {
                 container.toForeground(view)
             }
+            shape.id?.let { id ->
+                val hid = (-abs(id)).toString()
+                val v = htmlRenderer.draggableViews.find { it.html.getAttribute("data-id") == hid }
+                v?.highlightedView = selectedView
+            }
         }
         htmlRenderer.draggableViews += this
+        html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
 
         if (container != htmlRenderer.navigationView.container) {
             minTop = 0.0
@@ -267,8 +273,20 @@ abstract class HtmlShape(
         }
 
         allowDrag = true
+        onContext { event ->
+            shape.id?.let { id ->
+                val hid = abs(id).toString()
+                val v = htmlRenderer.draggableViews.find { it.html.getAttribute("data-id") == hid }
+                v?.onContext?.emit(event)
+            }
+        }
         onMouseDown { event ->
             event.stopPropagation()
+            shape.id?.let { id ->
+                val hid = abs(id).toString()
+                val v = htmlRenderer.draggableViews.find { it.html.getAttribute("data-id") == hid }
+                v?.onMouseDown?.emit(event)
+            }
 
             var markView = true
             async(200) {
@@ -326,6 +344,7 @@ abstract class HtmlShape(
         }
 
         htmlRenderer.draggableViews += this
+        html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
     }
 
     open fun remove() {

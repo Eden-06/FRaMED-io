@@ -35,8 +35,6 @@ class HtmlShapeContainer(
         is TextShape -> HtmlTextShape(htmlRenderer, shape, parent, this, container, jsPlumbInstance)
         is IconShape -> HtmlIconShape(htmlRenderer, shape, parent, this, container, containerShape.position, jsPlumbInstance)
         else -> throw UnsupportedOperationException()
-    }.also {
-        it.view.html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
     }
 
     private fun add(shape: Shape) {
