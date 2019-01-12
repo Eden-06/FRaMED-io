@@ -13,7 +13,8 @@ data class LayerData(
         private var width: Double = 0.0,
         private var height: Double = 0.0,
         private var autosize: Boolean = true,
-        private val data: MutableMap<String, String> = mutableMapOf()
+        private val data: MutableMap<String, String> = mutableMapOf(),
+        private var labels: List<Label> = emptyList()
 ) {
 
     @Transient
@@ -33,6 +34,9 @@ data class LayerData(
 
     @Transient
     val propertyMap: MutableMap<String, Property<String?>> = mutableMapOf()
+
+    @Transient
+    val labelsProperty = property(this::labels).trackHistory()
 
     fun data(name: String): Property<String?> {
         return propertyMap.getOrPut(name) {

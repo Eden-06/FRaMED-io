@@ -1,6 +1,7 @@
 package io.framed.framework.pictogram
 
 import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.basic.flatMapBinding
 import de.westermann.kobserve.basic.property
 
 /**
@@ -18,6 +19,11 @@ abstract class Pictogram(
 
     var hasSidebar = false
     var hasContextMenu = false
+
+    val labelsProperty = layerProperty.flatMapBinding { it[id].labelsProperty }
+    var labels by labelsProperty
+
+    fun data(name: String) = layerProperty.flatMapBinding { it[id].data(name) }
 
     override fun toString(): String {
         return "${this::class.simpleName}($id)"

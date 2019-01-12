@@ -17,12 +17,18 @@ class ViewModel(
         }
 
     var connections: Set<Connection> = emptySet()
+        set(value) {
+            field = value
+            for (connection in value) {
+                connection.layer = layer
+            }
+        }
 
     val onConnectionAdd = EventHandler<Connection>()
     val onConnectionRemove = EventHandler<Connection>()
 
     val onLayerChange = EventHandler<Unit>()
-    
+
     operator fun plusAssign(connection: Connection) {
         connections += connection
         onConnectionAdd.emit(connection)
@@ -31,5 +37,13 @@ class ViewModel(
     operator fun minusAssign(connection: Connection) {
         connections -= connection
         onConnectionRemove.emit(connection)
+    }
+
+    init {
+        onLayerChange {
+            for (connection in connections) {
+                connection.layer = layer
+            }
+        }
     }
 }

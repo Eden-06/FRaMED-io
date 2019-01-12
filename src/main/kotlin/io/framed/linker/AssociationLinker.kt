@@ -26,10 +26,6 @@ class AssociationLinker(
     override val targetIdProperty = property(model::targetId).trackHistory()
 
     override val pictogram = connection(sourceIdProperty, targetIdProperty) {
-        labels += textShape(nameProperty) to 0.5
-        labels += textShape(sourceCardinalityProperty, CardinalityPreset.STRING_VALUES) to -30.0
-        labels += textShape(targetCardinalityProperty, CardinalityPreset.STRING_VALUES) to 31.0
-
         line(ConnectionLine.Type.RECTANGLE) {
             stroke = Color(0, 0, 0)
             strokeWidth = 1
@@ -54,6 +50,38 @@ class AssociationLinker(
         addItem(MaterialIcon.DELETE, "Delete") {
             delete()
         }
+    }
+
+    override fun updateLabelBindings() {
+        val ids = pictogram.labels.mapNotNull { it.id }.distinct().toSet()
+        if ("name" !in ids) {
+            pictogram.labels += Label(id = "name", position = 0.5)
+        }
+        if ("source" !in ids) {
+            pictogram.labels += Label(id = "source", position = -30.0)
+        }
+        if ("target" !in ids) {
+            pictogram.labels += Label(id = "target", position = 31.0)
+        }
+
+        for (label in pictogram.labels) {
+            if (label.textProperty.isBound) {
+                label.textProperty.unbind()
+            }
+            when {
+                label.id == "name" -> label.textProperty.bindBidirectional(nameProperty)
+                label.id == "source" -> {
+                    label.textProperty.bindBidirectional(sourceCardinalityProperty)
+                    label.autocomplete = CardinalityPreset.STRING_VALUES
+                }
+                label.id == "target" -> {
+                    label.textProperty.bindBidirectional(targetCardinalityProperty)
+                    label.autocomplete = CardinalityPreset.STRING_VALUES
+                }
+            }
+        }
+
+        super.updateLabelBindings()
     }
 
     init {

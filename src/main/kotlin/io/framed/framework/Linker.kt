@@ -32,4 +32,8 @@ interface Linker<M : ModelElement<M>, P : Pictogram> {
 
     fun Sidebar.onOpen(event: SidebarEvent) {}
     fun ContextMenu.onOpen(event: ContextEvent) {}
+
+    fun updateLabelBindings() {
+        pictogram.labelsProperty.onChange.emit(Unit)
+    }
 }

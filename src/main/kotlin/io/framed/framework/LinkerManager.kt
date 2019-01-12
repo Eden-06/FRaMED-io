@@ -28,6 +28,10 @@ object LinkerManager {
                 }
             }
         }
+
+        pictogram.layerProperty.onChange {
+            linker.updateLabelBindings()
+        }
     }
 
     fun setup(linker: ConnectionLinker<*>, info: LinkerInfoConnection) {
@@ -77,6 +81,7 @@ object LinkerManager {
     }
 
     fun setup(linker: Linker<*, *>) {
+        linker.updateLabelBindings()
         setupPictogram(linker, linker.pictogram)
 
         if (linker is PreviewLinker<*, *, *>) {

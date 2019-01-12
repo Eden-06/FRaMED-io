@@ -346,6 +346,10 @@ abstract class HtmlShape(
     var labels: Set<HtmlLabel> = emptySet()
 
     private fun initLabels() {
+        for (label in labels) {
+            label.remove()
+        }
+        labels = emptySet()
         for (label in shape.labels) {
             val htmlLabel = HtmlLabel(htmlRenderer, label, container, shape)
             container += htmlLabel.view
@@ -361,6 +365,10 @@ abstract class HtmlShape(
         }?.let { reference = it }
 
         async {
+            shape.layerProperty.onChange {
+                initLabels()
+            }
+
             initLabels()
         }
     }

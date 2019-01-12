@@ -12,11 +12,6 @@ class Connection(
         val target: Property<Long>,
         id: Long
 ) : Pictogram(id) {
-    var labels: Map<TextShape, Double> = emptyMap()
-        set(value) {
-            field = value
-            onStyleChange.emit(Unit)
-        }
 
     var lines: List<ConnectionLine> = emptyList()
         set(value) {

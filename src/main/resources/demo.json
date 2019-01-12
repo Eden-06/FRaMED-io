@@ -1,157 +1,365 @@
 {
-  "root": {
-    "id": 0,
-    "name": "Economy",
-    "classes": [
-      {
-        "id": 3,
-        "name": "Bank",
-        "attributes": [
-          {
-            "id": 5,
-            "name": "name",
-            "type": "String"
-          }
+    "root": {
+        "id": 5,
+        "name": "Library",
+        "classes": [
+            {
+                "id": 6,
+                "name": "Book",
+                "attributes": [
+                ],
+                "methods": [
+                ]
+            },
+            {
+                "id": 7,
+                "name": "Shelf",
+                "attributes": [
+                ],
+                "methods": [
+                ]
+            }
         ],
-        "methods": [
-        ]
-      },
-      {
-        "id": 4,
-        "name": "Account",
-        "attributes": [
-          {
-            "id": 6,
-            "name": "name",
-            "type": "String"
-          },
-          {
-            "id": 7,
-            "name": "amount",
-            "type": "Money"
-          }
+        "compartments": [
         ],
-        "methods": [
+        "containers": [
+            {
+                "id": 9,
+                "name": "utils",
+                "classes": [
+                    {
+                        "id": 10,
+                        "name": "ISBN",
+                        "attributes": [
+                        ],
+                        "methods": [
+                        ]
+                    },
+                    {
+                        "id": 11,
+                        "name": "Author",
+                        "attributes": [
+                        ],
+                        "methods": [
+                        ]
+                    }
+                ],
+                "compartments": [
+                ],
+                "containers": [
+                ],
+                "roleTypes": [
+                ],
+                "events": [
+                ],
+                "metadata": {
+                    "creationDate": "Sat Jan 12 2019 15:51:15 GMT+0100 (CET)",
+                    "modifiedDate": "Sat Jan 12 2019 15:51:15 GMT+0100 (CET)",
+                    "author": ""
+                }
+            }
+        ],
+        "roleTypes": [
+        ],
+        "events": [
+        ],
+        "metadata": {
+            "creationDate": "Sat Jan 12 2019 15:49:24 GMT+0100 (CET)",
+            "modifiedDate": "Sat Jan 12 2019 15:49:24 GMT+0100 (CET)",
+            "author": ""
+        }
+    },
+    "connections": {
+        "associations": [
+            {
+                "sourceId": 6,
+                "targetId": 11,
+                "id": 12,
+                "name": "",
+                "sourceCardinality": "*",
+                "targetCardinality": "*"
+            },
+            {
+                "sourceId": 6,
+                "targetId": 10,
+                "id": 13,
+                "name": "",
+                "sourceCardinality": "*",
+                "targetCardinality": "*"
+            }
+        ],
+        "aggregations": [
+            {
+                "sourceId": 6,
+                "targetId": 7,
+                "id": 8,
+                "name": "contains",
+                "sourceCardinality": "1",
+                "targetCardinality": "*"
+            }
+        ],
+        "compositions": [
+        ],
+        "inheritances": [
+            {
+                "sourceId": 11,
+                "targetId": 10,
+                "id": 14,
+                "name": "",
+                "sourceCardinality": "",
+                "targetCardinality": ""
+            }
         ]
-      }
-    ],
-    "compartments": [
-    ],
-    "containers": [
-    ],
-    "roleTypes": [
-    ],
-    "events": [
-    ],
-    "metadata": {
-      "creationDate": "Thu Dec 20 2018 13:37:38 GMT+0100 (CET)",
-      "modifiedDate": "Thu Dec 20 2018 13:37:38 GMT+0100 (CET)",
-      "author": ""
-    }
-  },
-  "connections": {
-    "associations": [
-      {
-        "sourceId": 3,
-        "targetId": 4,
-        "id": 8,
-        "name": "",
-        "sourceCardinality": "*",
-        "targetCardinality": "*"
-      }
-    ],
-    "aggregations": [
-    ],
-    "compositions": [
-    ],
-    "inheritances": [
-    ]
-  },
-  "layer": {
-    0:
-    {
-      "data": {
-        0:
-        {
-          "left": 0,
-          "top": 0,
-          "width": 0,
-          "height": 0,
-          "autosize": true,
-          "data": {
-          }
-        },
-        1:
-        {
-          "left": 309,
-          "top": 155.00000000000003,
-          "width": 0,
-          "height": 0,
-          "autosize": true,
-          "data": {
-          }
-        },
-        2:
-        {
-          "left": 0,
-          "top": 0,
-          "width": 0,
-          "height": 0,
-          "autosize": true,
-          "data": {
-          }
-        },
-        3:
-        {
-          "left": 64,
-          "top": 64,
-          "width": 292,
-          "height": 99,
-          "autosize": true,
-          "data": {
-          }
-        },
-        4:
-        {
-          "left": 64,
-          "top": 256,
-          "width": 292,
-          "height": 123,
-          "autosize": true,
-          "data": {
-          }
-        },
+    },
+    "layer": {
         5:
         {
-          "left": 0,
-          "top": 0,
-          "width": 0,
-          "height": 0,
-          "autosize": true,
-          "data": {
-          }
-        },
-        6:
-        {
-          "left": 0,
-          "top": 0,
-          "width": 0,
-          "height": 0,
-          "autosize": true,
-          "data": {
-          }
-        },
-        7:
-        {
-          "left": 0,
-          "top": 0,
-          "width": 0,
-          "height": 0,
-          "autosize": true,
-          "data": {
-          }
+            "data": {
+                5:
+                {
+                    "left": -73.70938404361155,
+                    "top": 64.97244849477788,
+                    "width": 751,
+                    "height": 666,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                6:
+                {
+                    "left": 128,
+                    "top": 96,
+                    "width": 292,
+                    "height": 75,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                7:
+                {
+                    "left": 128,
+                    "top": 368,
+                    "width": 292,
+                    "height": 75,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                8:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                        {
+                            "text": "contains",
+                            "left": 0,
+                            "top": 0,
+                            "position": 0.5,
+                            "id": "name"
+                        },
+                        {
+                            "text": "1",
+                            "left": 14.5,
+                            "top": -1.5,
+                            "position": -30,
+                            "id": "source"
+                        },
+                        {
+                            "text": "*",
+                            "left": 0,
+                            "top": 0,
+                            "position": 31,
+                            "id": "target"
+                        }
+                    ]
+                },
+                9:
+                {
+                    "left": 544,
+                    "top": 80,
+                    "width": 384,
+                    "height": 384,
+                    "autosize": false,
+                    "data": {
+                        "flat-preview":
+                        "true"
+                    },
+                    "labels": [
+                    ]
+                },
+                10:
+                {
+                    "left": 48,
+                    "top": 16,
+                    "width": 296,
+                    "height": 46,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                11:
+                {
+                    "left": 48,
+                    "top": 272,
+                    "width": 296,
+                    "height": 46,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                12:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                        {
+                            "text": "",
+                            "left": 0,
+                            "top": 0,
+                            "position": 0.5,
+                            "id": "name"
+                        },
+                        {
+                            "text": "*",
+                            "left": 0,
+                            "top": 0,
+                            "position": -30,
+                            "id": "source"
+                        },
+                        {
+                            "text": "*",
+                            "left": 0,
+                            "top": 0,
+                            "position": 31,
+                            "id": "target"
+                        }
+                    ]
+                },
+                -11:
+                {
+                    "left": 0,
+                    "top": 128,
+                    "width": 22,
+                    "height": 22,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                        {
+                            "text": "Class: Author",
+                            "left": 16,
+                            "top": 16,
+                            "position": 0,
+                            "id": "name"
+                        }
+                    ]
+                },
+                13:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                        {
+                            "text": "",
+                            "left": 0,
+                            "top": 0,
+                            "position": 0.5,
+                            "id": "name"
+                        },
+                        {
+                            "text": "*",
+                            "left": 0,
+                            "top": 0,
+                            "position": -30,
+                            "id": "source"
+                        },
+                        {
+                            "text": "*",
+                            "left": 0,
+                            "top": 0,
+                            "position": 31,
+                            "id": "target"
+                        }
+                    ]
+                },
+                -10:
+                {
+                    "left": 0,
+                    "top": 64,
+                    "width": 22,
+                    "height": 22,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                        {
+                            "text": "Class: ISBN",
+                            "left": 16,
+                            "top": 16,
+                            "position": 0,
+                            "id": "name"
+                        }
+                    ]
+                },
+                14:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                        {
+                            "text": "",
+                            "left": 0,
+                            "top": 0,
+                            "position": 0.5,
+                            "id": "name"
+                        },
+                        {
+                            "text": "",
+                            "left": 0,
+                            "top": 0,
+                            "position": -30,
+                            "id": "source"
+                        },
+                        {
+                            "text": "",
+                            "left": 0,
+                            "top": 0,
+                            "position": 31,
+                            "id": "target"
+                        }
+                    ]
+                }
+            }
         }
-      }
     }
-  }
 }

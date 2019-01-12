@@ -24,10 +24,6 @@ abstract class Shape(id: Long?) : Pictogram(id) {
     val heightProperty = layerProperty.flatMapBinding { it[id].heightProperty }
     var height by heightProperty
 
-    var labels = emptyList<TextShape>()
-
-    fun data(name: String) = layerProperty.flatMapBinding { it[id].data(name) }
-
     var style: Style = Style()
 
     fun style(init: Style.() -> Unit) {

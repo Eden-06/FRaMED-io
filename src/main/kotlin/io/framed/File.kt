@@ -9,7 +9,6 @@ import io.framed.model.Container
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JSON
-import kotlinx.serialization.json.JsonParsingException
 
 @Serializable
 class File(
@@ -33,15 +32,13 @@ class File(
                 ModelElement.lastId = file.root.maxId() + 1
 
                 file
-            } catch (e: JsonParsingException) {
+            } catch (e: Exception) {
                 println("Error while opening file!")
                 dialog {
                     title = "Error while opening file"
                     contentView.textView("The selected file is malformated and cannot be parsed.")
                     closable = true
-                    addButton("Abort", true) {
-
-                    }
+                    addButton("Abort", true) {}
                 }.open()
                 null
             }

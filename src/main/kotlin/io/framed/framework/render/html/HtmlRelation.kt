@@ -16,18 +16,24 @@ import org.w3c.dom.events.MouseEvent
  */
 class HtmlRelation(
         val connection: Connection,
-        val jsPlumbInstance: JsPlumbInstance,
-        val container: ViewCollection<View<*>,*>,
         val renderer: HtmlRenderer
 ) {
 
     private val references: MutableList<ListenerReference<*>> = mutableListOf()
     private var connections: List<JsPlumbConnection> = emptyList()
+    private var labels: List<HtmlLabel> = emptyList()
     fun remove(complete: Boolean = false) {
-        connections.forEach {
-            jsPlumbInstance.deleteConnection(it)
+        if (this::jsPlumbInstance.isInitialized) {
+            connections.forEach {
+                jsPlumbInstance.deleteConnection(it)
+            }
+            connections = emptyList()
         }
-        connections = emptyList()
+
+        for (label in labels) {
+            label.remove()
+        }
+        labels = emptyList()
 
         if (complete) {
             references.forEach {
@@ -37,95 +43,21 @@ class HtmlRelation(
         }
     }
 
-    private val labels = connection.labels.map { (shape, position) ->
-        HtmlLabel(renderer, shape, container) to position
-    }
-
     fun draw() {
-        draw(connection.source.get(), connection.target.get())
-    }
+        val sourceId = connection.source.value
+        val targetId = connection.target.value
 
-    private fun createJsPlumbConnection(line: ConnectionLine, sourceView: View<*>, targetView: View<*>) = jsPlumbConnect {
-        source = sourceView.html
-        target = targetView.html
+        val instance = renderer.htmlConnections.findInstance(listOf(sourceId, targetId))
+        val box = renderer.htmlConnections.jsPlumbList.find { it.first == instance }?.second
 
-        anchors = arrayOf(sourceAnchorString, targetAnchorString)
-
-        connector = when (line.type) {
-            ConnectionLine.Type.STRAIGHT -> {
-                arrayOf("Straight")
-            }
-            ConnectionLine.Type.RECTANGLE -> {
-                arrayOf("Flowchart", object {
-                    val cornerRadius = 5
-                })
-            }
-        }
-        endpoint = "Blank"
-
-        paintStyle = jsPlumbPaintStyle {
-            stroke = line.paintStyle.stroke.toCss()
-            strokeWidth = line.paintStyle.strokeWidth
-        }
-    }
-
-    private fun createEndStyle(connectInit: JsPlumbConnectInit) {
-        var overlays = labels.map { (label, position) ->
-            arrayOf("Custom", object {
-                val create = { _: dynamic ->
-                    label.view.html
-                }
-                val cssClass = label.view.classes.toString()
-                val location = position
-            })
-        }
-
-        connection.sourceStyle?.let { style ->
-            overlays += listOf(arrayOf("Arrow", object {
-                val width = style.width
-                val length = style.length
-                val foldback = style.foldback
-                val paintStyle = jsPlumbPaintStyle {
-                    stroke = style.paintStyle.stroke.toCss()
-                    strokeWidth = style.paintStyle.strokeWidth
-                    fill = style.paintStyle.fill.toCss()
-                }
-                val location = 0
-            }))
-        }
-
-        connection.targetStyle?.let { style ->
-            overlays += listOf(arrayOf("Arrow", object {
-                val width = style.width
-                val length = style.length
-                val foldback = style.foldback
-                val paintStyle = jsPlumbPaintStyle {
-                    stroke = style.paintStyle.stroke.toCss()
-                    strokeWidth = style.paintStyle.strokeWidth
-                    fill = style.paintStyle.fill.toCss()
-                }
-                val location = 1
-            }))
-        }
-
-        connectInit.overlays = overlays.toTypedArray()
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private val sourceAnchorString: Array<Any>
-        get() = (renderer.htmlConnections.anchors[sourceView]?.map { it.jsPlumb }?.toTypedArray()
-                ?: ALL_SIDES_STRING) as Array<Any>
-
-    @Suppress("UNCHECKED_CAST")
-    private val targetAnchorString: Array<Any>
-        get() = (renderer.htmlConnections.anchors[targetView]?.map { it.jsPlumb }?.toTypedArray()
-                ?: ALL_SIDES_STRING) as Array<Any>
-
-    lateinit var sourceView: View<*>
-    lateinit var targetView: View<*>
-
-    fun draw(sourceId: Long, targetId: Long) {
         remove()
+
+        if (instance == null || box == null) {
+            return
+        }
+
+        jsPlumbInstance = instance
+        container = box
 
         val sourceViewNew = renderer[sourceId, jsPlumbInstance] ?: return
         val targetViewNew = renderer[targetId, jsPlumbInstance] ?: return
@@ -191,6 +123,91 @@ class HtmlRelation(
             }
         }
     }
+
+    private fun createJsPlumbConnection(line: ConnectionLine, sourceView: View<*>, targetView: View<*>) = jsPlumbConnect {
+        source = sourceView.html
+        target = targetView.html
+
+        anchors = arrayOf(sourceAnchorString, targetAnchorString)
+
+        connector = when (line.type) {
+            ConnectionLine.Type.STRAIGHT -> {
+                arrayOf("Straight")
+            }
+            ConnectionLine.Type.RECTANGLE -> {
+                arrayOf("Flowchart", object {
+                    val cornerRadius = 5
+                })
+            }
+        }
+        endpoint = "Blank"
+
+        paintStyle = jsPlumbPaintStyle {
+            stroke = line.paintStyle.stroke.toCss()
+            strokeWidth = line.paintStyle.strokeWidth
+        }
+    }
+
+    private fun createEndStyle(connectInit: JsPlumbConnectInit) {
+        labels = connection.labels.map { label ->
+            HtmlLabel(renderer, label, container)
+        }
+
+        var overlays = labels.map { label ->
+            arrayOf("Custom", object {
+                val create = { _: dynamic ->
+                    label.view.html
+                }
+                val cssClass = label.view.classes.toString()
+                val location = label.label.positionProperty.value
+            })
+        }
+
+        connection.sourceStyle?.let { style ->
+            overlays += listOf(arrayOf("Arrow", object {
+                val width = style.width
+                val length = style.length
+                val foldback = style.foldback
+                val paintStyle = jsPlumbPaintStyle {
+                    stroke = style.paintStyle.stroke.toCss()
+                    strokeWidth = style.paintStyle.strokeWidth
+                    fill = style.paintStyle.fill.toCss()
+                }
+                val location = 0
+            }))
+        }
+
+        connection.targetStyle?.let { style ->
+            overlays += listOf(arrayOf("Arrow", object {
+                val width = style.width
+                val length = style.length
+                val foldback = style.foldback
+                val paintStyle = jsPlumbPaintStyle {
+                    stroke = style.paintStyle.stroke.toCss()
+                    strokeWidth = style.paintStyle.strokeWidth
+                    fill = style.paintStyle.fill.toCss()
+                }
+                val location = 1
+            }))
+        }
+
+        connectInit.overlays = overlays.toTypedArray()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private val sourceAnchorString: Array<Any>
+        get() = (renderer.htmlConnections.anchors[sourceView]?.map { it.jsPlumb }?.toTypedArray()
+                ?: ALL_SIDES_STRING) as Array<Any>
+
+    @Suppress("UNCHECKED_CAST")
+    private val targetAnchorString: Array<Any>
+        get() = (renderer.htmlConnections.anchors[targetView]?.map { it.jsPlumb }?.toTypedArray()
+                ?: ALL_SIDES_STRING) as Array<Any>
+
+    lateinit var sourceView: View<*>
+    lateinit var targetView: View<*>
+    lateinit var jsPlumbInstance: JsPlumbInstance
+    lateinit var container: ViewCollection<View<*>, *>
 
     init {
         draw()

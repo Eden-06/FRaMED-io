@@ -24,7 +24,7 @@ class HtmlConnections(
     private val endpointMap = mutableMapOf<Shape, EndpointItem>()
     private var relations: Map<Connection, HtmlRelation> = emptyMap()
     val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
-    private var jsPlumbList: List<Pair<JsPlumbInstance, ViewCollection<View<*>, *>>> = emptyList()
+    var jsPlumbList: List<Pair<JsPlumbInstance, ViewCollection<View<*>, *>>> = emptyList()
 
     private var isConnecting: Shape? = null
 
@@ -87,7 +87,7 @@ class HtmlConnections(
         return instance
     }
 
-    private fun findInstance(idList: List<Long>): JsPlumbInstance? {
+    fun findInstance(idList: List<Long>): JsPlumbInstance? {
         val list = htmlRenderer.shapeMap.filterKeys { it.id in idList }.values.mapNotNull {
             it.jsPlumbInstance
         }.distinct()
@@ -107,9 +107,9 @@ class HtmlConnections(
             }
 
             val id = abs(shape.id)
-            for ((conn, html) in relations) {
+            for ((conn, relation) in relations) {
                 if (conn.source.value == id || conn.target.value == id) {
-                    html.draw()
+                    relation.draw()
                 }
             }
         }
@@ -251,9 +251,8 @@ class HtmlConnections(
         endpointMap -= shape
     }
 
-    private fun drawRelation(jsPlumbInstance: JsPlumbInstance, relation: Connection) {
-        val container = jsPlumbList.find { it.first == jsPlumbInstance }?.second ?: return
-        relations += relation to HtmlRelation(relation, jsPlumbInstance, container, htmlRenderer)
+    private fun drawRelation(relation: Connection) {
+        relations += relation to HtmlRelation(relation, htmlRenderer)
     }
 
     fun limitSide(view: View<*>, anchor: Set<RelationSide>) {
@@ -270,7 +269,7 @@ class HtmlConnections(
     init {
         viewModel.onConnectionAdd.reference {
             async {
-                drawRelation(findInstance(listOf(it.source.get(), it.target.get())) ?: return@async, it)
+                drawRelation(it)
             }
         }?.let(listeners::add)
 
@@ -283,9 +282,7 @@ class HtmlConnections(
     }
 
     fun init() {
-        viewModel.connections.forEach {
-            drawRelation(findInstance(listOf(it.source.get(), it.target.get())) ?: return@forEach, it)
-        }
+        viewModel.connections.forEach(this::drawRelation)
     }
 
     class EndpointItem(

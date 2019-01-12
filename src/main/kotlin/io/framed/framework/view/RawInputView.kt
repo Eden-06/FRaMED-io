@@ -69,15 +69,18 @@ class RawInputView() : View<HTMLInputElement>("input") {
     fun bind(property: ReadOnlyProperty<String>) {
         value = property.get()
 
-        readOnly = property !is Property<String>
+        readOnly = !(property is Property<String> && property.isWritable)
 
         onChange {
-            if (property is Property<String>) {
+            if (property is Property<String> && property.isWritable) {
                 property.set(it)
             }
         }
+        onFocusEnter {
+            readOnly = !(property is Property<String> && property.isWritable)
+        }
         onFocusLeave {
-            if (property is Property<String>) {
+            if (property is Property<String> && property.isWritable) {
                 property.set(value.trim())
             }
         }

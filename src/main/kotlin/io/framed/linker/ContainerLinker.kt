@@ -1,5 +1,6 @@
 package io.framed.linker
 
+import Layouting
 import de.westermann.kobserve.basic.*
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
@@ -419,15 +420,34 @@ class ContainerLinker(
                     }
                     padding = box(10.0)
                 }
-
-                val linker = shapeLinkers.find { it.id == id } as? PreviewLinker<*, *, *> ?: return@iconShape
-
-                val typeName = linker.typeName
-                val name = linker.nameProperty.mapBinding { "$typeName: $it" }
-                labels += textShape(name)
             }
             borderBox += shape
             borderShapes += shape
+        }
+
+        updateLabelBindings()
+    }
+
+    override fun updateLabelBindings() {
+        for (shape in borderShapes) {
+            var label = shape.labels.find { it.id == "name" }
+            if (label == null) {
+                label = Label(id = "name")
+                shape.labels += label
+            }
+
+            val id = -(shape.id ?: continue)
+            val linker = shapeLinkers.find { it.id == id } as? PreviewLinker<*, *, *> ?: continue
+
+            val typeName = linker.typeName
+            val name = linker.nameProperty.mapBinding { "$typeName: $it" }
+
+            if (label.textProperty.isBound) {
+                label.textProperty.unbind()
+            }
+            label.textProperty.bind(name)
+
+            shape.labelsProperty.onChange.emit(Unit)
         }
     }
 

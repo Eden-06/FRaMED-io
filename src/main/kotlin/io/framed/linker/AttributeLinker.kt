@@ -69,8 +69,6 @@ class AttributeLinker(
             History.group("Change property") {
                 nameProperty.value = name.trim()
                 typeProperty.value = type.trim()
-
-                println("Set properties: '$name' | '$type'")
             }
 
             return nameProperty.valid && typeProperty.valid

@@ -32,7 +32,7 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$serialization_version"
-    implementation "de.westermann:KObserve-js:0.6.1"
+    implementation "de.westermann:KObserve-js:0.7.0"
 }
 
 clean.doFirst() {

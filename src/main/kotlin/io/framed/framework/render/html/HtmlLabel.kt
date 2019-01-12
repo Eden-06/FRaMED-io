@@ -1,15 +1,15 @@
 package io.framed.framework.render.html
 
 import de.westermann.kobserve.ListenerReference
+import io.framed.framework.pictogram.Label
 import io.framed.framework.pictogram.Shape
-import io.framed.framework.pictogram.TextShape
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import io.framed.framework.view.*
 
 class HtmlLabel(
         private val htmlRenderer: HtmlRenderer,
-        val shape: TextShape,
+        val label: Label,
         val parent: ViewCollection<View<*>, *>,
         boundShape: Shape? = null
 ) {
@@ -23,19 +23,19 @@ class HtmlLabel(
         listeners.clear()
     }
 
-    val view: View<*> = InputView(shape.property).apply {
+    val view: View<*> = InputView(label.textProperty).apply {
         classes += "html-label"
-        autocomplete = shape.autocomplete
+        autocomplete = label.autocomplete
         sizeMatchText()
 
-        marginLeft = shape.left
-        marginTop = shape.top
+        marginLeft = label.leftProperty.value
+        marginTop = label.topProperty.value
 
-        shape.leftProperty.onChange.reference {
-            marginLeft = shape.left
+        label.leftProperty.onChange.reference {
+            marginLeft = label.leftProperty.value
         }?.let(listeners::add)
-        shape.topProperty.onChange.reference {
-            marginTop = shape.top
+        label.topProperty.onChange.reference {
+            marginTop = label.topProperty.value
         }?.let(listeners::add)
 
         allowDrag = true
@@ -69,8 +69,8 @@ class HtmlLabel(
         onDrag { e ->
             val event = htmlRenderer.directDragView(e, this, parent)
 
-            shape.left = marginLeft + event.delta.x
-            shape.top = marginTop + event.delta.y
+            label.leftProperty.value = marginLeft + event.delta.x
+            label.topProperty.value = marginTop + event.delta.y
 
             if (event.direct) {
                 (htmlRenderer.selectedViews - this).forEach {
