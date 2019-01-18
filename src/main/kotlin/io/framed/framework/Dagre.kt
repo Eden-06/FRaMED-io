@@ -68,9 +68,14 @@ external interface DagreGraph {
      */
     fun nodes() : Array<Long>
     /**
-     *
+     * The method returns the node with the given ID
      */
     fun node(id: Long): DagreNodeOptions
+
+    /**
+     * The method gets the output graph with the current height and width.
+     */
+    fun graph(): DagreOutputGraph
 }
 enum class DagreGraphAlign {
     UL, UR, DL, DR
@@ -143,8 +148,18 @@ external interface DagreNodeOptions {
     var left: Double
 }
 /**
- *
+ * The interface binds the dagre output graph.
  */
+external interface DagreOutputGraph {
+    /**
+     * height of the output graph
+     */
+    var height: Double
+    /**
+     * width of the output graph
+     */
+    var width: Double
+}
 fun dagreNodeOptions(init: DagreNodeOptions.() -> Unit = {}): DagreNodeOptions {
     val n = js("{}")
     init(n)

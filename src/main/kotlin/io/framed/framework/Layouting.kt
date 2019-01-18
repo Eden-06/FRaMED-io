@@ -30,15 +30,21 @@ object Layouting {
                 )
             }
         }
-        console.log(graph)
+
         Dagre.layout(graph)
 
         container.shapes.forEach { shape ->
             val id = shape.id ?: return@forEach
             val options = graph.node(id)
-
             shape.top = options.top
             shape.left = options.left
         }
+
+        val o = graph.graph()
+
+        console.log(o)
+
+        container.height = o.height
+        container.width = o.width
     }
 }
