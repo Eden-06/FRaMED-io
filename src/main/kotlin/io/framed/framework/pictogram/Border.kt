@@ -7,7 +7,8 @@ class Border(
         var style: BorderStyle = BorderStyle.NONE,
         var width: Box<Double> = box(0.0),
         var color: Box<Color> = box(Color.TRANSPARENT),
-        var radius: Box<Double>? = null
+        var radius: Box<Double>? = null,
+        var double: Boolean = false
 ) {
     enum class BorderStyle {
         SOLID, DASHED, NONE;

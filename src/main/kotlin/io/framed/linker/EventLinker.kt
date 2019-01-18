@@ -1,6 +1,5 @@
 package io.framed.linker
 
-import de.westermann.kobserve.Property
 import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.basic.join
 import de.westermann.kobserve.basic.mapBinding
@@ -29,7 +28,10 @@ class EventLinker(
     }
     override val name: String by nameProperty
 
-    override val pictogram: IconShape = iconShape(symbolProperty) {
+    private val returnEventProperty = property(model::returnEvent).trackHistory()
+    var returnEvent by returnEventProperty
+
+    override val pictogram = iconShape(symbolProperty) {
         style {
             background = color(255, 255, 255)
             border {
@@ -37,12 +39,16 @@ class EventLinker(
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
                 radius = box(20.0)
+                double = returnEvent
+                returnEventProperty.onChange {
+                    double = returnEvent
+                }
             }
             padding = box(10.0)
         }
     }
 
-    override val listPreview: IconShape = iconShape(symbolProperty) {
+    override val listPreview = iconShape(symbolProperty) {
         style {
             background = color(255, 255, 255)
             border {
@@ -50,6 +56,10 @@ class EventLinker(
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
                 radius = box(20.0)
+                double = returnEvent
+                returnEventProperty.onChange {
+                    double = returnEvent
+                }
             }
             padding = box(10.0)
         }
@@ -63,6 +73,10 @@ class EventLinker(
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
                 radius = box(20.0)
+                double = returnEvent
+                returnEventProperty.onChange {
+                    double = returnEvent
+                }
             }
             padding = box(10.0)
         }
@@ -78,6 +92,7 @@ class EventLinker(
             select("Type", EventType.values().toList(), typeProperty) {
                 it.printableName
             }
+            checkBox("Return event", returnEventProperty, CheckBox.Type.SWITCH)
         }
 
         sidebarViewGroup = group("Layout") {
@@ -112,6 +127,10 @@ class EventLinker(
 
     init {
         LinkerManager.setup(this)
+
+        returnEventProperty.onChange {
+            parent.redraw(this)
+        }
     }
 
     companion object : LinkerInfoItem {

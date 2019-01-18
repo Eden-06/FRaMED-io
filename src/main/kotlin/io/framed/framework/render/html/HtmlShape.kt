@@ -68,6 +68,7 @@ abstract class HtmlShape(
             border.radius?.let { radius ->
                 view.html.style.borderRadius = radius.toCss("px")
             }
+            view.classes["double-border"] = border.double
         }
         style.padding?.let { padding ->
             view.html.style.padding = padding.toCss("px")

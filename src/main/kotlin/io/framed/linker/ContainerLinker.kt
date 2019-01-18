@@ -72,6 +72,10 @@ class ContainerLinker(
 
         borderBox = boxShape(BoxShape.Position.BORDER) {}
 
+        events.conditionalContainer(borderBox) {
+            it.returnEvent
+        }
+
         style {
             background = linearGradient("to bottom") {
                 add(color("#fffbd9"), 0.0)

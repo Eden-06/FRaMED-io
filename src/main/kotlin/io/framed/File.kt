@@ -9,6 +9,7 @@ import io.framed.model.Container
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JSON
+import kotlin.math.max
 
 @Serializable
 class File(
@@ -21,6 +22,10 @@ class File(
     val name: String
         get() = root.name.toLowerCase()
 
+    fun maxId():Long {
+        return max(root.maxId(), connections.maxId())
+    }
+
     fun toJSON(): String {
         return JSON.indented.stringify(File.serializer(), this) + "\n"
     }
@@ -29,7 +34,7 @@ class File(
         fun fromJSON(content: String): File? {
             return try {
                 val file = JSON.parse(File.serializer(), content)
-                ModelElement.lastId = file.root.maxId() + 1
+                ModelElement.lastId = file.maxId() + 1
 
                 file
             } catch (e: Exception) {

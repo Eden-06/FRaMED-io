@@ -26,6 +26,8 @@ class Event() : ModelElement<Event> {
      */
     var desc: String = ""
 
+    var returnEvent: Boolean = false
+
     override fun copy() = Event { new ->
         new.type = type
         new.desc = desc

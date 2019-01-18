@@ -15,6 +15,8 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
     lateinit var view: BoxShape
     var previewBox: BoxShape? = null
 
+    private var conditionalBoxes: List<Pair<BoxShape, (L) -> Boolean>> = emptyList()
+
     var linkers = emptySet<L>()
 
     protected abstract fun backingContains(model: M): Boolean
@@ -35,6 +37,10 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
         }
     }
 
+    fun conditionalContainer(container: BoxShape, predicate: (L) -> Boolean) {
+        conditionalBoxes += container to predicate
+    }
+
     private fun internalAdd(linker: L) {
         if (!backingContains(linker.model)) {
             backingAdd(linker.model)
@@ -43,12 +49,24 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
         view += linker.pictogram
 
         previewBox?.let { box ->
-            if (linker is PreviewLinker<*, *, *>) {
-                box += if (box.position == BoxShape.Position.ABSOLUTE) {
+
+            val prev = if (linker is PreviewLinker<*, *, *>) {
+                if (box.position == BoxShape.Position.ABSOLUTE) {
                     linker.flatPreview
                 } else {
                     linker.listPreview
                 }
+            } else return@let
+
+            var added = false
+            for ((b, cond) in conditionalBoxes) {
+                if (cond(linker)) {
+                    b += prev
+                    added = true
+                }
+            }
+            if (!added) {
+                box += prev
             }
         }
         linkers += linker
@@ -57,6 +75,13 @@ sealed class LinkerShapeBox<M : ModelElement<M>, L : ShapeLinker<M, *>>(
     private fun internalRemove(linker: L) {
         backingRemove(linker.model)
         view -= linker.pictogram
+        for ((box, _) in conditionalBoxes) {
+            box -= linker.pictogram
+            if (linker is PreviewLinker<*, *, *>) {
+                box -= linker.flatPreview
+                box -= linker.listPreview
+            }
+        }
 
         previewBox?.let { box ->
             if (linker is PreviewLinker<*, *, *>) {
