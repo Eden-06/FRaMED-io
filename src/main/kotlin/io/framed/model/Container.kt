@@ -66,7 +66,7 @@ class Container() : ModelElementMetadata<Container> {
             events.map { it.maxId() }.max() ?: 0
     ).max() ?: id
 
-    override fun copy() = Container {new ->
+    override fun copy() = Container { new ->
         new.name = name
         new.classes = classes
         new.compartments = compartments

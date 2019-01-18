@@ -201,6 +201,7 @@ abstract class HtmlShape(
             }
         }
         htmlRenderer.draggableViews += this
+        assignedShape = shape
         html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
 
         if (container != htmlRenderer.navigationView.container) {
@@ -345,6 +346,7 @@ abstract class HtmlShape(
         }
 
         htmlRenderer.draggableViews += this
+        assignedShape = shape
         html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
     }
 

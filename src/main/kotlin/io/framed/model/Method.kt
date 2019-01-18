@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Method(): ModelElement<Method> {
+class Method() : ModelElement<Method> {
 
     constructor(init: (Method) -> Unit) : this() {
         init(this)
@@ -37,7 +37,7 @@ class Method(): ModelElement<Method> {
             parameters.map { it.maxId() }.max() ?: 0
     ).max() ?: id
 
-    override fun copy() = Method {new ->
+    override fun copy() = Method { new ->
         new.name = name
         new.type = type
         new.parameters = parameters

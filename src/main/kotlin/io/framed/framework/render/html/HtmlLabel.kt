@@ -5,7 +5,10 @@ import io.framed.framework.pictogram.Label
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
-import io.framed.framework.view.*
+import io.framed.framework.view.InputView
+import io.framed.framework.view.Root
+import io.framed.framework.view.View
+import io.framed.framework.view.ViewCollection
 
 class HtmlLabel(
         private val htmlRenderer: HtmlRenderer,

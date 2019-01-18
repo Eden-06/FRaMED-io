@@ -65,7 +65,7 @@ class BoxShape(id: Long?) : Shape(id) {
         else -> 0.0
     }
 
-    fun topOffset(shape: Shape): Double =  if (parent == null) 0.0 else topOffset + when (position) {
+    fun topOffset(shape: Shape): Double = if (parent == null) 0.0 else topOffset + when (position) {
         Position.VERTICAL -> {
             var sum = 0.0
             for (s in internalShapes) {

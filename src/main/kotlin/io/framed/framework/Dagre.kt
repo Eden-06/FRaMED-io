@@ -12,6 +12,7 @@ class Dagre {
         fun getGraph(): DagreGraph {
             return js("new dagre.graphlib.Graph()") as DagreGraph
         }
+
         /**
          * The method sorts all nodes according to the current options.
          */
@@ -38,6 +39,7 @@ external interface DagreEdge {
      */
     var weight: Int
 }
+
 /**
  *
  */
@@ -46,16 +48,19 @@ fun dagreEdge(init: DagreEdge.() -> Unit = {}): DagreEdge {
     init(e)
     return e
 }
+
 @JsName("Graph")
 external interface DagreGraph {
     /**
      * The method sets the general settings for the algorithm.
      */
     fun setGraph(options: DagreGraphOptions)
+
     /**
      * The method adds a new node to the algorithm.
      */
     fun setNode(id: Long, node: DagreNodeOptions)
+
     /**
      * The method adds a new edge to the algorithm.
      */
@@ -66,7 +71,8 @@ external interface DagreGraph {
     /**
      * The method gets all (sorted) nodes from the graph.
      */
-    fun nodes() : Array<Long>
+    fun nodes(): Array<Long>
+
     /**
      * The method returns the node with the given ID
      */
@@ -77,9 +83,11 @@ external interface DagreGraph {
      */
     fun graph(): DagreOutputGraph
 }
+
 enum class DagreGraphAlign {
     UL, UR, DL, DR
 }
+
 external interface DagreGraphOptions {
     /**
      * Alignment for rank nodes. Can be UL, UR, DL, or DR, where U = up, D = down, L = left, and R = right.
@@ -112,6 +120,7 @@ external interface DagreGraphOptions {
 
     var edgesep: Double
 }
+
 /**
  *
  */
@@ -128,6 +137,7 @@ external interface DagreNode {
     var id: Long
     var options: DagreNodeOptions
 }
+
 /**
  *
  */
@@ -149,6 +159,7 @@ external interface DagreNodeOptions {
     @JsName("x")
     var left: Double
 }
+
 /**
  * The interface binds the dagre output graph.
  */
@@ -162,11 +173,13 @@ external interface DagreOutputGraph {
      */
     var width: Double
 }
+
 fun dagreNodeOptions(init: DagreNodeOptions.() -> Unit = {}): DagreNodeOptions {
     val n = js("{}")
     init(n)
     return n
 }
+
 fun DagreGraph.setDefaultEdgeLabel() = asDynamic().setDefaultEdgeLabel {
     js("{}")
 }

@@ -1,6 +1,5 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.Property
 import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.basic.property
 import org.w3c.dom.HTMLDivElement

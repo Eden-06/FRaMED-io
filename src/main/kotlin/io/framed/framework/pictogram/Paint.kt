@@ -46,7 +46,7 @@ class LinearGradient(
     }
 
     override fun toCss(): String =
-            "linear-gradient(" + direction + colorStops.map { ", ${it.first.toCss()} ${(it.second*100).roundToInt()}%" }.joinToString(" ") + ")"
+            "linear-gradient(" + direction + colorStops.map { ", ${it.first.toCss()} ${(it.second * 100).roundToInt()}%" }.joinToString(" ") + ")"
 }
 
 fun linearGradient(direction: String, init: LinearGradient.() -> Unit): LinearGradient =

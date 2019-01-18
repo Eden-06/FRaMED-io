@@ -35,12 +35,15 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     fun delete(shapes: List<Long>) {
         shapeLinkers.filter { it.id in shapes }.forEach { it.delete() }
     }
+
     fun copy(shapes: List<Long>) {
         throw NotImplementedError("The current container does not support copy!")
     }
+
     fun cut(shapes: List<Long>) {
         throw NotImplementedError("The current container does not support cut!")
     }
+
     fun paste(target: Long) {
         throw NotImplementedError("The current container does not support paste!")
     }

@@ -16,7 +16,7 @@ class Metadata {
 }
 
 @Serializer(forClass = Date::class)
-object DateSerializer: KSerializer<Date> {
+object DateSerializer : KSerializer<Date> {
     override val descriptor: SerialDescriptor = StringDescriptor
 
     override fun serialize(output: Encoder, obj: Date) {

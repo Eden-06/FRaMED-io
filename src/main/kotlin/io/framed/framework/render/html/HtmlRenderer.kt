@@ -71,7 +71,9 @@ class HtmlRenderer(
                 selectedViews.forEach { it.selectedView = false }
             } else {
                 draggableViews.forEach {
-                    it.selectedView = (it.dimension in dimension)
+                    val shape = it.assignedShape ?: return@forEach
+                    val viewDimension = Dimension(shape.leftOffset, shape.topOffset, shape.width, shape.height)
+                    it.selectedView = (viewDimension in dimension)
                 }
             }
             selectedViewSizeProperty.value = selectedViews.size

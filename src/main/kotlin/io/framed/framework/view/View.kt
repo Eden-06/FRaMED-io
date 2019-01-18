@@ -4,6 +4,7 @@ import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.basic.FunctionAccessor
 import de.westermann.kobserve.basic.property
+import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.KeyboardEvent
@@ -32,6 +33,8 @@ abstract class View<V : HTMLElement>(view: V) {
             view.classList.add(name.toDashCase())
         }
     }
+
+    var assignedShape: Shape? = null
 
     /**
      * Access css classes of this view.

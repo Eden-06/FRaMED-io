@@ -22,7 +22,7 @@ class File(
     val name: String
         get() = root.name.toLowerCase()
 
-    fun maxId():Long {
+    fun maxId(): Long {
         return max(root.maxId(), connections.maxId())
     }
 

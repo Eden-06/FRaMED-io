@@ -5,7 +5,7 @@ import org.w3c.dom.HTMLOptionElement
 /**
  * @author lars
  */
-class OptionView: View<HTMLOptionElement>("option") {
+class OptionView : View<HTMLOptionElement>("option") {
     var value: String
         get() = html.value
         set(value) {

@@ -5,7 +5,7 @@ import org.w3c.dom.HTMLTableRowElement
 /**
  * @author lars
  */
-class TableRow: ViewCollection<TableCell, HTMLTableRowElement>("tr") {
+class TableRow : ViewCollection<TableCell, HTMLTableRowElement>("tr") {
 }
 
 fun TableView.row(init: TableRow.() -> Unit): TableRow {

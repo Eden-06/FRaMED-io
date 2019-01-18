@@ -1,6 +1,9 @@
-import io.framed.framework.*
+import io.framed.framework.Dagre
+import io.framed.framework.dagreGraphOptions
+import io.framed.framework.dagreNodeOptions
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Connection
+import io.framed.framework.setDefaultEdgeLabel
 
 object Layouting {
     fun autoLayout(container: BoxShape, connections: Set<Connection>) {
@@ -36,20 +39,20 @@ object Layouting {
             val options = graph.node(id)
             shape.top = options.top
             shape.left = options.left
-            if(shape.left < minX){
+            if (shape.left < minX) {
                 minX = shape.left
             }
-            if((shape.left + shape.width) > maxX){
+            if ((shape.left + shape.width) > maxX) {
                 maxX = (shape.left + shape.width)
             }
-            if(shape.top < minY){
+            if (shape.top < minY) {
                 minY = shape.top
             }
-            if((shape.top + shape.height) > maxY){
+            if ((shape.top + shape.height) > maxY) {
                 maxY = (shape.top + shape.height)
             }
         }
-        container.parent?.height = (minY + maxY + container.topOffset - (container.parent?.topOffset?:0.0))
-        container.parent?.width = (minX + maxX + container.leftOffset - (container.parent?.leftOffset?:0.0))
+        container.parent?.height = (minY + maxY + container.topOffset - (container.parent?.topOffset ?: 0.0))
+        container.parent?.width = (minX + maxX + container.leftOffset - (container.parent?.leftOffset ?: 0.0))
     }
 }

@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class Event() : ModelElement<Event> {
 
-    constructor(init: (Event) -> Unit): this() {
+    constructor(init: (Event) -> Unit) : this() {
         init(this)
     }
 

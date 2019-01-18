@@ -1,6 +1,5 @@
 package io.framed.framework.pictogram
 
-import de.westermann.kobserve.Property
 import de.westermann.kobserve.ReadOnlyProperty
 import io.framed.framework.Linker
 

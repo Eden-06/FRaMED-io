@@ -1,5 +1,6 @@
 package io.framed.linker
 
+import Layouting
 import de.westermann.kobserve.basic.FunctionAccessor
 import de.westermann.kobserve.basic.join
 import de.westermann.kobserve.basic.property

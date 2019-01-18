@@ -1,6 +1,5 @@
 package io.framed.framework.render.html
 
-import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.IconShape

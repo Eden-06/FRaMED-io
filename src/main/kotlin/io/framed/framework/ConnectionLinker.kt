@@ -9,7 +9,7 @@ import io.framed.framework.util.History
 /**
  * @author lars
  */
-interface ConnectionLinker<M : ModelConnection<M>>: Linker<M, Connection> {
+interface ConnectionLinker<M : ModelConnection<M>> : Linker<M, Connection> {
     val manager: ConnectionManager
 
     val sourceIdProperty: Property<Long>

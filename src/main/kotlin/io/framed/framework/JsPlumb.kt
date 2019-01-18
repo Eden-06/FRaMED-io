@@ -103,8 +103,8 @@ external interface JsPlumbInstance {
     fun makeTarget(element: HTMLElement, options: JsPlumbTargetOptionsInit)
     fun makeSource(element: HTMLElement, options: JsPlumbSourceOptionsInit)
 
-    fun isTarget(element: HTMLElement):Boolean
-    fun isSource(element: HTMLElement):Boolean
+    fun isTarget(element: HTMLElement): Boolean
+    fun isSource(element: HTMLElement): Boolean
 
     fun setTargetEnabled(element: HTMLElement)
     fun setSourceEnabled(element: HTMLElement)
@@ -220,6 +220,7 @@ external interface JsPlumbConnection {
 
     fun bind(event: String, listener: (JsPlumbConnection, Event) -> Unit)
 }
+
 /**
  *
  */
@@ -249,12 +250,14 @@ fun jsPlumbEndpointOptions(init: JsPlumbEndpointOptionsInit.() -> Unit = {}): Js
     init(h)
     return h
 }
+
 /**
  *
  */
 external interface JsPlumbDropOptionsInit {
     var drop: () -> Unit
 }
+
 /**
  *
  */
