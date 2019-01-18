@@ -52,7 +52,7 @@ class HtmlConnections(
         val instance = JsPlumb.getInstance().apply {
             setContainer(container.html)
 
-            setZoom(1.0)
+            setZoom(htmlRenderer.zoom)
             bind("beforeDrop") { info: dynamic ->
                 val source = htmlRenderer.getShapeById(info.sourceId as String)?.id ?: return@bind false
                 val target = htmlRenderer.getShapeById(info.targetId as String)?.id ?: return@bind false
@@ -77,7 +77,7 @@ class HtmlConnections(
                 updateEndpoints()
             }
 
-            htmlRenderer.navigationView.onZoom { zoom ->
+            htmlRenderer.onZoom { zoom ->
                 setZoom(zoom)
             }
         }
@@ -211,12 +211,10 @@ class HtmlConnections(
 
                 var reference: ListenerReference<*>? = null
                 reference = Root.onMouseMove.reference { event ->
-                    val left = view.offsetLeft.toDouble()
-                    val top = view.offsetTop.toDouble()
-                    val width = view.clientWidth.toDouble()
-                    val height = view.clientHeight.toDouble()
-                    val dimension = Dimension(left, top, width, height)
-                    if (event.point() !in dimension || event.buttons == 0.toShort()) {
+                    val dimension = Dimension(shape.leftOffset, shape.topOffset, shape.width, shape.height)
+                    val can = htmlRenderer.navigationView.mouseToCanvas(event.point())
+                    //console.log(event.point(), can, dimension)
+                    if (can !in dimension || event.buttons == 0.toShort()) {
                         view.classes -= "drop-target"
                         reference?.remove()
                     }

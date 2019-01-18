@@ -30,6 +30,7 @@ class BoxShape(id: Long?) : Shape(id) {
     fun add(shape: Shape) {
         if (shape !in internalShapes) {
             internalShapes += shape
+            shape.parent = this
             shape.layerProperty.bind(layerProperty)
             onAdd.emit(shape)
         }
@@ -39,6 +40,7 @@ class BoxShape(id: Long?) : Shape(id) {
     fun remove(shape: Shape) {
         if (shape in internalShapes) {
             internalShapes -= shape
+            shape.parent = null
             if (shape.layerProperty.isBound) {
                 shape.layerProperty.unbind()
             }

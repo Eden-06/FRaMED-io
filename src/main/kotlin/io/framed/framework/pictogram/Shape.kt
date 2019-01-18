@@ -1,8 +1,6 @@
 package io.framed.framework.pictogram
 
-import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.basic.flatMapBinding
-import de.westermann.kobserve.listenTo
 
 /**
  * @author lars
@@ -23,6 +21,14 @@ abstract class Shape(id: Long?) : Pictogram(id) {
 
     val heightProperty = layerProperty.flatMapBinding { it[id].heightProperty }
     var height by heightProperty
+
+    var parent: BoxShape? = null
+
+    val leftOffset: Double
+        get() = left + (parent?.leftOffset ?: 0.0)
+
+    val topOffset: Double
+        get() = top + (parent?.topOffset ?: 0.0)
 
     var style: Style = Style()
 
