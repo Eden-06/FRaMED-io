@@ -20,10 +20,10 @@ abstract class Pictogram(
     var hasSidebar = false
     var hasContextMenu = false
 
-    val labelsProperty = layerProperty.flatMapBinding { it[id].labelsProperty }
+    val labelsProperty = layerProperty.flatMapBinding { it[id, this].labelsProperty }
     var labels by labelsProperty
 
-    fun data(name: String) = layerProperty.flatMapBinding { it[id].data(name) }
+    fun data(name: String) = layerProperty.flatMapBinding { it[id, this].data(name) }
 
     override fun toString(): String {
         return "${this::class.simpleName}($id)"

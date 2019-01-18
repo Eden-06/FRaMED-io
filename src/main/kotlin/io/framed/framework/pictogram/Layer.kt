@@ -1,6 +1,7 @@
 package io.framed.framework.pictogram
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * @author lars
@@ -9,13 +10,16 @@ import kotlinx.serialization.Serializable
 class Layer {
     private val data: MutableMap<Long, LayerData> = mutableMapOf()
 
-    operator fun get(id: Long?): LayerData {
-        return if (id == null) {
+    @Transient
+    private val transient: MutableMap<Pictogram, LayerData> = mutableMapOf()
+
+    operator fun get(id: Long?, picto: Pictogram): LayerData = if (id == null) {
+        transient.getOrPut(picto) {
             LayerData()
-        } else {
-            return data.getOrPut(id) {
-                LayerData()
-            }
+        }
+    } else {
+        data.getOrPut(id) {
+            LayerData()
         }
     }
 }

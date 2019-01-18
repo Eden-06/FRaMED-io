@@ -213,7 +213,6 @@ class HtmlConnections(
                 reference = Root.onMouseMove.reference { event ->
                     val dimension = Dimension(shape.leftOffset, shape.topOffset, shape.width, shape.height)
                     val can = htmlRenderer.navigationView.mouseToCanvas(event.point())
-                    //console.log(event.point(), can, dimension)
                     if (can !in dimension || event.buttons == 0.toShort()) {
                         view.classes -= "drop-target"
                         reference?.remove()
@@ -222,7 +221,15 @@ class HtmlConnections(
             }
         }?.let(references::add)
         endpointMap[shape] = EndpointItem(view, handler.html, references, jsPlumbInstance)
-
+/*
+        view.onMouseDown {
+            val dimension = Dimension(shape.leftOffset, shape.topOffset, shape.width, shape.height)
+            val can = htmlRenderer.navigationView.mouseToCanvas(it.point())
+            console.log(it.point(), can, dimension, can in dimension)
+            htmlRenderer.navigationView.vLines(setOf(can.x, dimension.left))
+            htmlRenderer.navigationView.hLines(setOf(can.y, dimension.top))
+        }
+*/
         setSourceEnabled(shape, true)
         setTargetEnabled(shape, true)
 

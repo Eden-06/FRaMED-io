@@ -1,6 +1,5 @@
 package io.framed.framework.render.html
 
-import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.util.Point
@@ -103,17 +102,24 @@ class HtmlBoxShape(
                         revalidate()
                     }
                 } else {
-                    shape.width = clientWidth.toDouble()
-                    shape.height = clientHeight.toDouble()
-                    width = shape.width
-                    height = shape.height
-                    revalidate()
+                    async {
+                        shape.width = clientWidth.toDouble()
+                        shape.height = clientHeight.toDouble()
+                        width = shape.width
+                        height = shape.height
+                        revalidate()
+                    }
                 }
             }
 
             if (!shape.autosize) {
                 width = shape.width
                 height = shape.height
+            }
+        } else {
+            async(1000) {
+                shape.width = clientWidth.toDouble()
+                shape.height = clientHeight.toDouble()
             }
         }
 

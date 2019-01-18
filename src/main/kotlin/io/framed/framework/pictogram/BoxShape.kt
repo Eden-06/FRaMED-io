@@ -1,10 +1,7 @@
 package io.framed.framework.pictogram
 
 import de.westermann.kobserve.EventHandler
-import io.framed.framework.Dagre
-import io.framed.framework.DagreGraph
 import io.framed.framework.Linker
-import io.framed.framework.util.History
 
 /**
  * @author lars
@@ -53,6 +50,35 @@ class BoxShape(id: Long?) : Shape(id) {
     }
 
     operator fun Shape.unaryPlus() = add(this)
+
+    fun leftOffset(shape: Shape): Double = if (parent == null) 0.0 else leftOffset + when (position) {
+        Position.HORIZONTAL -> {
+            var sum = 0.0
+            for (s in internalShapes) {
+                if (s == shape) {
+                    break
+                }
+                sum += s.width
+            }
+            sum
+        }
+        else -> 0.0
+    }
+
+    fun topOffset(shape: Shape): Double =  if (parent == null) 0.0 else topOffset + when (position) {
+        Position.VERTICAL -> {
+            var sum = 0.0
+            for (s in internalShapes) {
+                if (s == shape) {
+                    break
+                }
+                println(s.height)
+                sum += s.height
+            }
+            sum
+        }
+        else -> 0.0
+    }
 }
 
 fun Linker<*, *>.boxShape(position: BoxShape.Position = BoxShape.Position.VERTICAL, id: Long = this.id, init: BoxShape.() -> Unit) =

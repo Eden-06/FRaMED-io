@@ -162,6 +162,27 @@ class ContainerLinker(
         title("Container")
         group("General") {
             input("Name", nameProperty)
+
+            /*
+            button("Log") {
+                fun log(shape: Shape): dynamic {
+                    val h = js("{}")
+                    h.type = shape::class.simpleName
+                    h.width = shape.width
+                    h.height = shape.height
+                    h.id = shape.id?.toInt()
+                    if (shape is BoxShape) {
+                        h.children = js("[]")
+                        for (s in shape.shapes) {
+                            h.children.push(log(s))
+                        }
+                    }
+                    return h
+                }
+
+                console.log(log(pictogram))
+            }
+            */
         }
         sidebarActionsGroup = group("Actions") {
             button("Auto layout") {
