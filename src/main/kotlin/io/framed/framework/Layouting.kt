@@ -6,11 +6,7 @@ object Layouting {
     fun autoLayout(container: BoxShape, connections: Set<Connection>) {
         val graph = Dagre.getGraph()
         graph.setDefaultEdgeLabel()
-        graph.setGraph(dagreGraphOptions {
-            rankSep = 70
-            rankdir = "BT"
-            ranker = "network-simplex"
-        })
+        graph.setGraph(dagreGraphOptions { })
         val list = container.shapes.mapNotNull { shape ->
             val id = shape.id ?: return@mapNotNull null
             graph.setNode(id, dagreNodeOptions {
@@ -30,21 +26,30 @@ object Layouting {
                 )
             }
         }
-
         Dagre.layout(graph)
-
+        var minX = 20.0
+        var maxX = 0.0
+        var minY = 20.0
+        var maxY = 0.0
         container.shapes.forEach { shape ->
             val id = shape.id ?: return@forEach
             val options = graph.node(id)
             shape.top = options.top
             shape.left = options.left
+            if(shape.left < minX){
+                minX = shape.left
+            }
+            if((shape.left + shape.width) > maxX){
+                maxX = (shape.left + shape.width)
+            }
+            if(shape.top < minY){
+                minY = shape.top
+            }
+            if((shape.top + shape.height) > maxY){
+                maxY = (shape.top + shape.height)
+            }
         }
-
-        val o = graph.graph()
-
-        console.log(o)
-
-        container.height = o.height
-        container.width = o.width
+        container.parent?.height = (minY + maxY + container.topOffset - (container.parent?.topOffset?:0.0))
+        container.parent?.width = (minX + maxX + container.leftOffset - (container.parent?.leftOffset?:0.0))
     }
 }

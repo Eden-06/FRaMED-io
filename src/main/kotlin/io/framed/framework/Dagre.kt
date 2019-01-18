@@ -109,6 +109,8 @@ external interface DagreGraphOptions {
      * Number of pixels between each rank in the layout.
      */
     var rankSep: Int
+
+    var edgesep: Double
 }
 /**
  *
