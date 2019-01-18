@@ -5,7 +5,7 @@ import de.westermann.kobserve.Property
 import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.ValidationProperty
 import de.westermann.kobserve.basic.property
-import io.framed.framework.util.eventListener
+import io.framed.framework.util.bind
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -128,7 +128,7 @@ class RawInputView() : View<HTMLInputElement>("input") {
         html.addEventListener("onchange", changeListener)
         html.addEventListener("keyup", changeListener)
 
-        html.addEventListener("focus", onFocusEnter.eventListener())
-        html.addEventListener("focusout", onFocusLeave.eventListener())
+        onFocusEnter.bind(html, "focus")
+        onFocusLeave.bind(html, "focusout")
     }
 }

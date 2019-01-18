@@ -280,20 +280,21 @@ abstract class View<V : HTMLElement>(view: V) {
     }
 
     init {
-        html.addEventListener("click", onClick.eventListener())
-        html.addEventListener("contextmenu", onContext.eventListener())
+        onClick.bind(html, "click")
+        onContext.bind(html, "contextmenu")
+        onMouseDown.bind(html, "mousedown")
+        onMouseMove.bind(html, "mousemove")
+        onMouseUp.bind(html, "mouseup")
+        onMouseEnter.bind(html, "mouseenter")
+        onMouseLeave.bind(html, "mouseleave")
+        onDblClick.bind(html, "dblclick")
+        onKeyDown.bind(html, "keydown")
+        onKeyPress.bind(html, "keypress")
+        onKeyUp.bind(html, "keyup")
+
         onContext {
             it.preventDefault()
         }
-        html.addEventListener("mousedown", onMouseDown.eventListener())
-        html.addEventListener("mousemove", onMouseMove.eventListener())
-        html.addEventListener("mouseup", onMouseUp.eventListener())
-        html.addEventListener("mouseenter", onMouseEnter.eventListener())
-        html.addEventListener("mouseleave", onMouseLeave.eventListener())
-        html.addEventListener("dblclick", onDblClick.eventListener())
-        html.addEventListener("keydown", onKeyDown.eventListener())
-        html.addEventListener("keypress", onKeyPress.eventListener())
-        html.addEventListener("keyup", onKeyUp.eventListener())
 
         var isCurrentlyDragging = false
         var lastDragPosition = Point.ZERO

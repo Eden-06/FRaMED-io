@@ -2,7 +2,7 @@ package io.framed.framework.view
 
 import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
-import io.framed.framework.util.eventListener
+import io.framed.framework.util.bind
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -96,8 +96,8 @@ class TextView(
         html.addEventListener("onchange", changeListener)
         html.addEventListener("keypress", changeListener)
 
-        html.addEventListener("focus", onFocusEnter.eventListener())
-        html.addEventListener("blur", onFocusLeave.eventListener())
+        onFocusEnter.bind(html, "focus")
+        onFocusLeave.bind(html, "blur")
     }
 }
 
