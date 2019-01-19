@@ -19,7 +19,7 @@ import kotlin.math.roundToInt
  */
 class ClassLinker(
         override val model: Class,
-        override val parent: ShapeLinker<*, *>
+        override val parent: ModelLinker<*, *, *>
 ) : PreviewLinker<Class, BoxShape, TextShape> {
 
     override val nameProperty = property(model::name)
@@ -158,7 +158,7 @@ class ClassLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override fun canCreate(container: Linker<*, *>): Boolean = container is PackageLinker
         override fun contains(linker: Linker<*, *>): Boolean = linker is ClassLinker
 
         override val name: String = "Class"

@@ -4,10 +4,7 @@ import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.basic.join
 import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
-import io.framed.framework.Linker
-import io.framed.framework.LinkerInfoItem
-import io.framed.framework.LinkerManager
-import io.framed.framework.PreviewLinker
+import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
@@ -17,7 +14,7 @@ import kotlin.math.roundToInt
 
 class EventLinker(
         override val model: Event,
-        override val parent: ContainerLinker
+        override val parent: ModelLinker<*, *, *>
 ) : PreviewLinker<Event, IconShape, IconShape> {
 
     private val typeProperty = property(model::type).trackHistory()
@@ -134,7 +131,7 @@ class EventLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override fun canCreate(container: Linker<*, *>): Boolean = container is PackageLinker
         override fun contains(linker: Linker<*, *>): Boolean = linker is EventLinker
 
         override val name: String = "Event"

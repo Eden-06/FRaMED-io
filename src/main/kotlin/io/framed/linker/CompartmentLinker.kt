@@ -1,54 +1,48 @@
 package io.framed.linker
 
 import Layouting
-import de.westermann.kobserve.basic.FunctionAccessor
-import de.westermann.kobserve.basic.join
-import de.westermann.kobserve.basic.property
-import de.westermann.kobserve.basic.validate
+import de.westermann.kobserve.basic.*
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.RegexValidator
-import io.framed.framework.util.shapeBox
-import io.framed.framework.util.trackHistory
+import io.framed.framework.util.*
 import io.framed.framework.view.*
-import io.framed.model.Attribute
-import io.framed.model.Class
-import io.framed.model.Compartment
-import io.framed.model.Method
+import io.framed.model.*
 import kotlin.math.roundToInt
 
 /**
- * @author Sebastian
- * The linker manages a related compartment
+ * @author lars
  */
 class CompartmentLinker(
         override val model: Compartment,
         override val connectionManager: ConnectionManager,
-        override val parent: ModelLinker<*, *, *>
+        override val parent: ModelLinker<*, *, *>? = null
 ) : ModelLinker<Compartment, BoxShape, TextShape> {
 
     override val nameProperty = property(model::name)
-            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())::validate)
             .trackHistory()
     override var name by nameProperty
 
     override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
 
-    val attributes = shapeBox<Attribute, AttributeLinker>(model::attributes) { box ->
+    private val attributes = shapeBox<Attribute, AttributeLinker>(model::attributes, connectionManager)
+    private val methods = shapeBox<Method, MethodLinker>(model::methods, connectionManager)
+
+    private val classes = shapeBox<Class, ClassLinker>(model::classes, connectionManager) { box ->
         box.view = container
     }
-    val methods = shapeBox<Method, MethodLinker>(model::methods) { box ->
+    private val roleTypes = shapeBox<RoleType, RoleTypeLinker>(model::roleTypes, connectionManager) { box ->
         box.view = container
     }
-    val classes = shapeBox<Class, ClassLinker>(model::classes, connectionManager) { box ->
+    private val events = shapeBox<Event, EventLinker>(model::events, connectionManager) { box ->
         box.view = container
     }
 
     override val shapeLinkers: Set<ShapeLinker<*, *>>
-        get() = emptySet()
+        get() = classes.linkers + roleTypes.linkers + events.linkers
 
     private lateinit var autoLayoutBox: BoxShape
-
+    private lateinit var borderBox: BoxShape
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
@@ -77,7 +71,8 @@ class CompartmentLinker(
                 padding = box(8.0)
             }
         }
-        autoLayoutBox = boxShape(BoxShape.Position.ABSOLUTE) {
+
+        autoLayoutBox = boxShape(BoxShape.Position.VERTICAL) {
             style {
                 border {
                     style = Border.BorderStyle.SOLID
@@ -88,6 +83,14 @@ class CompartmentLinker(
             }
         }
         classes.previewBox = autoLayoutBox
+        roleTypes.previewBox = autoLayoutBox
+        events.previewBox = autoLayoutBox
+
+        borderBox = boxShape(BoxShape.Position.BORDER) {}
+
+        events.conditionalContainer(borderBox) {
+            it.returnEvent
+        }
 
         style {
             background = linearGradient("to bottom") {
@@ -98,9 +101,9 @@ class CompartmentLinker(
                 style = Border.BorderStyle.SOLID
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
-                radius = box(0.0)
             }
         }
+
         resizeable = true
 
         layerProperty.onChange {
@@ -108,17 +111,20 @@ class CompartmentLinker(
         }
     }
 
-    override val listPreview: TextShape = textShape(nameProperty)
+    override val listPreview = textShape(nameProperty)
+
     override val flatPreview = boxShape {
         textShape(nameProperty)
 
         style {
-            background = color("#fffbd9")
+            background = linearGradient("to bottom") {
+                add(color("#fffbd9"), 0.0)
+                add(color("#fff7c4"), 1.0)
+            }
             border {
                 style = Border.BorderStyle.SOLID
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
-                radius = box(0.0)
             }
             padding = box(10.0)
         }
@@ -135,6 +141,11 @@ class CompartmentLinker(
     }, isFlatPreviewStringProperty)
     private var isFlatPreview by isFlatPreviewProperty
 
+    private lateinit var sidebarActionsGroup: SidebarGroup
+    private lateinit var sidebarPreviewGroup: SidebarGroup
+    private lateinit var sidebarViewGroup: SidebarGroup
+    private lateinit var sidebarFlatViewGroup: SidebarGroup
+
     private fun updatePreviewType() {
         val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.ABSOLUTE
         if (shapeIsFlat == isFlatPreview) return
@@ -146,19 +157,38 @@ class CompartmentLinker(
         }
 
         autoLayoutBox.clear()
-        this@CompartmentLinker.classes.addAllPreviews()
+        classes.addAllPreviews()
+        roleTypes.addAllPreviews()
+        events.addAllPreviews()
 
-        parent.redraw(this@CompartmentLinker)
+        parent?.redraw(this)
     }
 
-    private lateinit var sidebarActionsGroup: SidebarGroup
-    private lateinit var sidebarViewGroup: SidebarGroup
-    private lateinit var sidebarFlatViewGroup: SidebarGroup
-    private lateinit var sidebarPreviewGroup: SidebarGroup
     override val sidebar = sidebar {
         title("Compartment")
         group("General") {
             input("Name", nameProperty)
+
+            /*
+            button("Log") {
+                fun log(shape: Shape): dynamic {
+                    val h = js("{}")
+                    h.type = shape::class.simpleName
+                    h.width = shape.width
+                    h.height = shape.height
+                    h.id = shape.id?.toInt()
+                    if (shape is BoxShape) {
+                        h.children = js("[]")
+                        for (s in shape.shapes) {
+                            h.children.push(log(s))
+                        }
+                    }
+                    return h
+                }
+
+                console.log(log(pictogram))
+            }
+            */
         }
         sidebarActionsGroup = group("Actions") {
             button("Auto layout") {
@@ -166,6 +196,12 @@ class CompartmentLinker(
                         container,
                         connectionManager.connections.asSequence().map { it.pictogram }.toSet()
                 )
+            }
+            button("Reset zoom") {
+                Application.renderer.zoom = 1.0
+            }
+            button("Reset pan") {
+                Application.renderer.panTo(Point.ZERO)
             }
         }
         sidebarPreviewGroup = group("Preview") {
@@ -177,7 +213,6 @@ class CompartmentLinker(
                 )
             }
         }
-
         sidebarViewGroup = group("Layout") {
             input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
                 "x=${left.roundToInt()}, y=${top.roundToInt()}"
@@ -199,20 +234,16 @@ class CompartmentLinker(
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
         val isTargetRoot = event.target == pictogram
+        sidebarActionsGroup.display = event.target == container
         sidebarViewGroup.display = isTargetRoot
         sidebarPreviewGroup.display = isTargetRoot
-        sidebarActionsGroup.display = event.target == container
 
         sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
     private lateinit var contextStepIn: ListView
     private lateinit var contextStepOut: ListView
-
-    override fun ContextMenu.onOpen(event: ContextEvent) {
-        contextStepIn.display = event.target == pictogram
-        contextStepOut.display = event.target != pictogram
-    }
+    private lateinit var contextDelete: ListView
 
     override val contextMenu = contextMenu {
         title = "Compartment: $name"
@@ -221,7 +252,18 @@ class CompartmentLinker(
             ControllerManager.display(this@CompartmentLinker)
         }
         contextStepOut = addItem(MaterialIcon.ARROW_BACK, "Step out") {
-            ControllerManager.display(parent)
+            parent?.let { ControllerManager.display(it) }
+        }
+
+        addItem(MaterialIcon.ADD, "Add attribute") { event ->
+            attributes += AttributeLinker(Attribute(), this@CompartmentLinker).also { linker ->
+                linker.focus(event.target)
+            }
+        }
+        addItem(MaterialIcon.ADD, "Add method") { event ->
+            methods += MethodLinker(Method(), this@CompartmentLinker).also { linker ->
+                linker.focus(event.target)
+            }
         }
 
         addItem(MaterialIcon.ADD, "Add class") { event ->
@@ -234,42 +276,208 @@ class CompartmentLinker(
             }
         }
 
-        addItem(MaterialIcon.DELETE, "Delete") { _ ->
+        addItem(MaterialIcon.ADD, "Add event") { event ->
+            val linker = EventLinker(Event(), this@CompartmentLinker)
+            events += linker
+            linker.also {
+                it.pictogram.left = event.diagram.x
+                it.pictogram.top = event.diagram.y
+                it.focus(event.target)
+            }
+        }
+        addItem(MaterialIcon.ADD, "Add role type") { event ->
+            val linker = RoleTypeLinker(RoleType(), this@CompartmentLinker)
+            roleTypes += linker
+            linker.also {
+                it.pictogram.left = event.diagram.x
+                it.pictogram.top = event.diagram.y
+                it.focus(event.target)
+            }
+        }
+
+        contextDelete = addItem(MaterialIcon.DELETE, "Delete") {
             delete()
         }
     }
 
     override fun remove(linker: ShapeLinker<*, *>) {
         when (linker) {
-            is AttributeLinker -> attributes -= linker
-            is MethodLinker -> methods -= linker
             is ClassLinker -> classes -= linker
+            is RoleTypeLinker -> roleTypes -= linker
+            is EventLinker -> events -= linker
 
             else -> super.remove(linker)
         }
+        checkBorder()
     }
+
+
+    override fun add(model: ModelElement<*>) {
+        when (model) {
+            is Class -> classes += ClassLinker(model, this)
+            is RoleType -> roleTypes += RoleTypeLinker(model, this)
+            is Event -> events += EventLinker(model, this)
+            else -> super.add(model)
+        }
+        checkBorder()
+    }
+
 
     override fun redraw(linker: ShapeLinker<*, *>) {
         when (linker) {
-            is AttributeLinker -> attributes.redraw(linker)
-            is MethodLinker -> methods.redraw(linker)
             is ClassLinker -> classes.redraw(linker)
+            is RoleTypeLinker -> roleTypes.redraw(linker)
+            is EventLinker -> events.redraw(linker)
 
             else -> super.remove(linker)
         }
+        checkBorder()
+    }
+
+    override fun ContextMenu.onOpen(event: ContextEvent) {
+        contextStepIn.display = event.target == pictogram
+        contextStepOut.display = event.target != pictogram && parent != null
+        contextDelete.display = parent != null
     }
 
     override fun dropShape(element: Long, target: Long) {
-        throw UnsupportedOperationException()
+        val elementLinker = getLinkerById(element) ?: throw IllegalArgumentException()
+        val targetLinker = getLinkerById(target) ?: throw IllegalArgumentException()
+
+        val connectionCount = connectionManager.listConnections(elementLinker.id).size
+
+        val elementName = elementLinker.model::class.simpleName?.toLowerCase() ?: "element"
+        val targetName = targetLinker.model::class.simpleName?.toLowerCase() ?: "container"
+
+        if (connectionCount > 0) {
+            dialog {
+                title = "Move $elementName to $targetName"
+                contentView.textView("How should $connectionCount connection(s) be handled.")
+                closable = true
+                addButton("Move and delete", true) {
+                    History.group("Move $elementName to $targetName") {
+                        remove(elementLinker)
+                        targetLinker.add(elementLinker.model.copy())
+                    }
+                }
+                addButton("Move and keep") {
+                    History.group("Move $elementName to $targetName") {
+                        val connectionList = connectionManager.listConnections(elementLinker.id).map { it.model }
+
+                        val oldId = elementLinker.id
+                        remove(elementLinker)
+                        val model = elementLinker.model.copy()
+                        targetLinker.add(model)
+                        val newId = model.id
+
+                        connectionList.forEach {
+                            if (it.sourceId == oldId) {
+                                it.sourceId = newId
+                            }
+                            if (it.targetId == oldId) {
+                                it.targetId = newId
+                            }
+                            connectionManager.add(it)
+                        }
+                    }
+                }
+                addButton("Abort")
+            }.open()
+        } else {
+            History.group("Move $elementName to $targetName") {
+                remove(elementLinker)
+                targetLinker.add(elementLinker.model.copy())
+            }
+        }
     }
 
+    private var borderShapes: List<Shape> = emptyList()
+
+    private fun checkBorder() {
+        val directIdList = shapeLinkers.map { it.id }
+        var neededBorderViews = connectionManager.connections
+                .mapNotNull {
+                    val s = it.sourceIdProperty.value
+                    val t = it.targetIdProperty.value
+
+                    if (s in directIdList && t !in directIdList) {
+                        s
+                    } else if (s !in directIdList && t in directIdList) {
+                        t
+                    } else {
+                        null
+                    }
+                }
+                .distinct()
+
+        borderShapes.forEach {
+            val id = it.id?.unaryMinus() ?: return@forEach
+            if ((id) !in neededBorderViews) {
+                borderBox -= it
+                borderShapes -= it
+            } else {
+                neededBorderViews -= id
+            }
+        }
+
+        neededBorderViews.forEach { id ->
+            val shape = iconShape(property<Icon?>(null), id = -id) {
+                style {
+                    background = color(255, 255, 255)
+                    border {
+                        style = Border.BorderStyle.SOLID
+                        width = box(1.0)
+                        color = box(color(0, 0, 0, 0.3))
+                    }
+                    padding = box(10.0)
+                }
+            }
+            borderBox += shape
+            borderShapes += shape
+        }
+
+        updateLabelBindings()
+    }
+
+    override fun updateLabelBindings() {
+        for (shape in borderShapes) {
+            var label = shape.labels.find { it.id == "name" }
+            if (label == null) {
+                label = Label(id = "name")
+                shape.labels += label
+            }
+
+            val id = -(shape.id ?: continue)
+            val linker = shapeLinkers.find { it.id == id } as? PreviewLinker<*, *, *> ?: continue
+
+            val typeName = linker.typeName
+            val name = linker.nameProperty.mapBinding { "$typeName: $it" }
+
+            if (label.textProperty.isBound) {
+                label.textProperty.unbind()
+            }
+            label.textProperty.bind(name)
+
+            shape.labelsProperty.onChange.emit(Unit)
+        }
+    }
+
+    /**
+     * The model initializes a new instance of the linker
+     */
     init {
         model.attributes.forEach { attributes += AttributeLinker(it, this) }
         model.methods.forEach { methods += MethodLinker(it, this) }
-        model.classes.forEach { classes += ClassLinker(it, parent) }
+        model.classes.forEach { classes += ClassLinker(it, this) }
+        model.roleTypes.forEach { roleTypes += RoleTypeLinker(it, this) }
+        model.events.forEach { events += EventLinker(it, this) }
 
         LinkerManager.setup(this)
         connectionManager.addModel(this)
+
+        connectionManager.onConnectionAdd { checkBorder() }
+        connectionManager.onConnectionRemove { checkBorder() }
+        checkBorder()
 
         isFlatPreviewProperty.onChange {
             updatePreviewType()
@@ -277,7 +485,7 @@ class CompartmentLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
+        override fun canCreate(container: Linker<*, *>): Boolean = container is CompartmentLinker
         override fun contains(linker: Linker<*, *>): Boolean = linker is CompartmentLinker
 
         override val name: String = "Compartment"

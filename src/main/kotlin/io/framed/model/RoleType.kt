@@ -4,7 +4,9 @@ import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
- * Model role model
+ * Model roleType for an uml roleType.
+ *
+ * @author lars
  */
 @Serializable
 class RoleType() : ModelElement<RoleType> {
@@ -13,16 +15,32 @@ class RoleType() : ModelElement<RoleType> {
         init(this)
     }
 
-    /**
-     * Identification of the instance
-     */
     override val id: Long = ModelElement.lastId++
+
     /**
-     * Name of the instance
+     * Name of this roleType
      */
     var name: String = "Unnamed role"
 
+    /**
+     * List of roleType attributes
+     */
+    var attributes: List<Attribute> = emptyList()
+
+    /**
+     * List of roleType methods
+     */
+    var methods: List<Method> = emptyList()
+
+    override fun maxId(): Long = listOf(
+            id,
+            attributes.map { it.maxId() }.max() ?: 0,
+            methods.map { it.maxId() }.max() ?: 0
+    ).max() ?: id
+
     override fun copy() = RoleType { new ->
         new.name = name
+        new.attributes = attributes
+        new.methods = methods
     }
 }

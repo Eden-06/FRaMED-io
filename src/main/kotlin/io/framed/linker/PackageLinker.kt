@@ -12,11 +12,11 @@ import kotlin.math.roundToInt
 /**
  * @author lars
  */
-class ContainerLinker(
-        override val model: Container,
+class PackageLinker(
+        override val model: Package,
         override val connectionManager: ConnectionManager,
         override val parent: ModelLinker<*, *, *>? = null
-) : ModelLinker<Container, BoxShape, TextShape> {
+) : ModelLinker<Package, BoxShape, TextShape> {
 
     override val nameProperty = property(model::name)
             .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())::validate)
@@ -31,7 +31,7 @@ class ContainerLinker(
     private val compartments = shapeBox<Compartment, CompartmentLinker>(model::compartments, connectionManager) { box ->
         box.view = container
     }
-    private val containers = shapeBox<Container, ContainerLinker>(model::containers, connectionManager) { box ->
+    private val packages = shapeBox<Package, PackageLinker>(model::packages, connectionManager) { box ->
         box.view = container
     }
     private val roleTypes = shapeBox<RoleType, RoleTypeLinker>(model::roleTypes, connectionManager) { box ->
@@ -42,7 +42,7 @@ class ContainerLinker(
     }
 
     override val shapeLinkers: Set<ShapeLinker<*, *>>
-        get() = classes.linkers + containers.linkers + roleTypes.linkers + events.linkers + compartments.linkers
+        get() = classes.linkers + packages.linkers + roleTypes.linkers + events.linkers + compartments.linkers
 
     private lateinit var autoLayoutBox: BoxShape
     private lateinit var borderBox: BoxShape
@@ -65,7 +65,7 @@ class ContainerLinker(
             }
         }
         classes.previewBox = autoLayoutBox
-        containers.previewBox = autoLayoutBox
+        packages.previewBox = autoLayoutBox
         compartments.previewBox = autoLayoutBox
         roleTypes.previewBox = autoLayoutBox
         events.previewBox = autoLayoutBox
@@ -149,17 +149,17 @@ class ContainerLinker(
         }
 
         autoLayoutBox.clear()
-        this@ContainerLinker.classes.addAllPreviews()
-        containers.addAllPreviews()
+        classes.addAllPreviews()
+        packages.addAllPreviews()
         compartments.addAllPreviews()
         roleTypes.addAllPreviews()
         events.addAllPreviews()
 
-        parent?.redraw(this@ContainerLinker)
+        parent?.redraw(this)
     }
 
     override val sidebar = sidebar {
-        title("Container")
+        title("Package")
         group("General") {
             input("Name", nameProperty)
 
@@ -251,15 +251,15 @@ class ContainerLinker(
         title = "Package: $name"
 
         contextStepIn = addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
-            ControllerManager.display(this@ContainerLinker)
+            ControllerManager.display(this@PackageLinker)
         }
         contextStepOut = addItem(MaterialIcon.ARROW_BACK, "Step out") {
             parent?.let { ControllerManager.display(it) }
         }
 
         addItem(MaterialIcon.ADD, "Add class") { event ->
-            val linker = ClassLinker(Class(), this@ContainerLinker)
-            this@ContainerLinker.classes += linker
+            val linker = ClassLinker(Class(), this@PackageLinker)
+            this@PackageLinker.classes += linker
             linker.also {
                 it.pictogram.left = event.diagram.x
                 it.pictogram.top = event.diagram.y
@@ -267,8 +267,8 @@ class ContainerLinker(
             }
         }
         addItem(MaterialIcon.ADD, "Add package") { event ->
-            val linker = ContainerLinker(Container(), connectionManager, this@ContainerLinker)
-            containers += linker
+            val linker = PackageLinker(Package(), connectionManager, this@PackageLinker)
+            packages += linker
             linker.also {
                 it.pictogram.left = event.diagram.x
                 it.pictogram.top = event.diagram.y
@@ -276,7 +276,7 @@ class ContainerLinker(
             }
         }
         addItem(MaterialIcon.ADD, "Add event") { event ->
-            val linker = EventLinker(Event(), this@ContainerLinker)
+            val linker = EventLinker(Event(), this@PackageLinker)
             events += linker
             linker.also {
                 it.pictogram.left = event.diagram.x
@@ -285,7 +285,7 @@ class ContainerLinker(
             }
         }
         addItem(MaterialIcon.ADD, "Add role type") { event ->
-            val linker = RoleTypeLinker(RoleType(), this@ContainerLinker)
+            val linker = RoleTypeLinker(RoleType(), this@PackageLinker)
             roleTypes += linker
             linker.also {
                 it.pictogram.left = event.diagram.x
@@ -294,7 +294,7 @@ class ContainerLinker(
             }
         }
         addItem(MaterialIcon.ADD, "Add compartment") { event ->
-            val linker = CompartmentLinker(Compartment(), connectionManager, this@ContainerLinker)
+            val linker = CompartmentLinker(Compartment(), connectionManager, this@PackageLinker)
             compartments += linker
             linker.also {
                 it.pictogram.left = event.diagram.x
@@ -312,7 +312,7 @@ class ContainerLinker(
         when (linker) {
             is ClassLinker -> classes -= linker
             is CompartmentLinker -> compartments -= linker
-            is ContainerLinker -> containers -= linker
+            is PackageLinker -> packages -= linker
             is RoleTypeLinker -> roleTypes -= linker
             is EventLinker -> events -= linker
 
@@ -326,7 +326,7 @@ class ContainerLinker(
         when (model) {
             is Class -> classes += ClassLinker(model, this)
             is Compartment -> compartments += CompartmentLinker(model, connectionManager, this)
-            is Container -> containers += ContainerLinker(model, connectionManager, this)
+            is Package -> packages += PackageLinker(model, connectionManager, this)
             is RoleType -> roleTypes += RoleTypeLinker(model, this)
             is Event -> events += EventLinker(model, this)
             else -> super.add(model)
@@ -339,7 +339,7 @@ class ContainerLinker(
         when (linker) {
             is ClassLinker -> classes.redraw(linker)
             is CompartmentLinker -> compartments.redraw(linker)
-            is ContainerLinker -> containers.redraw(linker)
+            is PackageLinker -> packages.redraw(linker)
             is RoleTypeLinker -> roleTypes.redraw(linker)
             is EventLinker -> events.redraw(linker)
 
@@ -481,7 +481,7 @@ class ContainerLinker(
      */
     init {
         model.classes.forEach { classes += ClassLinker(it, this) }
-        model.containers.forEach { containers += ContainerLinker(it, connectionManager, this) }
+        model.packages.forEach { packages += PackageLinker(it, connectionManager, this) }
         model.roleTypes.forEach { roleTypes += RoleTypeLinker(it, this) }
         model.events.forEach { events += EventLinker(it, this) }
         model.compartments.forEach { compartments += CompartmentLinker(it, connectionManager, this) }
@@ -499,9 +499,9 @@ class ContainerLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is ContainerLinker
-        override fun contains(linker: Linker<*, *>): Boolean = linker is ContainerLinker
+        override fun canCreate(container: Linker<*, *>): Boolean = container is PackageLinker
+        override fun contains(linker: Linker<*, *>): Boolean = linker is PackageLinker
 
-        override val name: String = "Container"
+        override val name: String = "Package"
     }
 }

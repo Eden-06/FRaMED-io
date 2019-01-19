@@ -27,7 +27,7 @@ fun init() {
 
     LinkerManager.register(AttributeLinker)
     LinkerManager.register(ClassLinker)
-    LinkerManager.register(ContainerLinker)
+    LinkerManager.register(PackageLinker)
     LinkerManager.register(EventLinker)
     LinkerManager.register(MethodLinker)
     LinkerManager.register(RoleTypeLinker)

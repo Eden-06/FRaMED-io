@@ -5,7 +5,7 @@ import io.framed.framework.pictogram.Layer
 import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
 import io.framed.model.Connections
-import io.framed.model.Container
+import io.framed.model.Package
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JSON
@@ -13,7 +13,7 @@ import kotlin.math.max
 
 @Serializable
 class File(
-        val root: Container,
+        val root: Package,
         val connections: Connections,
         val layer: Map<Long, Layer>
 ) {
@@ -50,7 +50,7 @@ class File(
         }
 
         fun empty(): File {
-            val file = File(Container(), Connections(), emptyMap())
+            val file = File(Package(), Connections(), emptyMap())
             ModelElement.lastId = file.root.maxId() + 1
 
             return file

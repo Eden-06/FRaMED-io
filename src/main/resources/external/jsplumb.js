@@ -3853,7 +3853,7 @@
         //
         // appends an element to some other element, which is calculated as follows:
         //
-        // 1. if Container exists, use that element.
+        // 1. if Package exists, use that element.
         // 2. if the 'parent' parameter exists, use that.
         // 3. otherwise just use the root element.
         //
@@ -3974,7 +3974,7 @@
 
                                     var _one = function (_e) {
                                         if (_e[1] != null) {
-                                            // run the reported offset through the code that takes parent containers
+                                            // run the reported offset through the code that takes parent packages
                                             // into account, to adjust if necessary (issue 554)
                                             uip = _currentInstance.getUIPosition([{
                                                 el:_e[2].el,
@@ -5194,7 +5194,7 @@
         // };
 
         // ensure that, if the current model exists, it is a DOM element and not a selector.
-        // if it does not exist and `candidate` is supplied, the offset parent of that element will be set as the Container.
+        // if it does not exist and `candidate` is supplied, the offset parent of that element will be set as the Package.
         // this is used to do a better default behaviour for the case that the user has not set a model:
         // createEndpointInternal, makeSource, makeTarget and connect all call this model with the offsetParent of the
         // element in question (for connect it is the source element). So if no model is set, it is inferred
@@ -14454,7 +14454,7 @@
                 },
                 getPosition: function (el, relativeToRoot) {
                     // if this is a nested draggable then compute the offset against its own offsetParent, otherwise
-                    // compute against the Container's origin. see also the getUIPosition model below.
+                    // compute against the Package's origin. see also the getUIPosition model below.
                     var o = instance.getOffset(el, relativeToRoot, el._katavorioDrag ? el.offsetParent : null);
                     return [o.left, o.top];
                 },
@@ -14605,7 +14605,7 @@
             // here the position reported to us by Katavorio is relative to the element's offsetParent. For top
             // level nodes that is fine, but if we have a nested draggable then its offsetParent is actually
             // not going to be the jsplumb model; it's going to be some child of that element. In that case
-            // we want to adjust the UI position to account for the offsetParent's position relative to the Container
+            // we want to adjust the UI position to account for the offsetParent's position relative to the Package
             // origin.
             var el = eventArgs[0].el;
             if (el.offsetParent == null) {

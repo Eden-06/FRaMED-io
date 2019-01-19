@@ -4,11 +4,11 @@ import io.framed.File
 import io.framed.framework.pictogram.Layer
 import io.framed.framework.view.Application
 import io.framed.linker.ConnectionManagerLinker
-import io.framed.linker.ContainerLinker
+import io.framed.linker.PackageLinker
 
 object ControllerManager {
 
-    private lateinit var rootLinker: ContainerLinker
+    private lateinit var rootLinker: PackageLinker
 
     var file: File
         get() = File(
@@ -17,7 +17,7 @@ object ControllerManager {
                 layers
         )
         set(value) {
-            rootLinker = ContainerLinker(value.root, ConnectionManagerLinker(value.connections))
+            rootLinker = PackageLinker(value.root, ConnectionManagerLinker(value.connections))
 
             layers.clear()
             controllers.clear()

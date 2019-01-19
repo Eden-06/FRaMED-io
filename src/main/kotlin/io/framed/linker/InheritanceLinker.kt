@@ -102,11 +102,11 @@ class InheritanceLinker(
         override val info = ConnectionInfo("Inheritance", MaterialIcon.ADD)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is ClassLinker || source is RoleTypeLinker || source is EventLinker
+            return source is ClassLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) && (target is ClassLinker || target is RoleTypeLinker || target is EventLinker)
+            return canStart(source) && target is ClassLinker && source != target
         }
     }
 }

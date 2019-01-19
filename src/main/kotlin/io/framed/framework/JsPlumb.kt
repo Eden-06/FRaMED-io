@@ -41,7 +41,7 @@ external interface JsPlumbInstance {
     /**
      * Set the model for drawing.
      *
-     * @param element Container for drawing.
+     * @param element Package for drawing.
      */
     fun setContainer(element: Element)
 

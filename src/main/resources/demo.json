@@ -1,126 +1,284 @@
 {
     "root": {
-        "id": 5,
-        "name": "Library",
+        "id": 1,
+        "name": "Economy",
         "classes": [
             {
-                "id": 6,
-                "name": "Book",
+                "id": 20,
+                "name": "Account",
                 "attributes": [
+                    {
+                        "id": 21,
+                        "name": "id",
+                        "type": "int"
+                    },
+                    {
+                        "id": 22,
+                        "name": "balance",
+                        "type": "Money"
+                    }
                 ],
                 "methods": [
                 ]
             },
             {
-                "id": 7,
-                "name": "Shelf",
+                "id": 23,
+                "name": "Person",
                 "attributes": [
+                    {
+                        "id": 24,
+                        "name": "title",
+                        "type": "String"
+                    },
+                    {
+                        "id": 25,
+                        "name": "firstName",
+                        "type": "String"
+                    },
+                    {
+                        "id": 26,
+                        "name": "lastName",
+                        "type": "String"
+                    },
+                    {
+                        "id": 27,
+                        "name": "address",
+                        "type": "String"
+                    }
+                ],
+                "methods": [
+                ]
+            },
+            {
+                "id": 28,
+                "name": "Company",
+                "attributes": [
+                    {
+                        "id": 29,
+                        "name": "name",
+                        "type": "String"
+                    },
+                    {
+                        "id": 30,
+                        "name": "legalForm",
+                        "type": "String"
+                    },
+                    {
+                        "id": 31,
+                        "name": "address",
+                        "type": "String"
+                    },
+                    {
+                        "id": 32,
+                        "name": "POBox",
+                        "type": "String"
+                    }
                 ],
                 "methods": [
                 ]
             }
         ],
         "compartments": [
-        ],
-        "containers": [
             {
-                "id": 9,
-                "name": "utils",
+                "id": 2,
+                "name": "Bank",
+                "attributes": [
+                    {
+                        "id": 3,
+                        "name": "name",
+                        "type": "String"
+                    }
+                ],
+                "methods": [
+                ],
                 "classes": [
+                ],
+                "roleTypes": [
+                    {
+                        "id": 4,
+                        "name": "Consultant",
+                        "attributes": [
+                            {
+                                "id": 5,
+                                "name": "phone",
+                                "type": "String"
+                            }
+                        ],
+                        "methods": [
+                        ]
+                    },
+                    {
+                        "id": 6,
+                        "name": "Customer",
+                        "attributes": [
+                            {
+                                "id": 7,
+                                "name": "id",
+                                "type": "int"
+                            },
+                            {
+                                "id": 8,
+                                "name": "name",
+                                "type": "String"
+                            }
+                        ],
+                        "methods": [
+                        ]
+                    },
+                    {
+                        "id": 9,
+                        "name": "MoneyTransfer",
+                        "attributes": [
+                            {
+                                "id": 11,
+                                "name": "execution",
+                                "type": "DateTime"
+                            }
+                        ],
+                        "methods": [
+                        ]
+                    },
                     {
                         "id": 10,
-                        "name": "ISBN",
+                        "name": "CheckingAccount",
+                        "attributes": [
+                            {
+                                "id": 12,
+                                "name": "limit",
+                                "type": "Money"
+                            }
+                        ],
+                        "methods": [
+                        ]
+                    },
+                    {
+                        "id": 13,
+                        "name": "SavingAccount",
+                        "attributes": [
+                            {
+                                "id": 14,
+                                "name": "transactionFee",
+                                "type": "double"
+                            }
+                        ],
+                        "methods": [
+                        ]
+                    }
+                ],
+                "events": [
+                ]
+            },
+            {
+                "id": 15,
+                "name": "Transaction",
+                "attributes": [
+                    {
+                        "id": 16,
+                        "name": "creationTime",
+                        "type": "DateTime"
+                    },
+                    {
+                        "id": 17,
+                        "name": "amount",
+                        "type": "Money"
+                    }
+                ],
+                "methods": [
+                ],
+                "classes": [
+                ],
+                "roleTypes": [
+                    {
+                        "id": 18,
+                        "name": "Source",
                         "attributes": [
                         ],
                         "methods": [
                         ]
                     },
                     {
-                        "id": 11,
-                        "name": "Author",
+                        "id": 19,
+                        "name": "Target",
                         "attributes": [
                         ],
                         "methods": [
                         ]
                     }
                 ],
-                "compartments": [
-                ],
-                "containers": [
-                ],
-                "roleTypes": [
-                ],
                 "events": [
-                ],
-                "metadata": {
-                    "creationDate": "Sat Jan 12 2019 15:51:15 GMT+0100 (CET)",
-                    "modifiedDate": "Sat Jan 12 2019 15:51:15 GMT+0100 (CET)",
-                    "author": ""
-                }
+                ]
             }
+        ],
+        "packages": [
         ],
         "roleTypes": [
         ],
         "events": [
         ],
         "metadata": {
-            "creationDate": "Sat Jan 12 2019 15:49:24 GMT+0100 (CET)",
-            "modifiedDate": "Sat Jan 12 2019 15:49:24 GMT+0100 (CET)",
+            "creationDate": "Sat Jan 19 2019 16:36:16 GMT+0100 (CET)",
+            "modifiedDate": "Sat Jan 19 2019 16:36:16 GMT+0100 (CET)",
             "author": ""
         }
     },
     "connections": {
         "associations": [
-            {
-                "sourceId": 6,
-                "targetId": 11,
-                "id": 12,
-                "name": "",
-                "sourceCardinality": "*",
-                "targetCardinality": "*"
-            },
-            {
-                "sourceId": 6,
-                "targetId": 10,
-                "id": 13,
-                "name": "",
-                "sourceCardinality": "*",
-                "targetCardinality": "*"
-            }
         ],
         "aggregations": [
-            {
-                "sourceId": 6,
-                "targetId": 7,
-                "id": 8,
-                "name": "contains",
-                "sourceCardinality": "1",
-                "targetCardinality": "*"
-            }
         ],
         "compositions": [
         ],
         "inheritances": [
-            {
-                "sourceId": 11,
-                "targetId": 10,
-                "id": 14,
-                "name": "",
-                "sourceCardinality": "",
-                "targetCardinality": ""
-            }
         ]
     },
     "layer": {
-        5:
+        1:
         {
             "data": {
-                5:
+                1:
                 {
-                    "left": -73.70938404361155,
-                    "top": 64.97244849477788,
-                    "width": 751,
-                    "height": 666,
+                    "left": -10,
+                    "top": -73,
+                    "width": 1517,
+                    "height": 759,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                2:
+                {
+                    "left": 80,
+                    "top": 112,
+                    "width": 704,
+                    "height": 496,
+                    "autosize": false,
+                    "data": {
+                        "flat-preview":
+                        "true"
+                    },
+                    "labels": [
+                    ]
+                },
+                3:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                4:
+                {
+                    "left": 32,
+                    "top": 32,
+                    "width": 289,
+                    "height": 46,
                     "autosize": true,
                     "data": {
                     },
@@ -129,10 +287,317 @@
                 },
                 6:
                 {
-                    "left": 128,
-                    "top": 96,
-                    "width": 292,
-                    "height": 75,
+                    "left": 32,
+                    "top": 208,
+                    "width": 289,
+                    "height": 46,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                9:
+                {
+                    "left": 352,
+                    "top": 32,
+                    "width": 289,
+                    "height": 46,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                10:
+                {
+                    "left": 352,
+                    "top": 162,
+                    "width": 289,
+                    "height": 46,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                13:
+                {
+                    "left": 352,
+                    "top": 254,
+                    "width": 289,
+                    "height": 46,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                15:
+                {
+                    "left": 880,
+                    "top": 112,
+                    "width": 560,
+                    "height": 320,
+                    "autosize": false,
+                    "data": {
+                        "flat-preview":
+                        "true"
+                    },
+                    "labels": [
+                    ]
+                },
+                16:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                17:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                18:
+                {
+                    "left": 63.5,
+                    "top": 32,
+                    "width": 289,
+                    "height": 46,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                19:
+                {
+                    "left": 208,
+                    "top": 112,
+                    "width": 289,
+                    "height": 46,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                20:
+                {
+                    "left": 960,
+                    "top": 480,
+                    "width": 285,
+                    "height": 123,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                21:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                22:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                23:
+                {
+                    "left": 112,
+                    "top": 640,
+                    "width": 285,
+                    "height": 170,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                24:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                25:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                26:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                27:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                28:
+                {
+                    "left": 480,
+                    "top": 640,
+                    "width": 285,
+                    "height": 170,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                29:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                30:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                31:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                32:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                }
+            }
+        },
+        2:
+        {
+            "data": {
+                2:
+                {
+                    "left": 197,
+                    "top": 60,
+                    "width": 1517,
+                    "height": 759,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                4:
+                {
+                    "left": 64,
+                    "top": 112,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                5:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                6:
+                {
+                    "left": 64,
+                    "top": 305.5,
+                    "width": 0,
+                    "height": 0,
                     "autosize": true,
                     "data": {
                     },
@@ -141,10 +606,10 @@
                 },
                 7:
                 {
-                    "left": 128,
-                    "top": 368,
-                    "width": 292,
-                    "height": 75,
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
                     "autosize": true,
                     "data": {
                     },
@@ -161,49 +626,26 @@
                     "data": {
                     },
                     "labels": [
-                        {
-                            "text": "contains",
-                            "left": 0,
-                            "top": 0,
-                            "position": 0.5,
-                            "id": "name"
-                        },
-                        {
-                            "text": "1",
-                            "left": 14.5,
-                            "top": -1.5,
-                            "position": -30,
-                            "id": "source"
-                        },
-                        {
-                            "text": "*",
-                            "left": 0,
-                            "top": 0,
-                            "position": 31,
-                            "id": "target"
-                        }
                     ]
                 },
                 9:
                 {
-                    "left": 544,
-                    "top": 80,
-                    "width": 384,
-                    "height": 384,
-                    "autosize": false,
+                    "left": 464,
+                    "top": 112,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
                     "data": {
-                        "flat-preview":
-                        "true"
                     },
                     "labels": [
                     ]
                 },
                 10:
                 {
-                    "left": 48,
-                    "top": 16,
-                    "width": 296,
-                    "height": 46,
+                    "left": 464,
+                    "top": 256,
+                    "width": 0,
+                    "height": 0,
                     "autosize": true,
                     "data": {
                     },
@@ -212,10 +654,10 @@
                 },
                 11:
                 {
-                    "left": 48,
-                    "top": 272,
-                    "width": 296,
-                    "height": 46,
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
                     "autosize": true,
                     "data": {
                     },
@@ -232,98 +674,18 @@
                     "data": {
                     },
                     "labels": [
-                        {
-                            "text": "",
-                            "left": 0,
-                            "top": 0,
-                            "position": 0.5,
-                            "id": "name"
-                        },
-                        {
-                            "text": "*",
-                            "left": 0,
-                            "top": 0,
-                            "position": -30,
-                            "id": "source"
-                        },
-                        {
-                            "text": "*",
-                            "left": 0,
-                            "top": 0,
-                            "position": 31,
-                            "id": "target"
-                        }
-                    ]
-                },
-                -11:
-                {
-                    "left": 0,
-                    "top": 128,
-                    "width": 22,
-                    "height": 22,
-                    "autosize": true,
-                    "data": {
-                    },
-                    "labels": [
-                        {
-                            "text": "Class: Author",
-                            "left": 16,
-                            "top": 16,
-                            "position": 0,
-                            "id": "name"
-                        }
                     ]
                 },
                 13:
                 {
-                    "left": 0,
-                    "top": 0,
+                    "left": 464,
+                    "top": 379,
                     "width": 0,
                     "height": 0,
                     "autosize": true,
                     "data": {
                     },
                     "labels": [
-                        {
-                            "text": "",
-                            "left": 0,
-                            "top": 0,
-                            "position": 0.5,
-                            "id": "name"
-                        },
-                        {
-                            "text": "*",
-                            "left": 0,
-                            "top": 0,
-                            "position": -30,
-                            "id": "source"
-                        },
-                        {
-                            "text": "*",
-                            "left": 0,
-                            "top": 0,
-                            "position": 31,
-                            "id": "target"
-                        }
-                    ]
-                },
-                -10:
-                {
-                    "left": 0,
-                    "top": 64,
-                    "width": 22,
-                    "height": 22,
-                    "autosize": true,
-                    "data": {
-                    },
-                    "labels": [
-                        {
-                            "text": "Class: ISBN",
-                            "left": 16,
-                            "top": 16,
-                            "position": 0,
-                            "id": "name"
-                        }
                     ]
                 },
                 14:
@@ -336,27 +698,47 @@
                     "data": {
                     },
                     "labels": [
-                        {
-                            "text": "",
-                            "left": 0,
-                            "top": 0,
-                            "position": 0.5,
-                            "id": "name"
-                        },
-                        {
-                            "text": "",
-                            "left": 0,
-                            "top": 0,
-                            "position": -30,
-                            "id": "source"
-                        },
-                        {
-                            "text": "",
-                            "left": 0,
-                            "top": 0,
-                            "position": 31,
-                            "id": "target"
-                        }
+                    ]
+                }
+            }
+        },
+        15:
+        {
+            "data": {
+                15:
+                {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                18:
+                {
+                    "left": 128,
+                    "top": 128,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                19:
+                {
+                    "left": 544,
+                    "top": 128,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
                     ]
                 }
             }

@@ -37,17 +37,31 @@ class Compartment() : ModelElement<Compartment> {
      */
     var classes: Set<Class> = emptySet()
 
+    /**
+     * List of related role types
+     */
+    var roleTypes: Set<RoleType> = emptySet()
+
+    /**
+     * List of all events of the current application
+     */
+    var events: Set<Event> = emptySet()
+
     override fun maxId(): Long = listOf(
             id,
             attributes.map { it.maxId() }.max() ?: 0,
             methods.map { it.maxId() }.max() ?: 0,
-            classes.map { it.maxId() }.max() ?: 0
+            classes.map { it.maxId() }.max() ?: 0,
+            roleTypes.map { it.maxId() }.max() ?: 0,
+            events.map { it.maxId() }.max() ?: 0
     ).max() ?: id
 
     override fun copy() = Compartment { new ->
         new.name = name
         new.attributes = attributes
-        new.classes = classes
         new.methods = methods
+        new.classes = classes
+        new.roleTypes = roleTypes
+        new.events = events
     }
 }

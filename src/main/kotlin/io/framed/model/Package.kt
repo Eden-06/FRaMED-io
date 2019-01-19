@@ -6,12 +6,12 @@ import kotlinx.serialization.Serializable
 /**
  * Model class for an uml package (package is a reserved keyword).
  *
- * It contains classes, connections, role types and nested containers.
+ * It contains classes, connections, role types and nested packages.
  */
 @Serializable
-class Container() : ModelElementMetadata<Container> {
+class Package() : ModelElementMetadata<Package> {
 
-    constructor(init: (Container) -> Unit) : this() {
+    constructor(init: (Package) -> Unit) : this() {
         init(this)
     }
 
@@ -23,7 +23,7 @@ class Container() : ModelElementMetadata<Container> {
     /**
      * Name of this package.
      */
-    var name: String = "Unnamed container"
+    var name: String = "Unnamed package"
 
     /**
      * List of nested classes.
@@ -37,10 +37,10 @@ class Container() : ModelElementMetadata<Container> {
     var compartments: Set<Compartment> = emptySet()
 
     /**
-     * List of nested containers.
+     * List of nested packages.
      * Should this be a set?
      */
-    var containers: Set<Container> = emptySet()
+    var packages: Set<Package> = emptySet()
 
     /**
      * List of related role types
@@ -59,18 +59,18 @@ class Container() : ModelElementMetadata<Container> {
 
     override fun maxId(): Long = listOf(
             id,
-            containers.map { it.maxId() }.max() ?: 0,
+            packages.map { it.maxId() }.max() ?: 0,
             compartments.map { it.maxId() }.max() ?: 0,
             classes.map { it.maxId() }.max() ?: 0,
             roleTypes.map { it.maxId() }.max() ?: 0,
             events.map { it.maxId() }.max() ?: 0
     ).max() ?: id
 
-    override fun copy() = Container { new ->
+    override fun copy() = Package { new ->
         new.name = name
         new.classes = classes
         new.compartments = compartments
-        new.containers = containers
+        new.packages = packages
         new.roleTypes = roleTypes
         new.events = events
     }
