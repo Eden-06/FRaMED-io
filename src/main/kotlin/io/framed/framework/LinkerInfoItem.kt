@@ -1,7 +1,8 @@
 package io.framed.framework
 
 interface LinkerInfoItem {
-    fun canCreate(container: Linker<*, *>): Boolean
-    operator fun contains(linker: Linker<*, *>): Boolean
+    fun canCreateIn(container: ModelElement<*>): Boolean
+    fun isLinkerOfType(element: ModelElement<*>): Boolean
+    
     val name: String
 }

@@ -10,6 +10,7 @@ import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Attribute
+import io.framed.model.Compartment
 import io.framed.model.Method
 import io.framed.model.RoleType
 import kotlin.math.roundToInt
@@ -160,8 +161,11 @@ class RoleTypeLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is PackageLinker
-        override fun contains(linker: Linker<*, *>): Boolean = linker is RoleTypeLinker
+        override fun canCreateIn(container: ModelElement<*>): Boolean {
+            return container is Compartment
+        }
+
+        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is RoleType
 
         override val name: String = "RoleType"
     }

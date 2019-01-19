@@ -34,15 +34,12 @@ class PackageLinker(
     private val packages = shapeBox<Package, PackageLinker>(model::packages, connectionManager) { box ->
         box.view = container
     }
-    private val roleTypes = shapeBox<RoleType, RoleTypeLinker>(model::roleTypes, connectionManager) { box ->
-        box.view = container
-    }
     private val events = shapeBox<Event, EventLinker>(model::events, connectionManager) { box ->
         box.view = container
     }
 
     override val shapeLinkers: Set<ShapeLinker<*, *>>
-        get() = classes.linkers + packages.linkers + roleTypes.linkers + events.linkers + compartments.linkers
+        get() = classes.linkers + packages.linkers + events.linkers + compartments.linkers
 
     private lateinit var autoLayoutBox: BoxShape
     private lateinit var borderBox: BoxShape
@@ -67,7 +64,6 @@ class PackageLinker(
         classes.previewBox = autoLayoutBox
         packages.previewBox = autoLayoutBox
         compartments.previewBox = autoLayoutBox
-        roleTypes.previewBox = autoLayoutBox
         events.previewBox = autoLayoutBox
 
         borderBox = boxShape(BoxShape.Position.BORDER) {}
@@ -152,7 +148,6 @@ class PackageLinker(
         classes.addAllPreviews()
         packages.addAllPreviews()
         compartments.addAllPreviews()
-        roleTypes.addAllPreviews()
         events.addAllPreviews()
 
         parent?.redraw(this)
@@ -284,15 +279,6 @@ class PackageLinker(
                 it.focus(event.target)
             }
         }
-        addItem(MaterialIcon.ADD, "Add role type") { event ->
-            val linker = RoleTypeLinker(RoleType(), this@PackageLinker)
-            roleTypes += linker
-            linker.also {
-                it.pictogram.left = event.diagram.x
-                it.pictogram.top = event.diagram.y
-                it.focus(event.target)
-            }
-        }
         addItem(MaterialIcon.ADD, "Add compartment") { event ->
             val linker = CompartmentLinker(Compartment(), connectionManager, this@PackageLinker)
             compartments += linker
@@ -313,7 +299,6 @@ class PackageLinker(
             is ClassLinker -> classes -= linker
             is CompartmentLinker -> compartments -= linker
             is PackageLinker -> packages -= linker
-            is RoleTypeLinker -> roleTypes -= linker
             is EventLinker -> events -= linker
 
             else -> super.remove(linker)
@@ -327,7 +312,6 @@ class PackageLinker(
             is Class -> classes += ClassLinker(model, this)
             is Compartment -> compartments += CompartmentLinker(model, connectionManager, this)
             is Package -> packages += PackageLinker(model, connectionManager, this)
-            is RoleType -> roleTypes += RoleTypeLinker(model, this)
             is Event -> events += EventLinker(model, this)
             else -> super.add(model)
         }
@@ -340,7 +324,6 @@ class PackageLinker(
             is ClassLinker -> classes.redraw(linker)
             is CompartmentLinker -> compartments.redraw(linker)
             is PackageLinker -> packages.redraw(linker)
-            is RoleTypeLinker -> roleTypes.redraw(linker)
             is EventLinker -> events.redraw(linker)
 
             else -> super.remove(linker)
@@ -482,7 +465,6 @@ class PackageLinker(
     init {
         model.classes.forEach { classes += ClassLinker(it, this) }
         model.packages.forEach { packages += PackageLinker(it, connectionManager, this) }
-        model.roleTypes.forEach { roleTypes += RoleTypeLinker(it, this) }
         model.events.forEach { events += EventLinker(it, this) }
         model.compartments.forEach { compartments += CompartmentLinker(it, connectionManager, this) }
 
@@ -499,8 +481,11 @@ class PackageLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is PackageLinker
-        override fun contains(linker: Linker<*, *>): Boolean = linker is PackageLinker
+        override fun canCreateIn(container: ModelElement<*>): Boolean {
+            return container is Package
+        }
+
+        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Package
 
         override val name: String = "Package"
     }

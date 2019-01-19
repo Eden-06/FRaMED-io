@@ -103,4 +103,8 @@ object LinkerManager {
 
     var linkerItemList: List<LinkerInfoItem> = emptyList()
     var linkerConnectionList: List<LinkerInfoConnection> = emptyList()
+
+    fun itemLinkerFor(element: ModelElement<*>): LinkerInfoItem {
+        return linkerItemList.find { it.isLinkerOfType(element) } ?: TODO()
+    }
 }

@@ -26,7 +26,8 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
         val shapeLinker = shapeLinkers.find { it.id == element } ?: return false
         val targetLinker = shapeLinkers.find { it.id == target } ?: return false
 
-        return LinkerManager.linkerItemList.find { shapeLinker in it }?.canCreate(targetLinker) ?: false
+        return LinkerManager.linkerItemList.find { it.isLinkerOfType(shapeLinker.model) }?.canCreateIn(targetLinker.model)
+                ?: false
     }
 
     fun dropShape(element: Long, target: Long)
@@ -63,7 +64,9 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     fun paste(target: Long?, elements: List<ModelElement<*>>) {
         if (target == null || id == target) {
             for (element in elements) {
-                add(element)
+                if (LinkerManager.itemLinkerFor(element).canCreateIn(model)) {
+                    add(element)
+                }
             }
         } else {
             for (linker in shapeLinkers) {
@@ -71,7 +74,9 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
                     linker.paste(target, elements)
                 } else if (linker.id == target) {
                     for (element in elements) {
-                        add(element)
+                        if (LinkerManager.itemLinkerFor(element).canCreateIn(model)) {
+                            add(element)
+                        }
                     }
                     break
                 }

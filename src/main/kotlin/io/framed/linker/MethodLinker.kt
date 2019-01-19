@@ -3,18 +3,14 @@ package io.framed.linker
 import de.westermann.kobserve.basic.FunctionAccessor
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.basic.validate
-import io.framed.framework.Linker
-import io.framed.framework.LinkerInfoItem
-import io.framed.framework.LinkerManager
-import io.framed.framework.ShapeLinker
+import io.framed.framework.*
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.History
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
-import io.framed.model.Method
-import io.framed.model.Parameter
+import io.framed.model.*
 
 /**
  * @author lars
@@ -245,8 +241,12 @@ class MethodLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is ClassLinker
-        override fun contains(linker: Linker<*, *>): Boolean = linker is MethodLinker
+
+        override fun canCreateIn(container: ModelElement<*>): Boolean {
+            return container is Class || container is Compartment || container is RoleType
+        }
+
+        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Method
 
         override val name: String = "Method"
     }

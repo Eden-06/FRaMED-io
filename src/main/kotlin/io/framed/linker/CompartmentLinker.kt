@@ -485,8 +485,11 @@ class CompartmentLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is CompartmentLinker
-        override fun contains(linker: Linker<*, *>): Boolean = linker is CompartmentLinker
+        override fun canCreateIn(container: ModelElement<*>): Boolean {
+            return container is Package
+        }
+
+        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Compartment
 
         override val name: String = "Compartment"
     }

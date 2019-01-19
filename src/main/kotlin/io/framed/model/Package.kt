@@ -43,11 +43,6 @@ class Package() : ModelElementMetadata<Package> {
     var packages: Set<Package> = emptySet()
 
     /**
-     * List of related role types
-     */
-    var roleTypes: Set<RoleType> = emptySet()
-
-    /**
      * List of all events of the current application
      */
     var events: Set<Event> = emptySet()
@@ -62,7 +57,6 @@ class Package() : ModelElementMetadata<Package> {
             packages.map { it.maxId() }.max() ?: 0,
             compartments.map { it.maxId() }.max() ?: 0,
             classes.map { it.maxId() }.max() ?: 0,
-            roleTypes.map { it.maxId() }.max() ?: 0,
             events.map { it.maxId() }.max() ?: 0
     ).max() ?: id
 
@@ -71,7 +65,6 @@ class Package() : ModelElementMetadata<Package> {
         new.classes = classes.map { it.copy() }.toSet()
         new.compartments = compartments.map { it.copy() }.toSet()
         new.packages = packages.map { it.copy() }.toSet()
-        new.roleTypes = roleTypes.map { it.copy() }.toSet()
         new.events = events.map { it.copy() }.toSet()
     }
 }

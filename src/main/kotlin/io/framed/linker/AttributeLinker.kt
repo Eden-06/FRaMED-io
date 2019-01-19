@@ -4,10 +4,7 @@ import de.westermann.kobserve.basic.FunctionAccessor
 import de.westermann.kobserve.basic.FunctionProperty
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.basic.validate
-import io.framed.framework.Linker
-import io.framed.framework.LinkerInfoItem
-import io.framed.framework.LinkerManager
-import io.framed.framework.ShapeLinker
+import io.framed.framework.*
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.History
@@ -17,6 +14,9 @@ import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
 import io.framed.model.Attribute
+import io.framed.model.Class
+import io.framed.model.Compartment
+import io.framed.model.RoleType
 
 /**
  * @author lars
@@ -108,8 +108,11 @@ class AttributeLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is ClassLinker
-        override fun contains(linker: Linker<*, *>): Boolean = linker is AttributeLinker
+        override fun canCreateIn(container: ModelElement<*>): Boolean {
+            return container is Class || container is Compartment || container is RoleType
+        }
+
+        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Attribute
 
         override val name: String = "Attribute"
     }

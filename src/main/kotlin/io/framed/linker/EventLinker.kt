@@ -8,8 +8,10 @@ import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
+import io.framed.model.Compartment
 import io.framed.model.Event
 import io.framed.model.EventType
+import io.framed.model.Package
 import kotlin.math.roundToInt
 
 class EventLinker(
@@ -131,8 +133,11 @@ class EventLinker(
     }
 
     companion object : LinkerInfoItem {
-        override fun canCreate(container: Linker<*, *>): Boolean = container is PackageLinker
-        override fun contains(linker: Linker<*, *>): Boolean = linker is EventLinker
+        override fun canCreateIn(container: ModelElement<*>): Boolean {
+            return container is Package || container is Compartment
+        }
+
+        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Event
 
         override val name: String = "Event"
     }
