@@ -40,7 +40,7 @@ class RoleType() : ModelElement<RoleType> {
 
     override fun copy() = RoleType { new ->
         new.name = name
-        new.attributes = attributes
-        new.methods = methods
+        new.attributes = attributes.map { it.copy() }
+        new.methods = methods.map { it.copy() }
     }
 }

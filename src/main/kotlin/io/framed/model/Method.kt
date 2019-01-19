@@ -40,7 +40,7 @@ class Method() : ModelElement<Method> {
     override fun copy() = Method { new ->
         new.name = name
         new.type = type
-        new.parameters = parameters
+        new.parameters = parameters.map { it.copy() }
     }
 
 }

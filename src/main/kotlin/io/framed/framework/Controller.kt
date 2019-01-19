@@ -1,6 +1,8 @@
 package io.framed.framework
 
 import de.westermann.kobserve.Property
+import de.westermann.kobserve.basic.mapBinding
+import de.westermann.kobserve.basic.property
 import io.framed.framework.pictogram.Layer
 import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.pictogram.ViewModelHandler
@@ -26,11 +28,18 @@ class Controller(
 
         override fun delete(shapes: List<Long>) = linker.delete(shapes)
 
-        override fun copy(shapes: List<Long>) = linker.copy(shapes)
+        override fun copy(shapes: List<Long>) {
+            clipboard = linker.copy(shapes)
+        }
 
-        override fun cut(shapes: List<Long>) = linker.cut(shapes)
+        override fun cut(shapes: List<Long>) {
+            clipboard = linker.cut(shapes)
+        }
 
-        override fun paste(target: Long) = linker.paste(target)
+        override fun paste(target: Long?) {
+            linker.paste(target, clipboard)
+            clipboard = emptyList()
+        }
     }
 
     val viewModel: ViewModel = ViewModel(linker.container, handler).also { viewModel ->
@@ -48,5 +57,11 @@ class Controller(
             viewModel -= it.pictogram
         }
         linker.connectionManager.init()
+    }
+
+    companion object {
+        val clipboardProperty = property(emptyList<ModelElement<*>>())
+        var clipboard: List<ModelElement<*>> by clipboardProperty
+        val clipboardEmptyProperty = clipboardProperty.mapBinding { it.isEmpty() }
     }
 }

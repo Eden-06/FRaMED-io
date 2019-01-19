@@ -40,7 +40,7 @@ class Class() : ModelElement<Class> {
 
     override fun copy() = Class { new ->
         new.name = name
-        new.attributes = attributes
-        new.methods = methods
+        new.attributes = attributes.map { it.copy() }
+        new.methods = methods.map { it.copy() }
     }
 }

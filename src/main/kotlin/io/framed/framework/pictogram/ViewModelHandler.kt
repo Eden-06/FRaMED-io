@@ -12,5 +12,5 @@ interface ViewModelHandler {
     fun delete(shapes: List<Long>)
     fun copy(shapes: List<Long>)
     fun cut(shapes: List<Long>)
-    fun paste(target: Long)
+    fun paste(target: Long?)
 }

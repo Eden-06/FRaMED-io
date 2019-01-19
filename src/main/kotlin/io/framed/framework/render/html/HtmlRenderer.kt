@@ -116,11 +116,39 @@ class HtmlRenderer(
 
     fun deleteSelected() {
         if (selectedViews.isNotEmpty()) {
-            History.group("Delete views") {
+            History.group("Delete") {
                 viewModel.handler.delete(shapeMap.filterValues {
                     it.viewList.any { it in selectedViews }
                 }.keys.mapNotNull { it.id }.distinct())
             }
+        }
+    }
+
+    fun copySelected() {
+        if (selectedViews.isNotEmpty()) {
+            viewModel.handler.copy(shapeMap.filterValues {
+                it.viewList.any { it in selectedViews }
+            }.keys.mapNotNull { it.id }.distinct())
+        }
+    }
+
+    fun cutSelected() {
+        if (selectedViews.isNotEmpty()) {
+            History.group("Cut") {
+                viewModel.handler.cut(shapeMap.filterValues {
+                    it.viewList.any { it in selectedViews }
+                }.keys.mapNotNull { it.id }.distinct())
+            }
+        }
+    }
+
+    fun paste() {
+        val selected = shapeMap.filterValues {
+            it.viewList.any { it in selectedViews }
+        }.keys.mapNotNull { it.id }.distinct().firstOrNull()
+
+        History.group("Paste") {
+            viewModel.handler.paste(selected)
         }
     }
 

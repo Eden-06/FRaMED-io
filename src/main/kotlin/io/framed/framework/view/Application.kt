@@ -156,14 +156,14 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             separator()
 
             item(MaterialIcon.CONTENT_CUT, "Cut", Shortcut("X", Shortcut.Modifier.CTRL)) {
-                //TODO
+                renderer.cutSelected()
             }.bindCssClass("inactive", renderer.selectedViewSizeProperty.mapBinding { it == 0 })
             item(MaterialIcon.CONTENT_COPY, "Copy", Shortcut("C", Shortcut.Modifier.CTRL)) {
-                //TODO
+                renderer.copySelected()
             }.bindCssClass("inactive", renderer.selectedViewSizeProperty.mapBinding { it == 0 })
             item(MaterialIcon.CONTENT_PASTE, "Paste", Shortcut("V", Shortcut.Modifier.CTRL)) {
-                //TODO
-            }.bindCssClass("inactive", property(true))
+                renderer.paste()
+            }.bindCssClass("inactive", Controller.clipboardEmptyProperty)
             item(MaterialIcon.DELETE, "Delete", Shortcut("Delete")) {
                 renderer.deleteSelected()
             }.bindCssClass("inactive", renderer.selectedViewSizeProperty.mapBinding { it == 0 })

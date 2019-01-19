@@ -66,12 +66,12 @@ class Package() : ModelElementMetadata<Package> {
             events.map { it.maxId() }.max() ?: 0
     ).max() ?: id
 
-    override fun copy() = Package { new ->
+    override fun copy(): Package = Package { new ->
         new.name = name
-        new.classes = classes
-        new.compartments = compartments
-        new.packages = packages
-        new.roleTypes = roleTypes
-        new.events = events
+        new.classes = classes.map { it.copy() }.toSet()
+        new.compartments = compartments.map { it.copy() }.toSet()
+        new.packages = packages.map { it.copy() }.toSet()
+        new.roleTypes = roleTypes.map { it.copy() }.toSet()
+        new.events = events.map { it.copy() }.toSet()
     }
 }

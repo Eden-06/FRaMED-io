@@ -58,10 +58,10 @@ class Compartment() : ModelElement<Compartment> {
 
     override fun copy() = Compartment { new ->
         new.name = name
-        new.attributes = attributes
-        new.methods = methods
-        new.classes = classes
-        new.roleTypes = roleTypes
-        new.events = events
+        new.attributes = attributes.map { it.copy() }
+        new.methods = methods.map { it.copy() }
+        new.classes = classes.map { it.copy() }.toSet()
+        new.roleTypes = roleTypes.map { it.copy() }.toSet()
+        new.events = events.map { it.copy() }.toSet()
     }
 }

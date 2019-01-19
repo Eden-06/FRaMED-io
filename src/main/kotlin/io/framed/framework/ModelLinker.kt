@@ -33,18 +33,49 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
 
 
     fun delete(shapes: List<Long>) {
-        shapeLinkers.filter { it.id in shapes }.forEach { it.delete() }
+        for (linker in shapeLinkers) {
+            if (linker.id in shapes) {
+                linker.delete()
+            } else if (linker is ModelLinker<*, *, *>) {
+                linker.delete(shapes)
+            }
+        }
     }
 
-    fun copy(shapes: List<Long>) {
-        throw NotImplementedError("The current container does not support copy!")
+    fun copy(shapes: List<Long>): List<ModelElement<*>> {
+        var elements = emptyList<ModelElement<*>>()
+        for (linker in shapeLinkers) {
+            if (linker.id in shapes) {
+                elements += linker.model.copy()
+            } else if (linker is ModelLinker<*, *, *>) {
+                elements += linker.copy(shapes)
+            }
+        }
+        return elements
     }
 
-    fun cut(shapes: List<Long>) {
-        throw NotImplementedError("The current container does not support cut!")
+    fun cut(shapes: List<Long>): List<ModelElement<*>> {
+        val elements = copy(shapes)
+        delete(shapes)
+        return elements
     }
 
-    fun paste(target: Long) {
-        throw NotImplementedError("The current container does not support paste!")
+    fun paste(target: Long?, elements: List<ModelElement<*>>) {
+        if (target == null || id == target) {
+            for (element in elements) {
+                add(element)
+            }
+        } else {
+            for (linker in shapeLinkers) {
+                if (linker is ModelLinker<*, *, *>) {
+                    linker.paste(target, elements)
+                } else if (linker.id == target) {
+                    for (element in elements) {
+                        add(element)
+                    }
+                    break
+                }
+            }
+        }
     }
 }
