@@ -1,6 +1,7 @@
 package io.framed.linker
 
 import de.westermann.kobserve.basic.join
+import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
@@ -93,6 +94,8 @@ class RoleTypeLinker(
             }
             padding = box(10.0)
         }
+
+        resizeable = true
     }
 
     private lateinit var sidebarViewGroup: SidebarGroup
@@ -119,6 +122,7 @@ class RoleTypeLinker(
             input("Size", flatPreview.widthProperty.join(flatPreview.heightProperty) { width, height ->
                 "width=${width.roundToInt()}, height=${height.roundToInt()}"
             })
+            checkBox("Autosize", flatPreview.autosizeProperty, CheckBox.Type.SWITCH)
         }
 
     }
@@ -129,7 +133,7 @@ class RoleTypeLinker(
     }
 
     override val contextMenu = contextMenu {
-        title = "RoleType: $name"
+        titleProperty.bind(nameProperty.mapBinding { "RoleType: $it" })
         addItem(MaterialIcon.ADD, "Add attribute") { event ->
             attributes += AttributeLinker(Attribute(), this@RoleTypeLinker).also { linker ->
                 linker.focus(event.target)

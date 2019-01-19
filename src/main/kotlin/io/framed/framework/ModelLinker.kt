@@ -3,6 +3,9 @@ package io.framed.framework
 import de.westermann.kobserve.Property
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Shape
+import io.framed.framework.util.History
+import io.framed.framework.view.dialog
+import io.framed.framework.view.textView
 
 /**
  * @author lars
@@ -30,7 +33,56 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
                 ?: false
     }
 
-    fun dropShape(element: Long, target: Long)
+    fun dropShape(element: Long, target: Long) {
+        val elementLinker = getLinkerById(element) ?: throw IllegalArgumentException()
+        val targetLinker = getLinkerById(target) ?: throw IllegalArgumentException()
+
+        val connectionCount = connectionManager.listConnections(elementLinker.id).size
+
+        val elementName = elementLinker.model::class.simpleName?.toLowerCase() ?: "element"
+        val targetName = targetLinker.model::class.simpleName?.toLowerCase() ?: "container"
+
+        if (connectionCount > 0) {
+            dialog {
+                title = "Move $elementName to $targetName"
+                contentView.textView("How should $connectionCount connection(s) be handled.")
+                closable = true
+                addButton("Move and delete", true) {
+                    History.group("Move $elementName to $targetName") {
+                        remove(elementLinker)
+                        targetLinker.add(elementLinker.model.copy())
+                    }
+                }
+                addButton("Move and keep") {
+                    History.group("Move $elementName to $targetName") {
+                        val connectionList = connectionManager.listConnections(elementLinker.id).map { it.model }
+
+                        val oldId = elementLinker.id
+                        remove(elementLinker)
+                        val model = elementLinker.model.copy()
+                        targetLinker.add(model)
+                        val newId = model.id
+
+                        connectionList.forEach {
+                            if (it.sourceId == oldId) {
+                                it.sourceId = newId
+                            }
+                            if (it.targetId == oldId) {
+                                it.targetId = newId
+                            }
+                            connectionManager.add(it)
+                        }
+                    }
+                }
+                addButton("Abort")
+            }.open()
+        } else {
+            History.group("Move $elementName to $targetName") {
+                remove(elementLinker)
+                targetLinker.add(elementLinker.model.copy())
+            }
+        }
+    }
 
 
     fun delete(shapes: List<Long>) {

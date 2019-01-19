@@ -1,6 +1,7 @@
 package io.framed.linker
 
 import de.westermann.kobserve.basic.join
+import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
@@ -88,6 +89,8 @@ class ClassLinker(
             }
             padding = box(10.0)
         }
+
+        resizeable = true
     }
 
     private lateinit var sidebarViewGroup: SidebarGroup
@@ -114,6 +117,7 @@ class ClassLinker(
             input("Size", flatPreview.widthProperty.join(flatPreview.heightProperty) { width, height ->
                 "width=${width.roundToInt()}, height=${height.roundToInt()}"
             })
+            checkBox("Autosize", flatPreview.autosizeProperty, CheckBox.Type.SWITCH)
         }
 
     }
@@ -124,7 +128,7 @@ class ClassLinker(
     }
 
     override val contextMenu = contextMenu {
-        title = "Class: $name"
+        titleProperty.bind(nameProperty.mapBinding { "Class: $it" })
         addItem(MaterialIcon.ADD, "Add attribute") { event ->
             attributes += AttributeLinker(Attribute(), this@ClassLinker).also { linker ->
                 linker.focus(event.target)
@@ -160,7 +164,7 @@ class ClassLinker(
             return container is Package || container is Compartment
         }
 
-        override fun isLinkerOfType(element: ModelElement<*>): Boolean  = element is Class
+        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Class
 
         override val name: String = "Class"
     }

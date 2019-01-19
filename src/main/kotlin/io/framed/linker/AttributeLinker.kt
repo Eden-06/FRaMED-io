@@ -1,10 +1,10 @@
 package io.framed.linker
 
-import de.westermann.kobserve.basic.FunctionAccessor
-import de.westermann.kobserve.basic.FunctionProperty
-import de.westermann.kobserve.basic.property
-import de.westermann.kobserve.basic.validate
-import io.framed.framework.*
+import de.westermann.kobserve.basic.*
+import io.framed.framework.LinkerInfoItem
+import io.framed.framework.LinkerManager
+import io.framed.framework.ModelElement
+import io.framed.framework.ShapeLinker
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.History
@@ -97,7 +97,7 @@ class AttributeLinker(
     }
 
     override val contextMenu = contextMenu {
-        title = "Attribute: " + model.name
+        titleProperty.bind(nameProperty.mapBinding { "Attribute: $it" })
         addItem(MaterialIcon.DELETE, "Delete") {
             delete()
         }

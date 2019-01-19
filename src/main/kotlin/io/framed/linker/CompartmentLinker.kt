@@ -4,7 +4,10 @@ import Layouting
 import de.westermann.kobserve.basic.*
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.*
+import io.framed.framework.util.Point
+import io.framed.framework.util.RegexValidator
+import io.framed.framework.util.shapeBox
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.*
 import kotlin.math.roundToInt
@@ -246,7 +249,7 @@ class CompartmentLinker(
     private lateinit var contextDelete: ListView
 
     override val contextMenu = contextMenu {
-        title = "Compartment: $name"
+        titleProperty.bind(nameProperty.mapBinding { "Compartment: $it" })
 
         contextStepIn = addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
             ControllerManager.display(this@CompartmentLinker)
@@ -338,57 +341,6 @@ class CompartmentLinker(
         contextStepIn.display = event.target == pictogram
         contextStepOut.display = event.target != pictogram && parent != null
         contextDelete.display = parent != null
-    }
-
-    override fun dropShape(element: Long, target: Long) {
-        val elementLinker = getLinkerById(element) ?: throw IllegalArgumentException()
-        val targetLinker = getLinkerById(target) ?: throw IllegalArgumentException()
-
-        val connectionCount = connectionManager.listConnections(elementLinker.id).size
-
-        val elementName = elementLinker.model::class.simpleName?.toLowerCase() ?: "element"
-        val targetName = targetLinker.model::class.simpleName?.toLowerCase() ?: "container"
-
-        if (connectionCount > 0) {
-            dialog {
-                title = "Move $elementName to $targetName"
-                contentView.textView("How should $connectionCount connection(s) be handled.")
-                closable = true
-                addButton("Move and delete", true) {
-                    History.group("Move $elementName to $targetName") {
-                        remove(elementLinker)
-                        targetLinker.add(elementLinker.model.copy())
-                    }
-                }
-                addButton("Move and keep") {
-                    History.group("Move $elementName to $targetName") {
-                        val connectionList = connectionManager.listConnections(elementLinker.id).map { it.model }
-
-                        val oldId = elementLinker.id
-                        remove(elementLinker)
-                        val model = elementLinker.model.copy()
-                        targetLinker.add(model)
-                        val newId = model.id
-
-                        connectionList.forEach {
-                            if (it.sourceId == oldId) {
-                                it.sourceId = newId
-                            }
-                            if (it.targetId == oldId) {
-                                it.targetId = newId
-                            }
-                            connectionManager.add(it)
-                        }
-                    }
-                }
-                addButton("Abort")
-            }.open()
-        } else {
-            History.group("Move $elementName to $targetName") {
-                remove(elementLinker)
-                targetLinker.add(elementLinker.model.copy())
-            }
-        }
     }
 
     private var borderShapes: List<Shape> = emptyList()

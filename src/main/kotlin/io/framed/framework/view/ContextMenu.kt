@@ -1,5 +1,6 @@
 package io.framed.framework.view
 
+import de.westermann.kobserve.basic.property
 import io.framed.framework.pictogram.ContextEvent
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.KeyboardEvent
@@ -18,7 +19,7 @@ class ContextMenu : View<HTMLDivElement>("div") {
         it.display = false
     }
 
-    lateinit var lastEvent: ContextEvent
+    private lateinit var lastEvent: ContextEvent
 
     /**
      * Header content of the content menu. Blank title will remove the header.
@@ -28,7 +29,10 @@ class ContextMenu : View<HTMLDivElement>("div") {
         set(value) {
             titleView.text = value
             titleView.display = value.isNotBlank()
+            titleProperty.invalidate()
         }
+
+    val titleProperty = property(this::title)
 
     /**
      * Add an item to the onContextMenu menu.
