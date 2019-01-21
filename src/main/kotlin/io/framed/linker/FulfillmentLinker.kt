@@ -7,6 +7,7 @@ import io.framed.framework.util.trackHistory
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
+import io.framed.model.Fulfillment
 import io.framed.model.Inheritance
 
 /**
@@ -14,9 +15,9 @@ import io.framed.model.Inheritance
  */
 
 class FulfillmentLinker(
-        override val model: Inheritance,
+        override val model: Fulfillment,
         override val manager: ConnectionManager
-) : ConnectionLinker<Inheritance> {
+) : ConnectionLinker<Fulfillment> {
 
     private val nameProperty = property(model::name).trackHistory()
     private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()

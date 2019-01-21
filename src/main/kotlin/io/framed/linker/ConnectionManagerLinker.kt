@@ -30,6 +30,7 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
             is Relationship -> connectionBox += RelationshipLinker(model, this)
             is Composition -> connectionBox += CompositionLinker(model, this)
             is Inheritance -> connectionBox += InheritanceLinker(model, this)
+            is Fulfillment -> connectionBox += FulfillmentLinker(model, this)
         }
     }
 
@@ -38,6 +39,7 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
             is RelationshipLinker -> connectionBox -= linker
             is CompositionLinker -> connectionBox -= linker
             is InheritanceLinker -> connectionBox -= linker
+            is FulfillmentLinker -> connectionBox -= linker
         }
     }
 
@@ -68,6 +70,7 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
             RelationshipLinker.info -> RelationshipLinker(Relationship(source, target), this).also(connectionBox::add)
             InheritanceLinker.info -> InheritanceLinker(Inheritance(source, target), this).also(connectionBox::add)
             CompositionLinker.info -> CompositionLinker(Composition(source, target), this).also(connectionBox::add)
+            FulfillmentLinker.info -> FulfillmentLinker(Fulfillment(source, target), this).also(connectionBox::add)
             else -> throw IllegalArgumentException()
         }
     }
