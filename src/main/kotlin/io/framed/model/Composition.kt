@@ -1,7 +1,7 @@
 package io.framed.model
 
+import io.framed.PolymorphicSerializer
 import io.framed.framework.ModelConnection
-import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
@@ -10,24 +10,12 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Composition(
+class Composition() : ModelConnection<Composition>() {
 
-        /**
-         * The connections source class.
-         */
-        override var sourceId: Long,
-
-        /**
-         * The connections target class.
-         */
-        override var targetId: Long
-) : ModelConnection<Composition> {
-
-    constructor(sourceId: Long, targetId: Long, init: (Composition) -> Unit) : this(sourceId, targetId) {
-        init(this)
+    constructor(sourceId: Long, targetId: Long): this() {
+        this.sourceId = sourceId
+        this.targetId = targetId
     }
-
-    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this connection.
@@ -44,7 +32,7 @@ class Composition(
      */
     var targetCardinality: String = "*"
 
-    override fun copy() = Composition(sourceId, targetId) { new ->
+    override fun copy() = Composition().also { new ->
         new.name = name
         new.sourceCardinality = sourceCardinality
         new.targetCardinality = targetCardinality

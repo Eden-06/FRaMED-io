@@ -149,3 +149,10 @@ fun interval(timeout: Int, block: () -> Unit): Int {
 fun clearInterval(id: Int) {
     window.clearInterval(id)
 }
+
+fun Exception.log() {
+    val stack = asDynamic().stack as? String ?: ""
+    val type = asDynamic().name as? String ?: ""
+    val head = "Exception $type ($message)"
+    console.error(head + "\n" + stack.split("\n").joinToString("\n") { "    at $it" })
+}

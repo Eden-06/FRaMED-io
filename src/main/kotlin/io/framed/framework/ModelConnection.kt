@@ -1,14 +1,10 @@
 package io.framed.framework
 
-interface ModelConnection<M : ModelConnection<M>> : ModelElement<M> {
+import kotlinx.serialization.Serializable
 
-    /**
-     * The connections source class.
-     */
-    var sourceId: Long
+@Serializable
+abstract class ModelConnection<M : ModelConnection<M>>() : ModelElement<M>() {
 
-    /**
-     * The connections target class.
-     */
-    var targetId: Long
+    var sourceId: Long = id
+    var targetId: Long = id
 }

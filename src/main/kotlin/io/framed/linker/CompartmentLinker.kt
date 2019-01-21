@@ -31,18 +31,14 @@ class CompartmentLinker(
     private val attributes = shapeBox<Attribute, AttributeLinker>(model::attributes, connectionManager)
     private val methods = shapeBox<Method, MethodLinker>(model::methods, connectionManager)
 
-    private val classes = shapeBox<Class, ClassLinker>(model::classes, connectionManager) { box ->
+    private val children = shapeBox(model::children, connectionManager) { box ->
         box.view = container
     }
-    private val roleTypes = shapeBox<RoleType, RoleTypeLinker>(model::roleTypes, connectionManager) { box ->
-        box.view = container
-    }
-    private val events = shapeBox<Event, EventLinker>(model::events, connectionManager) { box ->
-        box.view = container
-    }
-
     override val shapeLinkers: Set<ShapeLinker<*, *>>
-        get() = classes.linkers + roleTypes.linkers + events.linkers
+        get() = children.linkers
+
+    override val subTypes: Set<String>
+        get() = (attributes.linkers.flatMap { it.subTypes } + methods.linkers.flatMap { it.subTypes } + shapeLinkers.flatMap { it.subTypes }).toSet() + model.name
 
     private lateinit var autoLayoutBox: BoxShape
     private lateinit var borderBox: BoxShape
@@ -85,14 +81,12 @@ class CompartmentLinker(
                 padding = box(8.0)
             }
         }
-        classes.previewBox = autoLayoutBox
-        roleTypes.previewBox = autoLayoutBox
-        events.previewBox = autoLayoutBox
+        children.previewBox = autoLayoutBox
 
         borderBox = boxShape(BoxShape.Position.BORDER) {}
 
-        events.conditionalContainer(borderBox) {
-            it.returnEvent
+        children.conditionalContainer(borderBox) {
+            it is EventLinker && it.returnEvent
         }
 
         style {
@@ -160,9 +154,7 @@ class CompartmentLinker(
         }
 
         autoLayoutBox.clear()
-        classes.addAllPreviews()
-        roleTypes.addAllPreviews()
-        events.addAllPreviews()
+        children.addAllPreviews()
 
         parent?.redraw(this)
     }
@@ -270,32 +262,13 @@ class CompartmentLinker(
         }
 
         addItem(MaterialIcon.ADD, "Add class") { event ->
-            val linker = ClassLinker(Class(), this@CompartmentLinker)
-            this@CompartmentLinker.classes += linker
-            linker.also {
-                it.pictogram.left = event.diagram.x
-                it.pictogram.top = event.diagram.y
-                it.focus(event.target)
-            }
+            add(Class(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
         }
-
         addItem(MaterialIcon.ADD, "Add event") { event ->
-            val linker = EventLinker(Event(), this@CompartmentLinker)
-            events += linker
-            linker.also {
-                it.pictogram.left = event.diagram.x
-                it.pictogram.top = event.diagram.y
-                it.focus(event.target)
-            }
+            add(Event(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
         }
         addItem(MaterialIcon.ADD, "Add role type") { event ->
-            val linker = RoleTypeLinker(RoleType(), this@CompartmentLinker)
-            roleTypes += linker
-            linker.also {
-                it.pictogram.left = event.diagram.x
-                it.pictogram.top = event.diagram.y
-                it.focus(event.target)
-            }
+            add(RoleType(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
         }
 
         contextDelete = addItem(MaterialIcon.DELETE, "Delete") {
@@ -304,33 +277,31 @@ class CompartmentLinker(
     }
 
     override fun remove(linker: ShapeLinker<*, *>) {
-        when (linker) {
-            is ClassLinker -> classes -= linker
-            is RoleTypeLinker -> roleTypes -= linker
-            is EventLinker -> events -= linker
-
-            else -> super.remove(linker)
-        }
+        if (linker is ClassLinker || linker is RoleTypeLinker || linker is EventLinker) {
+            children -= linker
+        } else super.remove(linker)
         checkBorder()
     }
 
 
-    override fun add(model: ModelElement<*>) {
-        when (model) {
-            is Class -> classes += ClassLinker(model, this)
-            is RoleType -> roleTypes += RoleTypeLinker(model, this)
-            is Event -> events += EventLinker(model, this)
+    override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
+        val linker = when (model) {
+            is Class -> ClassLinker(model, this)
+            is RoleType -> RoleTypeLinker(model, this)
+            is Event -> EventLinker(model, this)
             else -> super.add(model)
         }
+        children += linker
         checkBorder()
+        return linker
     }
 
 
     override fun redraw(linker: ShapeLinker<*, *>) {
         when (linker) {
-            is ClassLinker -> classes.redraw(linker)
-            is RoleTypeLinker -> roleTypes.redraw(linker)
-            is EventLinker -> events.redraw(linker)
+            is ClassLinker -> children.redraw(linker)
+            is RoleTypeLinker -> children.redraw(linker)
+            is EventLinker -> children.redraw(linker)
 
             else -> super.remove(linker)
         }
@@ -420,9 +391,9 @@ class CompartmentLinker(
     init {
         model.attributes.forEach { attributes += AttributeLinker(it, this) }
         model.methods.forEach { methods += MethodLinker(it, this) }
-        model.classes.forEach { classes += ClassLinker(it, this) }
-        model.roleTypes.forEach { roleTypes += RoleTypeLinker(it, this) }
-        model.events.forEach { events += EventLinker(it, this) }
+        for (element in model.children) {
+            add(element)
+        }
 
         LinkerManager.setup(this)
         connectionManager.addModel(this)

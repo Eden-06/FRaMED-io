@@ -1,5 +1,8 @@
 package io.framed.model
 
+import io.framed.PolymorphicListSerializer
+import io.framed.PolymorphicSerializer
+import io.framed.PolymorphicSetSerializer
 import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
@@ -9,13 +12,11 @@ import kotlinx.serialization.Serializable
  * @author Sebastian
  */
 @Serializable
-class Compartment() : ModelElement<Compartment> {
+class Compartment() : ModelElement<Compartment>() {
 
     constructor(init: (Compartment) -> Unit) : this() {
         init(this)
     }
-
-    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this class
@@ -25,43 +26,30 @@ class Compartment() : ModelElement<Compartment> {
     /**
      * List of class attributes
      */
+    @Serializable(with = PolymorphicListSerializer::class)
     var attributes: List<Attribute> = emptyList()
 
     /**
      * List of class methods
      */
+    @Serializable(with = PolymorphicListSerializer::class)
     var methods: List<Method> = emptyList()
 
-    /**
-     * List of classes
-     */
-    var classes: Set<Class> = emptySet()
 
-    /**
-     * List of related role types
-     */
-    var roleTypes: Set<RoleType> = emptySet()
-
-    /**
-     * List of all events of the current application
-     */
-    var events: Set<Event> = emptySet()
+    @Serializable(with = PolymorphicSetSerializer::class)
+    var children: Set<ModelElement<*>> = emptySet()
 
     override fun maxId(): Long = listOf(
             id,
             attributes.map { it.maxId() }.max() ?: 0,
             methods.map { it.maxId() }.max() ?: 0,
-            classes.map { it.maxId() }.max() ?: 0,
-            roleTypes.map { it.maxId() }.max() ?: 0,
-            events.map { it.maxId() }.max() ?: 0
-    ).max() ?: id
+            children.map { it.maxId() }.max() ?: 0
+            ).max() ?: id
 
     override fun copy() = Compartment { new ->
         new.name = name
         new.attributes = attributes.map { it.copy() }
         new.methods = methods.map { it.copy() }
-        new.classes = classes.map { it.copy() }.toSet()
-        new.roleTypes = roleTypes.map { it.copy() }.toSet()
-        new.events = events.map { it.copy() }.toSet()
+        new.children = children.map { it.copy() }.toSet()
     }
 }

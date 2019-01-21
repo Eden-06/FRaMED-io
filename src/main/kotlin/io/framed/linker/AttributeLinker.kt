@@ -33,6 +33,9 @@ class AttributeLinker(
             .validate(RegexValidator("([a-zA-Z]([a-zA-Z0-9])*)?".toRegex())::validate)
             .trackHistory()
 
+    override val subTypes: Set<String>
+        get() = setOf(model.type)
+
     private val lineProperty = FunctionProperty(object : FunctionAccessor<String> {
         override fun set(value: String): Boolean {
             var state = State.NAME
@@ -92,7 +95,7 @@ class AttributeLinker(
 
         group("General") {
             input("Name", nameProperty)
-            input("Type", typeProperty)
+            input("Type", typeProperty, this@AttributeLinker::getTypeSubset)
         }
     }
 

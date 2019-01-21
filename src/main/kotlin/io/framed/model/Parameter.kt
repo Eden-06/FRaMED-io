@@ -9,13 +9,11 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Parameter() : ModelElement<Parameter> {
+class Parameter() : ModelElement<Parameter>() {
 
     constructor(init: (Parameter) -> Unit) : this() {
         init(this)
     }
-
-    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this parameter.

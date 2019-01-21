@@ -5,6 +5,7 @@ import io.framed.framework.LinkerManager
 import io.framed.framework.util.loadAjaxFile
 import io.framed.framework.view.Application
 import io.framed.linker.*
+import io.framed.model.*
 import kotlin.browser.window
 
 /**
@@ -24,6 +25,18 @@ fun main(args: Array<String>) {
  * Startup the application
  */
 fun init() {
+    PolymorphicSerializer.registerSerializer(Aggregation::class, Aggregation.serializer(), "io.framed.model.Aggregation")
+    PolymorphicSerializer.registerSerializer(Association::class, Association.serializer(), "io.framed.model.Association")
+    PolymorphicSerializer.registerSerializer(Composition::class, Composition.serializer(), "io.framed.model.Composition")
+    PolymorphicSerializer.registerSerializer(Inheritance::class, Inheritance.serializer(), "io.framed.model.Inheritance")
+    PolymorphicSerializer.registerSerializer(Attribute::class, Attribute.serializer(), "io.framed.model.Attribute")
+    PolymorphicSerializer.registerSerializer(Class::class, Class.serializer(), "io.framed.model.Class")
+    PolymorphicSerializer.registerSerializer(Compartment::class, Compartment.serializer(), "io.framed.model.Compartment")
+    PolymorphicSerializer.registerSerializer(Event::class, Event.serializer(), "io.framed.model.Event")
+    PolymorphicSerializer.registerSerializer(Method::class, Method.serializer(), "io.framed.model.Method")
+    PolymorphicSerializer.registerSerializer(Package::class, Package.serializer(), "io.framed.model.Package")
+    PolymorphicSerializer.registerSerializer(Parameter::class, Parameter.serializer(), "io.framed.model.Parameter")
+    PolymorphicSerializer.registerSerializer(RoleType::class, RoleType.serializer(), "io.framed.model.RoleType")
 
     LinkerManager.register(AttributeLinker)
     LinkerManager.register(ClassLinker)

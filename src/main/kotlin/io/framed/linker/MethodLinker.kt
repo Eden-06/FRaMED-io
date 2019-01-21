@@ -31,6 +31,9 @@ class MethodLinker(
             .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
             .trackHistory()
 
+    override val subTypes: Set<String>
+        get() = setOf(model.type) + model.parameters.map { it.type }
+
     private val parameterProperty = property(model::parameters).trackHistory()
 
     private val lineProperty = property(object : FunctionAccessor<String> {
@@ -149,7 +152,7 @@ class MethodLinker(
         title("Method")
         group("General") {
             input("Name", nameProperty)
-            input("Type", typeProperty)
+            input("Type", typeProperty, this@MethodLinker::getTypeSubset)
         }
         sidebarParameters = group("Parameters") {}
 
@@ -194,6 +197,7 @@ class MethodLinker(
                         cellBox { textView("") }
                         cellBox {
                             inputView {
+                                autocomplete(this@MethodLinker::getTypeSubset)
                                 value = param.type
                                 onChange {
                                     param.type = it

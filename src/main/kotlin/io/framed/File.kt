@@ -2,6 +2,7 @@ package io.framed
 
 import io.framed.framework.ModelElement
 import io.framed.framework.pictogram.Layer
+import io.framed.framework.util.log
 import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
 import io.framed.model.Connections
@@ -13,6 +14,7 @@ import kotlin.math.max
 
 @Serializable
 class File(
+        @Serializable(with = PolymorphicSerializer::class)
         val root: Package,
         val connections: Connections,
         val layer: Map<Long, Layer>
@@ -39,6 +41,7 @@ class File(
                 file
             } catch (e: Exception) {
                 println("Error while opening file!")
+                e.log()
                 dialog {
                     title = "Error while opening file"
                     contentView.textView("The selected file is malformated and cannot be parsed.")

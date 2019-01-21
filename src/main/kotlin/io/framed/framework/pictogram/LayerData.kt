@@ -52,4 +52,22 @@ data class LayerData(
             prop
         }
     }
+
+    fun import(layerData: LayerData) {
+        leftProperty.value = layerData.leftProperty.value
+        topProperty.value = layerData.topProperty.value
+        widthProperty.value = layerData.widthProperty.value
+        heightProperty.value = layerData.heightProperty.value
+        autosizeProperty.value = layerData.autosizeProperty.value
+        labelsProperty.value = layerData.labelsProperty.value.map { it.copy() }
+
+        propertyMap.clear()
+        for ((key, value) in layerData.propertyMap.entries) {
+            data(key).value = value.value
+        }
+    }
+
+    fun export(): LayerData {
+        return copy()
+    }
 }

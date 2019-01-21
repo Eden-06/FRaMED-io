@@ -1,5 +1,7 @@
 package io.framed.model
 
+import io.framed.PolymorphicListSerializer
+import io.framed.PolymorphicSerializer
 import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
@@ -9,13 +11,11 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class RoleType() : ModelElement<RoleType> {
+class RoleType() : ModelElement<RoleType>() {
 
     constructor(init: (RoleType) -> Unit) : this() {
         init(this)
     }
-
-    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this roleType
@@ -25,11 +25,13 @@ class RoleType() : ModelElement<RoleType> {
     /**
      * List of roleType attributes
      */
+    @Serializable(with = PolymorphicListSerializer::class)
     var attributes: List<Attribute> = emptyList()
 
     /**
      * List of roleType methods
      */
+    @Serializable(with = PolymorphicListSerializer::class)
     var methods: List<Method> = emptyList()
 
     override fun maxId(): Long = listOf(

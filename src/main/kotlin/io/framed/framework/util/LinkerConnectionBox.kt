@@ -8,7 +8,7 @@ import io.framed.framework.ConnectionManager
 import io.framed.framework.ModelConnection
 import kotlin.reflect.KMutableProperty0
 
-class LinkerConnectionBox<M : ModelConnection<M>, L : ConnectionLinker<M>>(
+class LinkerConnectionBox<M : ModelConnection<out M>, L : ConnectionLinker<out M>>(
         kProperty: KMutableProperty0<Set<M>>,
         val parent: ConnectionManager
 ) {

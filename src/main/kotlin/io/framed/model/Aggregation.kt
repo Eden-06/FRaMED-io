@@ -1,7 +1,7 @@
 package io.framed.model
 
+import io.framed.PolymorphicSerializer
 import io.framed.framework.ModelConnection
-import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
@@ -10,24 +10,12 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Aggregation(
+class Aggregation() : ModelConnection<Aggregation>() {
 
-        /**
-         * The connections source class.
-         */
-        override var sourceId: Long,
-
-        /**
-         * The connections target class.
-         */
-        override var targetId: Long
-) : ModelConnection<Aggregation> {
-
-    constructor(sourceId: Long, targetId: Long, init: (Aggregation) -> Unit) : this(sourceId, targetId) {
-        init(this)
+    constructor(sourceId: Long, targetId: Long): this() {
+        this.sourceId = sourceId
+        this.targetId = targetId
     }
-
-    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this connection.
@@ -44,9 +32,12 @@ class Aggregation(
      */
     var targetCardinality: String = "*"
 
-    override fun copy() = Aggregation(sourceId, targetId) { new ->
+    override fun copy() = Aggregation().also { new ->
+        new.sourceId = sourceId
+        new.targetId = targetId
         new.name = name
         new.sourceCardinality = sourceCardinality
         new.targetCardinality = targetCardinality
     }
+
 }

@@ -28,7 +28,7 @@ class HtmlLabel(
 
     val view: View<*> = InputView(label.textProperty).apply {
         classes += "html-label"
-        autocomplete = label.autocomplete
+        autocomplete(label.autocomplete)
         sizeMatchText()
 
         marginLeft = label.leftProperty.value

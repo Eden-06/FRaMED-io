@@ -32,6 +32,9 @@ class RoleTypeLinker(
     val attributes = shapeBox(model::attributes)
     val methods = shapeBox(model::methods)
 
+    override val subTypes: Set<String>
+        get() = (attributes.linkers.flatMap { it.subTypes } + methods.linkers.flatMap { it.subTypes }).toSet() + model.name
+
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)

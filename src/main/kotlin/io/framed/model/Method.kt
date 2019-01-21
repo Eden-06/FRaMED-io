@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.PolymorphicListSerializer
 import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
@@ -9,13 +10,11 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Method() : ModelElement<Method> {
+class Method() : ModelElement<Method>() {
 
     constructor(init: (Method) -> Unit) : this() {
         init(this)
     }
-
-    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this model.
@@ -30,6 +29,7 @@ class Method() : ModelElement<Method> {
     /**
      * List of parameters for this model.
      */
+    @Serializable(with = PolymorphicListSerializer::class)
     var parameters: List<Parameter> = emptyList()
 
     override fun maxId(): Long = listOf(

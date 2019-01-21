@@ -2,6 +2,7 @@ package io.framed.framework.view
 
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.ReadOnlyProperty
+import io.framed.framework.AutocompleteHandler
 import org.w3c.dom.HTMLDivElement
 
 class SidebarGroup(
@@ -13,7 +14,17 @@ class SidebarGroup(
 
     fun input(label: String, property: ReadOnlyProperty<String>, autocomplete: List<String> = emptyList()): InputView {
         val i = InputView(property)
-        i.autocomplete = autocomplete
+        i.autocomplete(autocomplete)
+
+        append(ListView().also {
+            it += TextView(label)
+            it += i
+        })
+        return i
+    }
+    fun input(label: String, property: ReadOnlyProperty<String>, autocompleter: (patial: String) -> List<String>): InputView {
+        val i = InputView(property)
+        i.autocomplete(autocompleter)
 
         append(ListView().also {
             it += TextView(label)

@@ -1,7 +1,7 @@
 package io.framed.model
 
+import io.framed.PolymorphicSerializer
 import io.framed.framework.ModelConnection
-import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
@@ -10,24 +10,12 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Association(
+class Association() : ModelConnection<Association>() {
 
-        /**
-         * The connections source class.
-         */
-        override var sourceId: Long,
-
-        /**
-         * The connections target class.
-         */
-        override var targetId: Long
-) : ModelConnection<Association> {
-
-    constructor(sourceId: Long, targetId: Long, init: (Association) -> Unit) : this(sourceId, targetId) {
-        init(this)
+    constructor(sourceId: Long, targetId: Long): this() {
+        this.sourceId = sourceId
+        this.targetId = targetId
     }
-
-    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this connection.
@@ -44,7 +32,7 @@ class Association(
      */
     var targetCardinality: String = "*"
 
-    override fun copy() = Association(sourceId, targetId) { new ->
+    override fun copy() = Association().also { new ->
         new.name = name
         new.sourceCardinality = sourceCardinality
         new.targetCardinality = targetCardinality

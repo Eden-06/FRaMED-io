@@ -31,21 +31,15 @@ class PackageLinker(
 
     override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
 
-    private val classes = shapeBox<Class, ClassLinker>(model::classes, connectionManager) { box ->
-        box.view = container
-    }
-    private val compartments = shapeBox<Compartment, CompartmentLinker>(model::compartments, connectionManager) { box ->
-        box.view = container
-    }
-    private val packages = shapeBox<Package, PackageLinker>(model::packages, connectionManager) { box ->
-        box.view = container
-    }
-    private val events = shapeBox<Event, EventLinker>(model::events, connectionManager) { box ->
+    private val children = shapeBox(model::children, connectionManager) { box ->
         box.view = container
     }
 
     override val shapeLinkers: Set<ShapeLinker<*, *>>
-        get() = classes.linkers + packages.linkers + events.linkers + compartments.linkers
+        get() = children.linkers
+
+    override val subTypes: Set<String>
+        get() = shapeLinkers.flatMap { it.subTypes }.toSet()
 
     private lateinit var autoLayoutBox: BoxShape
     private lateinit var borderBox: BoxShape
@@ -67,15 +61,12 @@ class PackageLinker(
                 padding = box(8.0)
             }
         }
-        classes.previewBox = autoLayoutBox
-        packages.previewBox = autoLayoutBox
-        compartments.previewBox = autoLayoutBox
-        events.previewBox = autoLayoutBox
+        children.previewBox = autoLayoutBox
 
         borderBox = boxShape(BoxShape.Position.BORDER) {}
 
-        events.conditionalContainer(borderBox) {
-            it.returnEvent
+        children.conditionalContainer(borderBox) {
+            it is EventLinker && it.returnEvent
         }
 
         style {
@@ -153,10 +144,7 @@ class PackageLinker(
         }
 
         autoLayoutBox.clear()
-        classes.addAllPreviews()
-        packages.addAllPreviews()
-        compartments.addAllPreviews()
-        events.addAllPreviews()
+        children.addAllPreviews()
 
         parent?.redraw(this)
     }
@@ -262,40 +250,16 @@ class PackageLinker(
         }
 
         addItem(MaterialIcon.ADD, "Add class") { event ->
-            val linker = ClassLinker(Class(), this@PackageLinker)
-            this@PackageLinker.classes += linker
-            linker.also {
-                it.pictogram.left = event.diagram.x
-                it.pictogram.top = event.diagram.y
-                it.focus(event.target)
-            }
+            add(Class(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
         }
         addItem(MaterialIcon.ADD, "Add package") { event ->
-            val linker = PackageLinker(Package(), connectionManager, this@PackageLinker)
-            packages += linker
-            linker.also {
-                it.pictogram.left = event.diagram.x
-                it.pictogram.top = event.diagram.y
-                it.focus(event.target)
-            }
+            add(Package(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
         }
         addItem(MaterialIcon.ADD, "Add event") { event ->
-            val linker = EventLinker(Event(), this@PackageLinker)
-            events += linker
-            linker.also {
-                it.pictogram.left = event.diagram.x
-                it.pictogram.top = event.diagram.y
-                it.focus(event.target)
-            }
+            add(Event(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
         }
         addItem(MaterialIcon.ADD, "Add compartment") { event ->
-            val linker = CompartmentLinker(Compartment(), connectionManager, this@PackageLinker)
-            compartments += linker
-            linker.also {
-                it.pictogram.left = event.diagram.x
-                it.pictogram.top = event.diagram.y
-                it.focus(event.target)
-            }
+            add(Compartment(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
         }
 
         contextDelete = addItem(MaterialIcon.DELETE, "Delete") {
@@ -304,36 +268,33 @@ class PackageLinker(
     }
 
     override fun remove(linker: ShapeLinker<*, *>) {
-        when (linker) {
-            is ClassLinker -> classes -= linker
-            is CompartmentLinker -> compartments -= linker
-            is PackageLinker -> packages -= linker
-            is EventLinker -> events -= linker
-
-            else -> super.remove(linker)
-        }
+        if (linker is ClassLinker || linker is CompartmentLinker || linker is PackageLinker || linker is EventLinker) {
+            children -= linker
+        } else super.remove(linker)
         checkBorder()
     }
 
 
-    override fun add(model: ModelElement<*>) {
-        when (model) {
-            is Class -> classes += ClassLinker(model, this)
-            is Compartment -> compartments += CompartmentLinker(model, connectionManager, this)
-            is Package -> packages += PackageLinker(model, connectionManager, this)
-            is Event -> events += EventLinker(model, this)
+    override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
+        val linker = when (model) {
+            is Class -> ClassLinker(model, this)
+            is Compartment -> CompartmentLinker(model, connectionManager, this)
+            is Package -> PackageLinker(model, connectionManager, this)
+            is Event -> EventLinker(model, this)
             else -> super.add(model)
         }
+        children += linker
         checkBorder()
+        return linker
     }
 
 
     override fun redraw(linker: ShapeLinker<*, *>) {
         when (linker) {
-            is ClassLinker -> classes.redraw(linker)
-            is CompartmentLinker -> compartments.redraw(linker)
-            is PackageLinker -> packages.redraw(linker)
-            is EventLinker -> events.redraw(linker)
+            is ClassLinker -> children.redraw(linker)
+            is CompartmentLinker -> children.redraw(linker)
+            is PackageLinker -> children.redraw(linker)
+            is EventLinker -> children.redraw(linker)
 
             else -> super.remove(linker)
         }
@@ -421,10 +382,9 @@ class PackageLinker(
      * The model initializes a new instance of the linker
      */
     init {
-        model.classes.forEach { classes += ClassLinker(it, this) }
-        model.packages.forEach { packages += PackageLinker(it, connectionManager, this) }
-        model.events.forEach { events += EventLinker(it, this) }
-        model.compartments.forEach { compartments += CompartmentLinker(it, connectionManager, this) }
+        for (element in model.children) {
+            add(element)
+        }
 
         LinkerManager.setup(this)
         connectionManager.addModel(this)

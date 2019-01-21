@@ -53,10 +53,9 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
         custom(ToolBar.Side.LEFT) {
             inputView(zoomStringProperty) {
-                autocomplete = NavigationView.zoomSteps.map {
+                autocomplete(NavigationView.zoomSteps.map {
                     "${(it * 100).roundToInt()}%"
-                }
-                autocompleteMatch = false
+                }, true)
                 size = 4
                 onFocusLeave {
                     value = zoomStringProperty.value

@@ -145,10 +145,10 @@ class HtmlRenderer(
     fun paste() {
         val selected = shapeMap.filterValues {
             it.viewList.any { it in selectedViews }
-        }.keys.mapNotNull { it.id }.distinct().firstOrNull()
+        }.keys.filter { it.id != null }.distinct().firstOrNull()
 
         History.group("Paste") {
-            viewModel.handler.paste(selected)
+            viewModel.handler.paste(selected?.id, selected)
         }
     }
 

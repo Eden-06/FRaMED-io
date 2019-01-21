@@ -24,6 +24,8 @@ abstract class Pictogram(
     var labels by labelsProperty
 
     fun data(name: String) = layerProperty.flatMapBinding { it[id, this].data(name) }
+    fun import(layerData: LayerData) = layer[id,this].import(layerData)
+    fun export() = layer[id,this].export()
 
     override fun toString(): String {
         return "${this::class.simpleName}($id)"

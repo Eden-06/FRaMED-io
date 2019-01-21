@@ -18,5 +18,13 @@ interface ShapeLinker<M : ModelElement<M>, P : Shape> : Linker<M, P> {
     }
 
     fun remove(linker: ShapeLinker<*, *>): Unit = throw UnsupportedOperationException()
-    fun add(model: ModelElement<*>): Unit = throw  UnsupportedOperationException()
+    fun add(model: ModelElement<*>): ShapeLinker<*, *> = throw  UnsupportedOperationException()
+
+    val subTypes: Set<String>
+        get() = emptySet()
+
+    fun getTypeSubset(partial: String): List<String> {
+        val parent = parent
+        return parent?.getTypeSubset(partial) ?: subTypes.filter { it.toLowerCase().contains(partial.toLowerCase()) && it.isNotEmpty()}.take(8)
+    }
 }

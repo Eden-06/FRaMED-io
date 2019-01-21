@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.PolymorphicSerializer
 import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 
@@ -7,16 +8,12 @@ import kotlinx.serialization.Serializable
  * The model defines an model of the modeling language
  */
 @Serializable
-class Event() : ModelElement<Event> {
+class Event() : ModelElement<Event>() {
 
     constructor(init: (Event) -> Unit) : this() {
         init(this)
     }
 
-    /**
-     * Identifier of the Instance
-     */
-    override val id: Long = ModelElement.lastId++
     /**
      * Type of the model
      */

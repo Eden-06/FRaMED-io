@@ -2,6 +2,8 @@ package io.framed.framework
 
 import de.westermann.kobserve.Property
 import io.framed.framework.pictogram.BoxShape
+import io.framed.framework.pictogram.LayerData
+import io.framed.framework.pictogram.Pictogram
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.History
 import io.framed.framework.view.dialog
@@ -95,44 +97,62 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
         }
     }
 
-    fun copy(shapes: List<Long>): List<ModelElement<*>> {
-        var elements = emptyList<ModelElement<*>>()
+    fun copy(shapes: List<Long>, source: Pictogram): List<Pair<ModelElement<*>, LayerData>> {
+        var elements = emptyList<Pair<ModelElement<*>, LayerData>>()
         for (linker in shapeLinkers) {
             if (linker.id in shapes) {
-                elements += linker.model.copy()
+                val layerData = if (container == source || linker !is PreviewLinker<*, *, *>) {
+                    linker.pictogram.export()
+                } else {
+                    linker.flatPreview.export()
+                }
+                elements += linker.model.copy() to layerData
             } else if (linker is ModelLinker<*, *, *>) {
-                elements += linker.copy(shapes)
+                elements += linker.copy(shapes, source)
             }
         }
         return elements
     }
 
-    fun cut(shapes: List<Long>): List<ModelElement<*>> {
-        val elements = copy(shapes)
+    fun cut(shapes: List<Long>, source: Pictogram): List<Pair<ModelElement<*>, LayerData>> {
+        val elements = copy(shapes, source)
         delete(shapes)
         return elements
     }
 
-    fun paste(target: Long?, elements: List<ModelElement<*>>) {
-        if (target == null || id == target) {
-            for (element in elements) {
+    fun paste(target: Long?, elements: List<Pair<ModelElement<*>, LayerData>>, targetContainer: Pictogram?) {
+        if (target == null || id == target || targetContainer == null) {
+            for ((element, layerData) in elements) {
                 if (LinkerManager.itemLinkerFor(element).canCreateIn(model)) {
-                    add(element)
+                    add(element, layerData, container)
                 }
             }
         } else {
             for (linker in shapeLinkers) {
                 if (linker is ModelLinker<*, *, *>) {
-                    linker.paste(target, elements)
+                    linker.paste(target, elements, targetContainer)
                 } else if (linker.id == target) {
-                    for (element in elements) {
+                    for ((element, layerData) in elements) {
                         if (LinkerManager.itemLinkerFor(element).canCreateIn(model)) {
-                            add(element)
+                            add(element, layerData, targetContainer)
                         }
                     }
                     break
                 }
             }
         }
+    }
+
+
+    fun add(model: ModelElement<*>, layerData: LayerData, container: Pictogram): ShapeLinker<*, *> {
+        val linker = add(model)
+        if (container == pictogram) {
+            if (linker is PreviewLinker<*, *, *>) {
+                linker.flatPreview.import(layerData)
+            }
+        } else if (container == this.container) {
+            linker.pictogram.import(layerData)
+        }
+        return linker
     }
 }

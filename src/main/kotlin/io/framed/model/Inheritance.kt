@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.PolymorphicSerializer
 import io.framed.framework.ModelConnection
 import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
@@ -10,24 +11,12 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Inheritance(
+class Inheritance() : ModelConnection<Inheritance> (){
 
-        /**
-         * The connections source class.
-         */
-        override var sourceId: Long,
-
-        /**
-         * The connections target class.
-         */
-        override var targetId: Long
-) : ModelConnection<Inheritance> {
-
-    constructor(sourceId: Long, targetId: Long, init: (Inheritance) -> Unit) : this(sourceId, targetId) {
-        init(this)
+    constructor(sourceId: Long, targetId: Long): this() {
+        this.sourceId = sourceId
+        this.targetId = targetId
     }
-
-    override val id: Long = ModelElement.lastId++
 
     /**
      * Name of this connection.
@@ -44,7 +33,9 @@ class Inheritance(
      */
     var targetCardinality: String = ""
 
-    override fun copy() = Inheritance(sourceId, targetId) { new ->
+    override fun copy() = Inheritance().also { new ->
+        new.sourceId = sourceId
+        new.targetId = targetId
         new.name = name
         new.sourceCardinality = sourceCardinality
         new.targetCardinality = targetCardinality

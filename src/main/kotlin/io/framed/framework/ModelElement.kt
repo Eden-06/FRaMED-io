@@ -1,17 +1,20 @@
 package io.framed.framework
 
+import kotlinx.serialization.Serializable
+
 /**
  * Base model interface for easier access.
  *
  * @author lars
  */
-interface ModelElement<M : ModelElement<M>> {
-    val id: Long
+@Serializable
+abstract class ModelElement<M : ModelElement<M>> {
 
-    fun copy(): M
-    fun getChildren(): List<ModelElement<*>> = listOf(this)
+    val id: Long = lastId ++
 
-    fun maxId(): Long = id
+    abstract fun copy(): M
+    open fun getChildren(): List<ModelElement<*>> = listOf(this)
+    open fun maxId(): Long = id
 
     companion object {
         var lastId: Long = 0

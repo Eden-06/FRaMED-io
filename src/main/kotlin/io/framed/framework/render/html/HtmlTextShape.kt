@@ -20,7 +20,7 @@ class HtmlTextShape(
         style(this, shape.style)
         events(this, shape)
 
-        autocomplete = shape.autocomplete
+        autocomplete(shape.autocomplete)
 
         onMouseDown {
             focus()

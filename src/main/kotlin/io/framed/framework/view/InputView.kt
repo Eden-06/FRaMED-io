@@ -2,6 +2,7 @@ package io.framed.framework.view
 
 import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.basic.property
+import io.framed.framework.AutocompleteHandler
 import org.w3c.dom.HTMLDivElement
 
 /**
@@ -53,40 +54,21 @@ class InputView() : View<HTMLDivElement>("div") {
         it.classes += "autocomplete"
         it.display = false
     }
-    private var autocompleteMap: List<Pair<String, TextView>> = emptyList()
-    val autocompleteVisible: List<TextView>
-        get() = autocompleteMap.map { it.second }.filter { it.display }
 
-    var autocomplete: List<String> = emptyList()
-        set(value) {
-            autocompleteListView.clear()
+    var autocomplete: AutocompleteHandler? = null
 
-            value.forEach { txt ->
-                val textView = TextView(txt)
-                textView.onMouseDown { _ ->
-                    this.value = txt
-                }
+    fun autocomplete(dataset: List<String>, showAll: Boolean = false) {
+        autocomplete = AutocompleteHandler.ListAutocompleteHandler(input, autocompleteListView, dataset, showAll)
+    }
 
-                autocompleteMap += txt to textView
-                autocompleteListView.append(textView)
-            }
-            field = value
-
-            updateAutocomplete()
-        }
-    var autocompleteMatch: Boolean = true
-        set(value) {
-            field = value
-            updateAutocomplete()
-        }
+    fun autocomplete(autocompleter: (partial: String) -> List<String>) {
+        autocomplete = AutocompleteHandler.DynamicAutocompleteHandler(input, autocompleteListView, autocompleter)
+    }
 
     fun bind(property: ReadOnlyProperty<String>) = input.bind(property)
 
     private fun updateAutocomplete() {
-        autocompleteMap.forEach { (auto, view) ->
-            view.selectedView = false
-            view.display = !autocompleteMatch || auto.contains(value, ignoreCase = true)
-        }
+        autocomplete?.update(value)
     }
 
     override fun focus() = input.focus()
@@ -108,19 +90,19 @@ class InputView() : View<HTMLDivElement>("div") {
         }
 
         onFocusEnter {
-            if (autocomplete.isNotEmpty()) {
+            if (autocomplete != null) {
                 autocompleteListView.display = true
+                updateAutocomplete()
             }
             focusClass = true
         }
         onFocusLeave { _ ->
             autocompleteListView.display = false
-            autocompleteMap.forEach { it.second.selectedView = false }
             focusClass = false
         }
 
         onKeyPress { event ->
-            val list = autocompleteVisible
+            val list = autocomplete?.visible ?: return@onKeyPress
             val index = list.indexOfFirst { it.selectedView }
             if (list.isNotEmpty()) {
                 when (event.keyCode) {
