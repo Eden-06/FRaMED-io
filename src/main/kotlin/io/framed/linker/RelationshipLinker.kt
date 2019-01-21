@@ -7,16 +7,16 @@ import io.framed.framework.util.trackHistory
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
-import io.framed.model.Aggregation
+import io.framed.model.Relationship
 
 /**
  * @author lars
  */
 
-class AggregationLinker(
-        override val model: Aggregation,
+class RelationshipLinker(
+        override val model: Relationship,
         override val manager: ConnectionManager
-) : ConnectionLinker<Aggregation> {
+) : ConnectionLinker<Relationship> {
 
     private val nameProperty = property(model::name).trackHistory()
     private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
@@ -26,23 +26,13 @@ class AggregationLinker(
     override val targetIdProperty = property(model::targetId).trackHistory()
 
     override val pictogram = connection(sourceIdProperty, targetIdProperty) {
-
         line(ConnectionLine.Type.RECTANGLE) {
             stroke = Color(0, 0, 0)
             strokeWidth = 1
         }
 
         sourceStyle = null
-        targetStyle = connectionEnd {
-            width = 20
-            length = 20
-            foldback = 2.0
-            paintStyle {
-                stroke = Color(0, 0, 0)
-                strokeWidth = 1
-                fill = Color(255, 255, 255)
-            }
-        }
+        targetStyle = null
     }
 
     override val sidebar = sidebar {
@@ -95,18 +85,18 @@ class AggregationLinker(
     }
 
     init {
-        LinkerManager.setup(this, AggregationLinker)
+        LinkerManager.setup(this, RelationshipLinker)
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ConnectionInfo("Aggregation", MaterialIcon.ADD)
+        override val info = ConnectionInfo("Relationship", MaterialIcon.ADD)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is ClassLinker || source is RoleTypeLinker || source is EventLinker
+            return source is RoleTypeLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) && (target is ClassLinker || target is RoleTypeLinker || target is EventLinker)
+            return target is RoleTypeLinker && source is RoleTypeLinker && source != target
         }
     }
 }

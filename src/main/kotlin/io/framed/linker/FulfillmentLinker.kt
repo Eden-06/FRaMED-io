@@ -7,16 +7,16 @@ import io.framed.framework.util.trackHistory
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
-import io.framed.model.Association
+import io.framed.model.Inheritance
 
 /**
  * @author lars
  */
 
-class AssociationLinker(
-        override val model: Association,
+class FulfillmentLinker(
+        override val model: Inheritance,
         override val manager: ConnectionManager
-) : ConnectionLinker<Association> {
+) : ConnectionLinker<Inheritance> {
 
     private val nameProperty = property(model::name).trackHistory()
     private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
@@ -32,7 +32,16 @@ class AssociationLinker(
         }
 
         sourceStyle = null
-        targetStyle = null
+        targetStyle = connectionEnd {
+            width = 20
+            length = 20
+            foldback = 1.0
+            paintStyle {
+                stroke = Color(0, 0, 0)
+                strokeWidth = 1
+                fill = Color(0, 0, 0)
+            }
+        }
     }
 
     override val sidebar = sidebar {
@@ -51,6 +60,7 @@ class AssociationLinker(
             delete()
         }
     }
+
 
     override fun updateLabelBindings() {
         val ids = pictogram.labels.mapNotNull { it.id }.distinct().toSet()
@@ -85,18 +95,18 @@ class AssociationLinker(
     }
 
     init {
-        LinkerManager.setup(this, AssociationLinker)
+        LinkerManager.setup(this, InheritanceLinker)
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ConnectionInfo("Association", MaterialIcon.ADD)
+        override val info = ConnectionInfo("Fulfillment", MaterialIcon.ADD)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is ClassLinker || source is RoleTypeLinker || source is EventLinker || source is CompartmentLinker
+            return source is ClassLinker || source is CompartmentLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) && (target is ClassLinker || target is RoleTypeLinker || target is EventLinker || target is CompartmentLinker)
+            return (source is ClassLinker && target is CompartmentLinker) || (source is CompartmentLinker && target is CompartmentLinker && target != source)
         }
     }
 }

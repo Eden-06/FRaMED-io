@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Aggregation() : ModelConnection<Aggregation>() {
+class Fulfillment() : ModelConnection<Fulfillment>() {
 
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId
@@ -25,19 +25,16 @@ class Aggregation() : ModelConnection<Aggregation>() {
     /**
      * Cardinality for the source side of this connection.
      */
-    var sourceCardinality: String = "*"
+    var sourceCardinality: String = ""
 
     /**
      * Cardinality for the target side of this connection.
      */
-    var targetCardinality: String = "*"
+    var targetCardinality: String = ""
 
-    override fun copy() = Aggregation().also { new ->
-        new.sourceId = sourceId
-        new.targetId = targetId
+    override fun copy() = Fulfillment().also { new ->
         new.name = name
         new.sourceCardinality = sourceCardinality
         new.targetCardinality = targetCardinality
     }
-
 }

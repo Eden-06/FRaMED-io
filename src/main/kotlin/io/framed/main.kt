@@ -25,8 +25,8 @@ fun main(args: Array<String>) {
  * Startup the application
  */
 fun init() {
-    PolymorphicSerializer.registerSerializer(Aggregation::class, Aggregation.serializer(), "io.framed.model.Aggregation")
-    PolymorphicSerializer.registerSerializer(Association::class, Association.serializer(), "io.framed.model.Association")
+    PolymorphicSerializer.registerSerializer(Relationship::class, Relationship.serializer(), "io.framed.model.Relationship")
+    PolymorphicSerializer.registerSerializer(Fulfillment::class, Fulfillment.serializer(), "io.framed.model.Fulfillment")
     PolymorphicSerializer.registerSerializer(Composition::class, Composition.serializer(), "io.framed.model.Composition")
     PolymorphicSerializer.registerSerializer(Inheritance::class, Inheritance.serializer(), "io.framed.model.Inheritance")
     PolymorphicSerializer.registerSerializer(Attribute::class, Attribute.serializer(), "io.framed.model.Attribute")
@@ -46,9 +46,9 @@ fun init() {
     LinkerManager.register(RoleTypeLinker)
     LinkerManager.register(CompartmentLinker)
 
-    LinkerManager.register(AssociationLinker)
+    LinkerManager.register(RelationshipLinker)
     LinkerManager.register(InheritanceLinker)
-    LinkerManager.register(AggregationLinker)
+    LinkerManager.register(FulfillmentLinker)
     LinkerManager.register(CompositionLinker)
 
     Application.init()

@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Association() : ModelConnection<Association>() {
+class Relationship() : ModelConnection<Relationship>() {
 
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId
@@ -32,7 +32,7 @@ class Association() : ModelConnection<Association>() {
      */
     var targetCardinality: String = "*"
 
-    override fun copy() = Association().also { new ->
+    override fun copy() = Relationship().also { new ->
         new.name = name
         new.sourceCardinality = sourceCardinality
         new.targetCardinality = targetCardinality

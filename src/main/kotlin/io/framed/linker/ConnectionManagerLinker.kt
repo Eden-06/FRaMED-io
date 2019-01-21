@@ -27,8 +27,7 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
 
     override fun add(model: ModelConnection<*>) {
         when (model) {
-            is Association -> connectionBox += AssociationLinker(model, this)
-            is Aggregation -> connectionBox += AggregationLinker(model, this)
+            is Relationship -> connectionBox += RelationshipLinker(model, this)
             is Composition -> connectionBox += CompositionLinker(model, this)
             is Inheritance -> connectionBox += InheritanceLinker(model, this)
         }
@@ -36,8 +35,7 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
 
     override fun remove(linker: ConnectionLinker<*>) {
         when (linker) {
-            is AssociationLinker -> connectionBox -= linker
-            is AggregationLinker -> connectionBox -= linker
+            is RelationshipLinker -> connectionBox -= linker
             is CompositionLinker -> connectionBox -= linker
             is InheritanceLinker -> connectionBox -= linker
         }
@@ -67,8 +65,7 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
 
     override fun createConnection(source: Long, target: Long, type: ConnectionInfo): ConnectionLinker<*> {
         return when (type) {
-            AssociationLinker.info -> AssociationLinker(Association(source, target), this).also(connectionBox::add)
-            AggregationLinker.info -> AggregationLinker(Aggregation(source, target), this).also(connectionBox::add)
+            RelationshipLinker.info -> RelationshipLinker(Relationship(source, target), this).also(connectionBox::add)
             InheritanceLinker.info -> InheritanceLinker(Inheritance(source, target), this).also(connectionBox::add)
             CompositionLinker.info -> CompositionLinker(Composition(source, target), this).also(connectionBox::add)
             else -> throw IllegalArgumentException()
