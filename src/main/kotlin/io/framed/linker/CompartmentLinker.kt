@@ -131,6 +131,7 @@ class CompartmentLinker(
     private val isFlatPreviewProperty = property(object : FunctionAccessor<Boolean> {
         override fun set(value: Boolean): Boolean {
             isFlatPreviewStringProperty.value = value.toString()
+            updatePreviewType()
             return true
         }
 
@@ -401,10 +402,6 @@ class CompartmentLinker(
         connectionManager.onConnectionAdd { checkBorder() }
         connectionManager.onConnectionRemove { checkBorder() }
         checkBorder()
-
-        isFlatPreviewProperty.onChange {
-            updatePreviewType()
-        }
     }
 
     companion object : LinkerInfoItem {
