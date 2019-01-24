@@ -216,6 +216,9 @@
 *:hover > .connection-source {
   display: block;
 }
+.absolute-view:hover > div > .connection-source {
+  display: block;
+}
 
 .target-disabled {
   opacity: 0.4;

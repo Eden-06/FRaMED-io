@@ -57,9 +57,13 @@ class HtmlRenderer(
     lateinit var htmlShape: HtmlShapeContainer
     lateinit var htmlConnections: HtmlConnections
 
-    var draggableViews: List<View<*>> = emptyList()
-    val selectedViews: List<View<*>>
-        get() = draggableViews.filter { it.selectedView }
+    var selectable: List<Selectable> = emptyList()
+    val selected: List<Selectable>
+        get() = selectable.filter { it.isSelected }
+    val unselected: List<Selectable>
+        get() = selectable.filter { !it.isSelected }
+    val draggable: List<Selectable>
+        get() = selectable.filter { it.isDraggable }
 
     val selectedViewSizeProperty = property(0)
 
@@ -68,19 +72,17 @@ class HtmlRenderer(
 
         navigationView.onSelect { dimension ->
             if (dimension == null) {
-                selectedViews.forEach { it.selectedView = false }
+                selected.forEach { it.unselect() }
             } else {
-                draggableViews.forEach {
-                    val shape = it.assignedShape ?: return@forEach
-                    val viewDimension = Dimension(shape.leftOffset, shape.topOffset, shape.width, shape.height)
-                    it.selectedView = (viewDimension in dimension)
+                selectable.forEach {
+                    it.selectArea(dimension)
                 }
             }
-            selectedViewSizeProperty.value = selectedViews.size
+            selectedViewSizeProperty.value = selectable.size
         }
 
         navigationView.onZoom { zoom ->
-            draggableViews.forEach { it.dragZoom = zoom }
+            selectable.forEach { it.setZoom(zoom) }
             updateViewBox()
         }
         navigationView.onPan {
@@ -88,80 +90,90 @@ class HtmlRenderer(
         }
     }
 
-    fun selectView(view: View<*>, ctrlKey: Boolean, dblClick: Boolean) {
+    fun selectView(view: Selectable, ctrlKey: Boolean, dblClick: Boolean) {
         if (ctrlKey) {
-            view.selectedView = !view.selectedView
+            if (view.isSelected) view.unselect() else view.select()
         } else {
-            if (view.selectedView) {
+            if (view.isSelected) {
                 if (dblClick) {
-                    (selectedViews - view).forEach { it.selectedView = false }
+                    (selectable - view).forEach { it.unselect() }
                 }
             } else {
-                (selectedViews - view).forEach { it.selectedView = false }
-                view.selectedView = true
+                (selectable - view).forEach { it.unselect() }
+                view.select()
             }
         }
-        selectedViewSizeProperty.value = selectedViews.size
+        selectedViewSizeProperty.value = selected.size
+    }
+
+    fun select(idList: List<Long>) {
+        for (element in selectable) {
+            if (element.id in idList) {
+                element.select()
+            } else {
+                element.unselect()
+            }
+        }
+        selectedViewSizeProperty.value = selected.size
     }
 
     fun selectAll() {
-        draggableViews.forEach { it.selectedView = true }
-        selectedViewSizeProperty.value = selectedViews.size
+        selectable.forEach { it.select() }
+        selectedViewSizeProperty.value = selected.size
     }
 
     fun deselectAll() {
-        selectedViews.forEach { it.selectedView = false }
-        selectedViewSizeProperty.value = selectedViews.size
+        selectable.forEach { it.unselect() }
+        selectedViewSizeProperty.value = selected.size
     }
 
     fun deleteSelected() {
-        if (selectedViews.isNotEmpty()) {
+        if (selected.isNotEmpty()) {
             History.group("Delete") {
-                viewModel.handler.delete(shapeMap.filterValues {
-                    it.viewList.any { it in selectedViews }
-                }.keys.mapNotNull { it.id }.distinct())
+                viewModel.handler.delete(selected.map { it.id }.distinct())
             }
         }
     }
 
     fun copySelected() {
-        if (selectedViews.isNotEmpty()) {
-            viewModel.handler.copy(shapeMap.filterValues {
-                it.viewList.any { it in selectedViews }
-            }.keys.mapNotNull { it.id }.distinct())
+        if (selected.isNotEmpty()) {
+            viewModel.handler.copy(selected.map { it.id }.distinct())
         }
     }
 
     fun cutSelected() {
-        if (selectedViews.isNotEmpty()) {
+        if (selected.isNotEmpty()) {
             History.group("Cut") {
-                viewModel.handler.cut(shapeMap.filterValues {
-                    it.viewList.any { it in selectedViews }
-                }.keys.mapNotNull { it.id }.distinct())
+                viewModel.handler.cut(selected.map { it.id }.distinct())
             }
         }
     }
 
     fun paste() {
-        val selected = shapeMap.filterValues {
-            it.viewList.any { it in selectedViews }
-        }.keys.filter { it.id != null }.distinct().firstOrNull()
+        val selected = selected.let {
+            if (it.size == 1) it.first() else null
+        }
 
         History.group("Paste") {
-            viewModel.handler.paste(selected?.id, selected)
+            val idList = viewModel.handler.paste(selected?.id, selected?.pictogram)
+            select(idList)
         }
     }
 
     fun stopDragView() {
         navigationView.clearLines()
-        draggableViews.forEach { it.classes -= "snap-view" }
+        for (it in selectable) {
+            it.unhighlightSnap()
+        }
     }
 
     private var incrementSnap: Pair<View<*>, Point>? = null
     fun directDragView(event: View.DragEvent, view: View<*>, parent: ViewCollection<View<*>, *>): View.DragEvent {
         var delta = event.delta
 
-        draggableViews.forEach { it.classes -= "snap-view" }
+        for (it in selectable) {
+            it.unhighlightSnap()
+        }
 
         if (incrementSnap?.first != view) incrementSnap = null
         val currentCenter = Point(view.left + view.marginLeft, view.top + view.marginTop)
@@ -169,9 +181,9 @@ class HtmlRenderer(
         val center = (incrementSnap?.second ?: currentCenter) + delta
         incrementSnap = view to center
 
-        val ignore = selectedViews
-        val otherViews = (draggableViews - ignore)
-                .filter { it in parent }
+        val ignore = selected
+        val otherViews = (unselected)
+                .filter { it.isChildOf(parent) }
                 .flatMap {
                     listOf(
                             it to Point(it.left, it.top),
@@ -218,11 +230,11 @@ class HtmlRenderer(
             for (it in newPoints) {
                 otherViews.forEach { (v, p) ->
                     if (it.x == p.x) {
-                        v.classes += "snap-view"
+                        v.highlightSnap()
                         vLines += p.x
                     }
                     if (it.y == p.y) {
-                        v.classes += "snap-view"
+                        v.highlightSnap()
                         hLines += p.y
                     }
                 }
@@ -242,8 +254,8 @@ class HtmlRenderer(
             point: Point,
             direction: SnapDirection = SnapDirection.BOTH,
             parent: ViewCollection<View<*>, *>? = null,
-            ignore: List<View<*>> = emptyList(),
-            snapableViews: List<Pair<View<*>, Point>>? = null
+            ignore: List<Selectable> = emptyList(),
+            snapableViews: List<Pair<Selectable, Point>>? = null
     ): SnapResult {
         var p = point
         var snapToViewX = false
@@ -265,8 +277,8 @@ class HtmlRenderer(
         if (snapToView && parent != null) {
             val threshold = gridSize / 2
 
-            val otherViews = snapableViews ?: (draggableViews - ignore)
-                    .filter { (it in parent) }
+            val otherViews = snapableViews ?: (selectable - ignore)
+                    .filter { (it.isChildOf(parent)) }
                     .flatMap {
                         listOf(
                                 it to Point(it.left, it.top),
@@ -360,7 +372,7 @@ class HtmlRenderer(
         if (this::htmlShape.isInitialized) {
             htmlShape.remove()
         }
-        draggableViews = emptyList()
+        selectable = emptyList()
 
         htmlConnections = HtmlConnections(this, viewModel)
 
@@ -425,7 +437,7 @@ class HtmlRenderer(
 }
 
 data class SnapHelper(
-        val view: View<*>,
+        val view: Selectable,
         val targetPoint: Point,
         val delta: Double
 )

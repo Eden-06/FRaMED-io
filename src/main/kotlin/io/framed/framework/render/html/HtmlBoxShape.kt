@@ -2,6 +2,8 @@ package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
+import io.framed.framework.pictogram.Pictogram
+import io.framed.framework.util.Dimension
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import io.framed.framework.view.View
@@ -31,7 +33,7 @@ class HtmlBoxShape(
         }
     }
 
-    val positionView = container.listView {
+    override val positionView = container.listView {
         events(this, shape)
         if (shape.resizeable) {
             resizer = resizeable {
@@ -44,7 +46,7 @@ class HtmlBoxShape(
                                     Point(this@listView.left + this@listView.width, this@listView.top + this@listView.height),
                                     SnapDirection.BOTH,
                                     container,
-                                    listOf(this@listView)
+                                    listOf(this@HtmlBoxShape)
                             )
 
                             if (htmlRenderer.snapToView) {
@@ -64,7 +66,7 @@ class HtmlBoxShape(
                             event.position + event.size,
                             SnapDirection.BOTH,
                             container,
-                            listOf(this@listView)
+                            listOf(this@HtmlBoxShape)
                     )
                     val snappedSize = snap.point - event.position
 

@@ -70,4 +70,9 @@ data class LayerData(
     fun export(): LayerData {
         return copy()
     }
+
+    fun move(x: Double, y: Double) {
+        leftProperty.value += x
+        topProperty.value += y
+    }
 }

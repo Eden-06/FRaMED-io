@@ -2,22 +2,77 @@ package io.framed.framework.render.html
 
 import de.westermann.kobserve.ListenerReference
 import io.framed.framework.*
-import io.framed.framework.pictogram.Connection
-import io.framed.framework.pictogram.ConnectionLine
-import io.framed.framework.pictogram.ContextEvent
-import io.framed.framework.pictogram.SidebarEvent
+import io.framed.framework.pictogram.*
+import io.framed.framework.util.Dimension
+import io.framed.framework.util.Point
 import io.framed.framework.util.point
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
+import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.MouseEvent
 
 /**
  * @author lars
  */
+@Suppress("UNUSED")
 class HtmlRelation(
         val connection: Connection,
         val renderer: HtmlRenderer
-) {
+) : Selectable {
+
+    override val id: Long = connection.id!!
+    override val pictogram: Pictogram = connection
+
+    override val left: Double
+        get() = connections.last().canvas.style.left.replace("px", "").toDouble()
+    override val top: Double
+        get() = connections.last().canvas.style.top.replace("px", "").toDouble()
+    override val width: Double
+        get() = connections.last().canvas.width.baseVal.value.toDouble()
+    override val height: Double
+        get() = connections.last().canvas.height.baseVal.value.toDouble()
+
+    override val positionView: View<*>? = null
+
+    override fun select() {
+        isSelected = true
+        connection.onSidebar.emit(SidebarEvent(connection))
+        draw()
+    }
+
+    override fun unselect() {
+        isSelected = false
+        draw()
+    }
+
+    override fun selectArea(area: Dimension) {
+        val old = isSelected
+        isSelected = Dimension(left, top, width, height) in area
+        if (isSelected != old) {
+            draw()
+        }
+    }
+
+    override var isSelected: Boolean = false
+    override val isDraggable: Boolean = false
+
+    override fun drag(delta: Point) {
+        // Ignore
+    }
+
+    override fun setZoom(zoom: Double) {
+        // Ignore
+    }
+
+    override fun highlightSnap() {
+        // Ignore
+    }
+
+    override fun unhighlightSnap() {
+        // Ignore
+    }
+
+    override fun isChildOf(container: ViewCollection<View<*>, *>): Boolean = false
 
     private val references: MutableList<ListenerReference<*>> = mutableListOf()
     private var connections: List<JsPlumbConnection> = emptyList()
@@ -105,9 +160,12 @@ class HtmlRelation(
 
         connections.forEach { c ->
             if (connection.hasSidebar) {
-                c.bind("click") { _, event ->
-                    event.stopPropagation()
-                    connection.onSidebar.emit(SidebarEvent(connection))
+                c.bind("mousedown") { _, event ->
+                    if (!event.defaultPrevented && event is MouseEvent) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        renderer.selectView(this, event.ctrlKey, false)
+                    }
                 }
             }
 
@@ -143,19 +201,27 @@ class HtmlRelation(
         endpoint = "Blank"
 
         paintStyle = jsPlumbPaintStyle {
-            stroke = line.paintStyle.stroke.toCss()
+            stroke = if (isSelected) "#2980b9" else line.paintStyle.stroke.toCss()
             strokeWidth = line.paintStyle.strokeWidth
         }
     }
 
     private fun createEndStyle(connectInit: JsPlumbConnectInit) {
         labels = connection.labels.map { label ->
-            HtmlLabel(renderer, label, container)
+            HtmlLabel(renderer, label, container).also {
+                it.view.onMouseDown { event ->
+                    if (!event.defaultPrevented) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        connection.onSidebar.emit(SidebarEvent(connection))
+                    }
+                }
+            }
         }
 
         var overlays = labels.map { label ->
             arrayOf("Custom", object {
-                val create = { _: dynamic ->
+                val create: (dynamic) -> HTMLElement = {
                     label.view.html
                 }
                 val cssClass = label.view.classes.toString()
@@ -221,6 +287,8 @@ class HtmlRelation(
         connection.onStyleChange.reference {
             draw()
         }?.let(references::add)
+
+        renderer.selectable += this
     }
 
     companion object {

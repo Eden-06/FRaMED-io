@@ -29,6 +29,8 @@ class HtmlIconShape(
 
     override val viewList: List<View<*>> = listOf(view)
 
+    override val positionView: View<*>
+        get() = view
 
     init {
         if (position == BoxShape.Position.ABSOLUTE) {

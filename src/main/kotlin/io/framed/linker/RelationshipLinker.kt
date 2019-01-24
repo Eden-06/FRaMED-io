@@ -36,7 +36,7 @@ class RelationshipLinker(
     }
 
     override val sidebar = sidebar {
-        title("Connection")
+        title("Relationship")
 
         group("General") {
             input("Name", nameProperty)

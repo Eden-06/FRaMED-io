@@ -46,7 +46,7 @@ class CompositionLinker(
     }
 
     override val sidebar = sidebar {
-        title("Connection")
+        title("Composition")
 
         group("General") {
             input("Name", nameProperty)

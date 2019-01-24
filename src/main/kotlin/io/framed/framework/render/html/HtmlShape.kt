@@ -3,10 +3,8 @@ package io.framed.framework.render.html
 import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.ListenerReference
 import io.framed.framework.JsPlumbInstance
-import io.framed.framework.pictogram.ContextEvent
-import io.framed.framework.pictogram.Shape
-import io.framed.framework.pictogram.SidebarEvent
-import io.framed.framework.pictogram.Style
+import io.framed.framework.pictogram.*
+import io.framed.framework.util.Dimension
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import io.framed.framework.util.point
@@ -25,8 +23,9 @@ abstract class HtmlShape(
         parentContainer: HtmlShapeContainer?,
         val container: ViewCollection<View<*>, *>,
         open val jsPlumbInstance: JsPlumbInstance?
-) {
+): Selectable {
     abstract val view: View<*>
+
     abstract val viewList: List<View<*>>
 
     val listeners = mutableListOf<ListenerReference<*>>()
@@ -140,7 +139,7 @@ abstract class HtmlShape(
         allowDrag = true
         onMouseDown { event ->
             event.stopPropagation()
-            htmlRenderer.selectView(this, event.ctrlKey, false)
+            htmlRenderer.selectView(this@HtmlShape, event.ctrlKey, false)
             container.toForeground(view)
 
             var markView = true
@@ -162,7 +161,7 @@ abstract class HtmlShape(
         }
         onDblClick { event ->
             event.stopPropagation()
-            htmlRenderer.selectView(this, event.ctrlKey, true)
+            htmlRenderer.selectView(this@HtmlShape, event.ctrlKey, true)
         }
         onDrag { e ->
             var event = e
@@ -178,8 +177,8 @@ abstract class HtmlShape(
             shape.top = minTop?.let { max(it, newTop) } ?: newTop
 
             if (event.direct) {
-                (htmlRenderer.selectedViews - this).forEach {
-                    it.performDrag(event.indirect)
+                (htmlRenderer.selected - this@HtmlShape).forEach {
+                    if (it.isDraggable) it.drag(event.delta)
                 }
             }
 
@@ -195,12 +194,12 @@ abstract class HtmlShape(
                 container.toForeground(view)
             }
             shape.id?.let { id ->
-                val hid = (-abs(id)).toString()
-                val v = htmlRenderer.draggableViews.find { it.html.getAttribute("data-id") == hid }
-                v?.highlightedView = selectedView
+                val hid = -abs(id)
+                val v = htmlRenderer.selectable.find { it.id == hid }
+                v?.positionView?.highlightedView = selectedView
             }
         }
-        htmlRenderer.draggableViews += this
+        htmlRenderer.selectable += this@HtmlShape
         assignedShape = shape
         html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
 
@@ -277,17 +276,17 @@ abstract class HtmlShape(
         allowDrag = true
         onContext { event ->
             shape.id?.let { id ->
-                val hid = abs(id).toString()
-                val v = htmlRenderer.draggableViews.find { it.html.getAttribute("data-id") == hid }
-                v?.onContext?.emit(event)
+                val hid = abs(id)
+                val v = htmlRenderer.selectable.find { it.id == hid }
+                v?.positionView?.onContext?.emit(event)
             }
         }
         onMouseDown { event ->
             event.stopPropagation()
             shape.id?.let { id ->
-                val hid = abs(id).toString()
-                val v = htmlRenderer.draggableViews.find { it.html.getAttribute("data-id") == hid }
-                v?.onMouseDown?.emit(event)
+                val hid = abs(id)
+                val v = htmlRenderer.selectable.find { it.id == hid }
+                v?.select()
             }
 
             var markView = true
@@ -345,7 +344,7 @@ abstract class HtmlShape(
             htmlRenderer.htmlConnections.limitSide(view, anchor)
         }
 
-        htmlRenderer.draggableViews += this
+        htmlRenderer.selectable += this@HtmlShape
         assignedShape = shape
         html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
     }
@@ -380,6 +379,58 @@ abstract class HtmlShape(
     }
 
     private var reference: ListenerReference<*>? = null
+
+    abstract override val positionView: View<*>
+
+    override val id: Long
+        get()= shape.id!!
+    override val pictogram: Pictogram
+        get()= shape
+    override val left: Double
+        get() = shape.leftOffset
+    override val top: Double
+        get() = shape.topOffset
+    override val width: Double
+        get() = shape.width
+    override val height: Double
+        get() = shape.height
+
+    override fun select() {
+        positionView.selectedView = true
+    }
+
+    override fun unselect() {
+        positionView.selectedView = false
+    }
+
+    override fun selectArea(area: Dimension) {
+        positionView.selectedView = positionView.dimension in area
+    }
+
+    override val isSelected: Boolean
+        get() = positionView.selectedView
+    override val isDraggable: Boolean = true
+
+    override fun drag(delta: Point) {
+        positionView.performDrag(View.DragEvent(delta, false))
+    }
+
+    override fun setZoom(zoom: Double) {
+        positionView.dragZoom = zoom
+    }
+
+    override fun highlightSnap() {
+        positionView.classes["snap-view"] = true
+    }
+
+    override fun unhighlightSnap() {
+        positionView.classes["snap-view"] = false
+    }
+
+    override fun isChildOf(container: ViewCollection<View<*>, *>): Boolean {
+        return  positionView in container
+    }
+
 
     init {
         parentContainer?.onParentMove?.reference {

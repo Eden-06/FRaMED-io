@@ -87,56 +87,73 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     }
 
 
-    fun delete(shapes: List<Long>) {
+    fun delete(idList: List<Long>) {
+        connectionManager.delete(idList)
         for (linker in shapeLinkers) {
-            if (linker.id in shapes) {
+            if (linker.id in idList) {
                 linker.delete()
             } else if (linker is ModelLinker<*, *, *>) {
-                linker.delete(shapes)
+                linker.delete(idList)
             }
         }
     }
 
-    fun copy(shapes: List<Long>, source: Pictogram): List<Pair<ModelElement<*>, LayerData>> {
-        var elements = emptyList<Pair<ModelElement<*>, LayerData>>()
+    fun copy(idList: List<Long>, source: Pictogram): List<Copy> {
+        var elements = emptyList<Copy>()
         for (linker in shapeLinkers) {
-            if (linker.id in shapes) {
+            if (linker.id in idList) {
                 val layerData = if (container == source || linker !is PreviewLinker<*, *, *>) {
                     linker.pictogram.export()
                 } else {
                     linker.flatPreview.export()
                 }
-                elements += linker.model.copy() to layerData
+                elements += Copy(linker.model, linker.model.copy(), layerData)
             } else if (linker is ModelLinker<*, *, *>) {
-                elements += linker.copy(shapes, source)
+                elements += linker.copy(idList, source)
+            }
+        }
+        val found = elements.map { it.original.id }
+        for (connection in connectionManager.connections) {
+            if (connection.id in idList && connection.id !in found) {
+                val model = connection.model
+                val sourceCopy = elements.find { it.original.id == model.sourceId }
+                val targetCopy = elements.find { it.original.id == model.targetId }
+                if (sourceCopy != null && targetCopy != null) {
+                    val copy = model.copy()
+                    copy.sourceId = sourceCopy.copy.id
+                    copy.targetId = targetCopy.copy.id
+                    elements += Copy(model, copy)
+                }
             }
         }
         return elements
     }
 
-    fun cut(shapes: List<Long>, source: Pictogram): List<Pair<ModelElement<*>, LayerData>> {
+    fun cut(shapes: List<Long>, source: Pictogram): List<Copy> {
         val elements = copy(shapes, source)
         delete(shapes)
         return elements
     }
 
-    fun paste(target: Long?, elements: List<Pair<ModelElement<*>, LayerData>>, targetContainer: Pictogram?) {
-        if (target == null || id == target || targetContainer == null) {
-            for ((element, layerData) in elements) {
-                if (LinkerManager.itemLinkerFor(element).canCreateIn(model)) {
-                    add(element, layerData, container)
+    fun paste(target: Long?, elements: List<Copy>, targetContainer: Pictogram?) {
+        fun paste() {
+            for ((_, element, layerData) in elements) {
+                if (element is ModelConnection<*>) {
+                    connectionManager.add(element)
+                } else if (LinkerManager.itemLinkerFor(element).canCreateIn(model)) {
+                    add(element, layerData ?: LayerData(), container)
                 }
             }
+        }
+
+        if (target == null || id == target || targetContainer == null) {
+            paste()
         } else {
             for (linker in shapeLinkers) {
                 if (linker is ModelLinker<*, *, *>) {
                     linker.paste(target, elements, targetContainer)
                 } else if (linker.id == target) {
-                    for ((element, layerData) in elements) {
-                        if (LinkerManager.itemLinkerFor(element).canCreateIn(model)) {
-                            add(element, layerData, targetContainer)
-                        }
-                    }
+                    paste()
                     break
                 }
             }

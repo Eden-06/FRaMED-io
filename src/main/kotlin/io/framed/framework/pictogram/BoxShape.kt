@@ -72,7 +72,6 @@ class BoxShape(id: Long?) : Shape(id) {
                 if (s == shape) {
                     break
                 }
-                println(s.height)
                 sum += s.height
             }
             sum

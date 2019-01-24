@@ -55,7 +55,7 @@ class InheritanceLinker(
     }
 
     override val contextMenu = contextMenu {
-        title = "Connection"
+        title = "Inheritance"
         addItem(MaterialIcon.DELETE, "Delete") {
             delete()
         }

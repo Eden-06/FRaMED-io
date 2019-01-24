@@ -38,6 +38,8 @@ class HtmlTextShape(
         }
     }
 
+    override val positionView: View<*> = view
+
     override val viewList: List<View<*>> = listOf(view)
 
 }

@@ -34,9 +34,14 @@ class Controller(
             clipboard = linker.cut(shapes, linker.container)
         }
 
-        override fun paste(target: Long?, targetContainer: Pictogram?) {
+        override fun paste(target: Long?, targetContainer: Pictogram?): List<Long> {
+            clipboard.forEach {
+                it.layerData?.move(10.0, 10.0)
+            }
             linker.paste(target, clipboard, targetContainer)
+            val idList = clipboard.map { it.copy.id }
             clipboard = emptyList()
+            return idList
         }
     }
 
@@ -58,8 +63,14 @@ class Controller(
     }
 
     companion object {
-        val clipboardProperty = property(emptyList<Pair<ModelElement<*>, LayerData>>())
+        val clipboardProperty = property(emptyList<Copy>())
         var clipboard by clipboardProperty
         val clipboardEmptyProperty = clipboardProperty.mapBinding { it.isEmpty() }
     }
 }
+
+data class Copy(
+        val original: ModelElement<*>,
+        val copy: ModelElement<*>,
+        val layerData: LayerData? = null
+)

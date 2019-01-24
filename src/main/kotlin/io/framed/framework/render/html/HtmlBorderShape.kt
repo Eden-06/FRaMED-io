@@ -23,6 +23,9 @@ class HtmlBorderShape(
         realContainer.toBackground(this)
     }
 
+    override val positionView: View<*>
+        get() = view
+
     override val content = HtmlShapeContainer(
             htmlRenderer,
             shape,

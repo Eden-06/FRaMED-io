@@ -137,7 +137,7 @@
                                         ["io.framed.model.Attribute", {
                                                 "id": 34,
                                                 "name": "phone",
-                                                "type": "string"
+                                                "type": "String"
                                             }
                                         ]
                                     ],

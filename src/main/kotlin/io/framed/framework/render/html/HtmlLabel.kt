@@ -65,21 +65,11 @@ class HtmlLabel(
         onClick { event ->
             event.stopPropagation()
         }
-        onDblClick { event ->
-            event.stopPropagation()
-            htmlRenderer.selectView(this, event.ctrlKey, true)
-        }
         onDrag { e ->
             val event = htmlRenderer.directDragView(e, this, parent)
 
             label.leftProperty.value = marginLeft + event.delta.x
             label.topProperty.value = marginTop + event.delta.y
-
-            if (event.direct) {
-                (htmlRenderer.selectedViews - this).forEach {
-                    it.performDrag(event.indirect)
-                }
-            }
         }
     }
 

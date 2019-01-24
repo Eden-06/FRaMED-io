@@ -46,7 +46,7 @@ class FulfillmentLinker(
     }
 
     override val sidebar = sidebar {
-        title("Connection")
+        title("Fulfillment")
 
         group("General") {
             input("Name", nameProperty)

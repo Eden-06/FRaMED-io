@@ -41,4 +41,12 @@ interface ConnectionManager {
     }
 
     fun init()
+
+    fun delete(idList: List<Long>) {
+        for (connection in connections) {
+            if (connection.id in idList) {
+                connection.delete()
+            }
+        }
+    }
 }
