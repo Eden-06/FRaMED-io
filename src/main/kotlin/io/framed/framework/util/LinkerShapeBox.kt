@@ -17,7 +17,8 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
 
     private var conditionalBoxes: List<Pair<BoxShape, (L) -> Boolean>> = emptyList()
 
-    var linkers = emptySet<L>()
+    var linkers = emptyList<L>()
+        private set
 
     protected abstract fun backingContains(model: M): Boolean
     protected abstract fun backingAdd(model: M)
@@ -46,6 +47,8 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
             backingAdd(linker.model)
         }
 
+        linkers += linker
+
         view += linker.pictogram
 
         previewBox?.let { box ->
@@ -69,11 +72,13 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
                 box += prev
             }
         }
-        linkers += linker
     }
 
     private fun internalRemove(linker: L) {
         backingRemove(linker.model)
+
+        linkers -= linker
+
         view -= linker.pictogram
         for ((box, _) in conditionalBoxes) {
             box -= linker.pictogram
@@ -89,7 +94,6 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
                 box -= linker.listPreview
             }
         }
-        linkers -= linker
     }
 
     fun add(linker: L) {

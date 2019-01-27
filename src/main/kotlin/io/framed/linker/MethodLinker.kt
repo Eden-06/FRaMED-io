@@ -28,13 +28,17 @@ class MethodLinker(
             .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
             .trackHistory()
     private val typeProperty = property(model::type)
-            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .validate(RegexValidator("([a-zA-Z]([a-zA-Z0-9])*)?".toRegex())::validate)
             .trackHistory()
 
     override val subTypes: Set<String>
         get() = setOf(model.type) + model.parameters.map { it.type }
 
     private val parameterProperty = property(model::parameters).trackHistory()
+
+    private enum class State {
+        NAME, TYPE, PARAM_NAME, PARAM_TYPE, AFTER_PARAM
+    }
 
     private val lineProperty = property(object : FunctionAccessor<String> {
         override fun set(value: String): Boolean {
@@ -148,13 +152,43 @@ class MethodLinker(
 
     override val pictogram = textShape(lineProperty)
 
+    private lateinit var sidebarParameters: SidebarGroup
+    private lateinit var sidebarParametersAdd: ListView
+    private val sidebarList: MutableList<SidebarEntry> = mutableListOf()
+
+    private fun updateSidebar() {
+        while (sidebarList.size > model.parameters.size) {
+            val last = sidebarList.last()
+            last.remove()
+            sidebarList -= last
+        }
+
+        for (i in 0 until sidebarList.size) {
+            sidebarList[i].bind(model.parameters[i])
+        }
+
+        for (i in sidebarList.size until model.parameters.size) {
+            sidebarList += SidebarEntry(sidebarParameters, model.parameters[i])
+        }
+
+        sidebarParameters.toForeground(sidebarParametersAdd)
+    }
+
     override val sidebar = sidebar {
         title("Method")
         group("General") {
             input("Name", nameProperty)
             input("Type", typeProperty, this@MethodLinker::getTypeSubset)
         }
-        sidebarParameters = group("Parameters") {}
+        sidebarParameters = group("Parameters") {
+            sidebarParametersAdd = custom {
+                iconView(MaterialIcon.ADD)
+                textView("Add parameter")
+                onClick {
+                    parameterProperty.value += Parameter()
+                }
+            }
+        }
 
         updateSidebar()
     }
@@ -166,83 +200,9 @@ class MethodLinker(
         }
     }
 
-    private lateinit var sidebarParameters: SidebarGroup
-
-    private enum class State {
-        NAME, TYPE, PARAM_NAME, PARAM_TYPE, AFTER_PARAM
-    }
-
-    private fun updateSidebar() = sidebarParameters.apply {
-        clearContent()
-
-        model.parameters.forEach { param ->
-            custom {
-                tableView {
-                    row {
-                        cellBox {
-                            inputView {
-                                value = param.name
-                                onChange {
-                                    param.name = it
-                                    redraw = false
-                                    parameterProperty.onChange.emit(Unit)
-                                }
-                                onFocusLeave {
-                                    param.name = param.name.trim()
-                                    redraw = true
-                                    parameterProperty.onChange.emit(Unit)
-                                }
-                            }
-                        }
-                        cellBox { textView("") }
-                        cellBox {
-                            inputView {
-                                autocomplete(this@MethodLinker::getTypeSubset)
-                                value = param.type
-                                onChange {
-                                    param.type = it
-                                    redraw = false
-                                    parameterProperty.onChange.emit(Unit)
-                                }
-                                onFocusLeave {
-                                    param.type = param.type.trim()
-                                    redraw = true
-                                    parameterProperty.onChange.emit(Unit)
-                                }
-                            }
-                        }
-                        cellBox {
-                            iconView(MaterialIcon.CLEAR) {
-                                onClick {
-                                    model.parameters -= param
-                                    redraw = true
-                                    parameterProperty.onChange.emit(Unit)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        custom {
-            iconView(MaterialIcon.ADD)
-            textView("Add parameter")
-            onClick {
-                model.parameters += Parameter()
-                redraw = true
-                parameterProperty.onChange.emit(Unit)
-            }
-        }
-    }
-
-    var redraw = true
-
     init {
         parameterProperty.onChange { _ ->
-            if (redraw) {
-                updateSidebar()
-            }
+            updateSidebar()
         }
 
         LinkerManager.setup(this)
@@ -257,5 +217,73 @@ class MethodLinker(
         override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Method
 
         override val name: String = "Method"
+    }
+
+    inner class SidebarEntry(private val sidebarGroup: SidebarGroup, private var param: Parameter) {
+
+        private lateinit var nameInput: InputView
+        private lateinit var typeInput: InputView
+        private val listView: ListView
+
+        fun bind(parameter: Parameter) {
+            if (param !== parameter) {
+                param = parameter
+                nameInput.value = param.name
+                typeInput.value = param.type
+            }
+        }
+
+        private fun deleteParameter() {
+            parameterProperty.value -= param
+            remove()
+        }
+
+        fun remove() {
+            sidebarGroup.remove(listView)
+        }
+
+        init {
+            listView = sidebarGroup.custom {
+                tableView {
+                    row {
+                        cellBox {
+                            nameInput = inputView {
+                                value = param.name
+                                onChange {
+                                    param.name = it
+                                    parameterProperty.onChange.emit(Unit)
+                                }
+                                onFocusLeave {
+                                    param.name = param.name.trim()
+                                    parameterProperty.onChange.emit(Unit)
+                                }
+                            }
+                        }
+                        cellBox { textView("") }
+                        cellBox {
+                            typeInput = inputView {
+                                autocomplete(this@MethodLinker::getTypeSubset)
+                                value = param.type
+                                onChange {
+                                    param.type = it
+                                    parameterProperty.onChange.emit(Unit)
+                                }
+                                onFocusLeave {
+                                    param.type = param.type.trim()
+                                    parameterProperty.onChange.emit(Unit)
+                                }
+                            }
+                        }
+                        cellBox {
+                            iconView(MaterialIcon.CLEAR) {
+                                onClick {
+                                    deleteParameter()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

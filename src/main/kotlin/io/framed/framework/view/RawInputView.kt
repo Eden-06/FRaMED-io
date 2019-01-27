@@ -26,10 +26,24 @@ class RawInputView() : View<HTMLInputElement>("input") {
     var value: String
         get() = html.value
         set(value) {
+            val oldValue = html.value
+            val oldSelection = html.selectionStart
+            val oldLength = oldValue.length
+
             html.value = value
             lastValue = value
             if (sizeMatch) {
                 size = max(value.length, 1)
+            }
+
+            if (oldSelection != null) {
+                val pos: Int
+                if (value.endsWith("()") && value.dropLast(2) == oldValue) {
+                    pos = oldLength
+                } else {
+                    pos = value.length - oldLength + oldSelection
+                }
+                html.setSelectionRange(pos, pos)
             }
         }
 

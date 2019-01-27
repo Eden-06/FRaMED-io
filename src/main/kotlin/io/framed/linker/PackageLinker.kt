@@ -36,7 +36,7 @@ class PackageLinker(
     }
 
     override val shapeLinkers: Set<ShapeLinker<*, *>>
-        get() = children.linkers
+        get() = children.linkers.toSet()
 
     override val subTypes: Set<String>
         get() = shapeLinkers.flatMap { it.subTypes }.toSet()

@@ -6,6 +6,7 @@ import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
+import io.framed.framework.util.LinkerShapeBox
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
@@ -26,8 +27,8 @@ class ClassLinker(
             .trackHistory()
     override var name by nameProperty
 
-    val attributes = shapeBox(model::attributes)
-    val methods = shapeBox(model::methods)
+    val attributes: LinkerShapeBox<Attribute, AttributeLinker> = shapeBox(model::attributes)
+    val methods: LinkerShapeBox<Method, MethodLinker> = shapeBox(model::methods)
 
     override val subTypes: Set<String>
         get() = (attributes.linkers.flatMap { it.subTypes } + methods.linkers.flatMap { it.subTypes }).toSet() + model.name
@@ -99,10 +100,37 @@ class ClassLinker(
     private lateinit var sidebarViewGroup: SidebarGroup
     private lateinit var sidebarFlatViewGroup: SidebarGroup
 
+    private lateinit var sidebarAttributes: SidebarGroup
+    private lateinit var sidebarAttributesAdd: ListView
+    private val sidebarAttributesList: MutableList<SidebarEntry<Attribute>> = mutableListOf()
+    private lateinit var sidebarMethods: SidebarGroup
+    private lateinit var sidebarMethodsAdd: ListView
+    private val sidebarMethodsList: MutableList<SidebarEntry<Method>> = mutableListOf()
+
     override val sidebar = sidebar {
         title("Class")
         group("General") {
             input("Name", nameProperty)
+        }
+        sidebarAttributes = group("Attributes") {
+            collapse()
+            sidebarAttributesAdd = custom {
+                iconView(MaterialIcon.ADD)
+                textView("Add attribute")
+                onClick {
+                    attributes += AttributeLinker(Attribute(), this@ClassLinker)
+                }
+            }
+        }
+        sidebarMethods = group("Methods") {
+            collapse()
+            sidebarMethodsAdd = custom {
+                iconView(MaterialIcon.ADD)
+                textView("Add method")
+                onClick {
+                    methods += MethodLinker(Method(), this@ClassLinker)
+                }
+            }
         }
         sidebarViewGroup = group("Layout") {
             input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
@@ -122,7 +150,6 @@ class ClassLinker(
             })
             checkBox("Autosize", flatPreview.autosizeProperty, CheckBox.Type.SWITCH)
         }
-
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
@@ -155,9 +182,61 @@ class ClassLinker(
         }
     }
 
+    private fun updateSidebarAttributes() {
+        while (sidebarAttributesList.size > attributes.linkers.size) {
+            val last = sidebarAttributesList.last()
+            last.remove()
+            sidebarAttributesList -= last
+        }
+
+        for (i in 0 until sidebarAttributesList.size) {
+            sidebarAttributesList[i].bind(attributes.linkers[i])
+        }
+
+        for (i in sidebarAttributesList.size until attributes.linkers.size) {
+            sidebarAttributesList += SidebarEntry(sidebarAttributes, attributes.linkers[i])
+        }
+
+        sidebarAttributes.toForeground(sidebarAttributesAdd)
+    }
+
+    private fun updateSidebarMethods() {
+        while (sidebarMethodsList.size > methods.linkers.size) {
+            val last = sidebarMethodsList.last()
+            last.remove()
+            sidebarMethodsList -= last
+        }
+
+        for (i in 0 until sidebarMethodsList.size) {
+            sidebarMethodsList[i].bind(methods.linkers[i])
+        }
+
+        for (i in sidebarMethodsList.size until methods.linkers.size) {
+            sidebarMethodsList += SidebarEntry(sidebarMethods, methods.linkers[i])
+        }
+
+        sidebarMethods.toForeground(sidebarMethodsAdd)
+    }
+
     init {
         model.attributes.forEach { attributes += AttributeLinker(it, this) }
         model.methods.forEach { methods += MethodLinker(it, this) }
+
+        updateSidebarAttributes()
+        updateSidebarMethods()
+
+        attributes.view.onAdd {
+            updateSidebarAttributes()
+        }
+        attributes.view.onRemove {
+            updateSidebarAttributes()
+        }
+        methods.view.onAdd {
+            updateSidebarMethods()
+        }
+        methods.view.onRemove {
+            updateSidebarMethods()
+        }
 
         LinkerManager.setup(this)
     }

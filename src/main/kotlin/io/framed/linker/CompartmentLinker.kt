@@ -35,7 +35,7 @@ class CompartmentLinker(
         box.view = container
     }
     override val shapeLinkers: Set<ShapeLinker<*, *>>
-        get() = children.linkers
+        get() = children.linkers.toSet()
 
     override val subTypes: Set<String>
         get() = (attributes.linkers.flatMap { it.subTypes } + methods.linkers.flatMap { it.subTypes } + shapeLinkers.flatMap { it.subTypes }).toSet() + model.name
@@ -144,6 +144,13 @@ class CompartmentLinker(
     private lateinit var sidebarViewGroup: SidebarGroup
     private lateinit var sidebarFlatViewGroup: SidebarGroup
 
+    private lateinit var sidebarAttributes: SidebarGroup
+    private lateinit var sidebarAttributesAdd: ListView
+    private val sidebarAttributesList: MutableList<SidebarEntry<Attribute>> = mutableListOf()
+    private lateinit var sidebarMethods: SidebarGroup
+    private lateinit var sidebarMethodsAdd: ListView
+    private val sidebarMethodsList: MutableList<SidebarEntry<Method>> = mutableListOf()
+
     private fun updatePreviewType() {
         val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.ABSOLUTE
         if (shapeIsFlat == isFlatPreview) return
@@ -185,6 +192,26 @@ class CompartmentLinker(
                 console.log(log(pictogram))
             }
             */
+        }
+        sidebarAttributes = group("Attributes") {
+            collapse()
+            sidebarAttributesAdd = custom {
+                iconView(MaterialIcon.ADD)
+                textView("Add attribute")
+                onClick {
+                    attributes += AttributeLinker(Attribute(), this@CompartmentLinker)
+                }
+            }
+        }
+        sidebarMethods = group("Methods") {
+            collapse()
+            sidebarMethodsAdd = custom {
+                iconView(MaterialIcon.ADD)
+                textView("Add method")
+                onClick {
+                    methods += MethodLinker(Method(), this@CompartmentLinker)
+                }
+            }
         }
         sidebarActionsGroup = group("Actions") {
             button("Auto layout") {
@@ -386,6 +413,42 @@ class CompartmentLinker(
         }
     }
 
+    private fun updateSidebarAttributes() {
+        while (sidebarAttributesList.size > attributes.linkers.size) {
+            val last = sidebarAttributesList.last()
+            last.remove()
+            sidebarAttributesList -= last
+        }
+
+        for (i in 0 until sidebarAttributesList.size) {
+            sidebarAttributesList[i].bind(attributes.linkers[i])
+        }
+
+        for (i in sidebarAttributesList.size until attributes.linkers.size) {
+            sidebarAttributesList += SidebarEntry(sidebarAttributes, attributes.linkers[i])
+        }
+
+        sidebarAttributes.toForeground(sidebarAttributesAdd)
+    }
+
+    private fun updateSidebarMethods() {
+        while (sidebarMethodsList.size > methods.linkers.size) {
+            val last = sidebarMethodsList.last()
+            last.remove()
+            sidebarMethodsList -= last
+        }
+
+        for (i in 0 until sidebarMethodsList.size) {
+            sidebarMethodsList[i].bind(methods.linkers[i])
+        }
+
+        for (i in sidebarMethodsList.size until methods.linkers.size) {
+            sidebarMethodsList += SidebarEntry(sidebarMethods, methods.linkers[i])
+        }
+
+        sidebarMethods.toForeground(sidebarMethodsAdd)
+    }
+
     /**
      * The model initializes a new instance of the linker
      */
@@ -402,6 +465,22 @@ class CompartmentLinker(
         connectionManager.onConnectionAdd { checkBorder() }
         connectionManager.onConnectionRemove { checkBorder() }
         checkBorder()
+
+        updateSidebarAttributes()
+        updateSidebarMethods()
+
+        attributes.view.onAdd {
+            updateSidebarAttributes()
+        }
+        attributes.view.onRemove {
+            updateSidebarAttributes()
+        }
+        methods.view.onAdd {
+            updateSidebarMethods()
+        }
+        methods.view.onRemove {
+            updateSidebarMethods()
+        }
     }
 
     companion object : LinkerInfoItem {
