@@ -79,6 +79,7 @@ class CompartmentLinker(
                     color = box(color(0, 0, 0, 0.3))
                 }
                 padding = box(8.0)
+                stretchHeight = true
             }
         }
         children.previewBox = autoLayoutBox

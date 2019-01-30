@@ -11,7 +11,6 @@ class TextShape(
         val autocomplete: List<String>,
         id: Long?
 ) : Shape(id) {
-
 }
 
 fun BoxShape.textShape(

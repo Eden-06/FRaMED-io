@@ -57,9 +57,19 @@ abstract class HtmlShape(
     }
 
     fun style(view: View<*>, style: Style) {
-        style.background?.let { bg ->
-            view.html.style.background = bg.toCss()
+        if (!style.topNotch) {
+            style.background?.let { bg ->
+                view.html.style.background = bg.toCss()
+            }
         }
+
+        val parentStyle = shape.parent?.style
+        if (parentStyle != null && parentStyle.topNotch) {
+            parentStyle.background?.let { bg ->
+                view.html.style.background = bg.toCss()
+            }
+        }
+
         style.border?.let { border ->
             view.html.style.borderStyle = border.style.toString()
             view.html.style.borderWidth = border.width.toCss("px")

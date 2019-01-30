@@ -48,6 +48,12 @@ class PackageLinker(
             textShape(nameProperty)
             style {
                 padding = box(8.0)
+                notch = true
+                border {
+                    style = Border.BorderStyle.SOLID
+                    width = box(1.0, 1.0, 0.0, 1.0)
+                    color = box(color(0, 0, 0, 0.3))
+                }
             }
         }
 
@@ -55,10 +61,11 @@ class PackageLinker(
             style {
                 border {
                     style = Border.BorderStyle.SOLID
-                    width = box(1.0, 0.0, 0.0, 0.0)
+                    width = box(1.0)
                     color = box(color(0, 0, 0, 0.3))
                 }
                 padding = box(8.0)
+                stretchHeight = true
             }
         }
         children.previewBox = autoLayoutBox
@@ -70,15 +77,13 @@ class PackageLinker(
         }
 
         style {
-            background = linearGradient("to bottom") {
-                add(color("#fffbd9"), 0.0)
-                add(color("#fff7c4"), 1.0)
-            }
+            background = color("#fffbd9")
             border {
                 style = Border.BorderStyle.SOLID
-                width = box(1.0)
+                width = box(0.0, 0.0, 1.0, 0.0)
                 color = box(color(0, 0, 0, 0.3))
             }
+            topNotch = true
         }
 
         resizeable = true

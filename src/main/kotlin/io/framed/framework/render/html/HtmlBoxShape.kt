@@ -2,8 +2,6 @@ package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
-import io.framed.framework.pictogram.Pictogram
-import io.framed.framework.util.Dimension
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import io.framed.framework.view.View
@@ -34,6 +32,12 @@ class HtmlBoxShape(
     }
 
     override val positionView = container.listView {
+        if (shape.style.notch) {
+            classes += "notch"
+        }
+        if (shape.style.stretchHeight) {
+            html.style.height = "100%"
+        }
         events(this, shape)
         if (shape.resizeable) {
             resizer = resizeable {
@@ -123,10 +127,6 @@ class HtmlBoxShape(
                 shape.width = clientWidth.toDouble()
                 shape.height = clientHeight.toDouble()
             }
-        }
-
-        if (shape.position == BoxShape.Position.ABSOLUTE) {
-            html.style.height = "100%"
         }
     }
 

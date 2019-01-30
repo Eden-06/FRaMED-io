@@ -27,6 +27,11 @@ class BoxShape(id: Long?) : Shape(id) {
     fun add(shape: Shape) {
         if (shape !in internalShapes) {
             internalShapes += shape
+
+            if (internalShapes.isEmpty() || internalShapes.first().parent == this) {
+                renderShape(shape)
+            }
+
             onAdd.emit(shape)
         }
     }
@@ -79,6 +84,12 @@ class BoxShape(id: Long?) : Shape(id) {
 
     fun render() {
         for (shape in shapes) {
+            renderShape(shape)
+        }
+    }
+
+    private fun renderShape(shape: Shape) {
+        if (shape.parent != this) {
             shape.parent = this
             if (!shape.layerProperty.isBound) {
                 shape.layerProperty.bind(layerProperty)

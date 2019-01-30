@@ -15,6 +15,15 @@
   }
 }
 
+.notch {
+  float: left;
+  position: relative;
+
+  &:before {
+    background: inherit;
+  }
+}
+
 .border-box {
   position: absolute;
   top: 0;
