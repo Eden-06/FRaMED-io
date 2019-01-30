@@ -88,26 +88,26 @@ class PackageLinker(
         }
     }
 
-    override val listPreview = textShape(nameProperty)
+    override val preview = textShape(nameProperty)
 
-    override val flatPreview = boxShape {
-        textShape(nameProperty)
+    private val isCompleteViewStringProperty = pictogram.data("complete-view")
+    private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
+        val default: Boolean
+            get() = pictogram.parent?.parent == null
 
-        style {
-            background = linearGradient("to bottom") {
-                add(color("#fffbd9"), 0.0)
-                add(color("#fff7c4"), 1.0)
+        override fun set(value: Boolean): Boolean {
+            if (value == default) {
+                isCompleteViewStringProperty.value = null
+            } else {
+                isCompleteViewStringProperty.value = value.toString()
             }
-            border {
-                style = Border.BorderStyle.SOLID
-                width = box(1.0)
-                color = box(color(0, 0, 0, 0.3))
-            }
-            padding = box(10.0)
+            return true
         }
 
-        resizeable = true
-    }
+        override fun get(): Boolean {
+            return isCompleteViewStringProperty.value?.toBoolean() ?: default
+        }
+    }, isCompleteViewStringProperty)
 
     private val isFlatPreviewStringProperty = pictogram.data("flat-preview")
     private val isFlatPreviewProperty = property(object : FunctionAccessor<Boolean> {
@@ -124,7 +124,6 @@ class PackageLinker(
     private lateinit var sidebarActionsGroup: SidebarGroup
     private lateinit var sidebarPreviewGroup: SidebarGroup
     private lateinit var sidebarViewGroup: SidebarGroup
-    private lateinit var sidebarFlatViewGroup: SidebarGroup
 
     private val creationProperty = property(model.metadata::creationDate)
     private val creationStringProperty = creationProperty.mapBinding { it.toUTCString() }
@@ -207,15 +206,7 @@ class PackageLinker(
                 "width=${width.roundToInt()}, height=${height.roundToInt()}"
             })
             checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
-        }
-        sidebarFlatViewGroup = group("Preview layout") {
-            input("Position", flatPreview.leftProperty.join(flatPreview.topProperty) { left, top ->
-                "x=${left.roundToInt()}, y=${top.roundToInt()}"
-            })
-            input("Size", flatPreview.widthProperty.join(flatPreview.heightProperty) { width, height ->
-                "width=${width.roundToInt()}, height=${height.roundToInt()}"
-            })
-            checkBox("Autosize", flatPreview.autosizeProperty, CheckBox.Type.SWITCH)
+            checkBox("Complete view", isCompleteViewProperty, CheckBox.Type.SWITCH)
         }
 
         group("Metadata") {
@@ -232,8 +223,6 @@ class PackageLinker(
         sidebarActionsGroup.display = event.target == container
         sidebarViewGroup.display = isTargetRoot
         sidebarPreviewGroup.display = isTargetRoot
-
-        sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
     private lateinit var contextStepIn: ListView
@@ -383,6 +372,9 @@ class PackageLinker(
      * The model initializes a new instance of the linker
      */
     init {
+        children.view.visibleProperty.bind(isCompleteViewProperty)
+        children.previewBox?.visibleProperty?.bind(isCompleteViewProperty)
+
         for (element in model.children) {
             add(element)
         }

@@ -30,8 +30,6 @@ class HtmlConnections(
 
     fun remove() {
         for ((it, _) in jsPlumbList) {
-            //it.unmakeEverySource()
-            //it.unmakeEveryTarget()
             it.deleteEveryConnection()
             it.deleteEveryEndpoint()
             it.reset()
@@ -128,7 +126,9 @@ class HtmlConnections(
 
     fun revalidate(html: HTMLElement) {
         for ((instance, _) in jsPlumbList) {
-            instance.revalidate(html)
+            try {
+                instance.revalidate(html)
+            } catch (e: dynamic) { }
         }
     }
 
@@ -183,8 +183,7 @@ class HtmlConnections(
 
         val view = htmlRenderer.shapeMap[shape]?.view ?: return
         val html = view.html
-        //val jsPlumbInstance = htmlRenderer.shapeMap[shape]?.jsPlumbInstance ?: return
-        val jsPlumbInstance = jsPlumbList.first().first
+        val jsPlumbInstance = jsPlumbList.firstOrNull()?.first ?: return
 
         val handler = IconView(MaterialIcon.ADD)
         html.appendChild(handler.html)

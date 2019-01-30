@@ -1,9 +1,6 @@
 package io.framed.linker
 
-import de.westermann.kobserve.basic.join
-import de.westermann.kobserve.basic.mapBinding
-import de.westermann.kobserve.basic.property
-import de.westermann.kobserve.basic.validate
+import de.westermann.kobserve.basic.*
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.LinkerShapeBox
@@ -43,6 +40,7 @@ class RoleTypeLinker(
                 padding = box(8.0)
             }
         }
+
         attributes.view = boxShape {
             style {
                 border {
@@ -80,30 +78,28 @@ class RoleTypeLinker(
         resizeable = true
     }
 
-    override val listPreview: TextShape = textShape(nameProperty)
+    override val preview: TextShape = textShape(nameProperty)
 
-    override val flatPreview = boxShape {
-        textShape(nameProperty)
+    private val isCompleteViewStringProperty = pictogram.data("complete-view")
+    private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
+        val default: Boolean
+            get() = pictogram.parent?.parent == null
 
-        style {
-            background = linearGradient("to bottom") {
-                add(color("#d6d6d6"), 0.0)
-                add(color("#d6d6d6"), 1.0)
+        override fun set(value: Boolean): Boolean {
+            if (value == default) {
+                isCompleteViewStringProperty.value = null
+            } else {
+                isCompleteViewStringProperty.value = value.toString()
             }
-            border {
-                style = Border.BorderStyle.SOLID
-                width = box(1.0)
-                color = box(color(0, 0, 0, 0.3))
-                radius = box(20.0)
-            }
-            padding = box(10.0)
+            return true
         }
 
-        resizeable = true
-    }
+        override fun get(): Boolean {
+            return isCompleteViewStringProperty.value?.toBoolean() ?: default
+        }
+    }, isCompleteViewStringProperty)
 
     private lateinit var sidebarViewGroup: SidebarGroup
-    private lateinit var sidebarFlatViewGroup: SidebarGroup
 
     private lateinit var sidebarAttributes: SidebarGroup
     private lateinit var sidebarAttributesAdd: ListView
@@ -145,22 +141,12 @@ class RoleTypeLinker(
                 "width=${width.roundToInt()}, height=${height.roundToInt()}"
             })
             checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
+            checkBox("Complete view", isCompleteViewProperty, CheckBox.Type.SWITCH)
         }
-        sidebarFlatViewGroup = group("Preview layout") {
-            input("Position", flatPreview.leftProperty.join(flatPreview.topProperty) { left, top ->
-                "x=${left.roundToInt()}, y=${top.roundToInt()}"
-            })
-            input("Size", flatPreview.widthProperty.join(flatPreview.heightProperty) { width, height ->
-                "width=${width.roundToInt()}, height=${height.roundToInt()}"
-            })
-            checkBox("Autosize", flatPreview.autosizeProperty, CheckBox.Type.SWITCH)
-        }
-
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
         sidebarViewGroup.display = event.target == pictogram
-        sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
     override val contextMenu = contextMenu {
@@ -225,6 +211,9 @@ class RoleTypeLinker(
     }
 
     init {
+        attributes.view.visibleProperty.bind(isCompleteViewProperty)
+        methods.view.visibleProperty.bind(isCompleteViewProperty)
+
         model.attributes.forEach { attributes += AttributeLinker(it, this) }
         model.methods.forEach { methods += MethodLinker(it, this) }
 

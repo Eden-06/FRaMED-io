@@ -85,8 +85,7 @@ object LinkerManager {
         setupPictogram(linker, linker.pictogram)
 
         if (linker is PreviewLinker<*, *, *>) {
-            setupPictogram(linker, linker.listPreview)
-            setupPictogram(linker, linker.flatPreview)
+            setupPictogram(linker, linker.preview)
         }
         if (linker is ModelLinker<*, *, *>) {
             setupPictogram(linker, linker.container)

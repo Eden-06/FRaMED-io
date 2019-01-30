@@ -7,9 +7,11 @@ import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
 import io.framed.model.Connections
 import io.framed.model.Package
+import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Transient
-import kotlinx.serialization.json.JSON
+import kotlinx.serialization.json.Json
 import kotlin.math.max
 
 @Serializable
@@ -29,13 +31,20 @@ class File(
     }
 
     fun toJSON(): String {
-        return JSON.indented.stringify(File.serializer(), this) + "\n"
+        return Json.indented.stringify(File.serializer(), this) + "\n"
     }
 
     companion object {
         fun fromJSON(content: String): File? {
             return try {
-                val file = JSON.parse(File.serializer(), content)
+                val file = try {
+                    Json.parse(File.serializer(), content)
+                } catch (e: SerializationException) {
+                    val result = Json.nonstrict.parse(File.serializer(), content)
+                    println("The provided file was created with an older version of FRaMED-io and is not longer valid.\n" +
+                            "It could be opened in compatibility mode. Please resave to avoid further problems.")
+                    result
+                }
                 ModelElement.lastId = file.maxId() + 1
 
                 file

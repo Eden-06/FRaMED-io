@@ -50,6 +50,8 @@ class HtmlRenderer(
         layerChangeListener?.remove()
         this.viewModel = viewModel
 
+        viewModel.container.render()
+
         layerChangeListener = this.viewModel.onLayerChange.reference { draw() }
         layerChangeListener?.trigger(Unit)
     }

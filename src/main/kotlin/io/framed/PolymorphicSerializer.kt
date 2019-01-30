@@ -50,19 +50,17 @@ object PolymorphicSerializer : KSerializer<Any> {
     }
 
 
-    override fun serialize(output: Encoder, obj: Any) {
+    override fun serialize(encoder: Encoder, obj: Any) {
         val saver = getSerializerBySimpleClassName(obj::class.simpleName!!)
 
-        @Suppress("NAME_SHADOWING")
-        val output = output.beginStructure(descriptor)
+        val output = encoder.beginStructure(descriptor)
         output.encodeStringElement(descriptor, 0, saver.descriptor.name)
         output.encodeSerializableElement(descriptor, 1, saver, obj)
         output.endStructure(descriptor)
     }
 
-    override fun deserialize(input: Decoder): Any {
-        @Suppress("NAME_SHADOWING")
-        val input = input.beginStructure(descriptor)
+    override fun deserialize(decoder: Decoder): Any {
+        val input = decoder.beginStructure(descriptor)
         var klassName: String? = null
         var value: Any? = null
         mainLoop@ while (true) {

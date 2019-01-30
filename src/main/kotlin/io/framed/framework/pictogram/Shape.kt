@@ -1,6 +1,7 @@
 package io.framed.framework.pictogram
 
 import de.westermann.kobserve.basic.flatMapBinding
+import de.westermann.kobserve.basic.property
 
 /**
  * @author lars
@@ -31,6 +32,9 @@ abstract class Shape(id: Long?) : Pictogram(id) {
         get() = top + (parent?.topOffset(this) ?: 0.0)
 
     var style: Style = Style()
+
+    val visibleProperty = property(true)
+    var visible by visibleProperty
 
     fun style(init: Style.() -> Unit) {
         init(style)

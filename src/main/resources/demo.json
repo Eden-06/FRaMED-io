@@ -9,6 +9,27 @@
             "name": "Economy",
             "children": [
                 ["io.framed.model.Class", {
+                        "id": 6,
+                        "name": "Account",
+                        "attributes": [
+                            ["io.framed.model.Attribute", {
+                                    "id": 7,
+                                    "name": "id",
+                                    "type": "Int"
+                                }
+                            ],
+                            ["io.framed.model.Attribute", {
+                                    "id": 8,
+                                    "name": "balance",
+                                    "type": "Money"
+                                }
+                            ]
+                        ],
+                        "methods": [
+                        ]
+                    }
+                ],
+                ["io.framed.model.Class", {
                         "id": 18,
                         "name": "Company",
                         "attributes": [
@@ -34,27 +55,6 @@
                                     "id": 22,
                                     "name": "POBox",
                                     "type": "String"
-                                }
-                            ]
-                        ],
-                        "methods": [
-                        ]
-                    }
-                ],
-                ["io.framed.model.Class", {
-                        "id": 6,
-                        "name": "Account",
-                        "attributes": [
-                            ["io.framed.model.Attribute", {
-                                    "id": 7,
-                                    "name": "id",
-                                    "type": "Int"
-                                }
-                            ],
-                            ["io.framed.model.Attribute", {
-                                    "id": 8,
-                                    "name": "balance",
-                                    "type": "Money"
                                 }
                             ]
                         ],
@@ -96,6 +96,47 @@
                     }
                 ],
                 ["io.framed.model.Compartment", {
+                        "id": 4,
+                        "name": "Transaction",
+                        "attributes": [
+                            ["io.framed.model.Attribute", {
+                                    "id": 5,
+                                    "name": "creationtime",
+                                    "type": "DateTime"
+                                }
+                            ],
+                            ["io.framed.model.Attribute", {
+                                    "id": 40,
+                                    "name": "amount",
+                                    "type": "Money"
+                                }
+                            ]
+                        ],
+                        "methods": [
+                        ],
+                        "children": [
+                            ["io.framed.model.RoleType", {
+                                    "id": 23,
+                                    "name": "Source",
+                                    "attributes": [
+                                    ],
+                                    "methods": [
+                                    ]
+                                }
+                            ],
+                            ["io.framed.model.RoleType", {
+                                    "id": 24,
+                                    "name": "Target",
+                                    "attributes": [
+                                    ],
+                                    "methods": [
+                                    ]
+                                }
+                            ]
+                        ]
+                    }
+                ],
+                ["io.framed.model.Compartment", {
                         "id": 27,
                         "name": "Bank",
                         "attributes": [
@@ -110,6 +151,21 @@
                         ],
                         "children": [
                             ["io.framed.model.RoleType", {
+                                    "id": 29,
+                                    "name": "Consultant",
+                                    "attributes": [
+                                        ["io.framed.model.Attribute", {
+                                                "id": 34,
+                                                "name": "phone",
+                                                "type": "String"
+                                            }
+                                        ]
+                                    ],
+                                    "methods": [
+                                    ]
+                                }
+                            ],
+                            ["io.framed.model.RoleType", {
                                     "id": 31,
                                     "name": "Customer",
                                     "attributes": [
@@ -122,21 +178,6 @@
                                         ["io.framed.model.Attribute", {
                                                 "id": 39,
                                                 "name": "name",
-                                                "type": "String"
-                                            }
-                                        ]
-                                    ],
-                                    "methods": [
-                                    ]
-                                }
-                            ],
-                            ["io.framed.model.RoleType", {
-                                    "id": 29,
-                                    "name": "Consultant",
-                                    "attributes": [
-                                        ["io.framed.model.Attribute", {
-                                                "id": 34,
-                                                "name": "phone",
                                                 "type": "String"
                                             }
                                         ]
@@ -192,41 +233,6 @@
                             ]
                         ]
                     }
-                ],
-                ["io.framed.model.Compartment", {
-                        "id": 4,
-                        "name": "Transaction",
-                        "attributes": [
-                            ["io.framed.model.Attribute", {
-                                    "id": 5,
-                                    "name": "creationtime",
-                                    "type": "DateTime"
-                                }
-                            ]
-                        ],
-                        "methods": [
-                        ],
-                        "children": [
-                            ["io.framed.model.RoleType", {
-                                    "id": 24,
-                                    "name": "Target",
-                                    "attributes": [
-                                    ],
-                                    "methods": [
-                                    ]
-                                }
-                            ],
-                            ["io.framed.model.RoleType", {
-                                    "id": 23,
-                                    "name": "Source",
-                                    "attributes": [
-                                    ],
-                                    "methods": [
-                                    ]
-                                }
-                            ]
-                        ]
-                    }
                 ]
             ]
         }
@@ -236,14 +242,12 @@
         ]
     },
     "layer": {
-        1:
-        {
+        1: {
             "data": {
-                1:
-                {
-                    "left": -2,
-                    "top": 0,
-                    "width": 1077,
+                1: {
+                    "left": 11,
+                    "top": 6,
+                    "width": 1091,
                     "height": 759,
                     "autosize": true,
                     "data": {
@@ -251,22 +255,19 @@
                     "labels": [
                     ]
                 },
-                2:
-                {
+                2: {
                     "left": 32,
                     "top": 32,
                     "width": 621,
                     "height": 480,
                     "autosize": false,
                     "data": {
-                        "flat-preview":
-                        "true"
+                        "flat-preview": "true"
                     },
                     "labels": [
                     ]
                 },
-                3:
-                {
+                3: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -277,22 +278,19 @@
                     "labels": [
                     ]
                 },
-                4:
-                {
-                    "left": 678.5,
-                    "top": 96,
-                    "width": 368,
-                    "height": 304,
+                4: {
+                    "left": 704,
+                    "top": 112,
+                    "width": 352,
+                    "height": 320,
                     "autosize": false,
                     "data": {
-                        "flat-preview":
-                        "true"
+                        "flat-preview": "true"
                     },
                     "labels": [
                     ]
                 },
-                5:
-                {
+                5: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -303,8 +301,7 @@
                     "labels": [
                     ]
                 },
-                6:
-                {
+                6: {
                     "left": 720,
                     "top": 506,
                     "width": 285,
@@ -315,8 +312,7 @@
                     "labels": [
                     ]
                 },
-                7:
-                {
+                7: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -327,8 +323,7 @@
                     "labels": [
                     ]
                 },
-                8:
-                {
+                8: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -339,8 +334,7 @@
                     "labels": [
                     ]
                 },
-                9:
-                {
+                9: {
                     "left": 32,
                     "top": 544,
                     "width": 285,
@@ -351,8 +345,7 @@
                     "labels": [
                     ]
                 },
-                10:
-                {
+                10: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -363,8 +356,7 @@
                     "labels": [
                     ]
                 },
-                11:
-                {
+                11: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -375,8 +367,7 @@
                     "labels": [
                     ]
                 },
-                15:
-                {
+                15: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -387,8 +378,7 @@
                     "labels": [
                     ]
                 },
-                16:
-                {
+                16: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -399,8 +389,7 @@
                     "labels": [
                     ]
                 },
-                17:
-                {
+                17: {
                     "left": 368,
                     "top": 544,
                     "width": 0,
@@ -411,8 +400,7 @@
                     "labels": [
                     ]
                 },
-                18:
-                {
+                18: {
                     "left": 368,
                     "top": 544,
                     "width": 285,
@@ -423,8 +411,7 @@
                     "labels": [
                     ]
                 },
-                19:
-                {
+                19: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -435,8 +422,7 @@
                     "labels": [
                     ]
                 },
-                20:
-                {
+                20: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -447,8 +433,7 @@
                     "labels": [
                     ]
                 },
-                21:
-                {
+                21: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -459,8 +444,7 @@
                     "labels": [
                     ]
                 },
-                22:
-                {
+                22: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -471,32 +455,29 @@
                     "labels": [
                     ]
                 },
-                23:
-                {
-                    "left": 16,
+                23: {
+                    "left": 32,
                     "top": 32,
-                    "width": 289,
-                    "height": 46,
+                    "width": 285,
+                    "height": 42,
                     "autosize": true,
                     "data": {
                     },
                     "labels": [
                     ]
                 },
-                24:
-                {
-                    "left": 64,
+                24: {
+                    "left": 32,
                     "top": 112,
-                    "width": 289,
-                    "height": 46,
+                    "width": 285,
+                    "height": 42,
                     "autosize": true,
                     "data": {
                     },
                     "labels": [
                     ]
                 },
-                25:
-                {
+                25: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -507,87 +488,150 @@
                     "labels": [
                     ]
                 },
-                27:
-                {
-                    "left": 64,
-                    "top": 64,
-                    "width": 528,
-                    "height": 368,
-                    "autosize": false,
-                    "data": {
-                        "flat-preview":
-                        "true"
-                    },
-                    "labels": [
-                    ]
-                },
-                28:
-                {
-                    "left": 0,
-                    "top": 0,
-                    "width": 0,
-                    "height": 0,
-                    "autosize": true,
-                    "data": {
-                    },
-                    "labels": [
-                    ]
-                },
-                29:
-                {
+                27: {
                     "left": 16,
-                    "top": 42,
-                    "width": 240,
-                    "height": 54,
+                    "top": 40,
+                    "width": 662.5,
+                    "height": 464,
                     "autosize": false,
+                    "data": {
+                        "flat-preview": "true"
+                    },
+                    "labels": [
+                    ]
+                },
+                28: {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
                     "data": {
                     },
                     "labels": [
                     ]
                 },
-                30:
-                {
-                    "left": 320,
+                29: {
+                    "left": 16,
+                    "top": 39,
+                    "width": 285,
+                    "height": 99,
+                    "autosize": true,
+                    "data": {
+                        "complete-view": "true"
+                    },
+                    "labels": [
+                    ]
+                },
+                30: {
+                    "left": 352,
                     "top": 18,
-                    "width": 176,
-                    "height": 48,
-                    "autosize": false,
+                    "width": 285,
+                    "height": 99,
+                    "autosize": true,
                     "data": {
+                        "complete-view": "true"
                     },
                     "labels": [
                     ]
                 },
-                31:
-                {
+                31: {
                     "left": 16,
-                    "top": 146,
-                    "width": 240,
-                    "height": 46,
-                    "autosize": false,
+                    "top": 166.5,
+                    "width": 285,
+                    "height": 123,
+                    "autosize": true,
+                    "data": {
+                        "complete-view": "true"
+                    },
+                    "labels": [
+                    ]
+                },
+                32: {
+                    "left": 352,
+                    "top": 129,
+                    "width": 285,
+                    "height": 99,
+                    "autosize": true,
+                    "data": {
+                        "complete-view": "true"
+                    },
+                    "labels": [
+                    ]
+                },
+                33: {
+                    "left": 352,
+                    "top": 240,
+                    "width": 285,
+                    "height": 99,
+                    "autosize": true,
+                    "data": {
+                        "complete-view": "true"
+                    },
+                    "labels": [
+                    ]
+                },
+                35: {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
                     "data": {
                     },
                     "labels": [
                     ]
                 },
-                32:
-                {
-                    "left": 320,
-                    "top": 112,
-                    "width": 176,
-                    "height": 48,
-                    "autosize": false,
+                38: {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
                     "data": {
                     },
                     "labels": [
                     ]
                 },
-                33:
-                {
-                    "left": 320,
-                    "top": 192,
-                    "width": 176,
-                    "height": 48,
-                    "autosize": false,
+                39: {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                34: {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                36: {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
+                    "data": {
+                    },
+                    "labels": [
+                    ]
+                },
+                37: {
+                    "left": 0,
+                    "top": 0,
+                    "width": 0,
+                    "height": 0,
+                    "autosize": true,
                     "data": {
                     },
                     "labels": [
@@ -595,11 +639,9 @@
                 }
             }
         },
-        4:
-        {
+        4: {
             "data": {
-                4:
-                {
+                4: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -610,8 +652,7 @@
                     "labels": [
                     ]
                 },
-                23:
-                {
+                23: {
                     "left": 240,
                     "top": 224,
                     "width": 0,
@@ -622,8 +663,7 @@
                     "labels": [
                     ]
                 },
-                24:
-                {
+                24: {
                     "left": 464,
                     "top": 432,
                     "width": 0,
@@ -636,11 +676,9 @@
                 }
             }
         },
-        2:
-        {
+        2: {
             "data": {
-                2:
-                {
+                2: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -651,8 +689,7 @@
                     "labels": [
                     ]
                 },
-                25:
-                {
+                25: {
                     "left": 112,
                     "top": 144,
                     "width": 0,
@@ -663,8 +700,7 @@
                     "labels": [
                     ]
                 },
-                26:
-                {
+                26: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -677,11 +713,9 @@
                 }
             }
         },
-        27:
-        {
+        27: {
             "data": {
-                27:
-                {
+                27: {
                     "left": -20,
                     "top": 27,
                     "width": 1077,
@@ -692,8 +726,7 @@
                     "labels": [
                     ]
                 },
-                29:
-                {
+                29: {
                     "left": 192,
                     "top": 128,
                     "width": 0,
@@ -704,8 +737,7 @@
                     "labels": [
                     ]
                 },
-                30:
-                {
+                30: {
                     "left": 608,
                     "top": 128,
                     "width": 0,
@@ -716,8 +748,7 @@
                     "labels": [
                     ]
                 },
-                31:
-                {
+                31: {
                     "left": 192,
                     "top": 355.5,
                     "width": 0,
@@ -728,8 +759,7 @@
                     "labels": [
                     ]
                 },
-                32:
-                {
+                32: {
                     "left": 608,
                     "top": 306,
                     "width": 0,
@@ -740,8 +770,7 @@
                     "labels": [
                     ]
                 },
-                33:
-                {
+                33: {
                     "left": 608,
                     "top": 429,
                     "width": 0,
@@ -752,8 +781,7 @@
                     "labels": [
                     ]
                 },
-                34:
-                {
+                34: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -764,8 +792,7 @@
                     "labels": [
                     ]
                 },
-                35:
-                {
+                35: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -776,8 +803,7 @@
                     "labels": [
                     ]
                 },
-                36:
-                {
+                36: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -788,8 +814,7 @@
                     "labels": [
                     ]
                 },
-                37:
-                {
+                37: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -800,8 +825,7 @@
                     "labels": [
                     ]
                 },
-                38:
-                {
+                38: {
                     "left": 0,
                     "top": 0,
                     "width": 0,
@@ -812,8 +836,7 @@
                     "labels": [
                     ]
                 },
-                39:
-                {
+                39: {
                     "left": 0,
                     "top": 0,
                     "width": 0,

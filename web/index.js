@@ -37,6 +37,7 @@ app.get('/', function (req, res) {
 
 app.use('', express.static(path.join(__dirname, 'website')));
 app.use('/public', express.static(path.join(__dirname, 'website')));
+app.use('/src/main', express.static(path.join(__dirname, '../src/main')));
 
 app.listen(3000, function () {
     console.log('FRaMED-io is available on http://localhost:3000!');

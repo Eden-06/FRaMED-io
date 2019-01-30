@@ -47,24 +47,7 @@ class EventLinker(
         }
     }
 
-    override val listPreview = iconShape(symbolProperty) {
-        style {
-            background = color(255, 255, 255)
-            border {
-                style = Border.BorderStyle.SOLID
-                width = box(1.0)
-                color = box(color(0, 0, 0, 0.3))
-                radius = box(20.0)
-                double = returnEvent
-                returnEventProperty.onChange {
-                    double = returnEvent
-                }
-            }
-            padding = box(10.0)
-        }
-    }
-
-    override val flatPreview = iconShape(symbolProperty) {
+    override val preview = iconShape(symbolProperty) {
         style {
             background = color(255, 255, 255)
             border {
@@ -82,7 +65,6 @@ class EventLinker(
     }
 
     private lateinit var sidebarViewGroup: SidebarGroup
-    private lateinit var sidebarFlatViewGroup: SidebarGroup
 
     override val sidebar = sidebar {
         title("Event")
@@ -102,19 +84,10 @@ class EventLinker(
                 "width=${width.roundToInt()}, height=${height.roundToInt()}"
             })
         }
-        sidebarFlatViewGroup = group("Preview layout") {
-            input("Position", flatPreview.leftProperty.join(flatPreview.topProperty) { left, top ->
-                "x=${left.roundToInt()}, y=${top.roundToInt()}"
-            })
-            input("Size", flatPreview.widthProperty.join(flatPreview.heightProperty) { width, height ->
-                "width=${width.roundToInt()}, height=${height.roundToInt()}"
-            })
-        }
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
         sidebarViewGroup.display = event.target == pictogram
-        sidebarFlatViewGroup.display = event.target == flatPreview
     }
 
     override val contextMenu = contextMenu {

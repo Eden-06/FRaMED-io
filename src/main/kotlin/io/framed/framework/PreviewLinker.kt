@@ -10,6 +10,5 @@ interface PreviewLinker<M : ModelElement<M>, P : Shape, R : Shape> : ShapeLinker
     val nameProperty: ReadOnlyProperty<String>
     val name: String
 
-    val listPreview: R
-    val flatPreview: P
+    val preview: R
 }

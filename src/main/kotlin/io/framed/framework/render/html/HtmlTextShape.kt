@@ -42,4 +42,8 @@ class HtmlTextShape(
 
     override val viewList: List<View<*>> = listOf(view)
 
+    init {
+        init()
+    }
+
 }

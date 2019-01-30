@@ -27,8 +27,6 @@ class BoxShape(id: Long?) : Shape(id) {
     fun add(shape: Shape) {
         if (shape !in internalShapes) {
             internalShapes += shape
-            shape.parent = this
-            shape.layerProperty.bind(layerProperty)
             onAdd.emit(shape)
         }
     }
@@ -77,6 +75,19 @@ class BoxShape(id: Long?) : Shape(id) {
             sum
         }
         else -> 0.0
+    }
+
+    fun render() {
+        for (shape in shapes) {
+            shape.parent = this
+            if (!shape.layerProperty.isBound) {
+                shape.layerProperty.bind(layerProperty)
+            }
+
+            if (shape is BoxShape) {
+                shape.render()
+            }
+        }
     }
 }
 

@@ -19,11 +19,11 @@ class Metadata {
 object DateSerializer : KSerializer<Date> {
     override val descriptor: SerialDescriptor = StringDescriptor
 
-    override fun serialize(output: Encoder, obj: Date) {
-        output.encodeString(obj.toString())
+    override fun serialize(encoder: Encoder, obj: Date) {
+        encoder.encodeString(obj.toString())
     }
 
-    override fun deserialize(input: Decoder): Date {
-        return Date(input.decodeString())
+    override fun deserialize(decoder: Decoder): Date {
+        return Date(decoder.decodeString())
     }
 }

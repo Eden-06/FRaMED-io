@@ -162,5 +162,7 @@ class HtmlBoxShape(
         } else if (position == BoxShape.Position.BORDER) {
             borderPosition(positionView, parent?.parent as HtmlBoxShape)
         }
+
+        init()
     }
 }

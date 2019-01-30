@@ -29,9 +29,9 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
             linkers.forEach { linker ->
                 if (linker is PreviewLinker<*, *, *>) {
                     box += if (box.position == BoxShape.Position.ABSOLUTE) {
-                        linker.flatPreview
+                        linker.pictogram
                     } else {
-                        linker.listPreview
+                        linker.preview
                     }
                 }
             }
@@ -55,9 +55,9 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
 
             val prev = if (linker is PreviewLinker<*, *, *>) {
                 if (box.position == BoxShape.Position.ABSOLUTE) {
-                    linker.flatPreview
+                    linker.pictogram
                 } else {
-                    linker.listPreview
+                    linker.preview
                 }
             } else return@let
 
@@ -83,15 +83,15 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
         for ((box, _) in conditionalBoxes) {
             box -= linker.pictogram
             if (linker is PreviewLinker<*, *, *>) {
-                box -= linker.flatPreview
-                box -= linker.listPreview
+                box -= linker.pictogram
+                box -= linker.preview
             }
         }
 
         previewBox?.let { box ->
             if (linker is PreviewLinker<*, *, *>) {
-                box -= linker.flatPreview
-                box -= linker.listPreview
+                box -= linker.pictogram
+                box -= linker.preview
             }
         }
     }

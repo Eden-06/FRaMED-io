@@ -102,12 +102,7 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
         var elements = emptyList<Copy>()
         for (linker in shapeLinkers) {
             if (linker.id in idList) {
-                val layerData = if (container == source || linker !is PreviewLinker<*, *, *>) {
-                    linker.pictogram.export()
-                } else {
-                    linker.flatPreview.export()
-                }
-                elements += Copy(linker.model, linker.model.copy(), layerData)
+                elements += Copy(linker.model, linker.model.copy(), linker.pictogram.export())
             } else if (linker is ModelLinker<*, *, *>) {
                 elements += linker.copy(idList, source)
             }
@@ -163,13 +158,7 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
 
     fun add(model: ModelElement<*>, layerData: LayerData, container: Pictogram): ShapeLinker<*, *> {
         val linker = add(model)
-        if (container == pictogram) {
-            if (linker is PreviewLinker<*, *, *>) {
-                linker.flatPreview.import(layerData)
-            }
-        } else if (container == this.container) {
-            linker.pictogram.import(layerData)
-        }
+        linker.pictogram.import(layerData)
         return linker
     }
 }

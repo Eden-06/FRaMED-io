@@ -23,7 +23,7 @@ abstract class HtmlShape(
         parentContainer: HtmlShapeContainer?,
         val container: ViewCollection<View<*>, *>,
         open val jsPlumbInstance: JsPlumbInstance?
-): Selectable {
+) : Selectable {
     abstract val view: View<*>
 
     abstract val viewList: List<View<*>>
@@ -383,9 +383,9 @@ abstract class HtmlShape(
     abstract override val positionView: View<*>
 
     override val id: Long
-        get()= shape.id!!
+        get() = shape.id!!
     override val pictogram: Pictogram
-        get()= shape
+        get() = shape
     override val left: Double
         get() = shape.leftOffset
     override val top: Double
@@ -428,21 +428,24 @@ abstract class HtmlShape(
     }
 
     override fun isChildOf(container: ViewCollection<View<*>, *>): Boolean {
-        return  positionView in container
+        return positionView in container
     }
 
+    fun init() {
+        shape.visibleProperty.onChange.reference {
+            view.display = shape.visible
+        }?.let(listeners::add)
+        view.display = shape.visible
+
+        shape.layerProperty.onChange {
+            initLabels()
+        }
+        initLabels()
+    }
 
     init {
         parentContainer?.onParentMove?.reference {
             revalidate()
         }?.let { reference = it }
-
-        async {
-            shape.layerProperty.onChange {
-                initLabels()
-            }
-
-            initLabels()
-        }
     }
 }

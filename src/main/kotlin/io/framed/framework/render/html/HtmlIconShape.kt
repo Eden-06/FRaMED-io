@@ -42,5 +42,7 @@ class HtmlIconShape(
                 view.zIndex = if (shape.property.value == null) -1 else null
             }?.trigger(Unit)
         }
+
+        init()
     }
 }
