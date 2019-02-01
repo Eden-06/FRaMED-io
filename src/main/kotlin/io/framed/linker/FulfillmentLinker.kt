@@ -107,7 +107,7 @@ class FulfillmentLinker(
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return (source is ClassLinker && target is CompartmentLinker) || (source is CompartmentLinker && target is CompartmentLinker && target != source)
+            return (source is ClassLinker || source is CompartmentLinker) && target is RoleTypeLinker
         }
     }
 }
