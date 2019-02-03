@@ -205,7 +205,7 @@ class HtmlConnections(
 
         val references = mutableListOf<ListenerReference<*>>()
         view.onMouseEnter.reference {
-            if (isConnecting != null && isConnecting != shape) {
+            if (isConnecting != null && isConnecting != shape && "target-disabled" !in view.classes) {
                 view.classes += "drop-target"
 
                 var reference: ListenerReference<*>? = null
