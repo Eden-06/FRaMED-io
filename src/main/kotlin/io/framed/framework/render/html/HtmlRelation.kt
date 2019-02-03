@@ -77,6 +77,7 @@ class HtmlRelation(
     private val references: MutableList<ListenerReference<*>> = mutableListOf()
     private var connections: List<JsPlumbConnection> = emptyList()
     private var labels: List<HtmlLabel> = emptyList()
+
     fun remove(complete: Boolean = false) {
         if (this::jsPlumbInstance.isInitialized) {
             connections.forEach {

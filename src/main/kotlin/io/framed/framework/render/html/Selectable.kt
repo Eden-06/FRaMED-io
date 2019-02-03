@@ -1,12 +1,10 @@
 package io.framed.framework.render.html
 
-import io.framed.framework.pictogram.ContextEvent
 import io.framed.framework.pictogram.Pictogram
 import io.framed.framework.util.Dimension
 import io.framed.framework.util.Point
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
-import org.w3c.dom.events.MouseEvent
 
 interface Selectable {
     val id: Long

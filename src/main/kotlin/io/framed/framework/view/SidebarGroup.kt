@@ -2,7 +2,6 @@ package io.framed.framework.view
 
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.ReadOnlyProperty
-import io.framed.framework.AutocompleteHandler
 import org.w3c.dom.HTMLDivElement
 
 class SidebarGroup(

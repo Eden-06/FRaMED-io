@@ -44,10 +44,7 @@ class HtmlLabel(
 
         allowDrag = true
         onMouseDown { event ->
-            //console.log(event)
             event.stopPropagation()
-            htmlRenderer.deselectAll()
-            parent.toForeground(this)
             dragZoom = htmlRenderer.zoom
 
             var markView = true

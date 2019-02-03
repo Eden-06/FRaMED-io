@@ -1,6 +1,5 @@
 package io.framed.model
 
-import io.framed.PolymorphicSerializer
 import io.framed.framework.ModelElement
 import kotlinx.serialization.Serializable
 

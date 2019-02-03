@@ -7,7 +7,6 @@ import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
 import io.framed.model.Connections
 import io.framed.model.Package
-import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Transient

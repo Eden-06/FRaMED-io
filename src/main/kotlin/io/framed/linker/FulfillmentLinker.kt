@@ -8,7 +8,6 @@ import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
 import io.framed.model.Fulfillment
-import io.framed.model.Inheritance
 
 /**
  * @author lars

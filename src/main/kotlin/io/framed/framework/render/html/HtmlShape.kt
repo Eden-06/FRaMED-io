@@ -370,6 +370,7 @@ abstract class HtmlShape(
         for (label in labels) {
             label.remove()
         }
+        labels = emptySet()
 
         reference?.remove()
     }
