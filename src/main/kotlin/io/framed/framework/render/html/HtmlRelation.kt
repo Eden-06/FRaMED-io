@@ -211,7 +211,6 @@ class HtmlRelation(
             HtmlLabel(renderer, label, container).also {
                 it.view.onMouseDown { event ->
                     if (!event.defaultPrevented) {
-                        event.preventDefault()
                         event.stopPropagation()
                         connection.onSidebar.emit(SidebarEvent(connection))
                     }
@@ -239,7 +238,7 @@ class HtmlRelation(
                     strokeWidth = style.paintStyle.strokeWidth
                     fill = style.paintStyle.fill.toCss()
                 }
-                val location = 0
+                val location = style.length * style.foldback +1
             }))
         }
 

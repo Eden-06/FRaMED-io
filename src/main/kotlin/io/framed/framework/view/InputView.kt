@@ -90,6 +90,7 @@ class InputView() : View<HTMLDivElement>("div") {
         }
 
         onFocusEnter {
+            println("focus enters")
             if (autocomplete != null) {
                 autocompleteListView.display = true
                 updateAutocomplete()
@@ -97,6 +98,7 @@ class InputView() : View<HTMLDivElement>("div") {
             focusClass = true
         }
         onFocusLeave { _ ->
+            println("focus leaves")
             autocompleteListView.display = false
             focusClass = false
         }

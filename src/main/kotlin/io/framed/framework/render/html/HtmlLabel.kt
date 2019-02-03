@@ -24,6 +24,7 @@ class HtmlLabel(
             reference.remove()
         }
         listeners.clear()
+        parent -= view
     }
 
     val view: View<*> = InputView(label.textProperty).apply {
@@ -43,6 +44,7 @@ class HtmlLabel(
 
         allowDrag = true
         onMouseDown { event ->
+            //console.log(event)
             event.stopPropagation()
             htmlRenderer.deselectAll()
             parent.toForeground(this)

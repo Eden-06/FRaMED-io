@@ -380,12 +380,11 @@ abstract class HtmlShape(
         for (label in labels) {
             label.remove()
         }
-        labels = emptySet()
-        for (label in shape.labels) {
+        labels = shape.labels.map { label ->
             val htmlLabel = HtmlLabel(htmlRenderer, label, container, shape)
             container += htmlLabel.view
-            labels += htmlLabel
-        }
+            htmlLabel
+        }.toSet()
     }
 
     private var reference: ListenerReference<*>? = null
@@ -407,6 +406,7 @@ abstract class HtmlShape(
 
     override fun select() {
         positionView.selectedView = true
+        shape.onSidebar.emit(SidebarEvent(shape))
     }
 
     override fun unselect() {
@@ -448,6 +448,9 @@ abstract class HtmlShape(
         view.display = shape.visible
 
         shape.layerProperty.onChange {
+            initLabels()
+        }
+        shape.labelsProperty.onChange {
             initLabels()
         }
         initLabels()

@@ -1,5 +1,6 @@
 package io.framed.linker
 
+import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
@@ -19,7 +20,7 @@ class CompositionLinker(
 ) : ConnectionLinker<Composition> {
 
     private val nameProperty = property(model::name).trackHistory()
-    private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
+    private val sourceCardinalityProperty = property(model::sourceCardinality).mapBinding { it }
     private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 
     override val sourceIdProperty = property(model::sourceId).trackHistory()
@@ -32,10 +33,10 @@ class CompositionLinker(
             strokeWidth = 1
         }
 
-        sourceStyle = null
-        targetStyle = connectionEnd {
-            width = 20
-            length = 20
+        targetStyle = null
+        sourceStyle = connectionEnd {
+            width = 10
+            length = 10
             foldback = 2.0
             paintStyle {
                 stroke = Color(0, 0, 0)
@@ -67,11 +68,8 @@ class CompositionLinker(
         if ("name" !in ids) {
             pictogram.labels += Label(id = "name", position = 0.5)
         }
-        if ("source" !in ids) {
-            pictogram.labels += Label(id = "source", position = -30.0)
-        }
         if ("target" !in ids) {
-            pictogram.labels += Label(id = "target", position = 31.0)
+            pictogram.labels += Label(id = "target", position = -30.0)
         }
 
         for (label in pictogram.labels) {
@@ -80,10 +78,7 @@ class CompositionLinker(
             }
             when {
                 label.id == "name" -> label.textProperty.bindBidirectional(nameProperty)
-                label.id == "source" -> {
-                    label.textProperty.bindBidirectional(sourceCardinalityProperty)
-                    label.autocomplete = CardinalityPreset.STRING_VALUES
-                }
+
                 label.id == "target" -> {
                     label.textProperty.bindBidirectional(targetCardinalityProperty)
                     label.autocomplete = CardinalityPreset.STRING_VALUES
