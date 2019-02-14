@@ -22,13 +22,14 @@ class HtmlConnections(
 
     val listeners = mutableListOf<ListenerReference<*>>()
     private val endpointMap = mutableMapOf<Shape, EndpointItem>()
-    private var relations: Map<Connection, HtmlRelation> = emptyMap()
+    var relations: Map<Connection, HtmlRelation> = emptyMap()
     val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
     var jsPlumbList: List<Pair<JsPlumbInstance, ViewCollection<View<*>, *>>> = emptyList()
 
     private var isConnecting: Shape? = null
 
     fun remove() {
+        relations.values.forEach { it.remove(true) }
         for ((it, _) in jsPlumbList) {
             it.deleteEveryConnection()
             it.deleteEveryEndpoint()
@@ -128,7 +129,8 @@ class HtmlConnections(
         for ((instance, _) in jsPlumbList) {
             try {
                 instance.revalidate(html)
-            } catch (e: dynamic) { }
+            } catch (e: dynamic) {
+            }
         }
     }
 
