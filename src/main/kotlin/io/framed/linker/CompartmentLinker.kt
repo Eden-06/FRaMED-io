@@ -442,6 +442,19 @@ class CompartmentLinker(
         sidebarMethods.toForeground(sidebarMethodsAdd)
     }
 
+    override fun checkSize() {
+        var maxH = 0.0
+        for(child in children.linkers){
+            val cH = child.pictogram.topOffset + child.pictogram.height
+            if(cH > this.pictogram.height){
+                maxH = cH
+            }
+        }
+        if(maxH > 0.0){
+            this.pictogram.height = maxH+5
+        }
+    }
+
     /**
      * The model initializes a new instance of the linker
      */

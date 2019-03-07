@@ -22,6 +22,8 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
 
     val container: BoxShape
 
+    fun checkSize()
+
     fun getLinkerById(id: Long): ShapeLinker<*, *>? =
             shapeLinkers.find { it.id == id }
 

@@ -3,10 +3,7 @@ package io.framed.linker
 import de.westermann.kobserve.basic.*
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.LinkerShapeBox
-import io.framed.framework.util.RegexValidator
-import io.framed.framework.util.shapeBox
-import io.framed.framework.util.trackHistory
+import io.framed.framework.util.*
 import io.framed.framework.view.*
 import io.framed.model.Attribute
 import io.framed.model.Compartment
@@ -19,7 +16,7 @@ import kotlin.math.roundToInt
  */
 class RoleTypeLinker(
         override val model: RoleType,
-        override val parent: ShapeLinker<*, *>
+        override val parent: ModelLinker<*, *, *>
 ) : PreviewLinker<RoleType, BoxShape, TextShape> {
 
     override val nameProperty = property(model::name)
@@ -222,12 +219,14 @@ class RoleTypeLinker(
 
         attributes.view.onAdd {
             updateSidebarAttributes()
+            parent.checkSize()
         }
         attributes.view.onRemove {
             updateSidebarAttributes()
         }
         methods.view.onAdd {
             updateSidebarMethods()
+            parent.checkSize()
         }
         methods.view.onRemove {
             updateSidebarMethods()

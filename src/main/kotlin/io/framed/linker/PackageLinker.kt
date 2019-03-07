@@ -350,6 +350,19 @@ class PackageLinker(
         updateLabelBindings()
     }
 
+    override fun checkSize() {
+        var maxH = 0.0
+        for(child in children.linkers){
+            val cH = child.pictogram.topOffset + child.pictogram.height
+            if(cH > this.pictogram.height){
+                maxH = cH
+            }
+        }
+        if(maxH > 0.0){
+            this.pictogram.height = maxH+5
+        }
+    }
+
     override fun updateLabelBindings() {
         for (shape in borderShapes) {
             var label = shape.labels.find { it.id == "name" }
