@@ -352,14 +352,16 @@ class PackageLinker(
 
     override fun checkSize() {
         var maxH = 0.0
+        val headlineHeight = this.autoLayoutBox.topOffset - this.pictogram.topOffset
+        val contentHeight = this.pictogram.height - headlineHeight
         for(child in children.linkers){
             val cH = child.pictogram.topOffset + child.pictogram.height
-            if(cH > this.pictogram.height){
+            if(cH > contentHeight){
                 maxH = cH
             }
         }
         if(maxH > 0.0){
-            this.pictogram.height = maxH+5
+            this.pictogram.height = maxH + 20 + headlineHeight
         }
     }
 
