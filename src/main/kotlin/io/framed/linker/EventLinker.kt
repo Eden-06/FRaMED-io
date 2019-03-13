@@ -27,6 +27,8 @@ class EventLinker(
     }
     override val name: String by nameProperty
 
+    private val descriptionProperty = property(model::desc).trackHistory()
+
     private val returnEventProperty = property(model::returnEvent).trackHistory()
     var returnEvent by returnEventProperty
 
@@ -73,6 +75,7 @@ class EventLinker(
             select("Type", EventType.values().toList(), typeProperty) {
                 it.printableName
             }
+            input("Description", descriptionProperty)
             checkBox("Return event", returnEventProperty, CheckBox.Type.SWITCH)
         }
 

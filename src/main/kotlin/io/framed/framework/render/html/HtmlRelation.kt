@@ -78,8 +78,6 @@ class HtmlRelation(
     private var connections: List<JsPlumbConnection> = emptyList()
     private var labels: List<HtmlLabel> = emptyList()
 
-    private var deleted = false
-
     fun remove(complete: Boolean = false) {
         if (this::jsPlumbInstance.isInitialized) {
             connections.forEach {
@@ -98,14 +96,12 @@ class HtmlRelation(
                 it.remove()
             }
             references.clear()
-            deleted = true
+            renderer.selectable -= this
             renderer.htmlConnections.relations -= connection
         }
     }
 
     fun draw() {
-        if (deleted) return
-
         val sourceId = connection.source.value
         val targetId = connection.target.value
 
