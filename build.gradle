@@ -92,5 +92,6 @@ task run(type: NodeTask) {
 node {
     workDir = file("${project.buildDir}/${web_path}")
     npmWorkDir = file("${project.buildDir}/${web_path}")
-    nodeModulesDir = file("${project.projectDir}/${web_path}/node_modules")
+    nodeModulesDir = file("${project.projectDir}/${web_path}")
 }
+
