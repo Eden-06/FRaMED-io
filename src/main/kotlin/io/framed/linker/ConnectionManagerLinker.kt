@@ -31,6 +31,8 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
             is Composition -> connectionBox += CompositionLinker(model, this)
             is Inheritance -> connectionBox += InheritanceLinker(model, this)
             is Fulfillment -> connectionBox += FulfillmentLinker(model, this)
+            is CreateRelationship -> connectionBox += CreateRelationshipLinker(model, this)
+            is DestroyRelationship -> connectionBox += DestroyRelationshipLinker(model, this)
         }
     }
 
@@ -40,6 +42,8 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
             is CompositionLinker -> connectionBox -= linker
             is InheritanceLinker -> connectionBox -= linker
             is FulfillmentLinker -> connectionBox -= linker
+            is CreateRelationshipLinker -> connectionBox -= linker
+            is DestroyRelationshipLinker -> connectionBox -= linker
         }
     }
 
@@ -71,6 +75,8 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
             InheritanceLinker.info -> InheritanceLinker(Inheritance(source, target), this).also(connectionBox::add)
             CompositionLinker.info -> CompositionLinker(Composition(source, target), this).also(connectionBox::add)
             FulfillmentLinker.info -> FulfillmentLinker(Fulfillment(source, target), this).also(connectionBox::add)
+            CreateRelationshipLinker.info -> CreateRelationshipLinker(CreateRelationship(source, target), this).also(connectionBox::add)
+            DestroyRelationshipLinker.info -> DestroyRelationshipLinker(DestroyRelationship(source, target), this).also(connectionBox::add)
             else -> throw IllegalArgumentException()
         }
     }
@@ -79,7 +85,6 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
     override fun init() {
         if (!isInit) {
             modelConnections.connections.forEach(this::add)
-
             isInit = true
         }
     }
