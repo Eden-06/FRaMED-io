@@ -9,9 +9,6 @@ import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
-import io.framed.model.Class
-import io.framed.model.Compartment
-import io.framed.model.Event
 import io.framed.model.Package
 import kotlin.math.roundToInt
 
@@ -232,52 +229,28 @@ class PackageLinker(
 
     private lateinit var contextStepIn: ListView
     private lateinit var contextStepOut: ListView
-    private lateinit var contextDelete: ListView
 
-    override val contextMenu = contextMenu {
-        titleProperty.bind(nameProperty.mapBinding { "Package: $it" })
-
+    override val contextMenu = defaultContextMenu {
         contextStepIn = addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
             ControllerManager.display(this@PackageLinker)
         }
         contextStepOut = addItem(MaterialIcon.ARROW_BACK, "Step out") {
             parent?.let { ControllerManager.display(it) }
         }
-
-        addItem(MaterialIcon.ADD, "Add class") { event ->
-            add(Class(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
-        }
-        addItem(MaterialIcon.ADD, "Add package") { event ->
-            add(Package(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
-        }
-        addItem(MaterialIcon.ADD, "Add event") { event ->
-            add(Event(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
-        }
-        addItem(MaterialIcon.ADD, "Add compartment") { event ->
-            add(Compartment(), LayerData(event.diagram.x, event.diagram.y), event.target).focus(event.target)
-        }
-
-        contextDelete = addItem(MaterialIcon.DELETE, "Delete") {
-            delete()
-        }
     }
 
     override fun remove(linker: ShapeLinker<*, *>) {
-        if (linker is ClassLinker || linker is CompartmentLinker || linker is PackageLinker || linker is EventLinker) {
+        if (linker in children) {
             children -= linker
-        } else super.remove(linker)
+        } else {
+            super.remove(linker)
+        }
         checkBorder()
     }
 
 
     override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
-        val linker = when (model) {
-            is Class -> ClassLinker(model, this)
-            is Compartment -> CompartmentLinker(model, connectionManager, this)
-            is Package -> PackageLinker(model, connectionManager, this)
-            is Event -> EventLinker(model, this)
-            else -> super.add(model)
-        }
+        val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this, connectionManager)
         children += linker
         checkBorder()
         return linker
@@ -285,21 +258,13 @@ class PackageLinker(
 
 
     override fun redraw(linker: ShapeLinker<*, *>) {
-        when (linker) {
-            is ClassLinker -> children.redraw(linker)
-            is CompartmentLinker -> children.redraw(linker)
-            is PackageLinker -> children.redraw(linker)
-            is EventLinker -> children.redraw(linker)
-
-            else -> super.remove(linker)
-        }
+        children.redraw(linker)
         checkBorder()
     }
 
     override fun ContextMenu.onOpen(event: ContextEvent) {
         contextStepIn.display = event.target == pictogram
         contextStepOut.display = event.target != pictogram && parent != null
-        contextDelete.display = parent != null
     }
 
     private var borderShapes: List<Shape> = emptyList()
@@ -354,13 +319,13 @@ class PackageLinker(
         var maxH = 0.0
         val headlineHeight = this.autoLayoutBox.topOffset - this.pictogram.topOffset
         val contentHeight = this.pictogram.height - headlineHeight
-        for(child in children.linkers){
+        for (child in children.linkers) {
             val cH = child.pictogram.topOffset + child.pictogram.height
-            if(cH > contentHeight){
+            if (cH > contentHeight) {
                 maxH = cH
             }
         }
-        if(maxH > 0.0){
+        if (maxH > 0.0) {
             this.pictogram.height = maxH + 20 + headlineHeight
         }
     }
@@ -412,7 +377,15 @@ class PackageLinker(
             return container is Package
         }
 
-        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Package
+        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Package
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is PackageLinker
+
+        override fun createModel(): ModelElement<*> = Package()
+        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+            if (model is Package && parent is ModelLinker<*,*, *> && connectionManager != null) {
+                return PackageLinker(model, connectionManager, parent)
+            } else throw UnsupportedOperationException()
+        }
 
         override val name: String = "Package"
     }

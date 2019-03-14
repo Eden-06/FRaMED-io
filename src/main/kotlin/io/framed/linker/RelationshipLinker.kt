@@ -5,7 +5,6 @@ import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.MaterialIcon
-import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
 import io.framed.model.Relationship
 
@@ -18,7 +17,9 @@ class RelationshipLinker(
         override val manager: ConnectionManager
 ) : ConnectionLinker<Relationship> {
 
-    private val nameProperty = property(model::name).trackHistory()
+    override val nameProperty = property(model::name).trackHistory()
+    override val name by nameProperty
+
     private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
     private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 
@@ -45,12 +46,7 @@ class RelationshipLinker(
         }
     }
 
-    override val contextMenu = contextMenu {
-        title = "Connection"
-        addItem(MaterialIcon.DELETE, "Delete") {
-            delete()
-        }
-    }
+    override val contextMenu = defaultContextMenu()
 
     override fun updateLabelBindings() {
         val ids = pictogram.labels.mapNotNull { it.id }.distinct().toSet()

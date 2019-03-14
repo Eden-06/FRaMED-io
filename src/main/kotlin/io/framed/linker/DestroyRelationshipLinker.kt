@@ -14,7 +14,9 @@ class DestroyRelationshipLinker(
         override val manager: ConnectionManager
 ) : ConnectionLinker<DestroyRelationship> {
 
-    private val nameProperty = property(model::name).trackHistory()
+    override val nameProperty = property(model::name).trackHistory()
+    override val name by nameProperty
+
     private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
     private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 

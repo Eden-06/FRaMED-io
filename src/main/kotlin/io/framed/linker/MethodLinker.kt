@@ -1,13 +1,9 @@
 package io.framed.linker
 
 import de.westermann.kobserve.basic.FunctionAccessor
-import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.basic.validate
-import io.framed.framework.LinkerInfoItem
-import io.framed.framework.LinkerManager
-import io.framed.framework.ModelElement
-import io.framed.framework.ShapeLinker
+import io.framed.framework.*
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.History
@@ -24,12 +20,14 @@ class MethodLinker(
         override val parent: ShapeLinker<*, *>
 ) : ShapeLinker<Method, TextShape> {
 
-    private val nameProperty = property(model::name)
+    override val nameProperty = property(model::name)
             .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
             .trackHistory()
     private val typeProperty = property(model::type)
             .validate(RegexValidator("([a-zA-Z]([a-zA-Z0-9])*)?".toRegex())::validate)
             .trackHistory()
+
+    override val name by nameProperty
 
     override val subTypes: Set<String>
         get() = setOf(model.type) + model.parameters.map { it.type }
@@ -193,12 +191,7 @@ class MethodLinker(
         updateSidebar()
     }
 
-    override val contextMenu = contextMenu {
-        titleProperty.bind(nameProperty.mapBinding { "Method: $it" })
-        addItem(MaterialIcon.DELETE, "Delete") {
-            delete()
-        }
-    }
+    override val contextMenu = defaultContextMenu()
 
     init {
         parameterProperty.onChange { _ ->
@@ -214,7 +207,15 @@ class MethodLinker(
             return container is Class || container is Compartment || container is RoleType
         }
 
-        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Method
+        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Method
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is MethodLinker
+
+        override fun createModel(): ModelElement<*> = Method()
+        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+            if (model is Method && parent is ShapeLinker<*, *>) {
+                return MethodLinker(model, parent)
+            } else throw UnsupportedOperationException()
+        }
 
         override val name: String = "Method"
     }

@@ -1,9 +1,15 @@
 package io.framed.linker
 
-import de.westermann.kobserve.basic.*
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.join
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.*
+import io.framed.framework.util.LinkerShapeBox
+import io.framed.framework.util.RegexValidator
+import io.framed.framework.util.shapeBox
+import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Attribute
 import io.framed.model.Compartment
@@ -146,21 +152,17 @@ class RoleTypeLinker(
         sidebarViewGroup.display = event.target == pictogram
     }
 
-    override val contextMenu = contextMenu {
-        titleProperty.bind(nameProperty.mapBinding { "RoleType: $it" })
-        addItem(MaterialIcon.ADD, "Add attribute") { event ->
-            attributes += AttributeLinker(Attribute(), this@RoleTypeLinker).also { linker ->
-                linker.focus(event.target)
-            }
+    override val contextMenu = defaultContextMenu()
+
+    override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
+        val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this)
+        when (linker) {
+            is AttributeLinker -> attributes.add(linker)
+            is MethodLinker -> methods.add(linker)
+            else -> super.add(model)
         }
-        addItem(MaterialIcon.ADD, "Add method") { event ->
-            methods += MethodLinker(Method(), this@RoleTypeLinker).also { linker ->
-                linker.focus(event.target)
-            }
-        }
-        addItem(MaterialIcon.DELETE, "Delete") {
-            delete()
-        }
+        linker.focus(pictogram)
+        return linker
     }
 
     override fun remove(linker: ShapeLinker<*, *>) {
@@ -240,7 +242,15 @@ class RoleTypeLinker(
             return container is Compartment
         }
 
-        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is RoleType
+        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is RoleType
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is RoleTypeLinker
+
+        override fun createModel(): ModelElement<*> = RoleType()
+        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+            if (model is RoleType && parent is ModelLinker<*,*, *>) {
+                return RoleTypeLinker(model, parent)
+            } else throw UnsupportedOperationException()
+        }
 
         override val name: String = "RoleType"
     }

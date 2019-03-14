@@ -14,7 +14,9 @@ class CreateRelationshipLinker(
         override val manager: ConnectionManager
 ) : ConnectionLinker<CreateRelationship> {
 
-    private val nameProperty = property(model::name).trackHistory()
+    override val nameProperty = property(model::name).trackHistory()
+    override val name by nameProperty
+
     private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
     private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 

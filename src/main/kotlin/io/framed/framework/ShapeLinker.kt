@@ -2,6 +2,8 @@ package io.framed.framework
 
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.SidebarEvent
+import io.framed.framework.view.dialog
+import io.framed.framework.view.textView
 
 /**
  * @author lars
@@ -14,7 +16,13 @@ interface ShapeLinker<M : ModelElement<M>, P : Shape> : Linker<M, P> {
             parent.remove(this)
             parent.sidebar.onOpen(SidebarEvent(parent.pictogram))
             parent.sidebar.open()
-        }
+        } ?: dialog {
+            title = "Delete error"
+            contentView.apply {
+                textView("Cannot delete root element.")
+            }
+            addButton("Close")
+        }.open()
     }
 
     fun remove(linker: ShapeLinker<*, *>): Unit = throw UnsupportedOperationException()

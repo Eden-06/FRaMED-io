@@ -1,22 +1,17 @@
 package io.framed.linker
 
-import de.westermann.kobserve.basic.*
-import io.framed.framework.LinkerInfoItem
-import io.framed.framework.LinkerManager
-import io.framed.framework.ModelElement
-import io.framed.framework.ShapeLinker
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.FunctionProperty
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
+import io.framed.framework.*
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.History
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.MaterialIcon
-import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
-import io.framed.model.Attribute
-import io.framed.model.Class
-import io.framed.model.Compartment
-import io.framed.model.RoleType
+import io.framed.model.*
 
 /**
  * @author lars
@@ -26,12 +21,14 @@ class AttributeLinker(
         override val parent: ShapeLinker<*, *>
 ) : ShapeLinker<Attribute, TextShape> {
 
-    private val nameProperty = property(model::name)
+    override val nameProperty = property(model::name)
             .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
             .trackHistory()
     private val typeProperty = property(model::type)
             .validate(RegexValidator("([a-zA-Z]([a-zA-Z0-9])*)?".toRegex())::validate)
             .trackHistory()
+
+    override val name by nameProperty
 
     override val subTypes: Set<String>
         get() = setOf(model.type)
@@ -99,12 +96,7 @@ class AttributeLinker(
         }
     }
 
-    override val contextMenu = contextMenu {
-        titleProperty.bind(nameProperty.mapBinding { "Attribute: $it" })
-        addItem(MaterialIcon.DELETE, "Delete") {
-            delete()
-        }
-    }
+    override val contextMenu = defaultContextMenu()
 
     init {
         LinkerManager.setup(this)
@@ -112,10 +104,18 @@ class AttributeLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreateIn(container: ModelElement<*>): Boolean {
-            return container is Class || container is Compartment || container is RoleType
+            return container is Class || container is Compartment || container is Scene || container is RoleType
         }
 
-        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Attribute
+        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Attribute
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is AttributeLinker
+
+        override fun createModel(): ModelElement<*> = Attribute()
+        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+            if (model is Attribute && parent is ShapeLinker<*, *>) {
+                return AttributeLinker(model, parent)
+            } else throw UnsupportedOperationException()
+        }
 
         override val name: String = "Attribute"
     }

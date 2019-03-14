@@ -121,12 +121,15 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
     }
 
     fun redraw(linker: L) {
-        internalRemove(linker)
-        internalAdd(linker)
+        if (linker in linkers) {
+            internalRemove(linker)
+            internalAdd(linker)
+        }
     }
 
     operator fun plusAssign(linker: L) = add(linker)
     operator fun minusAssign(linker: L) = remove(linker)
+    operator fun contains(linker: L) = linker in linkers
 
     class SetShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
             kProperty: KMutableProperty0<Set<M>>,

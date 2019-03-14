@@ -10,19 +10,18 @@ import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Attribute
-import io.framed.model.Compartment
-import io.framed.model.Method
 import io.framed.model.Package
+import io.framed.model.Scene
 import kotlin.math.roundToInt
 
 /**
  * @author lars
  */
-class CompartmentLinker(
-        override val model: Compartment,
+class SceneLinker(
+        override val model: Scene,
         override val connectionManager: ConnectionManager,
         override val parent: ModelLinker<*, *, *>
-) : ModelLinker<Compartment, BoxShape, TextShape> {
+) : ModelLinker<Scene, BoxShape, TextShape> {
 
     override val nameProperty = property(model::name)
             .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())::validate)
@@ -32,7 +31,6 @@ class CompartmentLinker(
     override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
 
     private val attributes = shapeBox<Attribute, AttributeLinker>(model::attributes, connectionManager)
-    private val methods = shapeBox<Method, MethodLinker>(model::methods, connectionManager)
 
     private val children = shapeBox(model::children, connectionManager) { box ->
         box.view = container
@@ -41,7 +39,7 @@ class CompartmentLinker(
         get() = children.linkers.toSet()
 
     override val subTypes: Set<String>
-        get() = (attributes.linkers.flatMap { it.subTypes } + methods.linkers.flatMap { it.subTypes } + shapeLinkers.flatMap { it.subTypes }).toSet() + model.name
+        get() = (attributes.linkers.flatMap { it.subTypes } + shapeLinkers.flatMap { it.subTypes }).toSet() + model.name
 
     private lateinit var autoLayoutBox: BoxShape
     private lateinit var borderBox: BoxShape
@@ -54,16 +52,6 @@ class CompartmentLinker(
         }
 
         attributes.view = boxShape {
-            style {
-                border {
-                    style = Border.BorderStyle.SOLID
-                    width = box(1.0, 0.0, 0.0, 0.0)
-                    color = box(color(0, 0, 0, 0.3))
-                }
-                padding = box(8.0)
-            }
-        }
-        methods.view = boxShape {
             style {
                 border {
                     style = Border.BorderStyle.SOLID
@@ -95,13 +83,14 @@ class CompartmentLinker(
 
         style {
             background = linearGradient("to bottom") {
-                add(color("#fffbd9"), 0.0)
-                add(color("#fff7c4"), 1.0)
+                add(color("#e5ffd9"), 0.0)
+                add(color("#edf6e2"), 1.0)
             }
             border {
                 style = Border.BorderStyle.SOLID
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
+                leftDoubleBar = true
             }
         }
 
@@ -152,9 +141,6 @@ class CompartmentLinker(
     private lateinit var sidebarAttributes: SidebarGroup
     private lateinit var sidebarAttributesAdd: ListView
     private val sidebarAttributesList: MutableList<SidebarEntry<Attribute>> = mutableListOf()
-    private lateinit var sidebarMethods: SidebarGroup
-    private lateinit var sidebarMethodsAdd: ListView
-    private val sidebarMethodsList: MutableList<SidebarEntry<Method>> = mutableListOf()
 
     private fun updatePreviewType() {
         val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.ABSOLUTE
@@ -173,7 +159,7 @@ class CompartmentLinker(
     }
 
     override val sidebar = sidebar {
-        title("Compartment")
+        title("Scene")
         group("General") {
             input("Name", nameProperty)
 
@@ -204,17 +190,7 @@ class CompartmentLinker(
                 iconView(MaterialIcon.ADD)
                 textView("Add attribute")
                 onClick {
-                    attributes += AttributeLinker(Attribute(), this@CompartmentLinker)
-                }
-            }
-        }
-        sidebarMethods = group("Methods") {
-            collapse()
-            sidebarMethodsAdd = custom {
-                iconView(MaterialIcon.ADD)
-                textView("Add method")
-                onClick {
-                    methods += MethodLinker(Method(), this@CompartmentLinker)
+                    attributes += AttributeLinker(Attribute(), this@SceneLinker)
                 }
             }
         }
@@ -265,7 +241,7 @@ class CompartmentLinker(
 
     override val contextMenu = defaultContextMenu {
         contextStepIn = addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
-            ControllerManager.display(this@CompartmentLinker)
+            ControllerManager.display(this@SceneLinker)
         }
         contextStepOut = addItem(MaterialIcon.ARROW_BACK, "Step out") {
             ControllerManager.display(parent)
@@ -283,7 +259,6 @@ class CompartmentLinker(
         val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this, connectionManager)
         when (linker) {
             is AttributeLinker -> attributes.add(linker)
-            is MethodLinker -> methods.add(linker)
             else -> children += linker
         }
         checkBorder()
@@ -389,34 +364,16 @@ class CompartmentLinker(
         sidebarAttributes.toForeground(sidebarAttributesAdd)
     }
 
-    private fun updateSidebarMethods() {
-        while (sidebarMethodsList.size > methods.linkers.size) {
-            val last = sidebarMethodsList.last()
-            last.remove()
-            sidebarMethodsList -= last
-        }
-
-        for (i in 0 until sidebarMethodsList.size) {
-            sidebarMethodsList[i].bind(methods.linkers[i])
-        }
-
-        for (i in sidebarMethodsList.size until methods.linkers.size) {
-            sidebarMethodsList += SidebarEntry(sidebarMethods, methods.linkers[i])
-        }
-
-        sidebarMethods.toForeground(sidebarMethodsAdd)
-    }
-
     override fun checkSize() {
         var maxH = 0.0
-        for (child in children.linkers) {
+        for(child in children.linkers){
             val cH = child.pictogram.topOffset + child.pictogram.height
-            if (cH > this.pictogram.height) {
+            if(cH > this.pictogram.height){
                 maxH = cH
             }
         }
-        if (maxH > 0.0) {
-            this.pictogram.height = maxH + 5
+        if(maxH > 0.0){
+            this.pictogram.height = maxH+5
         }
     }
 
@@ -425,12 +382,10 @@ class CompartmentLinker(
      */
     init {
         attributes.view.visibleProperty.bind(isCompleteViewProperty)
-        methods.view.visibleProperty.bind(isCompleteViewProperty)
         children.view.visibleProperty.bind(isCompleteViewProperty)
         children.previewBox?.visibleProperty?.bind(isCompleteViewProperty)
 
         model.attributes.forEach { attributes += AttributeLinker(it, this) }
-        model.methods.forEach { methods += MethodLinker(it, this) }
         for (element in model.children) {
             add(element)
         }
@@ -443,19 +398,12 @@ class CompartmentLinker(
         checkBorder()
 
         updateSidebarAttributes()
-        updateSidebarMethods()
 
         attributes.view.onAdd {
             updateSidebarAttributes()
         }
         attributes.view.onRemove {
             updateSidebarAttributes()
-        }
-        methods.view.onAdd {
-            updateSidebarMethods()
-        }
-        methods.view.onRemove {
-            updateSidebarMethods()
         }
     }
 
@@ -464,16 +412,16 @@ class CompartmentLinker(
             return container is Package
         }
 
-        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Compartment
-        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is CompartmentLinker
+        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Scene
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is SceneLinker
 
-        override fun createModel(): ModelElement<*> = Compartment()
+        override fun createModel(): ModelElement<*> = Scene()
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is Compartment && parent is ModelLinker<*,*, *> && connectionManager != null) {
-                return CompartmentLinker(model, connectionManager, parent)
+            if (model is Scene && parent is ModelLinker<*,*, *> && connectionManager != null) {
+                return SceneLinker(model, connectionManager, parent)
             } else throw UnsupportedOperationException()
         }
 
-        override val name: String = "Compartment"
+        override val name: String = "Scene"
     }
 }

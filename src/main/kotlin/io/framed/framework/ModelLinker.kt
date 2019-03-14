@@ -33,7 +33,7 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
         val shapeLinker = shapeLinkers.find { it.id == element } ?: return false
         val targetLinker = shapeLinkers.find { it.id == target } ?: return false
 
-        return LinkerManager.linkerItemList.find { it.isLinkerOfType(shapeLinker.model) }?.canCreateIn(targetLinker.model)
+        return LinkerManager.linkerItemList.find { it.isLinkerFor(shapeLinker.model) }?.canCreateIn(targetLinker.model)
                 ?: false
     }
 

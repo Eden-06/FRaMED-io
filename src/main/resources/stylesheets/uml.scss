@@ -10,6 +10,7 @@
   width: -moz-max-content;
   width: -webkit-max-content;
   width: max-content;
+
   & > :not(.resize-handler) {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
   }
@@ -201,6 +202,7 @@
 .jtk-connector.jtk-dragging {
   z-index: 1;
 }
+
 .jtk-endpoint {
   visibility: hidden;
 }
@@ -225,6 +227,7 @@
 *:hover > .connection-source {
   display: block;
 }
+
 .absolute-view:hover > div > .connection-source {
   display: block;
 }
@@ -235,6 +238,7 @@
 
 .double-border {
   position: relative;
+
   &::after {
     content: '';
     position: absolute;
@@ -245,5 +249,20 @@
     right: 3px;
     border: inherit;
     border-radius: inherit;
+  }
+}
+
+.left-double-border {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 5px;
+    bottom: 0;
+    border: inherit;
+    border-width: 0 0 0 1px;
   }
 }

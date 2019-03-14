@@ -1,19 +1,17 @@
 package io.framed
 
-import io.framed.framework.ControllerManager
-import io.framed.framework.LinkerManager
+import io.framed.framework.*
 import io.framed.framework.util.loadAjaxFile
 import io.framed.framework.view.Application
 import io.framed.linker.*
 import io.framed.model.*
+import kotlinx.serialization.KSerializer
 import kotlin.browser.window
 
 /**
  * Entry point of the application.
  */
-var name = ""
-
-@Suppress("UNUSED")
+@Suppress("UNUSED", "UnusedMainParameter")
 fun main(args: Array<String>) {
     // Wait for the body to load.
     window.onload = {
@@ -25,40 +23,68 @@ fun main(args: Array<String>) {
  * Startup the application
  */
 fun init() {
-    PolymorphicSerializer.registerSerializer(CreateRelationship::class, CreateRelationship.serializer(), "io.framed.model.CreateRelationship")
-    PolymorphicSerializer.registerSerializer(DestroyRelationship::class, DestroyRelationship.serializer(), "io.framed.model.DestroyRelationship")
-    PolymorphicSerializer.registerSerializer(Relationship::class, Relationship.serializer(), "io.framed.model.Relationship")
-    PolymorphicSerializer.registerSerializer(Fulfillment::class, Fulfillment.serializer(), "io.framed.model.Fulfillment")
-    PolymorphicSerializer.registerSerializer(Composition::class, Composition.serializer(), "io.framed.model.Composition")
-    PolymorphicSerializer.registerSerializer(Inheritance::class, Inheritance.serializer(), "io.framed.model.Inheritance")
-    PolymorphicSerializer.registerSerializer(Attribute::class, Attribute.serializer(), "io.framed.model.Attribute")
-    PolymorphicSerializer.registerSerializer(Class::class, Class.serializer(), "io.framed.model.Class")
-    PolymorphicSerializer.registerSerializer(Compartment::class, Compartment.serializer(), "io.framed.model.Compartment")
-    PolymorphicSerializer.registerSerializer(Event::class, Event.serializer(), "io.framed.model.Event")
-    PolymorphicSerializer.registerSerializer(Method::class, Method.serializer(), "io.framed.model.Method")
-    PolymorphicSerializer.registerSerializer(Package::class, Package.serializer(), "io.framed.model.Package")
-    PolymorphicSerializer.registerSerializer(Parameter::class, Parameter.serializer(), "io.framed.model.Parameter")
-    PolymorphicSerializer.registerSerializer(RoleType::class, RoleType.serializer(), "io.framed.model.RoleType")
+    // Register relations
+    register(RelationshipLinker, Relationship.serializer())
+    register(FulfillmentLinker, Fulfillment.serializer())
+    register(CompositionLinker, Composition.serializer())
+    register(InheritanceLinker, Inheritance.serializer())
+    register(CreateRelationshipLinker, CreateRelationship.serializer())
+    register(DestroyRelationshipLinker, DestroyRelationship.serializer())
 
-    LinkerManager.register(AttributeLinker)
-    LinkerManager.register(ClassLinker)
-    LinkerManager.register(PackageLinker)
-    LinkerManager.register(EventLinker)
-    LinkerManager.register(MethodLinker)
-    LinkerManager.register(RoleTypeLinker)
-    LinkerManager.register(CompartmentLinker)
+    // Register model elements
+    // The order is important for the context menu
+    register(Parameter.serializer())
+    register(AttributeLinker, Attribute.serializer())
+    register(MethodLinker, Method.serializer())
+    register(RoleTypeLinker, RoleType.serializer())
+    register(EventLinker, Event.serializer())
+    register(ClassLinker, Class.serializer())
+    register(PackageLinker, Package.serializer())
+    register(CompartmentLinker, Compartment.serializer())
+    register(SceneLinker, Scene.serializer())
 
-    LinkerManager.register(CreateRelationshipLinker)
-    LinkerManager.register(DestroyRelationshipLinker)
-    LinkerManager.register(RelationshipLinker)
-    LinkerManager.register(InheritanceLinker)
-    LinkerManager.register(FulfillmentLinker)
-    LinkerManager.register(CompositionLinker)
-
+    // Startup ui
     Application.init()
 
+    // Load demo file
     loadAjaxFile("demo.json") {
         ControllerManager.file = File.fromJSON(it) ?: File.empty()
     }
-    //ControllerManager.file = File.empty()
+}
+
+const val PACKAGE_NAME = "io.framed.model"
+
+/**
+ * Register model element for polymorphic serializer. Through reified generic parameter and common package
+ * the instance and qualified name can be inferred.
+ *
+ * @param serializer The serializer instance. A generator function is automatically created by the `Serializable` annotation.
+ */
+inline fun <reified M : ModelElement<M>> register(serializer: KSerializer<M>) {
+    val className = M::class.simpleName!!
+    PolymorphicSerializer.registerSerializer(M::class, serializer, "$PACKAGE_NAME.$className")
+}
+
+/**
+ * Register linkerInfo and serializer in one step to prevent omitting one of it.
+ * @see register
+ *
+ * @param info LinkerInfoItem of a model shape
+ * @param serializer The serializer instance. A generator function is automatically created by the `Serializable` annotation.
+ */
+inline fun <reified M : ModelElement<M>> register(info: LinkerInfoItem, serializer: KSerializer<M>) {
+    register(serializer)
+    LinkerManager.register(info)
+}
+
+/**
+ * Register linkerInfo and serializer in one step to prevent omitting one of it.
+ * @see register
+ *
+ * @param info LinkerInfoConnection of a model relation
+ * @param serializer The serializer instance. A generator function is automatically created by the `Serializable` annotation.
+ */
+inline fun <reified M : ModelElement<M>> register(info: LinkerInfoConnection, serializer: KSerializer<M>) {
+    register(serializer)
+    LinkerManager.register(info)
 }

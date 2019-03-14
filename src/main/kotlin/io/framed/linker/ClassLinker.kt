@@ -1,6 +1,9 @@
 package io.framed.linker
 
-import de.westermann.kobserve.basic.*
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.join
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.LinkerShapeBox
@@ -144,21 +147,17 @@ class ClassLinker(
         sidebarViewGroup.display = event.target == pictogram
     }
 
-    override val contextMenu = contextMenu {
-        titleProperty.bind(nameProperty.mapBinding { "Class: $it" })
-        addItem(MaterialIcon.ADD, "Add attribute") { event ->
-            attributes += AttributeLinker(Attribute(), this@ClassLinker).also { linker ->
-                linker.focus(event.target)
-            }
+    override val contextMenu = defaultContextMenu()
+
+    override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
+        val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this)
+        when (linker) {
+            is AttributeLinker -> attributes.add(linker)
+            is MethodLinker -> methods.add(linker)
+            else -> super.add(model)
         }
-        addItem(MaterialIcon.ADD, "Add method") { event ->
-            methods += MethodLinker(Method(), this@ClassLinker).also { linker ->
-                linker.focus(event.target)
-            }
-        }
-        addItem(MaterialIcon.DELETE, "Delete") {
-            delete()
-        }
+        linker.focus(pictogram)
+        return linker
     }
 
     override fun remove(linker: ShapeLinker<*, *>) {
@@ -235,10 +234,18 @@ class ClassLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreateIn(container: ModelElement<*>): Boolean {
-            return container is Package || container is Compartment
+            return container is Package || container is Compartment || container is Scene
         }
 
-        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Class
+        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Class
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is ClassLinker
+
+        override fun createModel(): ModelElement<*> = Class()
+        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+            if (model is Class && parent is ModelLinker<*,*, *>) {
+                return ClassLinker(model, parent)
+            } else throw UnsupportedOperationException()
+        }
 
         override val name: String = "Class"
     }

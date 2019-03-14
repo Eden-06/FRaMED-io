@@ -7,11 +7,11 @@ import de.westermann.kobserve.basic.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.*
-import io.framed.model.Compartment
-import io.framed.model.Event
-import io.framed.model.EventType
-import io.framed.model.Package
+import io.framed.framework.view.CheckBox
+import io.framed.framework.view.Sidebar
+import io.framed.framework.view.SidebarGroup
+import io.framed.framework.view.sidebar
+import io.framed.model.*
 import kotlin.math.roundToInt
 
 class EventLinker(
@@ -93,12 +93,7 @@ class EventLinker(
         sidebarViewGroup.display = event.target == pictogram
     }
 
-    override val contextMenu = contextMenu {
-        title = "Event"
-        addItem(MaterialIcon.DELETE, "Delete") {
-            delete()
-        }
-    }
+    override val contextMenu = defaultContextMenu()
 
     init {
         LinkerManager.setup(this)
@@ -110,10 +105,18 @@ class EventLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreateIn(container: ModelElement<*>): Boolean {
-            return container is Package || container is Compartment
+            return container is Package || container is Compartment || container is Scene
         }
 
-        override fun isLinkerOfType(element: ModelElement<*>): Boolean = element is Event
+        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Event
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is EventLinker
+
+        override fun createModel(): ModelElement<*> = Event()
+        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+            if (model is Event && parent is ModelLinker<*,*, *>) {
+                return EventLinker(model, parent)
+            } else throw UnsupportedOperationException()
+        }
 
         override val name: String = "Event"
     }

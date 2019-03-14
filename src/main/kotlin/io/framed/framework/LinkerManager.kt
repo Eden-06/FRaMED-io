@@ -6,6 +6,8 @@ import io.framed.framework.pictogram.ConnectionInfo
 import io.framed.framework.pictogram.Pictogram
 import io.framed.framework.util.History
 import io.framed.framework.util.async
+import io.framed.framework.view.ContextMenu
+import io.framed.framework.view.MaterialIcon
 
 object LinkerManager {
     private fun setupPictogram(linker: Linker<*, *>, pictogram: Pictogram) {
@@ -104,6 +106,34 @@ object LinkerManager {
     var linkerConnectionList: List<LinkerInfoConnection> = emptyList()
 
     fun itemLinkerFor(element: ModelElement<*>): LinkerInfoItem {
-        return linkerItemList.find { it.isLinkerOfType(element) } ?: TODO()
+        return linkerItemList.find { it.isLinkerFor(element) } ?: TODO()
+    }
+
+    fun contextMenu(linker: ShapeLinker<*, *>, contextMenu: ContextMenu) {
+        for (item in linkerItemList) {
+            if (item.canCreateIn(linker.model)) {
+                contextMenu.addItem(MaterialIcon.ADD, "Create ${item.name}") {
+                    linker.add(item.createModel()).focus(it.target)
+                }
+            }
+        }
+    }
+
+    fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager? = null): Linker<*, *> {
+        for (item in linkerItemList) {
+            if (item.isLinkerFor(model) && item.canCreateIn(parent.model)) {
+                return item.createLinker(model, parent, connectionManager)
+            }
+        }
+        throw UnsupportedOperationException("Could not found linker for model of type ${model::class.simpleName}")
+    }
+
+    inline fun <reified L : Linker<*, *>> createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager? = null): L {
+        val linker = LinkerManager.createLinker(model, parent, connectionManager)
+        if (linker is L) {
+            return linker
+        } else {
+            throw UnsupportedOperationException("Could not cast linker of type ${linker::class.simpleName} to ${L::class.simpleName}")
+        }
     }
 }
