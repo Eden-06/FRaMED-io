@@ -27,10 +27,20 @@ class DestroyRelationshipLinker(
         line(ConnectionLine.Type.RECTANGLE) {
             stroke = Color(0, 0, 0)
             strokeWidth = 1
-        }
 
+            dashArray = arrayOf(3, 3)
+        }
         sourceStyle = null
-        targetStyle = null
+        targetStyle = connectionEnd {
+            width = 20
+            length = 20
+            foldback = 1.0
+            paintStyle {
+                stroke = Color(0, 0, 0)
+                strokeWidth = 1
+                fill = Color(0, 0, 0)
+            }
+        }
     }
 
     override val sidebar = sidebar {

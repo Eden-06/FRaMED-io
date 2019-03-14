@@ -206,6 +206,8 @@ class HtmlRelation(
         paintStyle = jsPlumbPaintStyle {
             stroke = if (isSelected) "#2980b9" else line.paintStyle.stroke.toCss()
             strokeWidth = line.paintStyle.strokeWidth
+
+            dashstyle = line.paintStyle.dashArray.joinToString(" ")
         }
     }
 
