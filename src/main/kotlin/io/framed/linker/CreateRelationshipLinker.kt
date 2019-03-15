@@ -104,7 +104,7 @@ class CreateRelationshipLinker(
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return (target is RoleTypeLinker) && source is EventLinker
+            return (target is RoleTypeLinker || target is SceneLinker) && source is EventLinker
         }
     }
 }

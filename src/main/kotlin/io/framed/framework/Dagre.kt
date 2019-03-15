@@ -2,6 +2,7 @@ package io.framed.framework
 
 /**
  * The class connects the Dagre-library to the middleware.
+ * @author Sebastian
  */
 class Dagre {
     companion object {

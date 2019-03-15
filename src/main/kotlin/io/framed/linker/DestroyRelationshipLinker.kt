@@ -9,6 +9,11 @@ import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
 import io.framed.model.DestroyRelationship
 
+/**
+ * Model class for an crom compartment.
+ *
+ * @author Sebastian
+ */
 class DestroyRelationshipLinker(
         override val model: DestroyRelationship,
         override val manager: ConnectionManager
@@ -100,11 +105,11 @@ class DestroyRelationshipLinker(
         override val info = ConnectionInfo("Destroy Relationship", MaterialIcon.ADD)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is RoleTypeLinker
+            return source is RoleTypeLinker || source is SceneLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return (target is EventLinker) && source is RoleTypeLinker
+            return target is EventLinker && (source is RoleTypeLinker || source is SceneLinker)
         }
     }
 }
