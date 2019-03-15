@@ -51,6 +51,17 @@ class CreateRelationshipLinker(
             input("Source cardinality", sourceCardinalityProperty)
             input("Target cardinality", targetCardinalityProperty)
         }
+
+        group("Structure") {
+            button("Convert to destroy") {
+                val source = sourceIdProperty.get()
+                val target = targetIdProperty.get()
+                val manager = manager
+                delete()
+
+                manager.createConnection(target, source, DestroyRelationshipLinker.info).focus()
+            }
+        }
     }
 
     override val contextMenu = contextMenu {
