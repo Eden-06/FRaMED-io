@@ -23,7 +23,7 @@ class ClassLinker(
 ) : PreviewLinker<Class, BoxShape, TextShape> {
 
     override val nameProperty = property(model::name)
-            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9 ])*".toRegex())::validate)
+            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9_])*".toRegex())::validate)
             .trackHistory()
     override var name by nameProperty
 
@@ -234,7 +234,7 @@ class ClassLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreateIn(container: ModelElement<*>): Boolean {
-            return container is Package || container is Compartment || container is Scene
+            return container is Package || container is Compartment
         }
 
         override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Class

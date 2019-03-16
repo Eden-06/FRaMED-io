@@ -93,11 +93,21 @@ class CompositionLinker(
         override val info = ConnectionInfo("Composition", MaterialIcon.ADD)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is ClassLinker || source is RoleTypeLinker || source is EventLinker
+            return source is RoleTypeLinker || source is ClassLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) && (target is ClassLinker || target is RoleTypeLinker || target is EventLinker)
+            return source != target && (
+                    (target is RoleTypeLinker && source is RoleTypeLinker) ||
+                            (target is ClassLinker && source is ClassLinker)
+                    )
         }
+
+        override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is Composition
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is CompositionLinker
+
+        override fun createModel(source: Long, target: Long): ModelConnection<*> = Composition(source, target)
+        override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
+                if (model is Composition) CompositionLinker(model, connectionManager) else throw UnsupportedOperationException()
     }
 }

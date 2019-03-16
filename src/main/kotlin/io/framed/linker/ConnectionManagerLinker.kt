@@ -1,10 +1,7 @@
 package io.framed.linker
 
 import de.westermann.kobserve.EventHandler
-import io.framed.framework.ConnectionLinker
-import io.framed.framework.ConnectionManager
-import io.framed.framework.ModelConnection
-import io.framed.framework.ModelLinker
+import io.framed.framework.*
 import io.framed.framework.pictogram.ConnectionInfo
 import io.framed.framework.util.LinkerConnectionBox
 import io.framed.framework.view.CyclicChooser
@@ -26,24 +23,12 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
     }
 
     override fun add(model: ModelConnection<*>) {
-        when (model) {
-            is Relationship -> connectionBox += RelationshipLinker(model, this)
-            is Composition -> connectionBox += CompositionLinker(model, this)
-            is Inheritance -> connectionBox += InheritanceLinker(model, this)
-            is Fulfillment -> connectionBox += FulfillmentLinker(model, this)
-            is CreateRelationship -> connectionBox += CreateRelationshipLinker(model, this)
-            is DestroyRelationship -> connectionBox += DestroyRelationshipLinker(model, this)
-        }
+        connectionBox += LinkerManager.createLinker(model, this)
     }
 
     override fun remove(linker: ConnectionLinker<*>) {
-        when (linker) {
-            is RelationshipLinker -> connectionBox -= linker
-            is CompositionLinker -> connectionBox -= linker
-            is InheritanceLinker -> connectionBox -= linker
-            is FulfillmentLinker -> connectionBox -= linker
-            is CreateRelationshipLinker -> connectionBox -= linker
-            is DestroyRelationshipLinker -> connectionBox -= linker
+        if (linker in connectionBox) {
+            connectionBox -= linker
         }
     }
 
@@ -70,15 +55,10 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
 
 
     override fun createConnection(source: Long, target: Long, type: ConnectionInfo): ConnectionLinker<*> {
-        return when (type) {
-            RelationshipLinker.info -> RelationshipLinker(Relationship(source, target), this).also(connectionBox::add)
-            InheritanceLinker.info -> InheritanceLinker(Inheritance(source, target), this).also(connectionBox::add)
-            CompositionLinker.info -> CompositionLinker(Composition(source, target), this).also(connectionBox::add)
-            FulfillmentLinker.info -> FulfillmentLinker(Fulfillment(source, target), this).also(connectionBox::add)
-            CreateRelationshipLinker.info -> CreateRelationshipLinker(CreateRelationship(source, target), this).also(connectionBox::add)
-            DestroyRelationshipLinker.info -> DestroyRelationshipLinker(DestroyRelationship(source, target), this).also(connectionBox::add)
-            else -> throw IllegalArgumentException()
-        }
+        val model = LinkerManager.createConnectionModelByType(type, source, target)
+        val linker = LinkerManager.createLinker<ConnectionLinker<*>>(model, this)
+        connectionBox += linker
+        return linker
     }
 
     private var isInit = false

@@ -21,19 +21,7 @@ class DestroyRelationship() : ModelConnection<DestroyRelationship>() {
      */
     var name: String = ""
 
-    /**
-     * Cardinality for the source side of this connection.
-     */
-    var sourceCardinality: String = "*"
-
-    /**
-     * Cardinality for the target side of this connection.
-     */
-    var targetCardinality: String = "*"
-
     override fun copy() = DestroyRelationship().also { new ->
         new.name = name
-        new.sourceCardinality = sourceCardinality
-        new.targetCardinality = targetCardinality
     }
 }

@@ -104,5 +104,12 @@ class InheritanceLinker(
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
             return canStart(source) && target is ClassLinker && source != target
         }
+
+        override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is Inheritance
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is InheritanceLinker
+
+        override fun createModel(source: Long, target: Long): ModelConnection<*> = Inheritance(source, target)
+        override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
+                if (model is Inheritance) InheritanceLinker(model, connectionManager) else throw UnsupportedOperationException()
     }
 }

@@ -11,10 +11,7 @@ import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
-import io.framed.model.Attribute
-import io.framed.model.Compartment
-import io.framed.model.Method
-import io.framed.model.RoleType
+import io.framed.model.*
 import kotlin.math.roundToInt
 
 /**
@@ -239,7 +236,7 @@ class RoleTypeLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreateIn(container: ModelElement<*>): Boolean {
-            return container is Compartment
+            return container is Compartment || container is Scene
         }
 
         override fun isLinkerFor(element: ModelElement<*>): Boolean = element is RoleType

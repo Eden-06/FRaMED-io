@@ -1,13 +1,17 @@
 # FRaMED-io
 This is the repository for the web-based reimplimentation of the FRaMED 2.0 editor for the family of role-based modeling languages.
 
-## Execute demo
-To simply run the project execute
+## Run demo
+The easiest way to start FRaMED-io is:
 ```bash
 ./gradlew run
 ```
-This will download all needed packages and starts an node.js server on port `3000`.
+and open http://localhost:3000 afterwards
 
+This command will download all needed dependencies and starts an node.js server on port `3000`.
+For this you need `node` and `npm` in the path variable.
+
+## Setup development environment
 For development start the node.js server manually.
 ```bash
 cd web

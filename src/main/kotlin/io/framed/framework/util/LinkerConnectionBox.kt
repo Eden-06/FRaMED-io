@@ -57,5 +57,7 @@ class LinkerConnectionBox<M : ModelConnection<out M>, L : ConnectionLinker<out M
     operator fun plusAssign(linker: L) = add(linker)
     operator fun minusAssign(linker: L) = remove(linker)
 
+    operator fun contains(linker: L): Boolean = linker in linkers
+
     val onRemove = EventHandler<Unit>()
 }

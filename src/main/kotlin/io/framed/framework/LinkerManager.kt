@@ -119,21 +119,32 @@ object LinkerManager {
         }
     }
 
-    fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager? = null): Linker<*, *> {
-        for (item in linkerItemList) {
-            if (item.isLinkerFor(model) && item.canCreateIn(parent.model)) {
-                return item.createLinker(model, parent, connectionManager)
-            }
-        }
-        throw UnsupportedOperationException("Could not found linker for model of type ${model::class.simpleName}")
-    }
-
     inline fun <reified L : Linker<*, *>> createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager? = null): L {
-        val linker = LinkerManager.createLinker(model, parent, connectionManager)
+        val linker = linkerItemList.firstOrNull { it.isLinkerFor(model) && it.canCreateIn(parent.model) }
+                ?.createLinker(model, parent, connectionManager)
+                ?: throw UnsupportedOperationException("Could not find linker for model of type ${model::class.simpleName}")
+
         if (linker is L) {
             return linker
         } else {
             throw UnsupportedOperationException("Could not cast linker of type ${linker::class.simpleName} to ${L::class.simpleName}")
         }
+    }
+
+    inline fun <reified L : Linker<*, *>> createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): L {
+        val linker = linkerConnectionList.firstOrNull { it.isLinkerFor(model) }
+                ?.createLinker(model, connectionManager)
+                ?: throw UnsupportedOperationException("Could not find linker for model of type ${model::class.simpleName}")
+
+        if (linker is L) {
+            return linker
+        } else {
+            throw UnsupportedOperationException("Could not cast linker of type ${linker::class.simpleName} to ${L::class.simpleName}")
+        }
+    }
+
+    fun createConnectionModelByType(type: ConnectionInfo, source: Long, target: Long): ModelConnection<*> {
+        return linkerConnectionList.firstOrNull { it.info == type }?.createModel(source, target)
+                ?: throw UnsupportedOperationException("Could not find linker for model of type ${type.name}")
     }
 }

@@ -27,6 +27,7 @@ fun init() {
     register(RelationshipLinker, Relationship.serializer())
     register(FulfillmentLinker, Fulfillment.serializer())
     register(CompositionLinker, Composition.serializer())
+    register(AggregationLinker, Aggregation.serializer())
     register(InheritanceLinker, Inheritance.serializer())
     register(CreateRelationshipLinker, CreateRelationship.serializer())
     register(DestroyRelationshipLinker, DestroyRelationship.serializer())

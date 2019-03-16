@@ -88,11 +88,21 @@ class RelationshipLinker(
         override val info = ConnectionInfo("Relationship", MaterialIcon.ADD)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is RoleTypeLinker
+            return source is RoleTypeLinker || source is ClassLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return target is RoleTypeLinker && source is RoleTypeLinker && source != target
+            return source != target && (
+                    (target is RoleTypeLinker && source is RoleTypeLinker) ||
+                            (target is ClassLinker && source is ClassLinker)
+                    )
         }
+
+        override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is Relationship
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is RelationshipLinker
+
+        override fun createModel(source: Long, target: Long): ModelConnection<*> = Relationship(source, target)
+        override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
+                if (model is Relationship) RelationshipLinker(model, connectionManager) else throw UnsupportedOperationException()
     }
 }
