@@ -7,7 +7,7 @@ import io.framed.framework.util.LinkerConnectionBox
 import io.framed.framework.view.CyclicChooser
 import io.framed.framework.view.iconView
 import io.framed.framework.view.textView
-import io.framed.model.*
+import io.framed.model.Connections
 
 class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionManager {
 

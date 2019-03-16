@@ -19,7 +19,7 @@ class Package() : ModelElementMetadata<Package>() {
     /**
      * Name of this package.
      */
-    var name: String = "Unnamed package"
+    var name: String = "UnnamedPackage"
 
     @Serializable(with = PolymorphicSetSerializer::class)
     var children: Set<ModelElement<*>> = emptySet()

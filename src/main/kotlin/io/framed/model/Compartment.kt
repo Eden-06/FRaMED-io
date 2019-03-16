@@ -20,7 +20,7 @@ class Compartment() : ModelElement<Compartment>() {
     /**
      * Name of this class
      */
-    var name: String = "Unnamed compartment"
+    var name: String = "UnnamedCompartment"
 
     /**
      * List of class attributes

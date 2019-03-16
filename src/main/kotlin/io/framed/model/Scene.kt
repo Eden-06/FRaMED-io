@@ -18,7 +18,7 @@ class Scene() : ModelElement<Scene>() {
     /**
      * Name of this scene
      */
-    var name: String = "Unnamed scene"
+    var name: String = "UnnamedScene"
 
     /**
      * List of scene attributes

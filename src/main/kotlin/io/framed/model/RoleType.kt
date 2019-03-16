@@ -19,7 +19,7 @@ class RoleType() : ModelElement<RoleType>() {
     /**
      * Name of this roleType
      */
-    var name: String = "Unnamed role"
+    var name: String = "UnnamedRole"
 
     /**
      * List of roleType attributes

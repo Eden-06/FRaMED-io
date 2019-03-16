@@ -23,7 +23,7 @@ class ClassLinker(
 ) : PreviewLinker<Class, BoxShape, TextShape> {
 
     override val nameProperty = property(model::name)
-            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9_])*".toRegex())::validate)
+            .validate(RegexValidator.IDENTIFIER::validate)
             .trackHistory()
     override var name by nameProperty
 

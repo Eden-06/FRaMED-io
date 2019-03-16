@@ -19,7 +19,7 @@ class Class() : ModelElement<Class>() {
     /**
      * Name of this class
      */
-    var name: String = "Unnamed class"
+    var name: String = "UnnamedClass"
 
     /**
      * List of class attributes

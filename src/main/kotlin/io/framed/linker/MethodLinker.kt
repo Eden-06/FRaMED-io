@@ -21,10 +21,10 @@ class MethodLinker(
 ) : ShapeLinker<Method, TextShape> {
 
     override val nameProperty = property(model::name)
-            .validate(RegexValidator("[a-zA-Z]([a-zA-Z0-9])*".toRegex())::validate)
+            .validate(RegexValidator.IDENTIFIER::validate)
             .trackHistory()
     private val typeProperty = property(model::type)
-            .validate(RegexValidator("([a-zA-Z]([a-zA-Z0-9])*)?".toRegex())::validate)
+            .validate(RegexValidator.IDENTIFIER::validate)
             .trackHistory()
 
     override val name by nameProperty
