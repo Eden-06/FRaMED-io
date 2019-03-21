@@ -332,6 +332,10 @@ abstract class HtmlShape(
             val parentWidth = container.clientWidth
             val parentHeight = container.clientHeight
 
+            if (parentWidth <= 0 || parentHeight <= 0) {
+                return@onDrag
+            }
+
             val xDiff = min(abs(newLeft), abs(parentWidth - newLeft))
             val yDiff = min(abs(newTop), abs(parentHeight - newTop))
 

@@ -340,7 +340,6 @@ abstract class View<V : HTMLElement>(view: V) {
                 h = h?.parentElement as? HTMLElement
             }
             if (allowDrag && !prevented) {
-                console.log("down", html)
                 it.stopPropagation()
 
                 Root.onMouseUp += dragEnd
@@ -354,7 +353,6 @@ abstract class View<V : HTMLElement>(view: V) {
         onMouseMove {
             val added = dragEnd in Root.onMouseUp
             if (isMouseDown && !isCurrentlyDragging && allowDrag && added) {
-                console.log("move", html, added)
                 it.preventDefault()
                 it.stopPropagation()
 
