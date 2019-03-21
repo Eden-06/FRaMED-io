@@ -65,8 +65,9 @@ class NavigationView : View<HTMLDivElement>("div") {
      */
     var zoom: Double = 1.0
         private set(value) {
+            var rounded = ((value * 10).toInt()).toDouble() / 10
             val old = field
-            field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, value))
+            field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, rounded))
 
             if (old != field) {
                 onZoom.emit(field)
@@ -98,7 +99,6 @@ class NavigationView : View<HTMLDivElement>("div") {
             }
 
             val p = value.position
-
             zoom = (client / size).min()
             pan = p + (client / 2.0 - (size / 2.0))
 
