@@ -212,6 +212,7 @@ abstract class HtmlShape(
             }
         }
         htmlRenderer.selectable += this@HtmlShape
+        setZoom(htmlRenderer.zoom)
         assignedShape = shape
         html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
 
@@ -361,6 +362,7 @@ abstract class HtmlShape(
         }
 
         htmlRenderer.selectable += this@HtmlShape
+        setZoom(htmlRenderer.zoom)
         assignedShape = shape
         html.setAttribute("data-id", shape.id?.toString() ?: "NULL")
     }

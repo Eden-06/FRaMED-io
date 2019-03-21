@@ -293,6 +293,7 @@ class HtmlRelation(
         }?.let(references::add)
 
         renderer.selectable += this
+        setZoom(renderer.zoom)
     }
 
     companion object {
