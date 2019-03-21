@@ -252,17 +252,13 @@
   }
 }
 
-.left-double-border {
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    display: block;
-    top: 0;
-    left: 5px;
-    bottom: 0;
-    border: inherit;
-    border-width: 0 0 0 1px;
-  }
+.left-double-border::after {
+  content: '';
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 5px;
+  bottom: 0;
+  border: inherit;
+  border-width: 0 0 0 1px;
 }
