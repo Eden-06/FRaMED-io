@@ -13,6 +13,9 @@ import io.framed.framework.util.async
 import io.framed.framework.util.point
 import io.framed.framework.view.*
 import org.w3c.dom.HTMLElement
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 import kotlin.math.abs
 
 class HtmlConnections(
@@ -191,6 +194,7 @@ class HtmlConnections(
         html.appendChild(handler.html)
         handler.id = "shape-${shape.id}-${endpointMap.size}"
         handler.classes += "connection-source"
+        handler.preventDrag()
         handler.onMouseMove {
             it.stopPropagation()
         }

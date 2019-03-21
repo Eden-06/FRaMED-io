@@ -9,6 +9,8 @@ import io.framed.framework.util.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.get
+import org.w3c.dom.set
 import kotlin.browser.document
 
 /**
@@ -282,6 +284,10 @@ abstract class View<V : HTMLElement>(view: V) {
         html.click()
     }
 
+    fun preventDrag() {
+        html.dataset["prevent"] = "true"
+    }
+
     init {
         onClick.bind(html, "click")
         onContext.bind(html, "contextmenu")
@@ -323,7 +329,18 @@ abstract class View<V : HTMLElement>(view: V) {
         onMouseDown {
             isMouseDown = true
 
-            if (allowDrag) {
+            var prevented = false
+
+            var h = it.target as? HTMLElement
+            while (h != null) {
+                if (h?.dataset?.get("prevent") == "true") {
+                    prevented = true
+                    break
+                }
+                h = h?.parentElement as? HTMLElement
+            }
+            if (allowDrag && !prevented) {
+                console.log("down", html)
                 it.stopPropagation()
 
                 Root.onMouseUp += dragEnd
@@ -335,7 +352,9 @@ abstract class View<V : HTMLElement>(view: V) {
         }
 
         onMouseMove {
-            if (isMouseDown && !isCurrentlyDragging && allowDrag) {
+            val added = dragEnd in Root.onMouseUp
+            if (isMouseDown && !isCurrentlyDragging && allowDrag && added) {
+                console.log("move", html, added)
                 it.preventDefault()
                 it.stopPropagation()
 
