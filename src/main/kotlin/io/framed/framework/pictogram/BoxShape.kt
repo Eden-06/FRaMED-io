@@ -89,15 +89,15 @@ class BoxShape(id: Long?) : Shape(id) {
     }
 
     private fun renderShape(shape: Shape) {
-        if (shape.parent != this) {
-            shape.parent = this
-            if (!shape.layerProperty.isBound) {
-                shape.layerProperty.bind(layerProperty)
-            }
+        shape.parent = this
 
-            if (shape is BoxShape) {
-                shape.render()
-            }
+        if (shape.layerProperty.isBound) {
+            shape.layerProperty.unbind()
+        }
+        shape.layerProperty.bind(layerProperty)
+
+        if (shape is BoxShape) {
+            shape.render()
         }
     }
 }

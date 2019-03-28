@@ -34,6 +34,7 @@ object ControllerManager {
             val layer = layers.getOrPut(linker.id) {
                 Layer()
             }
+            linker.container.layer = layer
             Controller(linker, layer)
         }
         Application.loadController(controller, clear)

@@ -383,7 +383,7 @@ class PackageLinker(
 
         override fun createModel(): ModelElement<*> = Package()
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is Package && parent is ModelLinker<*,*, *> && connectionManager != null) {
+            if (model is Package && parent is ModelLinker<*, *, *> && connectionManager != null) {
                 return PackageLinker(model, connectionManager, parent)
             } else throw UnsupportedOperationException()
         }
