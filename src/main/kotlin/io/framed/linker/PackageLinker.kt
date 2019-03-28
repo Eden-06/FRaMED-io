@@ -308,6 +308,7 @@ class PackageLinker(
                     padding = box(10.0)
                 }
             }
+
             borderBox += shape
             borderShapes += shape
         }

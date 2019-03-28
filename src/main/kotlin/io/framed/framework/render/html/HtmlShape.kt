@@ -325,10 +325,8 @@ abstract class HtmlShape(
         onDrag { e ->
             val event = htmlRenderer.directDragView(e, view, container)
 
-            var (newLeft, newTop) = htmlRenderer.snapPoint(Point(
-                    left + event.delta.x,
-                    top + event.delta.y
-            ), parent = parentHtmlBoxShape.container).point
+            var newLeft = shape.left + event.delta.x
+            var newTop = shape.top + event.delta.y
 
             val parentWidth = container.clientWidth
             val parentHeight = container.clientHeight

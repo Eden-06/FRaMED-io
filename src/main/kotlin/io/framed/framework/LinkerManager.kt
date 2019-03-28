@@ -113,7 +113,11 @@ object LinkerManager {
         for (item in linkerItemList) {
             if (item.canCreateIn(linker.model)) {
                 contextMenu.addItem(MaterialIcon.ADD, "Create ${item.name}") {
-                    linker.add(item.createModel()).focus(it.target)
+                    val new = linker.add(item.createModel())
+                    new.focus(it.target)
+
+                    new.pictogram.left = it.diagram.x - linker.pictogram.left
+                    new.pictogram.top = it.diagram.y - linker.pictogram.top
                 }
             }
         }

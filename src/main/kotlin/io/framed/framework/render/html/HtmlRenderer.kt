@@ -263,15 +263,15 @@ class HtmlRenderer(
         var snapToViewX = false
         var snapToViewY = false
 
-        val gridSize = navigationView.gridSize
+        val gridSize = navigationView.gridSize.toDouble()
 
         if (snapToGrid) {
             p = Point(
                     if (direction != SnapDirection.VERTICAL) {
-                        ((p.x + gridSize / 2) / gridSize).roundToInt() * gridSize.toDouble()
+                        ((p.x + gridSize / 2) / gridSize - 0.01).roundToInt() * gridSize
                     } else p.x,
                     if (direction != SnapDirection.HORIZONTAL) {
-                        ((p.y + gridSize / 2) / gridSize).roundToInt() * gridSize.toDouble()
+                        ((p.y + gridSize / 2) / gridSize - 0.01).roundToInt() * gridSize
                     } else p.y
             )
         }
