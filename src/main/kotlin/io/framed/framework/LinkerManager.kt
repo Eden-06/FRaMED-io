@@ -116,8 +116,11 @@ object LinkerManager {
                     val new = linker.add(item.createModel())
                     new.focus(it.target)
 
-                    new.pictogram.left = it.diagram.x - linker.pictogram.left
-                    new.pictogram.top = it.diagram.y - linker.pictogram.top
+                    val (left, top) = if (it.target == linker.pictogram) {
+                        linker.pictogram.left to linker.pictogram.top
+                    } else 0.0 to 0.0
+                    new.pictogram.left = it.diagram.x - left
+                    new.pictogram.top = it.diagram.y - top
                 }
             }
         }
