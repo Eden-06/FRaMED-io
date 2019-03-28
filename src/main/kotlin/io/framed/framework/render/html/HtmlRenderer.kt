@@ -267,12 +267,8 @@ class HtmlRenderer(
 
         if (snapToGrid) {
             p = Point(
-                    if (direction != SnapDirection.VERTICAL) {
-                        ((p.x + gridSize / 2) / gridSize - 0.01).roundToInt() * gridSize
-                    } else p.x,
-                    if (direction != SnapDirection.HORIZONTAL) {
-                        ((p.y + gridSize / 2) / gridSize - 0.01).roundToInt() * gridSize
-                    } else p.y
+                    if (direction != SnapDirection.VERTICAL) (p.x / gridSize).roundToInt() * gridSize else p.x,
+                    if (direction != SnapDirection.HORIZONTAL) (p.y / gridSize).roundToInt() * gridSize else p.y
             )
         }
 

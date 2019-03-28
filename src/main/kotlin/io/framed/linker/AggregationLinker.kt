@@ -21,7 +21,7 @@ class AggregationLinker(
     override val nameProperty = property(model::name).trackHistory()
     override val name by nameProperty
 
-    private val sourceCardinalityProperty = property(model::sourceCardinality).mapBinding { it }
+    private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
     private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 
     override val sourceIdProperty = property(model::sourceId).trackHistory()
