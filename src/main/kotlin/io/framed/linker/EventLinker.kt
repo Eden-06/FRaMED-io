@@ -22,9 +22,7 @@ class EventLinker(
     private val typeProperty = property(model::type).trackHistory()
     private val symbolProperty = typeProperty.mapBinding { it.symbol }
 
-    override val nameProperty: ReadOnlyProperty<String> = symbolProperty.mapBinding {
-        it?.let { it::class.simpleName } ?: "Unknown"
-    }
+    override val nameProperty: ReadOnlyProperty<String> = typeProperty.mapBinding { it.printableName }
     override val name: String by nameProperty
 
     private val descriptionProperty = property(model::desc).trackHistory()
@@ -95,6 +93,21 @@ class EventLinker(
 
     override val contextMenu = defaultContextMenu()
 
+    override fun updateLabelBindings() {
+        var label = pictogram.labels.find { it.id == "name" }
+        if (label == null) {
+            label = Label(id = "name")
+            pictogram.labels += label
+        }
+
+        if (label.textProperty.isBound) {
+            label.textProperty.unbind()
+        }
+        label.textProperty.bindBidirectional(descriptionProperty)
+
+        super.updateLabelBindings()
+    }
+
     init {
         LinkerManager.setup(this)
 
@@ -113,7 +126,7 @@ class EventLinker(
 
         override fun createModel(): ModelElement<*> = Event()
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is Event && parent is ModelLinker<*,*, *>) {
+            if (model is Event && parent is ModelLinker<*, *, *>) {
                 return EventLinker(model, parent)
             } else throw UnsupportedOperationException()
         }
