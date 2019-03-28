@@ -42,6 +42,11 @@ class HtmlLabel(
             marginTop = label.topProperty.value
         }?.let(listeners::add)
 
+        if (boundShape != null) {
+            left = boundShape.left
+            top = boundShape.top
+        }
+
         allowDrag = true
         onMouseDown { event ->
             event.stopPropagation()
