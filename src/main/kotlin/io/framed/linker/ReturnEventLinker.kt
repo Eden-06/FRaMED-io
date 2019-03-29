@@ -14,10 +14,10 @@ import io.framed.framework.view.sidebar
 import io.framed.model.*
 import kotlin.math.roundToInt
 
-class EventLinker(
-        override val model: Event,
+class ReturnEventLinker(
+        override val model: ReturnEvent,
         override val parent: ModelLinker<*, *, *>
-) : PreviewLinker<Event, IconShape, IconShape> {
+) : PreviewLinker<ReturnEvent, IconShape, IconShape> {
 
     private val typeProperty = property(model::type).trackHistory()
     private val symbolProperty = typeProperty.mapBinding { it.symbol }
@@ -27,6 +27,9 @@ class EventLinker(
 
     private val descriptionProperty = property(model::desc).trackHistory()
 
+    private val returnEventProperty = property(model::returnEvent).trackHistory()
+    var returnEvent by returnEventProperty
+
     override val pictogram = iconShape(symbolProperty) {
         style {
             background = color(255, 255, 255)
@@ -35,6 +38,11 @@ class EventLinker(
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
                 radius = box(20.0)
+
+                double = returnEvent
+                returnEventProperty.onChange {
+                    double = returnEvent
+                }
             }
             padding = box(10.0)
         }
@@ -48,6 +56,11 @@ class EventLinker(
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
                 radius = box(20.0)
+
+                double = returnEvent
+                returnEventProperty.onChange {
+                    double = returnEvent
+                }
             }
             padding = box(10.0)
         }
@@ -105,16 +118,16 @@ class EventLinker(
             return container is Package || container is Compartment || container is Scene
         }
 
-        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Event
-        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is EventLinker
+        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is ReturnEvent
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is ReturnEventLinker
 
-        override fun createModel(): ModelElement<*> = Event()
+        override fun createModel(): ModelElement<*> = ReturnEvent()
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is Event && parent is ModelLinker<*, *, *>) {
-                return EventLinker(model, parent)
+            if (model is ReturnEvent && parent is ModelLinker<*, *, *>) {
+                return ReturnEventLinker(model, parent)
             } else throw UnsupportedOperationException()
         }
 
-        override val name: String = "Event"
+        override val name: String = "Return event"
     }
 }

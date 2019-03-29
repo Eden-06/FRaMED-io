@@ -90,7 +90,7 @@ class CompartmentLinker(
         borderBox = boxShape(BoxShape.Position.BORDER) {}
 
         children.conditionalContainer(borderBox) {
-            it is EventLinker && it.returnEvent
+            it is ReturnEventLinker
         }
 
         style {

@@ -39,6 +39,7 @@ fun init() {
     register(MethodLinker, Method.serializer())
     register(RoleTypeLinker, RoleType.serializer())
     register(EventLinker, Event.serializer())
+    register(ReturnEventLinker, ReturnEvent.serializer())
     register(ClassLinker, Class.serializer())
     register(PackageLinker, Package.serializer())
     register(CompartmentLinker, Compartment.serializer())

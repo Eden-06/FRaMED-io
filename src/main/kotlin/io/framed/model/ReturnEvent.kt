@@ -7,9 +7,9 @@ import kotlinx.serialization.Serializable
  * The model defines an model of the modeling language
  */
 @Serializable
-class Event() : ModelElement<Event>() {
+class ReturnEvent() : ModelElement<ReturnEvent>() {
 
-    constructor(init: (Event) -> Unit) : this() {
+    constructor(init: (ReturnEvent) -> Unit) : this() {
         init(this)
     }
 
@@ -22,7 +22,9 @@ class Event() : ModelElement<Event>() {
      */
     var desc: String = ""
 
-    override fun copy() = Event { new ->
+    var returnEvent: Boolean = true
+
+    override fun copy() = ReturnEvent { new ->
         new.type = type
         new.desc = desc
     }
