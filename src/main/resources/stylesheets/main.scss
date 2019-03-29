@@ -170,6 +170,7 @@ select {
     padding-right: 0.4rem;
     float: left;
     margin-top: -0.05rem;
+    cursor: default;
   }
 
   .icon-view {
@@ -203,10 +204,12 @@ select {
 
 .menu {
   position: relative;
+  cursor: pointer;
 
   span:not(.icon-view) {
     display: block;
     padding: 0 0.8rem;
+    cursor: pointer;
 
     &:hover {
       background: rgba($text-color, 0.1);
@@ -215,6 +218,7 @@ select {
 
   .list-view > .text-view {
     padding-left: 2rem;
+    cursor: default;
   }
 
   .icon-view:first-child {
@@ -463,6 +467,7 @@ select {
       .text-view {
         padding-right: 1rem;
         display: inline-block;
+        cursor: pointer;
       }
 
       &:hover {
@@ -495,6 +500,7 @@ table {
     font-size: 1.3rem;
     padding: 0.5rem;
     display: block;
+    cursor: default;
   }
 
   .sidebar-group {
@@ -515,6 +521,7 @@ table {
 
       span {
         padding: 0.2rem;
+        cursor: default;
       }
 
       input, select {
