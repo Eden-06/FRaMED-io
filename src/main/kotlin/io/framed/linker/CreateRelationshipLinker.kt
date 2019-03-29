@@ -98,13 +98,14 @@ class CreateRelationshipLinker(
         override val info = ConnectionInfo("Create Relationship", MaterialIcon.ADD)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is EventLinker
+            return source is EventLinker || source is ReturnEventLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return (target is RoleTypeLinker || target is SceneLinker) && source is EventLinker
+            return (source is EventLinker && (target is RoleTypeLinker || target is SceneLinker) && source isSibling target) ||
+                    (source is ReturnEventLinker && (target is RoleTypeLinker || target is SceneLinker) && !(source isParentAncestorOf target))
         }
-        
+
         override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is CreateRelationship
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is CreateRelationshipLinker
 

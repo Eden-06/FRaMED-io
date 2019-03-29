@@ -10,4 +10,7 @@ interface LinkerInfoItem {
     fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *>
 
     val name: String
+
+    val isConnectable: Boolean
+        get() = true
 }

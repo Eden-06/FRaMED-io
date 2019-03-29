@@ -40,6 +40,10 @@ interface ConnectionManager {
         return LinkerManager.linkerConnectionList.asSequence().filter { it.canCreate(sourceLinker, targetLinker) }.map { it.info }.toList()
     }
 
+    fun isConnectable(shape: Long): Boolean {
+        return LinkerManager.itemLinkerFor(getLinkerById(shape) ?: return false).isConnectable
+    }
+
     fun init()
 
     fun delete(idList: List<Long>) {

@@ -2,10 +2,8 @@ package io.framed.framework
 
 import de.westermann.kobserve.basic.FunctionAccessor
 import de.westermann.kobserve.basic.FunctionProperty
-import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.ConnectionInfo
 import io.framed.framework.pictogram.Pictogram
-import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.History
 import io.framed.framework.util.async
 import io.framed.framework.view.ContextMenu
@@ -109,6 +107,10 @@ object LinkerManager {
 
     fun itemLinkerFor(element: ModelElement<*>): LinkerInfoItem {
         return linkerItemList.find { it.isLinkerFor(element) } ?: TODO()
+    }
+
+    fun itemLinkerFor(linker: Linker<*, *>): LinkerInfoItem {
+        return linkerItemList.find { it.isLinkerFor(linker) } ?: TODO()
     }
 
     fun contextMenu(linker: ShapeLinker<*, *>, contextMenu: ContextMenu) {

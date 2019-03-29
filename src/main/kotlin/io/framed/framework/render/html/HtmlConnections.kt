@@ -105,7 +105,9 @@ class HtmlConnections(
     fun addShape(shape: Shape) {
         async {
             val originalId = shape.id ?: return@async
-            createEndpointInternal(shape, viewModel.handler.canConnectionStart(originalId))
+            if (viewModel.handler.isConnectable(originalId)) {
+                createEndpointInternal(shape, viewModel.handler.canConnectionStart(originalId))
+            }
 
             val id = abs(originalId)
             for ((conn, relation) in relations) {

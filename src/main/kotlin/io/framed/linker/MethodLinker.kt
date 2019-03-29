@@ -218,6 +218,7 @@ class MethodLinker(
         }
 
         override val name: String = "Method"
+        override val isConnectable = false
     }
 
     inner class SidebarEntry(private val sidebarGroup: SidebarGroup, private var param: Parameter) {

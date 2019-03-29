@@ -7,10 +7,27 @@ interface LinkerInfoConnection {
 
     fun canStart(source: Linker<*, *>): Boolean
     fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean
-    
+
     fun isLinkerFor(element: ModelConnection<*>): Boolean
     fun isLinkerFor(linker: Linker<*, *>): Boolean
 
     fun createModel(source: Long, target: Long): ModelConnection<*>
     fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*>
+
+    infix fun Linker<*, *>.isSibling(other: Linker<*, *>) =
+            this is ShapeLinker<*, *> && other is ShapeLinker<*, *> && parent == other.parent
+
+    tailrec fun Linker<*, *>.getAncestors(accumulator: List<ShapeLinker<*, *>> = emptyList()): List<ShapeLinker<*, *>> {
+        if (this !is ShapeLinker<*, *>) return emptyList()
+        val parent = parent
+        @Suppress("IfThenToElvis")
+        return if (parent == null) {
+            listOf(this)
+        } else {
+            parent.getAncestors(accumulator + this)
+        }
+    }
+
+    infix fun Linker<*, *>.isParentAncestorOf(other: Linker<*, *>) =
+            this is ShapeLinker<*, *> && other is ShapeLinker<*, *> && parent in other.getAncestors()
 }

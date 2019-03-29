@@ -2,6 +2,7 @@ package io.framed.framework.pictogram
 
 interface ViewModelHandler {
 
+    fun isConnectable(shape: Long): Boolean
     fun canConnectionStart(source: Long): Boolean
     fun canConnectionCreate(source: Long, target: Long): Boolean
     fun createConnection(source: Long, target: Long)

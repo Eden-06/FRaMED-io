@@ -1,6 +1,5 @@
 package io.framed.linker
 
-import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
@@ -64,6 +63,9 @@ class AggregationLinker(
         if ("name" !in ids) {
             pictogram.labels += Label(id = "name", position = 0.5)
         }
+        if ("source" !in ids) {
+            pictogram.labels += Label(id = "source", position = 31.0)
+        }
         if ("target" !in ids) {
             pictogram.labels += Label(id = "target", position = -30.0)
         }
@@ -75,6 +77,10 @@ class AggregationLinker(
             when {
                 label.id == "name" -> label.textProperty.bindBidirectional(nameProperty)
 
+                label.id == "source" -> {
+                    label.textProperty.bindBidirectional(sourceCardinalityProperty)
+                    label.autocomplete = CardinalityPreset.STRING_VALUES
+                }
                 label.id == "target" -> {
                     label.textProperty.bindBidirectional(targetCardinalityProperty)
                     label.autocomplete = CardinalityPreset.STRING_VALUES

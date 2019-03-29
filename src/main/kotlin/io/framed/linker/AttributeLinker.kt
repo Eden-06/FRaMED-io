@@ -118,5 +118,6 @@ class AttributeLinker(
         }
 
         override val name: String = "Attribute"
+        override val isConnectable = false
     }
 }

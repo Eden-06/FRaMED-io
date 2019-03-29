@@ -33,9 +33,9 @@ class EventLinker(
                 style = Border.BorderStyle.SOLID
                 width = box(1.0)
                 color = box(color(0, 0, 0, 0.3))
-                radius = box(20.0)
+                radius = box(22.0)
             }
-            padding = box(10.0)
+            padding = box(10.0, 13.0)
         }
     }
 

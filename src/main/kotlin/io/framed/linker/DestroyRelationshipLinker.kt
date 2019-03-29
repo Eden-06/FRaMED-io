@@ -107,7 +107,7 @@ class DestroyRelationshipLinker(
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return target is ReturnEventLinker && (source is RoleTypeLinker || source is SceneLinker)
+            return canStart(source) && target is EventLinker && source isSibling target
         }
 
         override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is DestroyRelationship

@@ -11,6 +11,10 @@ class Controller(
 ) {
 
     val handler = object : ViewModelHandler {
+
+        override fun isConnectable(shape: Long): Boolean =
+                linker.connectionManager.isConnectable(shape)
+
         override fun canConnectionStart(source: Long): Boolean =
                 linker.connectionManager.canConnectionStart(source).isNotEmpty()
 

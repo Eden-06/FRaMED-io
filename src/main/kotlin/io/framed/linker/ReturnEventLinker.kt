@@ -7,11 +7,13 @@ import de.westermann.kobserve.basic.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.CheckBox
 import io.framed.framework.view.Sidebar
 import io.framed.framework.view.SidebarGroup
 import io.framed.framework.view.sidebar
-import io.framed.model.*
+import io.framed.model.Compartment
+import io.framed.model.EventType
+import io.framed.model.ReturnEvent
+import io.framed.model.Scene
 import kotlin.math.roundToInt
 
 class ReturnEventLinker(
@@ -96,7 +98,7 @@ class ReturnEventLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreateIn(container: ModelElement<*>): Boolean {
-            return container is Package || container is Compartment || container is Scene
+            return container is Compartment || container is Scene
         }
 
         override fun isLinkerFor(element: ModelElement<*>): Boolean = element is ReturnEvent
