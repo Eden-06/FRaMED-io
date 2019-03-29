@@ -7,7 +7,6 @@ import de.westermann.kobserve.basic.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.CheckBox
 import io.framed.framework.view.Sidebar
 import io.framed.framework.view.SidebarGroup
 import io.framed.framework.view.sidebar
@@ -17,7 +16,7 @@ import kotlin.math.roundToInt
 class EventLinker(
         override val model: Event,
         override val parent: ModelLinker<*, *, *>
-) : PreviewLinker<Event, IconShape, IconShape> {
+) : PreviewLinker<Event, IconShape, BoxShape> {
 
     private val typeProperty = property(model::type).trackHistory()
     private val symbolProperty = typeProperty.mapBinding { it.symbol }
@@ -40,17 +39,9 @@ class EventLinker(
         }
     }
 
-    override val preview = iconShape(symbolProperty) {
-        style {
-            background = color(255, 255, 255)
-            border {
-                style = Border.BorderStyle.SOLID
-                width = box(1.0)
-                color = box(color(0, 0, 0, 0.3))
-                radius = box(20.0)
-            }
-            padding = box(10.0)
-        }
+    override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
+        iconShape(symbolProperty)
+        textShape(descriptionProperty)
     }
 
     private lateinit var sidebarViewGroup: SidebarGroup

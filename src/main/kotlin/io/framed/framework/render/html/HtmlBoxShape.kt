@@ -137,6 +137,8 @@ class HtmlBoxShape(
 
         if (shape.position == BoxShape.Position.ABSOLUTE) {
             html.style.position = "relative"
+        }else if (shape.position == BoxShape.Position.HORIZONTAL) {
+            classes += "horizontal-view"
         }
     }
 

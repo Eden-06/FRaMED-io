@@ -262,3 +262,10 @@
   border: inherit;
   border-width: 0 0 0 1px;
 }
+
+.horizontal-view {
+  clear: left;
+  & > * {
+    float: left;
+  }
+}

@@ -22,8 +22,6 @@ class ReturnEvent() : ModelElement<ReturnEvent>() {
      */
     var desc: String = ""
 
-    var returnEvent: Boolean = true
-
     override fun copy() = ReturnEvent { new ->
         new.type = type
         new.desc = desc

@@ -104,11 +104,10 @@ class HtmlConnections(
 
     fun addShape(shape: Shape) {
         async {
-            if (viewModel.handler.canConnectionStart(shape.id ?: return@async)) {
-                createEndpointInternal(shape)
-            }
+            val originalId = shape.id ?: return@async
+            createEndpointInternal(shape, viewModel.handler.canConnectionStart(originalId))
 
-            val id = abs(shape.id)
+            val id = abs(originalId)
             for ((conn, relation) in relations) {
                 if (conn.source.value == id || conn.target.value == id) {
                     relation.draw()
@@ -183,28 +182,33 @@ class HtmlConnections(
         view.classes["target-disabled"] = !enabled
     }
 
-    private fun createEndpointInternal(shape: Shape) {
+    private fun createEndpointInternal(shape: Shape, canStart: Boolean) {
         if (shape in endpointMap) return
 
         val view = htmlRenderer.shapeMap[shape]?.view ?: return
         val html = view.html
         val jsPlumbInstance = jsPlumbList.firstOrNull()?.first ?: return
 
-        val handler = IconView(MaterialIcon.ADD)
-        html.appendChild(handler.html)
-        handler.id = "shape-${shape.id}-${endpointMap.size}"
-        handler.classes += "connection-source"
-        handler.preventDrag()
-        handler.onMouseMove {
-            it.stopPropagation()
-        }
-
-        jsPlumbInstance.makeSource(html, jsPlumbSourceOptionsInit {
-            filter = { event, _ ->
-                val target = event.target as HTMLElement
-                target == handler.html || target.parentElement == handler.html
+        val handler = if (canStart) {
+            val handler = IconView(MaterialIcon.ADD)
+            html.appendChild(handler.html)
+            handler.id = "shape-${shape.id}-${endpointMap.size}"
+            handler.classes += "connection-source"
+            handler.preventDrag()
+            handler.onMouseMove {
+                it.stopPropagation()
             }
-        })
+
+            jsPlumbInstance.makeSource(html, jsPlumbSourceOptionsInit {
+                filter = { event, _ ->
+                    val target = event.target as HTMLElement
+                    target == handler.html || target.parentElement == handler.html
+                }
+            })
+
+            handler
+        } else null
+
         jsPlumbInstance.makeTarget(html, jsPlumbTargetOptionsInit {
             allowLoopback = false
         })
@@ -225,11 +229,10 @@ class HtmlConnections(
                 }
             }
         }?.let(references::add)
-        endpointMap[shape] = EndpointItem(view, handler.html, references, jsPlumbInstance)
+        endpointMap[shape] = EndpointItem(view, handler?.html, references, jsPlumbInstance)
 
         setSourceEnabled(shape, true)
         setTargetEnabled(shape, true)
-
     }
 
     /**
@@ -289,7 +292,7 @@ class HtmlConnections(
 
     class EndpointItem(
             val view: View<*>,
-            val handler: HTMLElement,
+            val handler: HTMLElement?,
             val references: List<ListenerReference<*>>,
             val jsPlumbInstance: JsPlumbInstance
     )
