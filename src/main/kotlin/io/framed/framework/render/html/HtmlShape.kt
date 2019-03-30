@@ -281,8 +281,10 @@ abstract class HtmlShape(
             revalidate()
         }?.let(listeners::add)
 
-        val resizer = parentHtmlBoxShape.resizer
-        resizer?.onResize?.addListener {
+        parentHtmlBoxShape.shape.widthProperty.onChange {
+            onDrag.emit(View.DragEvent(Point.ZERO, false))
+        }
+        parentHtmlBoxShape.shape.heightProperty.onChange {
             onDrag.emit(View.DragEvent(Point.ZERO, false))
         }
 
