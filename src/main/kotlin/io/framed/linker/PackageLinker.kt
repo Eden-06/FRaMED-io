@@ -30,6 +30,9 @@ class PackageLinker(
 
     private val children = shapeBox(model::children, connectionManager) { box ->
         box.view = container
+        box.onChildrenChange {
+            updateSize()
+        }
     }
 
     override val shapeLinkers: Set<ShapeLinker<*, *>>
@@ -269,7 +272,7 @@ class PackageLinker(
         contextStepOut.display = event.target != pictogram && parent != null
     }
 
-    override fun checkSize() {
+    override fun updateSize() {
         var maxH = 0.0
         val headlineHeight = this.autoLayoutBox.topOffset - this.pictogram.topOffset
         val contentHeight = this.pictogram.height - headlineHeight

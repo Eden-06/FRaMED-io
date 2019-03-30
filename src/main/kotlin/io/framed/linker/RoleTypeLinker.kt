@@ -218,14 +218,12 @@ class RoleTypeLinker(
 
         attributes.view.onAdd {
             updateSidebarAttributes()
-            parent.checkSize()
         }
         attributes.view.onRemove {
             updateSidebarAttributes()
         }
         methods.view.onAdd {
             updateSidebarMethods()
-            parent.checkSize()
         }
         methods.view.onRemove {
             updateSidebarMethods()

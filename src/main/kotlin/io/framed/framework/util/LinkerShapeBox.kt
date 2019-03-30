@@ -1,5 +1,7 @@
 package io.framed.framework.util
 
+import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.ListenerReference
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.basic.property
 import io.framed.framework.ConnectionManager
@@ -17,12 +19,16 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
 
     private var conditionalBoxes: List<Pair<BoxShape, (L) -> Boolean>> = emptyList()
 
-    var linkers = emptyList<L>()
-        private set
+    private val linkerMap: MutableMap<L, List<ListenerReference<*>>> = mutableMapOf()
+
+    val linkers: List<L>
+        get() = linkerMap.keys.toList()
 
     protected abstract fun backingContains(model: M): Boolean
     protected abstract fun backingAdd(model: M)
     protected abstract fun backingRemove(model: M)
+
+    val onChildrenChange = EventHandler<Unit>()
 
     fun addAllPreviews() {
         previewBox?.let { box ->
@@ -47,8 +53,13 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
             backingAdd(linker.model)
         }
 
-        linkers += linker
+        val references = mutableListOf<ListenerReference<*>>()
+        linker.pictogram.widthProperty.onChange.reference(onChildrenChange::emit)?.let(references::add)
+        linker.pictogram.heightProperty.onChange.reference(onChildrenChange::emit)?.let(references::add)
+        linker.pictogram.leftProperty.onChange.reference(onChildrenChange::emit)?.let(references::add)
+        linker.pictogram.topProperty.onChange.reference(onChildrenChange::emit)?.let(references::add)
 
+        linkerMap[linker] = references.toList()
         view += linker.pictogram
 
         previewBox?.let { box ->
@@ -77,7 +88,7 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
     private fun internalRemove(linker: L) {
         backingRemove(linker.model)
 
-        linkers -= linker
+        linkerMap.remove(linker)?.forEach { it.remove() }
 
         view -= linker.pictogram
         for ((box, _) in conditionalBoxes) {
