@@ -5,6 +5,7 @@ import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.History
+import io.framed.framework.util.Point
 import io.framed.framework.view.Icon
 import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
@@ -213,8 +214,62 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
                     padding = box(10.0)
                 }
             }
+
+            // Check if it is a new border view
+            val isNew = -id !in borderBox.layer
+
             borderBox += shape
             borderShapes += shape
+
+            if (isNew) {
+                // Find connection
+                val connection = connectionManager.connections
+                        .find {
+                            val s = it.sourceIdProperty.value
+                            val t = it.targetIdProperty.value
+
+                            (s == id || t == id) && (
+                                    (s in directIdList && t !in directIdList) ||
+                                            (s !in directIdList && t in directIdList))
+                        }
+
+                if (connection != null) {
+                    // Get source and target shape
+                    val source = connectionManager.getLinkerById(connection.sourceIdProperty.value)
+                    val target = connectionManager.getLinkerById(connection.targetIdProperty.value)
+
+                    if (source != null && target != null) {
+                        val d = pictogram.dimension
+                        val s = source.pictogram.center
+                        val t = target.pictogram.center
+
+                        // Calculate intersection points with the four dimension lines
+                        val points = listOf(
+                                d.left to calcIntersection(s.x, s.y, t.x, t.y, d.left),
+                                d.left + d.width to calcIntersection(s.x, s.y, t.x, t.y, d.left + d.width),
+                                calcIntersection(s.y, s.x, t.y, t.x, d.top) to d.top,
+                                calcIntersection(s.y, s.x, t.y, t.x, d.top + d.height) to d.top + d.height
+                        ).mapNotNull { (x, y) ->
+                            if (x == null || y == null) null else Point(x, y)
+                        }.filter {
+                            it in d
+                        }
+
+                        // Find the nearest intersection to the outer element
+                        val nearest = if (source.id == id) {
+                            points.minBy { it.distance(t) }
+                        } else {
+                            points.minBy { it.distance(s) }
+                        }
+
+                        // Set the position
+                        if (nearest != null) {
+                            shape.left = nearest.x - pictogram.leftOffset
+                            shape.top = nearest.y - pictogram.topOffset
+                        }
+                    }
+                }
+            }
         }
 
         updateLabelBindings()
@@ -242,4 +297,12 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
             shape.labelsProperty.onChange.emit(Unit)
         }
     }
+}
+
+/**
+ * Calculates the `y` for a given `x` and and a given line defined by two points.
+ */
+private fun calcIntersection(x1: Double, y1: Double, x2: Double, y2: Double, x: Double): Double? {
+    if (x1 == x2) return null
+    return (y2 - y1) / (x2 - x1) * (x - x1) + y1
 }

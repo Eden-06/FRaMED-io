@@ -69,3 +69,6 @@ data class Dimension(
         val ZERO = Dimension(0.0, 0.0)
     }
 }
+
+val Dimension.center: Point
+    get() = Point(left + width / 2, top + height / 2)

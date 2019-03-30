@@ -22,4 +22,6 @@ class Layer {
             LayerData()
         }
     }
+
+    operator fun contains(id: Long): Boolean = id in data
 }
