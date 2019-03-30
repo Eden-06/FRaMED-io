@@ -39,7 +39,9 @@ class PackageLinker(
         get() = shapeLinkers.flatMap { it.subTypes }.toSet()
 
     private lateinit var autoLayoutBox: BoxShape
-    private lateinit var borderBox: BoxShape
+    override lateinit var borderBox: BoxShape
+    override val borderShapes = mutableListOf<Shape>()
+
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)
@@ -267,55 +269,6 @@ class PackageLinker(
         contextStepOut.display = event.target != pictogram && parent != null
     }
 
-    private var borderShapes: List<Shape> = emptyList()
-
-    private fun checkBorder() {
-        val directIdList = shapeLinkers.map { it.id }
-        var neededBorderViews = connectionManager.connections
-                .mapNotNull {
-                    val s = it.sourceIdProperty.value
-                    val t = it.targetIdProperty.value
-
-                    if (s in directIdList && t !in directIdList) {
-                        s
-                    } else if (s !in directIdList && t in directIdList) {
-                        t
-                    } else {
-                        null
-                    }
-                }
-                .distinct()
-
-        borderShapes.forEach {
-            val id = it.id?.unaryMinus() ?: return@forEach
-            if ((id) !in neededBorderViews) {
-                borderBox -= it
-                borderShapes -= it
-            } else {
-                neededBorderViews -= id
-            }
-        }
-
-        neededBorderViews.forEach { id ->
-            val shape = iconShape(property<Icon?>(null), id = -id) {
-                style {
-                    background = color(255, 255, 255)
-                    border {
-                        style = Border.BorderStyle.SOLID
-                        width = box(1.0)
-                        color = box(color(0, 0, 0, 0.3))
-                    }
-                    padding = box(10.0)
-                }
-            }
-
-            borderBox += shape
-            borderShapes += shape
-        }
-
-        updateLabelBindings()
-    }
-
     override fun checkSize() {
         var maxH = 0.0
         val headlineHeight = this.autoLayoutBox.topOffset - this.pictogram.topOffset
@@ -328,29 +281,6 @@ class PackageLinker(
         }
         if (maxH > 0.0) {
             this.pictogram.height = maxH + 20 + headlineHeight
-        }
-    }
-
-    override fun updateLabelBindings() {
-        for (shape in borderShapes) {
-            var label = shape.labels.find { it.id == "name" }
-            if (label == null) {
-                label = Label(id = "name")
-                shape.labels += label
-            }
-
-            val id = -(shape.id ?: continue)
-            val linker = shapeLinkers.find { it.id == id } as? PreviewLinker<*, *, *> ?: continue
-
-            val typeName = linker.typeName
-            val name = linker.nameProperty.mapBinding { "$typeName: $it" }
-
-            if (label.textProperty.isBound) {
-                label.textProperty.unbind()
-            }
-            label.textProperty.bind(name)
-
-            shape.labelsProperty.onChange.emit(Unit)
         }
     }
 

@@ -1,13 +1,14 @@
 package io.framed.framework
 
 import de.westermann.kobserve.Property
-import io.framed.framework.pictogram.BoxShape
-import io.framed.framework.pictogram.LayerData
-import io.framed.framework.pictogram.Pictogram
-import io.framed.framework.pictogram.Shape
+import de.westermann.kobserve.basic.mapBinding
+import de.westermann.kobserve.basic.property
+import io.framed.framework.pictogram.*
 import io.framed.framework.util.History
+import io.framed.framework.view.Icon
 import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
+import kotlin.math.absoluteValue
 
 /**
  * @author lars
@@ -21,6 +22,9 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     val connectionManager: ConnectionManager
 
     val container: BoxShape
+    val borderBox: BoxShape
+
+    val borderShapes: MutableList<Shape>
 
     fun checkSize()
 
@@ -157,10 +161,85 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
         }
     }
 
-
     fun add(model: ModelElement<*>, layerData: LayerData, container: Pictogram): ShapeLinker<*, *> {
         val linker = add(model)
         linker.pictogram.import(layerData)
         return linker
+    }
+
+    fun checkBorder() {
+        val directIdList = shapeLinkers.map { it.id }
+        var neededBorderViews = connectionManager.connections
+                .mapNotNull {
+                    val s = it.sourceIdProperty.value
+                    val t = it.targetIdProperty.value
+
+                    if (s in directIdList && t !in directIdList) {
+                        s
+                    } else if (s !in directIdList && t in directIdList) {
+                        t
+                    } else {
+                        null
+                    }
+                }
+                .distinct()
+
+        for (shape in borderShapes) {
+            val id = shape.id?.absoluteValue ?: continue
+            if (id !in neededBorderViews) {
+                borderBox -= shape
+                borderShapes -= shape
+            } else {
+                neededBorderViews -= id
+            }
+        }
+
+        for (shape in borderBox.shapes) {
+            val id = shape.id?.absoluteValue ?: continue
+            if (id >= 0 && id in neededBorderViews) {
+                neededBorderViews -= id
+            }
+        }
+
+        for (id in neededBorderViews) {
+            val shape = iconShape(property<Icon?>(null), id = -id) {
+                style {
+                    background = color(255, 255, 255)
+                    border {
+                        style = Border.BorderStyle.SOLID
+                        width = box(1.0)
+                        color = box(color(0, 0, 0, 0.3))
+                    }
+                    padding = box(10.0)
+                }
+            }
+            borderBox += shape
+            borderShapes += shape
+        }
+
+        updateLabelBindings()
+    }
+
+    override fun updateLabelBindings() {
+        for (shape in borderShapes) {
+            var label = shape.labels.find { it.id == "name" }
+            if (label == null) {
+                label = Label(id = "name")
+                shape.labels += label
+            }
+
+            val id = -(shape.id ?: continue)
+            val linker = shapeLinkers.find { it.id == id } as? PreviewLinker<*, *, *> ?: continue
+
+            val typeName = linker.typeName
+            val name = linker.nameProperty.mapBinding { "$typeName: $it" }
+
+            if (label.textProperty.isBound) {
+                label.textProperty.unbind()
+            }
+            label.textProperty.bind(name)
+
+            shape.labelsProperty.onChange.emit(Unit)
+        }
     }
 }
