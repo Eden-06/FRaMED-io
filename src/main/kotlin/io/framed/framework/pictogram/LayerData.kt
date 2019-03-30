@@ -6,6 +6,7 @@ import io.framed.framework.util.trackHistory
 import kotlinx.serialization.Optional
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import org.w3c.dom.History
 
 @Serializable
 data class LayerData(
@@ -20,33 +21,49 @@ data class LayerData(
         @Optional
         private val data: MutableMap<String, String> = mutableMapOf(),
         @Optional
-        private var labels: List<Label> = emptyList()
+        private var labels: List<Label> = emptyList(),
+        @Transient
+        private val trackHistory: Boolean = true
 ) {
 
     @Transient
-    val leftProperty = property(this::left).trackHistory()
+    val leftProperty = property(this::left)
 
     @Transient
-    val topProperty = property(this::top).trackHistory()
+    val topProperty = property(this::top)
 
     @Transient
-    val widthProperty = property(this::width).trackHistory()
+    val widthProperty = property(this::width)
 
     @Transient
-    val heightProperty = property(this::height).trackHistory()
+    val heightProperty = property(this::height)
 
     @Transient
-    val autosizeProperty = property(this::autosize).trackHistory()
+    val autosizeProperty = property(this::autosize)
 
     @Transient
     val propertyMap: MutableMap<String, Property<String?>> = mutableMapOf()
 
     @Transient
-    val labelsProperty = property(this::labels).trackHistory()
+    val labelsProperty = property(this::labels)
+
+    init {
+        if (trackHistory) {
+            leftProperty.trackHistory(this)
+            topProperty.trackHistory(this)
+            widthProperty.trackHistory(this)
+            heightProperty.trackHistory(this)
+            autosizeProperty.trackHistory(this)
+            labelsProperty.trackHistory(this)
+        }
+    }
 
     fun data(name: String): Property<String?> {
         return propertyMap.getOrPut(name) {
-            val prop = property(data[name]).trackHistory()
+            val prop = property(data[name])
+            if (trackHistory) {
+                prop.trackHistory()
+            }
             prop.onChange {
                 val value = prop.value
                 if (value == null) {

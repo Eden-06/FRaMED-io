@@ -15,10 +15,9 @@ object History {
     private var createGroup = 0
     private var group: List<HistoryItem> = emptyList()
 
-    fun <V> push(property: Property<V>, oldValue: V, newValue: V = property.get()) =
-            push(HistoryProperty(property, oldValue, newValue))
-
     fun push(historyItem: HistoryItem) {
+        js("console.trace()")
+        if (allowPush) println("Push to $createGroup | ${historyItem::class.simpleName}}")
         if (allowPush) if (createGroup > 0) {
             val top = group.lastOrNull()
 
@@ -118,12 +117,18 @@ object History {
     }
 }
 
-fun <P : Property<T>, T> P.trackHistory(): P {
+fun <P : Property<T>, T> P.trackHistory(grouping: Any? = null): P {
     var oldValue = get()
 
     onChange {
-        History.push(this, oldValue)
-        oldValue = get()
+        val newValue = get()
+        println("$oldValue -> $newValue")
+        if (grouping == null) {
+            History.push(HistoryProperty(this, oldValue, newValue))
+        } else {
+            History.push(HistoryGroupingProperty(grouping, this, oldValue, newValue))
+        }
+        oldValue = newValue
     }
 
     return this

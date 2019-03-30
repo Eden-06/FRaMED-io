@@ -21,11 +21,11 @@ data class Label(
     val textProperty = property(this::text).trackHistory()
 
     @Transient
-    val leftProperty = property(this::left).trackHistory()
+    val leftProperty = property(this::left).trackHistory(this)
 
     @Transient
-    val topProperty = property(this::top).trackHistory()
+    val topProperty = property(this::top).trackHistory(this)
 
     @Transient
-    val positionProperty = property(this::position).trackHistory()
+    val positionProperty = property(this::position).trackHistory(this)
 }

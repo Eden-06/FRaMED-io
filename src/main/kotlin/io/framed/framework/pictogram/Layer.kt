@@ -15,7 +15,7 @@ class Layer {
 
     operator fun get(id: Long?, picto: Pictogram): LayerData = if (id == null) {
         transient.getOrPut(picto) {
-            LayerData()
+            LayerData(trackHistory = false)
         }
     } else {
         data.getOrPut(id) {
