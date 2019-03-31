@@ -1,9 +1,35 @@
 package io.framed.framework.util
 
-class HistoryGroup(
-        private val items: List<HistoryItem>,
-        override val description: String
-) : HistoryItem {
+import kotlin.js.Date
+
+class HistoryGroup() : HistoryItem {
+
+    constructor(historyItem: HistoryItem): this() {
+        items += historyItem
+    }
+
+    private var items: List<HistoryItem> = emptyList()
+
+    internal var timeout = Date.now()
+    private var groupCount = 0
+    private var groupDescription: String? = null
+
+    val isOpen: Boolean
+        get() = Date.now() - timeout < 100.0 || groupCount > 0
+
+
+    fun endGroup() {
+        groupCount -= 1
+    }
+
+    fun startGroup(description: String) {
+        groupCount += 1
+        groupDescription = description
+    }
+
+    override val description: String
+        get() = groupDescription ?: items.first().description
+
     override fun undo() {
         items.reversed().forEach {
             it.undo()
@@ -17,27 +43,15 @@ class HistoryGroup(
     }
 
     override fun canApply(item: HistoryItem): Boolean {
-        if (item is HistoryGroup) {
-            if (items.size == item.items.size) {
-                return items.mapIndexed { index, historyItem -> historyItem.canApply(item.items[index]) }.all { it }
-            }
-        } else if (items.size == 1) {
-            return items.first().canApply(item)
-        }
-        return false
+        return isOpen || (items.lastOrNull()?.canApply(item) ?: false)
     }
 
     override fun apply(item: HistoryItem) {
-        if (item is HistoryGroup) {
-            if (items.size == item.items.size) {
-                if (items.mapIndexed { index, historyItem -> historyItem.canApply(item.items[index]) }.all { it }) {
-                    items.forEachIndexed { index, historyItem -> historyItem.apply(item.items[index]) }
-                }
-            }
-        } else if (items.size == 1) {
-            if (items.first().canApply(item)) {
-                items.first().apply(item)
-            }
+        if (items.isNotEmpty() && items.last().canApply(item)) {
+            items.last().apply(item)
+        } else {
+            items += item
         }
+        timeout = Date.now()
     }
 }

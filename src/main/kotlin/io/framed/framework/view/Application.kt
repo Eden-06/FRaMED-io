@@ -219,9 +219,11 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             tab.onOpen {
                 loadController(controller)
 
-                controller.linker.sidebar.open()
-                renderer.render(controller.viewModel)
-                zoom = renderer.zoom
+                History.ignore {
+                    controller.linker.sidebar.open()
+                    renderer.render(controller.viewModel)
+                    zoom = renderer.zoom
+                }
             }
 
             tab.onClose {
@@ -261,6 +263,10 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
         }
     }
 
+    /**
+     * This function is used to initialize the application. Through kotlin object's are lazily evaluated,
+     * this method starts it's evaluation and render's the ui.
+     */
     fun init() {
     }
 }

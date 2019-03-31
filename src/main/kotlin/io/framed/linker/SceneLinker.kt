@@ -1,7 +1,10 @@
 package io.framed.linker
 
 import Layouting
-import de.westermann.kobserve.basic.*
+import de.westermann.kobserve.basic.FunctionAccessor
+import de.westermann.kobserve.basic.join
+import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.basic.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.Point

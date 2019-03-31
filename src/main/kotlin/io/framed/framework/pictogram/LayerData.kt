@@ -6,7 +6,6 @@ import io.framed.framework.util.trackHistory
 import kotlinx.serialization.Optional
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import org.w3c.dom.History
 
 @Serializable
 data class LayerData(

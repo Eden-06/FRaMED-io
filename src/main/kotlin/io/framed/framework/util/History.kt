@@ -4,39 +4,37 @@ import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.basic.mapBinding
 import de.westermann.kobserve.basic.property
+import kotlin.js.Date
 
 object History {
-    private var list: List<HistoryItem> = emptyList()
+
+    private var list: List<HistoryGroup> = emptyList()
     private val pointerProperty = property(list.size)
     private var pointer by pointerProperty
 
-    private var allowPush = true
-
-    private var createGroup = 0
-    private var group: List<HistoryItem> = emptyList()
+    private var ignoreTime = 0.0
+    private var ignore = false
 
     fun push(historyItem: HistoryItem) {
-        js("console.trace()")
-        if (allowPush) println("Push to $createGroup | ${historyItem::class.simpleName}}")
-        if (allowPush) if (createGroup > 0) {
-            val top = group.lastOrNull()
+        val top = list.getOrNull(pointer - 1)
 
-            if (top != null && top.canApply(historyItem)) {
-                top.apply(historyItem)
-            } else {
-                group += historyItem
+        val now = Date.now()
+        val diff = now - ignoreTime
+        if (ignore || diff < 200.0) {
+            ignoreTime = Date.now()
+            if (top != null && top.isOpen) {
+                top.timeout = now
             }
+            return
+        }
+
+        if (top != null && top.canApply(historyItem)) {
+            top.apply(historyItem)
         } else {
-            val top = list.getOrNull(pointer - 1)
+            list = list.subList(0, pointer) + HistoryGroup(historyItem)
+            pointer = list.size
 
-            if (top != null && top.canApply(historyItem)) {
-                top.apply(historyItem)
-            } else {
-                list = list.subList(0, pointer) + historyItem
-                pointer = list.size
-
-                checkOnChange()
-            }
+            checkOnChange()
         }
     }
 
@@ -88,32 +86,33 @@ object History {
         }
     }
 
-    private fun startGroup(description: String) {
-        if (createGroup == 0) {
-            groupDescription = description
-        }
-        createGroup += 1
-    }
-
-    private fun endGroup() {
-        createGroup -= 1
-        if (createGroup == 0 && group.isNotEmpty()) {
-            push(HistoryGroup(group, groupDescription))
-            group = emptyList()
-        }
-    }
-
-    var groupDescription = ""
     fun group(description: String, block: () -> Unit) {
-        startGroup(description)
+        val top = list.getOrNull(pointer - 1)
+
+        val group = if (top != null && top.isOpen) {
+            top
+        } else {
+            val group = HistoryGroup()
+            list = list.subList(0, pointer) + group
+            pointer = list.size
+            checkOnChange()
+            group
+        }
+
+        group.startGroup(description)
+
         block()
-        endGroup()
+
+        group.endGroup()
     }
 
     fun ignore(block: () -> Unit) {
-        allowPush = false
+        ignoreTime = Date.now()
+        ignore = true
+
         block()
-        allowPush = true
+
+        ignore = false
     }
 }
 
@@ -122,7 +121,6 @@ fun <P : Property<T>, T> P.trackHistory(grouping: Any? = null): P {
 
     onChange {
         val newValue = get()
-        println("$oldValue -> $newValue")
         if (grouping == null) {
             History.push(HistoryProperty(this, oldValue, newValue))
         } else {
