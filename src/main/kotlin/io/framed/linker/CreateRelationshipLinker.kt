@@ -103,7 +103,7 @@ class CreateRelationshipLinker(
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
             return (source is EventLinker && (target is RoleTypeLinker || target is SceneLinker) && source isSibling target) ||
-                    (source is ReturnEventLinker && (target is RoleTypeLinker || target is SceneLinker) && !(source isParentAncestorOf target))
+                    (source is ReturnEventLinker && (target is RoleTypeLinker || target is SceneLinker) && !(source isParentAncestorOf target) && (target != source.parent))
         }
 
         override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is CreateRelationship

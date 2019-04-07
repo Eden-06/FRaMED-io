@@ -17,7 +17,7 @@ interface LinkerInfoConnection {
     infix fun Linker<*, *>.isSibling(other: Linker<*, *>) =
             this is ShapeLinker<*, *> && other is ShapeLinker<*, *> && parent == other.parent
 
-    tailrec fun Linker<*, *>.getAncestors(accumulator: List<ShapeLinker<*, *>> = emptyList()): List<ShapeLinker<*, *>> {
+    private tailrec fun Linker<*, *>.getAncestors(accumulator: List<ShapeLinker<*, *>> = emptyList()): List<ShapeLinker<*, *>> {
         if (this !is ShapeLinker<*, *>) return emptyList()
         val parent = parent
         @Suppress("IfThenToElvis")
@@ -28,6 +28,14 @@ interface LinkerInfoConnection {
         }
     }
 
+    val Linker<*, *>.ancestors
+        get() = getAncestors()
+
     infix fun Linker<*, *>.isParentAncestorOf(other: Linker<*, *>) =
-            this is ShapeLinker<*, *> && other is ShapeLinker<*, *> && parent in other.getAncestors()
+            this is ShapeLinker<*, *> && other is ShapeLinker<*, *> && parent in other.ancestors
+
+    val Linker<*, *>.parent: ShapeLinker<*, *>?
+        get() = (this as? ShapeLinker<*, *>)?.parent
+
+    infix fun Linker<*, *>.isAncestorOf(other: Linker<*, *>) = this in other.ancestors
 }
