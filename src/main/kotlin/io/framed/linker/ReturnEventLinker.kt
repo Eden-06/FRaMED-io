@@ -19,7 +19,7 @@ import kotlin.math.roundToInt
 class ReturnEventLinker(
         override val model: ReturnEvent,
         override val parent: ModelLinker<*, *, *>
-) : PreviewLinker<ReturnEvent, IconShape, BoxShape> {
+) : ShapeLinker<ReturnEvent, IconShape> {
 
     private val typeProperty = property(model::type).trackHistory()
     private val symbolProperty = typeProperty.mapBinding { it.symbol }
@@ -42,11 +42,6 @@ class ReturnEventLinker(
             }
             padding = box(10.0)
         }
-    }
-
-    override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
-        iconShape(symbolProperty)
-        textShape(descriptionProperty)
     }
 
     private lateinit var sidebarViewGroup: SidebarGroup

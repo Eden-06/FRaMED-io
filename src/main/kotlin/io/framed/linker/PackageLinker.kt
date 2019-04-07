@@ -276,8 +276,8 @@ class PackageLinker(
         var maxH = 0.0
         val headlineHeight = this.autoLayoutBox.topOffset - this.pictogram.topOffset
         val contentHeight = this.pictogram.height - headlineHeight
-        for (child in children.linkers) {
-            val cH = child.pictogram.topOffset + child.pictogram.height
+        for (child in autoLayoutBox.shapes) {
+            val cH = child.topOffset + child.height
             if (cH > contentHeight) {
                 maxH = cH
             }

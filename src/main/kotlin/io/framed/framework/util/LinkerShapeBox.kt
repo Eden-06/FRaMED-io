@@ -64,13 +64,12 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
 
         previewBox?.let { box ->
 
-            val prev = if (linker is PreviewLinker<*, *, *>) {
-                if (box.position == BoxShape.Position.ABSOLUTE) {
-                    linker.pictogram
-                } else {
-                    linker.preview
-                }
-            } else return@let
+            val prev =
+                    if (box.position == BoxShape.Position.ABSOLUTE || linker !is PreviewLinker<*, *, *>) {
+                        linker.pictogram
+                    } else {
+                        linker.preview
+                    }
 
             var added = false
             for ((b, cond) in conditionalBoxes) {
