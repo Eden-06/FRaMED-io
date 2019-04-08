@@ -16,6 +16,7 @@ import io.framed.model.Attribute
 import io.framed.model.Compartment
 import io.framed.model.Method
 import io.framed.model.Package
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
@@ -346,18 +347,25 @@ class CompartmentLinker(
     }
 
     override fun updateSize() {
-        var maxH = 0.0
-        val headlineHeight = this.autoLayoutBox.topOffset - this.pictogram.topOffset
-        val contentHeight = this.pictogram.height - headlineHeight
+        // Get size of top views
+        val headlineHeight = autoLayoutBox.topOffset - this.pictogram.topOffset
+
+        // Set spacing to left and bottom border
+        val spacing = 20
+
+        // Calculate size boundaries
+        var contentHeight = pictogram.height - headlineHeight - spacing
+        var contentWidth = pictogram.width - spacing
+
+        // Check boundaries of children and increase parent boundaries if necessary
         for (child in autoLayoutBox.shapes) {
-            val cH = child.topOffset + child.height
-            if (cH > contentHeight) {
-                maxH = cH
-            }
+            contentHeight = max(contentHeight, child.top + child.height)
+            contentWidth = max(contentWidth, child.left + child.width)
         }
-        if (maxH > 0.0) {
-            this.pictogram.height = maxH + 20 + headlineHeight
-        }
+
+        // Set new boundaries
+        pictogram.height = contentHeight + spacing + headlineHeight
+        pictogram.width = contentWidth + spacing
     }
 
     /**
@@ -409,7 +417,7 @@ class CompartmentLinker(
 
         override fun createModel(): ModelElement<*> = Compartment()
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is Compartment && parent is ModelLinker<*,*, *> && connectionManager != null) {
+            if (model is Compartment && parent is ModelLinker<*, *, *> && connectionManager != null) {
                 return CompartmentLinker(model, connectionManager, parent)
             } else throw UnsupportedOperationException()
         }
