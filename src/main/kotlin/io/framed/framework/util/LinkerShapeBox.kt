@@ -9,13 +9,22 @@ import io.framed.framework.ModelElement
 import io.framed.framework.PreviewLinker
 import io.framed.framework.ShapeLinker
 import io.framed.framework.pictogram.BoxShape
+import kotlin.js.Date
 import kotlin.reflect.KMutableProperty0
 
 sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
         private val connectionManager: ConnectionManager?
 ) {
-    lateinit var view: BoxShape
+    var view: BoxShape = BoxShape(-1)
+        set(value) {
+            field = value
+            setIgnore(value)
+        }
     var previewBox: BoxShape? = null
+        set(value) {
+            field = value
+            value?.let(this::setIgnore)
+        }
 
     private var conditionalBoxes: List<Pair<BoxShape, (L) -> Boolean>> = emptyList()
 
@@ -27,6 +36,20 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
     protected abstract fun backingContains(model: M): Boolean
     protected abstract fun backingAdd(model: M)
     protected abstract fun backingRemove(model: M)
+
+    private var ignoreTime = 0.0
+    private fun setIgnore(shape: BoxShape) {
+        ignoreTime = Date.now() + 1000
+        shape.layerProperty.onChange {
+            ignoreTime = Date.now() + 1000
+        }
+    }
+
+    private fun emitChildrenChanged(unit: Unit) {
+        if (Date.now() > ignoreTime) {
+            onChildrenChange.emit(unit)
+        }
+    }
 
     val onChildrenChange = EventHandler<Unit>()
 
@@ -53,11 +76,21 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
             backingAdd(linker.model)
         }
 
+        val emit = emit@{ unit: Unit ->
+            val box = previewBox ?: return@emit
+            val sameLayer = box.shapes.all {
+                it.layer == box.layer
+            }
+            if (sameLayer) {
+                emitChildrenChanged(unit)
+            }
+        }
+
         val references = mutableListOf<ListenerReference<*>>()
-        linker.pictogram.widthProperty.onChange.reference(onChildrenChange::emit)?.let(references::add)
-        linker.pictogram.heightProperty.onChange.reference(onChildrenChange::emit)?.let(references::add)
-        linker.pictogram.leftProperty.onChange.reference(onChildrenChange::emit)?.let(references::add)
-        linker.pictogram.topProperty.onChange.reference(onChildrenChange::emit)?.let(references::add)
+        linker.pictogram.widthProperty.onChange.reference(emit)?.let(references::add)
+        linker.pictogram.heightProperty.onChange.reference(emit)?.let(references::add)
+        linker.pictogram.leftProperty.onChange.reference(emit)?.let(references::add)
+        linker.pictogram.topProperty.onChange.reference(emit)?.let(references::add)
 
         linkerMap[linker] = references.toList()
         view += linker.pictogram
