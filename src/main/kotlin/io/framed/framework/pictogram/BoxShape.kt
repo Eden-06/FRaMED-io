@@ -28,9 +28,7 @@ class BoxShape(id: Long?) : Shape(id) {
         if (shape !in internalShapes) {
             internalShapes += shape
 
-            if (internalShapes.isEmpty() || internalShapes.first().parent == this) {
-                renderShape(shape)
-            }
+            renderShape(shape)
 
             onAdd.emit(shape)
         }
@@ -54,7 +52,7 @@ class BoxShape(id: Long?) : Shape(id) {
 
     operator fun Shape.unaryPlus() = add(this)
 
-    fun leftOffset(shape: Shape): Double = if (parent == null) 0.0 else leftOffset + when (position) {
+    fun leftOffset(shape: Shape): Double = leftOffset + when (position) {
         Position.HORIZONTAL -> {
             var sum = 0.0
             for (s in internalShapes) {
@@ -68,7 +66,7 @@ class BoxShape(id: Long?) : Shape(id) {
         else -> 0.0
     }
 
-    fun topOffset(shape: Shape): Double = if (parent == null) 0.0 else topOffset + when (position) {
+    fun topOffset(shape: Shape): Double = topOffset + when (position) {
         Position.VERTICAL -> {
             var sum = 0.0
             for (s in internalShapes) {

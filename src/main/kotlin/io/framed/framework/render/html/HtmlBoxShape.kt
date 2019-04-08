@@ -123,7 +123,7 @@ class HtmlBoxShape(
                 height = shape.height
             }
         } else {
-            async(1000) {
+            async {
                 shape.width = clientWidth.toDouble()
                 shape.height = clientHeight.toDouble()
             }

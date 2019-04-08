@@ -348,7 +348,7 @@ class CompartmentLinker(
 
     override fun updateSize() {
         // Get size of top views
-        val headlineHeight = autoLayoutBox.topOffset - this.pictogram.topOffset
+        val headlineHeight = autoLayoutBox.topOffset - pictogram.topOffset
 
         // Set spacing to left and bottom border
         val spacing = 20
