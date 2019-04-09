@@ -196,6 +196,8 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
     private lateinit var controller: Controller
 
     fun loadController(controller: Controller, clear: Boolean = false) {
+        if (this::controller.isInitialized) this.controller.viewModel.container.stopRender()
+
         if (this::controller.isInitialized && !clear) {
             if (this.controller == controller) {
                 return

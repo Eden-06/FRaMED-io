@@ -80,13 +80,28 @@ class BoxShape(id: Long?) : Shape(id) {
         else -> 0.0
     }
 
+    private var ignoreRender = true
+    fun stopRender() {
+        ignoreRender = true
+
+        for (shape in shapes) {
+            if (shape is BoxShape) {
+                shape.stopRender()
+            }
+        }
+    }
+
     fun render() {
+        ignoreRender = false
+
         for (shape in shapes) {
             renderShape(shape)
         }
     }
 
     private fun renderShape(shape: Shape) {
+        if (ignoreRender) return
+
         shape.parent = this
 
         if (shape.layerProperty.isBound) {
