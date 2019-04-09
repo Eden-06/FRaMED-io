@@ -63,6 +63,7 @@ task populateWebFolder(dependsOn: [classes]) {
                 if (it.exists() && !it.isDirectory()) {
                     from zipTree(it.absolutePath).matching {
                         include '*.js'
+                        include '*.js.map'
                         exclude '*.meta.js'
                     }
                 }

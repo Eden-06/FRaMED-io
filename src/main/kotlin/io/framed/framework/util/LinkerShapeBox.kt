@@ -39,15 +39,17 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
 
     private var ignoreTime = 0.0
     private fun setIgnore(shape: BoxShape) {
-        ignoreTime = Date.now() + 1000
-        shape.layerProperty.onChange {
-            ignoreTime = Date.now() + 1000
-        }
+        val reset: (Unit) -> Unit = { ignoreTime = Date.now() + TIMEOUT }
+        shape.layerProperty.onChange(reset)
+        shape.onRender(reset)
+        reset(Unit)
     }
 
     private fun emitChildrenChanged(unit: Unit) {
         if (Date.now() > ignoreTime) {
             onChildrenChange.emit(unit)
+        } else {
+            ignoreTime = Date.now() + TIMEOUT
         }
     }
 
@@ -81,7 +83,7 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
             val sameLayer = box.shapes.all {
                 it.layer == box.layer
             }
-            if (sameLayer) {
+            if (sameLayer && !box.ignore) {
                 emitChildrenChanged(unit)
             }
         }
@@ -209,6 +211,10 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
         override fun backingRemove(model: M) {
             backingField -= model
         }
+    }
+
+    companion object {
+        private const val TIMEOUT = 500
     }
 }
 

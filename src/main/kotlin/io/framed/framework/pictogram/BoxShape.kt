@@ -81,6 +81,11 @@ class BoxShape(id: Long?) : Shape(id) {
     }
 
     private var ignoreRender = true
+    val ignore
+        get() = ignoreRender
+
+    val onRender = EventHandler<Unit>()
+
     fun stopRender() {
         ignoreRender = true
 
@@ -93,6 +98,7 @@ class BoxShape(id: Long?) : Shape(id) {
 
     fun render() {
         ignoreRender = false
+        onRender.emit(Unit)
 
         for (shape in shapes) {
             renderShape(shape)
