@@ -1,8 +1,8 @@
 package io.framed.framework.render.html
 
-import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.ListenerReference
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.event.EventListener
+import de.westermann.kobserve.property.property
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.ContextEvent
 import io.framed.framework.pictogram.Shape
@@ -28,7 +28,7 @@ class HtmlRenderer(
 ) : Renderer {
     lateinit var viewModel: ViewModel
 
-    private var layerChangeListener: ListenerReference<Unit>? = null
+    private var layerChangeListener: EventListener<Unit>? = null
 
     val snapToGridProperty = property(window.localStorage["snap-to-grid"]?.toBoolean() ?: true).also { property ->
         property.onChange { _ ->
@@ -47,13 +47,13 @@ class HtmlRenderer(
     var snapToView by snapToViewProperty
 
     override fun render(viewModel: ViewModel) {
-        layerChangeListener?.remove()
+        layerChangeListener?.detach()
         this.viewModel = viewModel
 
         viewModel.container.render()
 
         layerChangeListener = this.viewModel.onLayerChange.reference { draw() }
-        layerChangeListener?.trigger(Unit)
+        layerChangeListener?.emit(Unit)
     }
 
     lateinit var htmlShape: HtmlShapeContainer

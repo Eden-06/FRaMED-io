@@ -1,7 +1,7 @@
 package io.framed.framework.pictogram
 
-import de.westermann.kobserve.basic.flatMapBinding
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.property.flatMapBinding
+import de.westermann.kobserve.property.property
 import io.framed.framework.util.Dimension
 import io.framed.framework.util.Point
 import io.framed.framework.util.center

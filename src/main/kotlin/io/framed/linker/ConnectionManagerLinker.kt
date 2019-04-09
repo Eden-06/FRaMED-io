@@ -1,6 +1,6 @@
 package io.framed.linker
 
-import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.event.EventHandler
 import io.framed.framework.*
 import io.framed.framework.pictogram.ConnectionInfo
 import io.framed.framework.util.LinkerConnectionBox

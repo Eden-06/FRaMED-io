@@ -75,7 +75,7 @@ class Dialog : View<HTMLDivElement>("div") {
                     it()
                 }
             }
-        }!!
+        }
     }
 
     /**

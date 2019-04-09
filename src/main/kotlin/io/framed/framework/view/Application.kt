@@ -1,9 +1,9 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.basic.FunctionAccessor
-import de.westermann.kobserve.basic.mapBinding
-import de.westermann.kobserve.basic.property
 import de.westermann.kobserve.not
+import de.westermann.kobserve.property.FunctionAccessor
+import de.westermann.kobserve.property.mapBinding
+import de.westermann.kobserve.property.property
 import io.framed.File
 import io.framed.framework.Controller
 import io.framed.framework.ControllerManager

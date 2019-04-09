@@ -1,7 +1,7 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.property.property
 import io.framed.framework.util.Dimension
 import io.framed.framework.util.Point
 import io.framed.framework.util.async

@@ -1,9 +1,9 @@
 package io.framed.framework.util
 
-import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
-import de.westermann.kobserve.basic.mapBinding
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.property.mapBinding
+import de.westermann.kobserve.property.property
 import kotlin.js.Date
 
 object History {

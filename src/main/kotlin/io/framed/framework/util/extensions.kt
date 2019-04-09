@@ -1,6 +1,6 @@
 package io.framed.framework.util
 
-import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.event.EventHandler
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event

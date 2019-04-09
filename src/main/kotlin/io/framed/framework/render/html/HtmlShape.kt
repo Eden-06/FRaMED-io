@@ -1,7 +1,7 @@
 package io.framed.framework.render.html
 
-import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.ListenerReference
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.event.EventListener
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.Dimension
@@ -28,7 +28,7 @@ abstract class HtmlShape(
 
     abstract val viewList: List<View<*>>
 
-    val listeners = mutableListOf<ListenerReference<*>>()
+    val listeners = mutableListOf<EventListener<*>>()
 
     var resizer: ResizeHandler? = null
 
@@ -115,19 +115,19 @@ abstract class HtmlShape(
             height = shape.height
         }
 
-        shape.leftProperty.onChange.reference {
+        listeners += shape.leftProperty.onChange.reference {
             left = shape.left
 
             revalidate()
             onMove?.emit(shape)
-        }?.let(listeners::add)
-        shape.topProperty.onChange.reference {
+        }
+        listeners += shape.topProperty.onChange.reference {
             top = shape.top
 
             revalidate()
             onMove?.emit(shape)
-        }?.let(listeners::add)
-        shape.widthProperty.onChange.reference {
+        }
+        listeners += shape.widthProperty.onChange.reference {
             if (shape.autosize) {
                 autoWidth()
             } else {
@@ -136,8 +136,8 @@ abstract class HtmlShape(
 
             revalidate()
             onMove?.emit(shape)
-        }?.let(listeners::add)
-        shape.heightProperty.onChange.reference {
+        }
+        listeners += shape.heightProperty.onChange.reference {
             if (shape.autosize) {
                 autoHeight()
             } else {
@@ -146,7 +146,7 @@ abstract class HtmlShape(
 
             revalidate()
             onMove?.emit(shape)
-        }?.let(listeners::add)
+        }
 
         allowDrag = true
         onMouseDown { event ->
@@ -161,10 +161,10 @@ abstract class HtmlShape(
                 }
             }
 
-            var reference: ListenerReference<*>? = null
+            var reference: EventListener<*>? = null
             reference = Root.onMouseUp.reference {
                 markView = false
-                reference?.remove()
+                reference?.detach()
                 htmlRenderer.stopDragView()
             }
         }
@@ -252,17 +252,17 @@ abstract class HtmlShape(
             height = shape.height
         }
 
-        shape.leftProperty.onChange.reference {
+        listeners += shape.leftProperty.onChange.reference {
             left = shape.left
 
             revalidate()
-        }?.let(listeners::add)
-        shape.topProperty.onChange.reference {
+        }
+        listeners += shape.topProperty.onChange.reference {
             top = shape.top
 
             revalidate()
-        }?.let(listeners::add)
-        shape.widthProperty.onChange.reference {
+        }
+        listeners += shape.widthProperty.onChange.reference {
             if (shape.autosize) {
                 autoWidth()
             } else {
@@ -270,8 +270,8 @@ abstract class HtmlShape(
             }
 
             revalidate()
-        }?.let(listeners::add)
-        shape.heightProperty.onChange.reference {
+        }
+        listeners += shape.heightProperty.onChange.reference {
             if (shape.autosize) {
                 autoHeight()
             } else {
@@ -279,7 +279,7 @@ abstract class HtmlShape(
             }
 
             revalidate()
-        }?.let(listeners::add)
+        }
 
         parentHtmlBoxShape.shape.widthProperty.onChange {
             onDrag.emit(View.DragEvent(Point.ZERO, false))
@@ -311,10 +311,10 @@ abstract class HtmlShape(
                 }
             }
 
-            var reference: ListenerReference<*>? = null
+            var reference: EventListener<*>? = null
             reference = Root.onMouseUp.reference {
                 markView = false
-                reference?.remove()
+                reference?.detach()
                 htmlRenderer.stopDragView()
             }
         }
@@ -371,7 +371,7 @@ abstract class HtmlShape(
         container -= view
 
         for (reference in listeners) {
-            reference.remove()
+            reference.detach()
         }
         listeners.clear()
 
@@ -380,7 +380,7 @@ abstract class HtmlShape(
         }
         labels = emptySet()
 
-        reference?.remove()
+        reference?.detach()
     }
 
     var labels: Set<HtmlLabel> = emptySet()
@@ -396,7 +396,7 @@ abstract class HtmlShape(
         }.toSet()
     }
 
-    private var reference: ListenerReference<*>? = null
+    private var reference: EventListener<*>? = null
 
     abstract override val positionView: View<*>
 
@@ -451,9 +451,9 @@ abstract class HtmlShape(
     }
 
     fun init() {
-        shape.visibleProperty.onChange.reference {
+        listeners += shape.visibleProperty.onChange.reference {
             view.display = shape.visible
-        }?.let(listeners::add)
+        }
         view.display = shape.visible
 
         shape.layerProperty.onChange {

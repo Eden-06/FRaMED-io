@@ -32,7 +32,7 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$serialization_version"
-    implementation "de.westermann:KObserve-js:0.7.0"
+    implementation "de.westermann:KObserve-js:0.9.0"
 }
 
 clean.doFirst() {
@@ -43,6 +43,7 @@ clean.doFirst() {
 }
 
 compileKotlin2Js {
+    kotlinOptions.moduleKind = "umd"
     kotlinOptions.sourceMap = true
     kotlinOptions.sourceMapEmbedSources = "always"
 
@@ -50,38 +51,28 @@ compileKotlin2Js {
     //kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.contracts.ExperimentalContracts"
 }
 
-jar {
-    includeEmptyDirs = false
+def webFolder = new File(project.buildDir, "../web/website")
+def jsCompilations = kotlin.target.compilations
 
-    from {
-        configurations.compileClasspath.collect {
-            if (it.exists()) {
-                ((it.isDirectory() || !it.exists()) ? it : zipTree(it)).getFiles().findAll {
-                    it.name ==~ "^[a-zA-Z|-]+.js(.map)?\$"
+task populateWebFolder(dependsOn: [classes]) {
+    doLast {
+        copy {
+            from jsCompilations.main.output
+            from kotlin.sourceSets.main.resources.srcDirs
+            jsCompilations.test.runtimeDependencyFiles.each {
+                if (it.exists() && !it.isDirectory()) {
+                    from zipTree(it.absolutePath).matching {
+                        include '*.js'
+                        exclude '*.meta.js'
+                    }
                 }
-            } else {
-                ArrayList
             }
-        }
-    }
-
-    exclude "**/*.kjsm", "**/META-INF/*", "META-INF/*", "**/*meta*"
-    into "website"
-}
-
-build.doLast() {
-    copy {
-        File artifact = new File("build/libs/${project.name}-${project.version}.jar")
-        includeEmptyDirs = false
-
-        from zipTree(artifact)
-        into "${web_path}"
-        include { fileTreeElement ->
-            def path = fileTreeElement.path
-            !path.contains("META-INF") && !path.endsWith("sass")
+            into webFolder
         }
     }
 }
+
+build.dependsOn(populateWebFolder)
 
 task run(type: NodeTask) {
     dependsOn build
@@ -90,7 +81,7 @@ task run(type: NodeTask) {
 }
 
 node {
-    workDir = file("${project.buildDir}/${web_path}")
-    npmWorkDir = file("${project.buildDir}/${web_path}")
+    workDir = file("${project.projectDir}/${web_path}")
+    npmWorkDir = file("${project.projectDir}/${web_path}")
     nodeModulesDir = file("${project.projectDir}/${web_path}")
 }

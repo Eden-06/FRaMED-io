@@ -17,7 +17,7 @@ class MenuBar : ViewCollection<View<*>, HTMLDivElement>("div") {
                 closeListener = Root.onClick.addListener { _ ->
                     menu.classes -= "show"
                     Root.onClick -= closeListener
-                }!!
+                }
             }
         }
     }

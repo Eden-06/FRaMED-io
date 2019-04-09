@@ -1,7 +1,7 @@
 package io.framed.framework
 
-import de.westermann.kobserve.basic.FunctionAccessor
-import de.westermann.kobserve.basic.FunctionProperty
+import de.westermann.kobserve.property.FunctionAccessor
+import de.westermann.kobserve.property.FunctionProperty
 import io.framed.framework.pictogram.ConnectionInfo
 import io.framed.framework.pictogram.Pictogram
 import io.framed.framework.util.History

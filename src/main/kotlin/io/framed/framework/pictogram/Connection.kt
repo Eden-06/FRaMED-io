@@ -1,7 +1,7 @@
 package io.framed.framework.pictogram
 
-import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
+import de.westermann.kobserve.event.EventHandler
 import io.framed.framework.ConnectionLinker
 
 /**

@@ -1,9 +1,9 @@
 package io.framed.linker
 
-import de.westermann.kobserve.basic.FunctionAccessor
-import de.westermann.kobserve.basic.FunctionProperty
-import de.westermann.kobserve.basic.property
-import de.westermann.kobserve.basic.validate
+import de.westermann.kobserve.property.FunctionAccessor
+import de.westermann.kobserve.property.FunctionProperty
+import de.westermann.kobserve.property.property
+import de.westermann.kobserve.property.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape

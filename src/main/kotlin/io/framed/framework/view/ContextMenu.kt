@@ -1,6 +1,6 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.property.property
 import io.framed.framework.pictogram.ContextEvent
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.KeyboardEvent

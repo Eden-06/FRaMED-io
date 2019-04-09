@@ -1,8 +1,8 @@
 package io.framed.framework.util
 
-import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.property.property
 import io.framed.framework.ConnectionLinker
 import io.framed.framework.ConnectionManager
 import io.framed.framework.ModelConnection

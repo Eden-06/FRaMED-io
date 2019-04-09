@@ -1,8 +1,8 @@
 package io.framed.framework
 
 import de.westermann.kobserve.Property
-import de.westermann.kobserve.basic.mapBinding
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.property.mapBinding
+import de.westermann.kobserve.property.property
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.History
 import io.framed.framework.util.Point

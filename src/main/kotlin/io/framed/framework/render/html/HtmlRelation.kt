@@ -1,6 +1,6 @@
 package io.framed.framework.render.html
 
-import de.westermann.kobserve.ListenerReference
+import de.westermann.kobserve.event.EventListener
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.Dimension
@@ -74,7 +74,7 @@ class HtmlRelation(
 
     override fun isChildOf(container: ViewCollection<View<*>, *>): Boolean = false
 
-    private val references: MutableList<ListenerReference<*>> = mutableListOf()
+    private val references: MutableList<EventListener<*>> = mutableListOf()
     private var connections: List<JsPlumbConnection> = emptyList()
     private var labels: List<HtmlLabel> = emptyList()
 
@@ -93,7 +93,7 @@ class HtmlRelation(
 
         if (complete) {
             references.forEach {
-                it.remove()
+                it.detach()
             }
             references.clear()
             renderer.selectable -= this
@@ -282,15 +282,15 @@ class HtmlRelation(
     init {
         draw()
 
-        connection.source.onChange.reference {
+        references += connection.source.onChange.reference {
             draw()
-        }?.let(references::add)
-        connection.target.onChange.reference {
+        }
+        references += connection.target.onChange.reference {
             draw()
-        }?.let(references::add)
-        connection.onStyleChange.reference {
+        }
+        references += connection.onStyleChange.reference {
             draw()
-        }?.let(references::add)
+        }
 
         renderer.selectable += this
         setZoom(renderer.zoom)

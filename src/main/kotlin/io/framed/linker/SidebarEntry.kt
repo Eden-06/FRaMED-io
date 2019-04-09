@@ -1,7 +1,7 @@
 package io.framed.linker
 
-import de.westermann.kobserve.ListenerReference
 import de.westermann.kobserve.Property
+import de.westermann.kobserve.event.EventListener
 import io.framed.framework.ModelElement
 import io.framed.framework.ShapeLinker
 import io.framed.framework.pictogram.TextShape
@@ -13,11 +13,11 @@ class SidebarEntry<T : ModelElement<T>>(private val sidebarGroup: SidebarGroup, 
     private lateinit var nameInput: InputView
     private val listView: ListView
 
-    private var reference: ListenerReference<*>? = null
+    private var reference: EventListener<*>? = null
 
     fun bind(parameter: ShapeLinker<T, TextShape>) {
         if (param !== parameter) {
-            reference?.remove()
+            reference?.detach()
 
             param = parameter
             nameInput.value = param.pictogram.property.value

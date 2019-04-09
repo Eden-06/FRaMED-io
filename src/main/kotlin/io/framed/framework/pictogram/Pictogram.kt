@@ -1,8 +1,8 @@
 package io.framed.framework.pictogram
 
-import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.basic.flatMapBinding
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.property.flatMapBinding
+import de.westermann.kobserve.property.property
 
 /**
  * @author lars

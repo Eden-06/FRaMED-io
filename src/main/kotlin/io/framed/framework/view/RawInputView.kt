@@ -1,10 +1,10 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.ValidationProperty
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.property.property
 import io.framed.framework.util.bind
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event

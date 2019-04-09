@@ -1,6 +1,6 @@
 package io.framed.framework.render.html
 
-import de.westermann.kobserve.ListenerReference
+import de.westermann.kobserve.event.EventListener
 import io.framed.framework.JsPlumb
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.jsPlumbSourceOptionsInit
@@ -23,7 +23,7 @@ class HtmlConnections(
         private val viewModel: ViewModel
 ) {
 
-    val listeners = mutableListOf<ListenerReference<*>>()
+    val listeners = mutableListOf<EventListener<*>>()
     private val endpointMap = mutableMapOf<Shape, EndpointItem>()
     var relations: Map<Connection, HtmlRelation> = emptyMap()
     val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
@@ -41,7 +41,7 @@ class HtmlConnections(
         jsPlumbList = emptyList()
 
         for (it in listeners) {
-            it.remove()
+            it.detach()
         }
         listeners.clear()
         relations = emptyMap()
@@ -215,22 +215,22 @@ class HtmlConnections(
             allowLoopback = false
         })
 
-        val references = mutableListOf<ListenerReference<*>>()
-        view.onMouseEnter.reference {
+        val references = mutableListOf<EventListener<*>>()
+        references += view.onMouseEnter.reference {
             if (isConnecting != null && isConnecting != shape && "target-disabled" !in view.classes) {
                 view.classes += "drop-target"
 
-                var reference: ListenerReference<*>? = null
+                var reference: EventListener<*>? = null
                 reference = Root.onMouseMove.reference { event ->
                     val dimension = Dimension(shape.leftOffset, shape.topOffset, shape.width, shape.height)
                     val can = htmlRenderer.navigationView.mouseToCanvas(event.point())
                     if (can !in dimension || event.buttons == 0.toShort()) {
                         view.classes -= "drop-target"
-                        reference?.remove()
+                        reference?.detach()
                     }
                 }
             }
-        }?.let(references::add)
+        }
         endpointMap[shape] = EndpointItem(view, handler?.html, references, jsPlumbInstance)
 
         setSourceEnabled(shape, true)
@@ -247,7 +247,7 @@ class HtmlConnections(
         val html = view.html
 
         for (reference in endpointItem.references) {
-            reference.remove()
+            reference.detach()
         }
 
         view.classes -= "source-disabled"
@@ -274,18 +274,18 @@ class HtmlConnections(
     }
 
     init {
-        viewModel.onConnectionAdd.reference {
+        listeners += viewModel.onConnectionAdd.reference {
             async {
                 drawRelation(it)
             }
-        }?.let(listeners::add)
+        }
 
-        viewModel.onConnectionRemove.reference { r ->
+        listeners += viewModel.onConnectionRemove.reference { r ->
             relations[r]?.let { relation ->
                 relations -= r
                 relation.remove(true)
             }
-        }?.let(listeners::add)
+        }
     }
 
     fun init() {
@@ -295,7 +295,7 @@ class HtmlConnections(
     class EndpointItem(
             val view: View<*>,
             val handler: HTMLElement?,
-            val references: List<ListenerReference<*>>,
+            val references: List<EventListener<*>>,
             val jsPlumbInstance: JsPlumbInstance
     )
 }

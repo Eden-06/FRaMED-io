@@ -1,6 +1,6 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.ListenerReference
+import de.westermann.kobserve.event.EventListener
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
 import org.w3c.dom.HTMLDivElement
@@ -54,7 +54,7 @@ class CyclicChooser<T>(
         }
     }
 
-    var reference: ListenerReference<*>? = null
+    var reference: EventListener<*>? = null
 
     fun open() {
         Root += this
@@ -63,7 +63,7 @@ class CyclicChooser<T>(
 
     private fun close() {
         Root -= this
-        reference?.remove()
+        reference?.detach()
     }
 
     init {

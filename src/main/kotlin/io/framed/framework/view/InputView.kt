@@ -1,7 +1,7 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.ReadOnlyProperty
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.property.property
 import io.framed.framework.AutocompleteHandler
 import org.w3c.dom.HTMLDivElement
 

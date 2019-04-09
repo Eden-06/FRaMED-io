@@ -1,6 +1,6 @@
 package io.framed.framework.render.html
 
-import de.westermann.kobserve.ListenerReference
+import de.westermann.kobserve.event.EventListener
 import io.framed.framework.pictogram.Label
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.Point
@@ -17,11 +17,11 @@ class HtmlLabel(
         boundShape: Shape? = null
 ) {
 
-    val listeners = mutableListOf<ListenerReference<*>>()
+    val listeners = mutableListOf<EventListener<*>>()
 
     fun remove() {
         for (reference in listeners) {
-            reference.remove()
+            reference.detach()
         }
         listeners.clear()
         parent -= view
@@ -35,12 +35,12 @@ class HtmlLabel(
         marginLeft = label.leftProperty.value
         marginTop = label.topProperty.value
 
-        label.leftProperty.onChange.reference {
+        listeners += label.leftProperty.onChange.reference {
             marginLeft = label.leftProperty.value
-        }?.let(listeners::add)
-        label.topProperty.onChange.reference {
+        }
+        listeners += label.topProperty.onChange.reference {
             marginTop = label.topProperty.value
-        }?.let(listeners::add)
+        }
 
         if (boundShape != null) {
             left = boundShape.left
@@ -59,10 +59,10 @@ class HtmlLabel(
                 }
             }
 
-            var reference: ListenerReference<*>? = null
+            var reference: EventListener<*>? = null
             reference = Root.onMouseUp.reference {
                 markView = false
-                reference?.remove()
+                reference?.detach()
                 htmlRenderer.stopDragView()
             }
         }
@@ -79,12 +79,12 @@ class HtmlLabel(
 
     init {
         if (boundShape != null) {
-            boundShape.topProperty.onChange.reference {
+            listeners += boundShape.topProperty.onChange.reference {
                 view.top = boundShape.top
-            }?.let(listeners::add)
-            boundShape.leftProperty.onChange.reference {
+            }
+            listeners += boundShape.leftProperty.onChange.reference {
                 view.left = boundShape.left
-            }?.let(listeners::add)
+            }
         }
     }
 }

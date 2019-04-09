@@ -1,6 +1,6 @@
 package io.framed.linker
 
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.property.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory

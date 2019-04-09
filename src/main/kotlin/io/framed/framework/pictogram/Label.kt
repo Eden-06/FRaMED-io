@@ -1,6 +1,6 @@
 package io.framed.framework.pictogram
 
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.property.property
 import io.framed.framework.util.trackHistory
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient

@@ -1,6 +1,6 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.EventHandler
+import de.westermann.kobserve.event.EventHandler
 import io.framed.framework.util.Point
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.events.MouseEvent

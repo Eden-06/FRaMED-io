@@ -1,7 +1,7 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.EventHandler
 import de.westermann.kobserve.Property
+import de.westermann.kobserve.event.EventHandler
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLabelElement

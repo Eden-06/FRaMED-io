@@ -1,9 +1,9 @@
 package io.framed.framework.util
 
-import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.ListenerReference
 import de.westermann.kobserve.Property
-import de.westermann.kobserve.basic.property
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.event.EventListener
+import de.westermann.kobserve.property.property
 import io.framed.framework.ConnectionManager
 import io.framed.framework.ModelElement
 import io.framed.framework.PreviewLinker
@@ -28,7 +28,7 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
 
     private var conditionalBoxes: List<Pair<BoxShape, (L) -> Boolean>> = emptyList()
 
-    private val linkerMap: MutableMap<L, List<ListenerReference<*>>> = mutableMapOf()
+    private val linkerMap: MutableMap<L, List<EventListener<*>>> = mutableMapOf()
 
     val linkers: List<L>
         get() = linkerMap.keys.toList()
@@ -86,13 +86,12 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
             }
         }
 
-        val references = mutableListOf<ListenerReference<*>>()
-        linker.pictogram.widthProperty.onChange.reference(emit)?.let(references::add)
-        linker.pictogram.heightProperty.onChange.reference(emit)?.let(references::add)
-        linker.pictogram.leftProperty.onChange.reference(emit)?.let(references::add)
-        linker.pictogram.topProperty.onChange.reference(emit)?.let(references::add)
-
-        linkerMap[linker] = references.toList()
+        linkerMap[linker] = listOf(
+                linker.pictogram.widthProperty.onChange.reference(emit),
+                linker.pictogram.heightProperty.onChange.reference(emit),
+                linker.pictogram.leftProperty.onChange.reference(emit),
+                linker.pictogram.topProperty.onChange.reference(emit)
+        )
         view += linker.pictogram
 
         previewBox?.let { box ->
@@ -120,7 +119,7 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
     private fun internalRemove(linker: L) {
         backingRemove(linker.model)
 
-        linkerMap.remove(linker)?.forEach { it.remove() }
+        linkerMap.remove(linker)?.forEach { it.detach() }
 
         view -= linker.pictogram
         for ((box, _) in conditionalBoxes) {
@@ -176,7 +175,7 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
 
     class SetShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
             kProperty: KMutableProperty0<Set<M>>,
-            private val connectionManager: ConnectionManager? = null
+            connectionManager: ConnectionManager? = null
     ) : LinkerShapeBox<M, L>(connectionManager) {
 
         val property: Property<Set<M>> = property(kProperty)
@@ -195,7 +194,7 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
 
     class ListShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
             kProperty: KMutableProperty0<List<M>>,
-            private val connectionManager: ConnectionManager? = null
+            connectionManager: ConnectionManager? = null
     ) : LinkerShapeBox<M, L>(connectionManager) {
 
         val property: Property<List<M>> = property(kProperty)

@@ -1,7 +1,7 @@
 package io.framed.framework
 
 import de.westermann.kobserve.ReadOnlyProperty
-import de.westermann.kobserve.basic.mapBinding
+import de.westermann.kobserve.property.mapBinding
 import io.framed.framework.pictogram.ContextEvent
 import io.framed.framework.pictogram.Pictogram
 import io.framed.framework.pictogram.SidebarEvent

@@ -1,7 +1,7 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.ListenerReference
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.event.EventListener
 import io.framed.framework.util.async
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.MouseEvent
@@ -18,12 +18,12 @@ class PropertyBar : ViewCollection<View<*>, HTMLDivElement>("div") {
         listView {
             classes += "property-bar-resizer"
 
-            val listeners: MutableList<ListenerReference<*>> = mutableListOf()
+            val listeners: MutableList<EventListener<*>> = mutableListOf()
 
             onMouseDown {
                 it.preventDefault()
                 Root.classes += "resize-ew"
-                Root.onMouseMove.reference { e ->
+                listeners += Root.onMouseMove.reference { e ->
                     e.preventDefault()
                     val deltaWidth = e.clientX.toDouble() - this@PropertyBar.offsetLeft - clientWidth
                     val currentWidth = this@PropertyBar.clientWidth.toDouble()
@@ -39,19 +39,19 @@ class PropertyBar : ViewCollection<View<*>, HTMLDivElement>("div") {
 
                     this@PropertyBar.width = newWidth
                     onResize.emit(newWidth)
-                }?.let(listeners::add)
+                }
 
                 val l = { e: MouseEvent ->
                     e.preventDefault()
                     Root.classes -= "resize-ew"
                     for (l in listeners) {
-                        l.remove()
+                        l.detach()
                     }
                     listeners.clear()
                 }
 
-                Root.onMouseUp.reference(l)?.let(listeners::add)
-                Root.onMouseLeave.reference(l)?.let(listeners::add)
+                listeners += Root.onMouseUp.reference(l)
+                listeners += Root.onMouseLeave.reference(l)
             }
         }
         iconView(MaterialIcon.EXPAND_LESS) {

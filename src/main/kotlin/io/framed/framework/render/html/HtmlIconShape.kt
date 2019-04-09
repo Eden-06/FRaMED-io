@@ -40,7 +40,7 @@ class HtmlIconShape(
 
             shape.property.onChange.reference {
                 view.zIndex = if (shape.property.value == null) -1 else null
-            }?.trigger(Unit)
+            }.emit(Unit)
         }
 
         init()

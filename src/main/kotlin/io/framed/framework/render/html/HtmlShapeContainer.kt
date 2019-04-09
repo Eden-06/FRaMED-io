@@ -1,7 +1,7 @@
 package io.framed.framework.render.html
 
-import de.westermann.kobserve.EventHandler
-import de.westermann.kobserve.ListenerReference
+import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.event.EventListener
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.IconShape
@@ -85,18 +85,18 @@ class HtmlShapeContainer(
 
     val onParentMove = EventHandler<Shape>()
 
-    private val references: MutableList<ListenerReference<*>> = mutableListOf()
+    private val references: MutableList<EventListener<*>> = mutableListOf()
 
     init {
         containerShape.shapes.forEach(this::add)
-        containerShape.onAdd.reference(this::add)?.let(references::add)
-        containerShape.onRemove.reference(this::remove)?.let(references::add)
+        references += containerShape.onAdd.reference(this::add)
+        references += containerShape.onRemove.reference(this::remove)
     }
 
     fun remove() {
         shapeMap.keys.forEach(this::remove)
         for (it in references) {
-            it.remove()
+            it.detach()
         }
         references.clear()
     }
