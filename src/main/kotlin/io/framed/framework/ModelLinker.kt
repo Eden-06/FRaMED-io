@@ -27,7 +27,7 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
 
     val borderShapes: MutableList<Shape>
 
-    fun updateSize()
+    fun updateSize(allowDownscale: Boolean = false)
 
     fun getLinkerById(id: Long): ShapeLinker<*, *>? =
             shapeLinkers.find { it.id == id }

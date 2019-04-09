@@ -9,6 +9,7 @@ import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Package
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
@@ -205,6 +206,9 @@ class PackageLinker(
             }
         }
         sidebarViewGroup = group("Layout") {
+            button("Auto size") {
+                updateSize(true)
+            }
             input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
                 "x=${left.roundToInt()}, y=${top.roundToInt()}"
             })
@@ -271,18 +275,39 @@ class PackageLinker(
         contextStepOut.display = event.target != pictogram && parent != null
     }
 
-    override fun updateSize() {
-        var maxH = 0.0
-        val headlineHeight = this.autoLayoutBox.topOffset - this.pictogram.topOffset
-        val contentHeight = this.pictogram.height - headlineHeight
+    override fun updateSize(allowDownscale: Boolean) {
+        // Get size of top views
+        val headlineHeight = autoLayoutBox.topOffset - pictogram.topOffset
+
+        // Set spacing to left and bottom border
+        val spacing = 20
+
+        var calcWidth = 50.0
+        var calcHeight = 20.0
+
+        // Calculate size boundaries
+        var contentHeight = pictogram.height - headlineHeight - spacing
+        var contentWidth = pictogram.width - spacing
+
+        // Check boundaries of children and increase parent boundaries if necessary
         for (child in autoLayoutBox.shapes) {
-            val cH = child.topOffset + child.height
-            if (cH > contentHeight) {
-                maxH = cH
-            }
+            calcHeight = max(calcHeight, child.top + child.height)
+            calcWidth = max(calcWidth, child.left + child.width)
         }
-        if (maxH > 0.0) {
-            this.pictogram.height = maxH + 20 + headlineHeight
+
+        if(calcHeight < contentHeight){
+            if(allowDownscale){
+                pictogram.height = calcHeight + spacing + headlineHeight
+            }
+        } else {
+            pictogram.height = calcHeight + spacing + headlineHeight
+        }
+        if(calcWidth < contentWidth){
+            if(allowDownscale){
+                pictogram.width = calcWidth + spacing
+            }
+        } else {
+            pictogram.width = calcWidth + spacing
         }
     }
 

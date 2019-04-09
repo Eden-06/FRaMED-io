@@ -250,6 +250,9 @@ class CompartmentLinker(
             }
         }
         sidebarViewGroup = group("Layout") {
+            button("Auto size") {
+                updateSize(true)
+            }
             input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
                 "x=${left.roundToInt()}, y=${top.roundToInt()}"
             })
@@ -345,12 +348,15 @@ class CompartmentLinker(
         sidebarMethods.toForeground(sidebarMethodsAdd)
     }
 
-    override fun updateSize() {
+    override fun updateSize(allowDownscale: Boolean) {
         // Get size of top views
         val headlineHeight = autoLayoutBox.topOffset - pictogram.topOffset
 
         // Set spacing to left and bottom border
         val spacing = 20
+
+        var calcWidth = 50.0
+        var calcHeight = 20.0
 
         // Calculate size boundaries
         var contentHeight = pictogram.height - headlineHeight - spacing
@@ -358,13 +364,24 @@ class CompartmentLinker(
 
         // Check boundaries of children and increase parent boundaries if necessary
         for (child in autoLayoutBox.shapes) {
-            contentHeight = max(contentHeight, child.top + child.height)
-            contentWidth = max(contentWidth, child.left + child.width)
+            calcHeight = max(calcHeight, child.top + child.height)
+            calcWidth = max(calcWidth, child.left + child.width)
         }
 
-        // Set new boundaries
-        pictogram.height = contentHeight + spacing + headlineHeight
-        pictogram.width = contentWidth + spacing
+        if(calcHeight < contentHeight){
+            if(allowDownscale){
+                pictogram.height = calcHeight + spacing + headlineHeight
+            }
+        } else {
+            pictogram.height = calcHeight + spacing + headlineHeight
+        }
+        if(calcWidth < contentWidth){
+            if(allowDownscale){
+                pictogram.width = calcWidth + spacing
+            }
+        } else {
+            pictogram.width = calcWidth + spacing
+        }
     }
 
     /**
