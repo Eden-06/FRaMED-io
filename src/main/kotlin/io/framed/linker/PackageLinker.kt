@@ -1,11 +1,11 @@
 package io.framed.linker
 
-import Layouting
 import de.westermann.kobserve.property.*
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.Point
 import io.framed.framework.util.RegexValidator
+import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Package

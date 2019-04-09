@@ -1,9 +1,7 @@
-import io.framed.framework.Dagre
-import io.framed.framework.dagreGraphOptions
-import io.framed.framework.dagreNodeOptions
+package io.framed.framework
+
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Connection
-import io.framed.framework.setDefaultEdgeLabel
 
 object Layouting {
     fun autoLayout(container: BoxShape, connections: Set<Connection>) {
