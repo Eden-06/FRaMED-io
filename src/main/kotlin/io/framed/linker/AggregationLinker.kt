@@ -114,6 +114,7 @@ class AggregationLinker(
 
         override fun createModel(source: Long, target: Long): ModelConnection<*> = Aggregation(source, target)
         override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
-                if (model is Aggregation) AggregationLinker(model, connectionManager) else throw UnsupportedOperationException()
+                if (model is Aggregation) AggregationLinker(model, connectionManager)
+                else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
     }
 }

@@ -111,6 +111,7 @@ class CreateRelationshipLinker(
 
         override fun createModel(source: Long, target: Long): ModelConnection<*> = CreateRelationship(source, target)
         override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
-                if (model is CreateRelationship) CreateRelationshipLinker(model, connectionManager) else throw UnsupportedOperationException()
+                if (model is CreateRelationship) CreateRelationshipLinker(model, connectionManager)
+                else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
     }
 }

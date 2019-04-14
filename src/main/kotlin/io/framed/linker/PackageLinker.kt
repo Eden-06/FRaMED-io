@@ -225,9 +225,7 @@ class PackageLinker(
     override fun remove(linker: ShapeLinker<*, *>) {
         if (linker in children) {
             children -= linker
-        } else {
-            super.remove(linker)
-        }
+        } else super.remove(linker)
         checkBorder()
     }
 
@@ -285,7 +283,7 @@ class PackageLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Package && parent is ModelLinker<*, *, *> && connectionManager != null) {
                 return PackageLinker(model, connectionManager, parent)
-            } else throw UnsupportedOperationException()
+            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
         }
 
         override val name: String = "Package"

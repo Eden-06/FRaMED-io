@@ -254,9 +254,12 @@ class CompartmentLinker(
     }
 
     override fun remove(linker: ShapeLinker<*, *>) {
-        if (linker is ClassLinker || linker is RoleTypeLinker || linker is EventLinker) {
-            children -= linker
-        } else super.remove(linker)
+        when (linker) {
+            is AttributeLinker -> attributes.remove(linker)
+            is MethodLinker -> methods.remove(linker)
+            in children -> children -= linker
+            else -> super.remove(linker)
+        }
         checkBorder()
     }
 
@@ -373,7 +376,7 @@ class CompartmentLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Compartment && parent is ModelLinker<*, *, *> && connectionManager != null) {
                 return CompartmentLinker(model, connectionManager, parent)
-            } else throw UnsupportedOperationException()
+            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
         }
 
         override val name: String = "Compartment"

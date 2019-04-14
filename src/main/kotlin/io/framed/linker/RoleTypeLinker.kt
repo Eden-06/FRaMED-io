@@ -244,7 +244,7 @@ class RoleTypeLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is RoleType && parent is ModelLinker<*,*, *>) {
                 return RoleTypeLinker(model, parent)
-            } else throw UnsupportedOperationException()
+            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
         }
 
         override val name: String = "RoleType"

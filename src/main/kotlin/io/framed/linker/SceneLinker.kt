@@ -231,9 +231,11 @@ class SceneLinker(
     }
 
     override fun remove(linker: ShapeLinker<*, *>) {
-        if (linker is ClassLinker || linker is RoleTypeLinker || linker is EventLinker) {
-            children -= linker
-        } else super.remove(linker)
+        when (linker) {
+            is AttributeLinker -> attributes.remove(linker)
+            in children -> children -= linker
+            else -> super.remove(linker)
+        }
         checkBorder()
     }
 
@@ -319,9 +321,9 @@ class SceneLinker(
 
         override fun createModel(): ModelElement<*> = Scene()
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is Scene && parent is ModelLinker<*,*, *> && connectionManager != null) {
+            if (model is Scene && parent is ModelLinker<*, *, *> && connectionManager != null) {
                 return SceneLinker(model, connectionManager, parent)
-            } else throw UnsupportedOperationException()
+            } else throw IllegalArgumentException("Cannot create ${AttributeLinker.name} linker for model element ${model::class}")
         }
 
         override val name: String = "Scene"

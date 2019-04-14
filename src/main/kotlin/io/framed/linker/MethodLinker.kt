@@ -214,7 +214,7 @@ class MethodLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Method && parent is ShapeLinker<*, *>) {
                 return MethodLinker(model, parent)
-            } else throw UnsupportedOperationException()
+            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
         }
 
         override val name: String = "Method"

@@ -114,7 +114,7 @@ class AttributeLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Attribute && parent is ShapeLinker<*, *>) {
                 return AttributeLinker(model, parent)
-            } else throw UnsupportedOperationException()
+            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
         }
 
         override val name: String = "Attribute"

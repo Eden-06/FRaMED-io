@@ -115,6 +115,7 @@ class DestroyRelationshipLinker(
 
         override fun createModel(source: Long, target: Long): ModelConnection<*> = DestroyRelationship(source, target)
         override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
-                if (model is DestroyRelationship) DestroyRelationshipLinker(model, connectionManager) else throw UnsupportedOperationException()
+                if (model is DestroyRelationship) DestroyRelationshipLinker(model, connectionManager)
+                else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
     }
 }
