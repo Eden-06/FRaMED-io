@@ -2,16 +2,18 @@ package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.TextShape
+import io.framed.framework.util.async
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.inputView
 import kotlin.browser.document
+import kotlin.math.max
 
 class HtmlTextShape(
         htmlRenderer: HtmlRenderer,
         override val shape: TextShape,
         parent: HtmlContentShape?,
-        parentContainer: HtmlShapeContainer?,
+        parentContainer: HtmlShapeContainer,
         container: ViewCollection<View<*>, *>,
         override val jsPlumbInstance: JsPlumbInstance
 ) : HtmlShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
@@ -27,14 +29,28 @@ class HtmlTextShape(
         }
         onFocusEnter {
             val downEvent = document.createEvent("MouseEvents")
-            downEvent.initEvent("mousedown", true, true);
+            downEvent.initEvent("mousedown", bubbles = true, cancelable = true);
             html.dispatchEvent(downEvent)
             val upEvent = document.createEvent("MouseEvents")
-            upEvent.initEvent("mouseup", true, true);
+            upEvent.initEvent("mouseup", bubbles = true, cancelable = true);
             html.dispatchEvent(upEvent)
         }
         onFocusLeave {
             value = shape.property.value
+        }
+
+        onChange {
+            updateSize()
+        }
+    }
+
+    private fun updateSize() {
+        //TODO The current formula definitely depends on the dpi settings
+        val width = max(100, shape.property.value.length * 11 + 24)
+        view.html.style.minWidth = "${width}px"
+        async {
+            shape.width = width.toDouble()
+            shape.height = view.clientHeight.toDouble()
         }
     }
 
@@ -44,6 +60,6 @@ class HtmlTextShape(
 
     init {
         init()
+        updateSize()
     }
-
 }

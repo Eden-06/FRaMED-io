@@ -1,7 +1,9 @@
 package io.framed.framework.pictogram
 
 import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.event.EventListener
 import io.framed.framework.Linker
+import kotlin.math.max
 
 /**
  * @author lars
@@ -13,12 +15,12 @@ class BoxShape(id: Long?) : Shape(id) {
     }
 
     var position = Position.VERTICAL
-    var resizeable = false
-
-    val shapes: List<Shape>
-        get() = internalShapes
 
     private var internalShapes: List<Shape> = emptyList()
+    private val shapeMap: MutableMap<Shape, List<EventListener<*>>> = mutableMapOf()
+
+    val shapes: List<Shape>
+            get() = internalShapes
 
     val onAdd = EventHandler<Shape>()
     val onRemove = EventHandler<Shape>()
@@ -27,6 +29,12 @@ class BoxShape(id: Long?) : Shape(id) {
     fun add(shape: Shape) {
         if (shape !in internalShapes) {
             internalShapes += shape
+
+            shapeMap[shape] = listOf(
+                    shape.widthProperty.onChange.reference(this::onChildChanged),
+                    shape.heightProperty.onChange.reference(this::onChildChanged),
+                    shape.visibleProperty.onChange.reference(this::onChildChanged)
+            )
 
             renderShape(shape)
 
@@ -38,6 +46,7 @@ class BoxShape(id: Long?) : Shape(id) {
     fun remove(shape: Shape) {
         if (shape in internalShapes) {
             internalShapes -= shape
+            shapeMap.remove(shape)?.forEach { it.detach() }
             shape.parent = null
             if (shape.layerProperty.isBound) {
                 shape.layerProperty.unbind()
@@ -52,10 +61,75 @@ class BoxShape(id: Long?) : Shape(id) {
 
     operator fun Shape.unaryPlus() = add(this)
 
+    val onAutoSize = EventHandler<Unit>()
+    fun autoSize(allowDownsize: Boolean = false) {
+
+        val verticalPadding = (style.padding?.left ?: 0.0) + (style.padding?.right ?: 0.0)
+        val horizontalPadding = (style.padding?.top ?: 0.0) + (style.padding?.bottom ?: 0.0)
+
+        var newHeight: Double
+        var newWidth: Double
+
+        when (position) {
+            Position.ABSOLUTE -> {
+                var maxWidth = 80.0
+                var maxHeight = 0.0
+
+                for (child in shapes) {
+                    maxHeight = max(maxHeight, child.top + child.height)
+                    maxWidth = max(maxWidth, child.left + child.width)
+                }
+
+                newHeight = maxHeight
+                newWidth = maxWidth
+            }
+            Position.HORIZONTAL -> {
+                for (shape in shapes) {
+                    if (shape is BoxShape) {
+                        shape.autoSize(allowDownsize)
+                    }
+                }
+
+                newHeight = shapes.filter { it.visible }.maxBy { it.height }?.height ?: 0.0
+                newWidth = shapes.filter { it.visible }.sumByDouble { it.width }
+            }
+            Position.VERTICAL -> {
+                for (shape in shapes) {
+                    if (shape is BoxShape) {
+                        shape.autoSize(allowDownsize)
+                    }
+                }
+
+                newHeight = shapes.filter { it.visible }.sumByDouble { it.height }
+                newWidth = shapes.filter { it.visible }.maxBy { it.width }?.width ?: 0.0
+            }
+            Position.BORDER -> {
+                return
+            }
+        }
+
+        newHeight += verticalPadding
+        newWidth += horizontalPadding
+
+        if (newHeight > height || allowDownsize) {
+            height = newHeight
+        }
+        if (newWidth > width || allowDownsize) {
+            width = newWidth
+        }
+    }
+
+    private fun onChildChanged(@Suppress("UNUSED_PARAMETER") unit: Unit) {
+        onAutoSize.emit(Unit)
+        if (!resizeable && parent != null) {
+            autoSize(true)
+        }
+    }
+
     fun leftOffset(shape: Shape): Double = leftOffset + when (position) {
         Position.HORIZONTAL -> {
             var sum = 0.0
-            for (s in internalShapes) {
+            for (s in shapes) {
                 if (s == shape) {
                     break
                 }
@@ -69,7 +143,7 @@ class BoxShape(id: Long?) : Shape(id) {
     fun topOffset(shape: Shape): Double = topOffset + when (position) {
         Position.VERTICAL -> {
             var sum = 0.0
-            for (s in internalShapes) {
+            for (s in shapes) {
                 if (s == shape) {
                     break
                 }

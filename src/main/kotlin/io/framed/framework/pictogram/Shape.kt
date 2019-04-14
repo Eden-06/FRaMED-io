@@ -27,6 +27,7 @@ abstract class Shape(id: Long?) : Pictogram(id) {
     var height by heightProperty
 
     var parent: BoxShape? = null
+    var resizeable = false
 
     val leftOffset: Double
         get() = left + (parent?.leftOffset(this) ?: 0.0)

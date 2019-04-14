@@ -178,9 +178,7 @@
   width: -webkit-max-content;
   width: max-content;
 
-  &.focus {
-    z-index: 1;
-  }
+  z-index: 2;
 
   input {
     background-color: rgba($primary-background, .6);
@@ -199,8 +197,12 @@
   }
 }
 
-.jtk-connector.jtk-dragging {
+.jtk-connector {
   z-index: 1;
+
+  &.jtk-dragging {
+    z-index: 2;
+  }
 }
 
 .jtk-endpoint {
@@ -265,6 +267,7 @@
 
 .horizontal-view {
   clear: left;
+
   & > * {
     float: left;
   }

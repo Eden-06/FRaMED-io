@@ -1,7 +1,6 @@
 package io.framed.linker
 
 import de.westermann.kobserve.property.FunctionAccessor
-import de.westermann.kobserve.property.join
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
@@ -12,7 +11,6 @@ import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.*
-import kotlin.math.roundToInt
 
 /**
  * @author lars
@@ -134,15 +132,13 @@ class RoleTypeLinker(
             }
         }
         sidebarViewGroup = group("Layout") {
-            input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
-                "x=${left.roundToInt()}, y=${top.roundToInt()}"
-            })
-            input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
-                "width=${width.roundToInt()}, height=${height.roundToInt()}"
-            })
-            checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
+            button("Auto size") {
+                updateSize(true)
+            }
             checkBox("Complete view", isCompleteViewProperty, CheckBox.Type.SWITCH)
         }
+
+        advanced(pictogram)
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
@@ -209,6 +205,10 @@ class RoleTypeLinker(
     init {
         attributes.view.visibleProperty.bind(isCompleteViewProperty)
         methods.view.visibleProperty.bind(isCompleteViewProperty)
+
+        pictogram.onAutoSize {
+            updateSize()
+        }
 
         model.attributes.forEach { attributes += AttributeLinker(it, this) }
         model.methods.forEach { methods += MethodLinker(it, this) }

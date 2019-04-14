@@ -1,5 +1,6 @@
 package io.framed.framework
 
+import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.SidebarEvent
 import io.framed.framework.view.dialog
@@ -35,5 +36,12 @@ interface ShapeLinker<M : ModelElement<M>, P : Shape> : Linker<M, P> {
         val parent = parent
         return parent?.getTypeSubset(partial)
                 ?: subTypes.filter { it.toLowerCase().contains(partial.toLowerCase()) && it.isNotEmpty() }.take(8)
+    }
+
+    fun updateSize(allowDownsize: Boolean = false) {
+        if (allowDownsize) {
+            pictogram.autosize = true
+        }
+        (pictogram as? BoxShape)?.autoSize(allowDownsize || pictogram.autosize)
     }
 }

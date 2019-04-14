@@ -11,8 +11,8 @@ import kotlin.browser.window
 /**
  * Entry point of the application.
  */
-@Suppress("UNUSED", "UnusedMainParameter")
-fun main(args: Array<String>) {
+@Suppress("UNUSED")
+fun main() {
     // Wait for the body to load.
     window.onload = {
         init()

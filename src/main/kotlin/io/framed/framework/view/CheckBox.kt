@@ -1,6 +1,7 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.Property
+import de.westermann.kobserve.ReadOnlyProperty
 import de.westermann.kobserve.event.EventHandler
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLInputElement
@@ -13,7 +14,7 @@ import org.w3c.dom.events.EventListener
  *
  * @author lars
  */
-class CheckBox(label: String, property: Property<Boolean>) : View<HTMLDivElement>("div") {
+class CheckBox(label: String, property: ReadOnlyProperty<Boolean>) : View<HTMLDivElement>("div") {
 
     private val checkbox = View.createView<HTMLInputElement>("input")
     private val htmlLabel = View.createView<HTMLLabelElement>("label")
@@ -43,6 +44,12 @@ class CheckBox(label: String, property: Property<Boolean>) : View<HTMLDivElement
             }
         }
 
+    var readOnly: Boolean
+        get() = checkbox.readOnly
+        set(value) {
+            checkbox.readOnly = value
+        }
+
     init {
         html.appendChild(checkbox)
         html.appendChild(htmlLabel)
@@ -66,7 +73,11 @@ class CheckBox(label: String, property: Property<Boolean>) : View<HTMLDivElement
         property.onChange {
             state = property.value
         }
-        onChange(property::set)
+        if (property is Property<Boolean>) {
+            onChange(property::set)
+        } else {
+            readOnly = true
+        }
     }
 
     companion object {

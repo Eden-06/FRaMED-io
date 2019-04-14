@@ -12,7 +12,7 @@ class HtmlIconShape(
         htmlRenderer: HtmlRenderer,
         override val shape: IconShape,
         parent: HtmlContentShape?,
-        parentContainer: HtmlShapeContainer?,
+        parentContainer: HtmlShapeContainer,
         container: ViewCollection<View<*>, *>,
         val position: BoxShape.Position,
         override val jsPlumbInstance: JsPlumbInstance

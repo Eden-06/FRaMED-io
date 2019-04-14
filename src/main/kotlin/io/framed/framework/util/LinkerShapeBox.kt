@@ -15,10 +15,19 @@ import kotlin.reflect.KMutableProperty0
 sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
         private val connectionManager: ConnectionManager?
 ) {
+    private var listeners: List<EventListener<*>> = emptyList()
     var view: BoxShape = BoxShape(-1)
         set(value) {
+            for (it in listeners) {
+                it.detach()
+            }
             field = value
             setIgnore(value)
+            listeners = listOf(
+                    value.visibleProperty.onChange.reference(this::emitChildrenChanged),
+                    value.widthProperty.onChange.reference(this::emitChildrenChanged),
+                    value.heightProperty.onChange.reference(this::emitChildrenChanged)
+            )
         }
     var previewBox: BoxShape? = null
         set(value) {

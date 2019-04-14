@@ -8,9 +8,9 @@ import io.framed.framework.view.textView
 import io.framed.model.Connections
 import io.framed.model.Package
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import kotlin.math.max
 
 @Serializable
@@ -30,20 +30,20 @@ class File(
     }
 
     fun toJSON(): String {
-        return Json.indented.stringify(File.serializer(), this) + "\n"
+        return json.stringify(serializer(), this) + "\n"
     }
 
     companion object {
+        private val json = Json(
+                JsonConfiguration.Stable.copy(
+                        strictMode = false,
+                        prettyPrint = true
+                )
+        )
+
         fun fromJSON(content: String): File? {
             return try {
-                val file = try {
-                    Json.parse(File.serializer(), content)
-                } catch (e: SerializationException) {
-                    val result = Json.nonstrict.parse(File.serializer(), content)
-                    println("The provided file was created with an older version of FRaMED-io and is not longer valid.\n" +
-                            "It could be opened in compatibility mode. Please resave to avoid further problems.")
-                    result
-                }
+                val file = json.parse(serializer(), content)
                 ModelElement.lastId = file.maxId() + 1
 
                 file
@@ -52,7 +52,7 @@ class File(
                 e.log()
                 dialog {
                     title = "Error while opening file"
-                    contentView.textView("The selected file is malformated and cannot be parsed.")
+                    contentView.textView("The selected file is invalid and cannot be parsed.")
                     closable = true
                     addButton("Abort", true) {}
                 }.open()

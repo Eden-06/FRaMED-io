@@ -50,8 +50,6 @@ class HtmlShapeContainer(
             }
 
             htmlRenderer.htmlConnections.addShape(shape)
-
-            checkParentAutosize()
         }
     }
 
@@ -64,23 +62,6 @@ class HtmlShapeContainer(
         }
         htmlRenderer.shapeMap -= shape
         htmlRenderer.htmlConnections.deleteShape(shape)
-        checkParentAutosize()
-    }
-
-    private tailrec fun checkParentAutosize(p: HtmlContentShape? = parent) {
-        if (p != null) {
-            if (p is HtmlBoxShape) {
-                val resizer = p.resizer
-
-                if (resizer != null) {
-                    if (p.shape.autosize) {
-                        p.updateAutosize()
-                    }
-                }
-            }
-
-            checkParentAutosize(p.parent)
-        }
     }
 
     val onParentMove = EventHandler<Shape>()

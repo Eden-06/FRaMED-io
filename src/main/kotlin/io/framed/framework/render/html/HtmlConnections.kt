@@ -89,16 +89,15 @@ class HtmlConnections(
         return instance
     }
 
-    fun findInstance(idList: List<Long>): JsPlumbInstance? {
+    fun findInstance(idList: List<Long>): JsPlumbInstance {
         val list = htmlRenderer.shapeMap.filterKeys { it.id in idList }.values.mapNotNull {
             it.jsPlumbInstance
         }.distinct()
 
-        return when {
-            list.isEmpty() -> null
-            list.size == 1 -> list.first()
-            jsPlumbList.first().first in list -> jsPlumbList.first().first
-            else -> null
+        return if (list.size == 1) {
+            list.first()
+        } else {
+            jsPlumbList.firstOrNull { it.first in list }?.first ?: jsPlumbList.first().first
         }
     }
 

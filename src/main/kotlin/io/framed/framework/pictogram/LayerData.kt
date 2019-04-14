@@ -3,7 +3,6 @@ package io.framed.framework.pictogram
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.property.property
 import io.framed.framework.util.trackHistory
-import kotlinx.serialization.Optional
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -11,15 +10,10 @@ import kotlinx.serialization.Transient
 data class LayerData(
         private var left: Double = 0.0,
         private var top: Double = 0.0,
-        @Optional
         private var width: Double = 0.0,
-        @Optional
         private var height: Double = 0.0,
-        @Optional
         private var autosize: Boolean = true,
-        @Optional
         private val data: MutableMap<String, String> = mutableMapOf(),
-        @Optional
         private var labels: List<Label> = emptyList(),
         @Transient
         private val trackHistory: Boolean = true

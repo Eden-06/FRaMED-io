@@ -9,7 +9,7 @@ abstract class HtmlContentShape(
         htmlRenderer: HtmlRenderer,
         shape: Shape,
         parent: HtmlContentShape?,
-        parentContainer: HtmlShapeContainer?,
+        parentContainer: HtmlShapeContainer,
         container: ViewCollection<View<*>, *>,
         jsPlumbInstance: JsPlumbInstance?
 ) : HtmlShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {

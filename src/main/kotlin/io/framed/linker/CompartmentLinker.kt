@@ -1,7 +1,6 @@
 package io.framed.linker
 
 import de.westermann.kobserve.property.FunctionAccessor
-import de.westermann.kobserve.property.join
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
@@ -15,8 +14,6 @@ import io.framed.model.Attribute
 import io.framed.model.Compartment
 import io.framed.model.Method
 import io.framed.model.Package
-import kotlin.math.max
-import kotlin.math.roundToInt
 
 /**
  * @author lars
@@ -49,7 +46,7 @@ class CompartmentLinker(
     override val subTypes: Set<String>
         get() = (attributes.linkers.flatMap { it.subTypes } + methods.linkers.flatMap { it.subTypes } + shapeLinkers.flatMap { it.subTypes }).toSet() + model.name
 
-    private lateinit var autoLayoutBox: BoxShape
+    override lateinit var autoLayoutBox: BoxShape
     override lateinit var borderBox: BoxShape
     override val borderShapes = mutableListOf<Shape>()
 
@@ -184,27 +181,6 @@ class CompartmentLinker(
         title("Compartment")
         group("General") {
             input("Name", nameProperty)
-
-            /*
-            button("Log") {
-                fun log(shape: Shape): dynamic {
-                    val h = js("{}")
-                    h.type = shape::class.simpleName
-                    h.width = shape.width
-                    h.height = shape.height
-                    h.id = shape.id?.toInt()
-                    if (shape is BoxShape) {
-                        h.children = js("[]")
-                        for (s in shape.shapes) {
-                            h.children.push(log(s))
-                        }
-                    }
-                    return h
-                }
-
-                console.log(log(pictogram))
-            }
-            */
         }
         sidebarAttributes = group("Attributes") {
             collapse()
@@ -253,15 +229,9 @@ class CompartmentLinker(
             button("Auto size") {
                 updateSize(true)
             }
-            input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
-                "x=${left.roundToInt()}, y=${top.roundToInt()}"
-            })
-            input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
-                "width=${width.roundToInt()}, height=${height.roundToInt()}"
-            })
-            checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
             checkBox("Complete view", isCompleteViewProperty, CheckBox.Type.SWITCH)
         }
+        advanced(pictogram)
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
@@ -348,42 +318,6 @@ class CompartmentLinker(
         sidebarMethods.toForeground(sidebarMethodsAdd)
     }
 
-    override fun updateSize(allowDownscale: Boolean) {
-        // Get size of top views
-        val headlineHeight = autoLayoutBox.topOffset - pictogram.topOffset
-
-        // Set spacing to left and bottom border
-        val spacing = 20
-
-        var calcWidth = 50.0
-        var calcHeight = 20.0
-
-        // Calculate size boundaries
-        var contentHeight = pictogram.height - headlineHeight - spacing
-        var contentWidth = pictogram.width - spacing
-
-        // Check boundaries of children and increase parent boundaries if necessary
-        for (child in autoLayoutBox.shapes) {
-            calcHeight = max(calcHeight, child.top + child.height)
-            calcWidth = max(calcWidth, child.left + child.width)
-        }
-
-        if(calcHeight < contentHeight){
-            if(allowDownscale){
-                pictogram.height = calcHeight + spacing + headlineHeight
-            }
-        } else {
-            pictogram.height = calcHeight + spacing + headlineHeight
-        }
-        if(calcWidth < contentWidth){
-            if(allowDownscale){
-                pictogram.width = calcWidth + spacing
-            }
-        } else {
-            pictogram.width = calcWidth + spacing
-        }
-    }
-
     /**
      * The model initializes a new instance of the linker
      */
@@ -392,6 +326,10 @@ class CompartmentLinker(
         methods.view.visibleProperty.bind(isCompleteViewProperty)
         children.view.visibleProperty.bind(isCompleteViewProperty)
         children.previewBox?.visibleProperty?.bind(isCompleteViewProperty)
+
+        pictogram.onAutoSize {
+            updateSize()
+        }
 
         model.attributes.forEach { attributes += AttributeLinker(it, this) }
         model.methods.forEach { methods += MethodLinker(it, this) }

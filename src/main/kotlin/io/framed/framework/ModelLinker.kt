@@ -24,10 +24,9 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
 
     val container: BoxShape
     val borderBox: BoxShape
+    val autoLayoutBox: BoxShape
 
     val borderShapes: MutableList<Shape>
-
-    fun updateSize(allowDownscale: Boolean = false)
 
     fun getLinkerById(id: Long): ShapeLinker<*, *>? =
             shapeLinkers.find { it.id == id }

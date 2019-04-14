@@ -8,28 +8,17 @@ import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.listView
 import io.framed.framework.view.resizeable
+import kotlin.math.max
 
 class HtmlBoxShape(
         htmlRenderer: HtmlRenderer,
         override val shape: BoxShape,
         parent: HtmlContentShape?,
-        parentContainer: HtmlShapeContainer?,
+        parentContainer: HtmlShapeContainer,
         container: ViewCollection<View<*>, *>,
         val position: BoxShape.Position,
         override val jsPlumbInstance: JsPlumbInstance
 ) : HtmlContentShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
-
-    fun updateAutosize() {
-        if (shape.autosize) {
-            positionView.autoWidth()
-            positionView.autoHeight()
-
-            async {
-                shape.width = positionView.clientWidth.toDouble()
-                shape.height = positionView.clientHeight.toDouble()
-            }
-        }
-    }
 
     override val positionView = container.listView {
         if (shape.style.notch) {
@@ -75,10 +64,14 @@ class HtmlBoxShape(
                     val snappedSize = snap.point - event.position
 
                     shape.autosize = false
-                    shape.width = snappedSize.x
-                    shape.height = snappedSize.y
-                    this@listView.width = snappedSize.x
-                    this@listView.height = snappedSize.y
+
+                    val width = max(snappedSize.x, 100.0)
+                    val height = max(snappedSize.y, 40.0)
+
+                    shape.width = width
+                    shape.height = height
+                    this@listView.width = width
+                    this@listView.height = height
                     revalidate()
 
                     if (htmlRenderer.snapToView) {
@@ -97,35 +90,9 @@ class HtmlBoxShape(
                 }
             }
 
-            shape.autosizeProperty.onChange {
-                if (shape.autosize) {
-                    autoWidth()
-                    autoHeight()
-
-                    async {
-                        shape.width = clientWidth.toDouble()
-                        shape.height = clientHeight.toDouble()
-                        revalidate()
-                    }
-                } else {
-                    async {
-                        shape.width = clientWidth.toDouble()
-                        shape.height = clientHeight.toDouble()
-                        width = shape.width
-                        height = shape.height
-                        revalidate()
-                    }
-                }
-            }
-
-            if (!shape.autosize) {
+            if (shape.resizeable) {
                 width = shape.width
                 height = shape.height
-            }
-        } else {
-            async {
-                shape.width = clientWidth.toDouble()
-                shape.height = clientHeight.toDouble()
             }
         }
     }
@@ -137,6 +104,8 @@ class HtmlBoxShape(
 
         if (shape.position == BoxShape.Position.ABSOLUTE) {
             html.style.position = "relative"
+            html.style.overflowX = "visible"
+            html.style.overflowY = "visible"
         }else if (shape.position == BoxShape.Position.HORIZONTAL) {
             classes += "horizontal-view"
         }

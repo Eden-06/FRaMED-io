@@ -1,7 +1,6 @@
 package io.framed.linker
 
 import de.westermann.kobserve.property.FunctionAccessor
-import de.westermann.kobserve.property.join
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
@@ -12,7 +11,6 @@ import io.framed.framework.util.shapeBox
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.*
-import kotlin.math.roundToInt
 
 /**
  * @author lars
@@ -132,15 +130,13 @@ class ClassLinker(
             }
         }
         sidebarViewGroup = group("Layout") {
-            input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
-                "x=${left.roundToInt()}, y=${top.roundToInt()}"
-            })
-            input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
-                "width=${width.roundToInt()}, height=${height.roundToInt()}"
-            })
-            checkBox("Autosize", pictogram.autosizeProperty, CheckBox.Type.SWITCH)
+            button("Auto size") {
+                updateSize(true)
+            }
             checkBox("Complete view", isCompleteViewProperty, CheckBox.Type.SWITCH)
         }
+
+        advanced(pictogram)
     }
 
     override fun Sidebar.onOpen(event: SidebarEvent) {
@@ -208,6 +204,10 @@ class ClassLinker(
         attributes.view.visibleProperty.bind(isCompleteViewProperty)
         methods.view.visibleProperty.bind(isCompleteViewProperty)
 
+        pictogram.onAutoSize {
+            updateSize()
+        }
+
         model.attributes.forEach { attributes += AttributeLinker(it, this) }
         model.methods.forEach { methods += MethodLinker(it, this) }
 
@@ -240,7 +240,7 @@ class ClassLinker(
 
         override fun createModel(): ModelElement<*> = Class()
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is Class && parent is ModelLinker<*,*, *>) {
+            if (model is Class && parent is ModelLinker<*, *, *>) {
                 return ClassLinker(model, parent)
             } else throw UnsupportedOperationException()
         }
