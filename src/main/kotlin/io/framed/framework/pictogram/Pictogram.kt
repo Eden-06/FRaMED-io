@@ -11,6 +11,8 @@ abstract class Pictogram(
         val id: Long?
 ) {
 
+    var ignoreLabels: Boolean = false
+
     val layerProperty = property(Layer())
     var layer by layerProperty
 

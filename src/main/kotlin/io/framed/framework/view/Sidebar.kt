@@ -49,32 +49,3 @@ class Sidebar : ViewCollection<View<*>, HTMLDivElement>("div") {
  * @return The new sidebar.
  */
 fun sidebar(init: Sidebar.() -> Unit): Sidebar = Sidebar().also(init)
-
-fun Sidebar.advanced(pictogram: Shape) {
-    group("Advanced") {
-        input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
-            "x=${left.roundToInt()}, y=${top.roundToInt()}"
-        })
-        input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
-            "width=${width.roundToInt()}, height=${height.roundToInt()}"
-        })
-        checkBox("Autosize", pictogram.autosizeProperty.readOnly(), CheckBox.Type.SWITCH)
-        button("Log pictogram") {
-            fun log(shape: Shape): String {
-                val type = shape::class.simpleName ?: "Unknown"
-                val position = (shape as? BoxShape)?.position?.name?.first()?.let { "[$it]" } ?: ""
-                return buildString {
-                    append("$type$position(${shape.id?.toInt()}: ${shape.width} x ${shape.height})")
-                    if (shape is BoxShape) {
-                        for (child in shape.shapes) {
-                            append("\n")
-                            append(log(child).prependIndent("| "))
-                        }
-                    }
-                }
-            }
-
-            console.log(log(pictogram))
-        }
-    }
-}

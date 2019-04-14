@@ -15,7 +15,7 @@ abstract class HtmlShape(
         val htmlRenderer: HtmlRenderer,
         open val shape: Shape,
         val parent: HtmlContentShape?,
-        val parentContainer: HtmlShapeContainer,
+        parentContainer: HtmlShapeContainer,
         val container: ViewCollection<View<*>, *>,
         open val jsPlumbInstance: JsPlumbInstance?
 ) : Selectable {
@@ -108,6 +108,10 @@ abstract class HtmlShape(
     private fun initLabels() {
         for (label in labels) {
             label.remove()
+        }
+        if (shape.ignoreLabels) {
+            labels = emptySet()
+            return
         }
         labels = shape.labels.map { label ->
             val htmlLabel = HtmlLabel(htmlRenderer, label, container, shape)

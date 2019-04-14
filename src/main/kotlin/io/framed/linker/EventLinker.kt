@@ -42,6 +42,8 @@ class EventLinker(
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
         iconShape(symbolProperty)
         textShape(descriptionProperty)
+
+        ignoreLabels = true
     }
 
     private lateinit var sidebarViewGroup: SidebarGroup

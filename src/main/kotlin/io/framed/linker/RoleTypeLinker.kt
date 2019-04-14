@@ -5,10 +5,7 @@ import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.LinkerShapeBox
-import io.framed.framework.util.RegexValidator
-import io.framed.framework.util.shapeBox
-import io.framed.framework.util.trackHistory
+import io.framed.framework.util.*
 import io.framed.framework.view.*
 import io.framed.model.*
 
@@ -242,7 +239,7 @@ class RoleTypeLinker(
 
         override fun createModel(): ModelElement<*> = RoleType()
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is RoleType && parent is ModelLinker<*,*, *>) {
+            if (model is RoleType && parent is ModelLinker<*, *, *>) {
                 return RoleTypeLinker(model, parent)
             } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
         }

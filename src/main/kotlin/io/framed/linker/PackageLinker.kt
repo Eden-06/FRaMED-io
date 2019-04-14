@@ -6,10 +6,7 @@ import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
-import io.framed.framework.util.Point
-import io.framed.framework.util.RegexValidator
-import io.framed.framework.util.shapeBox
-import io.framed.framework.util.trackHistory
+import io.framed.framework.util.*
 import io.framed.framework.view.*
 import io.framed.model.Package
 

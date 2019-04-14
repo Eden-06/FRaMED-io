@@ -1,6 +1,12 @@
 package io.framed.framework.util
 
 import de.westermann.kobserve.event.EventHandler
+import de.westermann.kobserve.property.join
+import de.westermann.kobserve.property.readOnly
+import io.framed.framework.pictogram.BoxShape
+import io.framed.framework.pictogram.Shape
+import io.framed.framework.view.CheckBox
+import io.framed.framework.view.Sidebar
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
@@ -9,6 +15,7 @@ import org.w3c.files.FileReader
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.browser.document
 import kotlin.browser.window
+import kotlin.math.roundToInt
 
 /**
  * @author lars
@@ -155,4 +162,39 @@ fun Exception.log() {
     val type = asDynamic().name as? String ?: ""
     val head = "Exception $type ($message)"
     console.error(head + "\n" + stack.split("\n").joinToString("\n") { "    at $it" })
+}
+
+fun Sidebar.advanced(pictogram: Shape) {
+    group("Advanced") {
+        input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
+            "x=${left.roundToInt()}, y=${top.roundToInt()}"
+        })
+        input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
+            "width=${width.roundToInt()}, height=${height.roundToInt()}"
+        })
+        checkBox("Autosize", pictogram.autosizeProperty.readOnly(), CheckBox.Type.SWITCH)
+        button("Log pictogram") {
+            fun log(shape: Shape): String {
+                val type = shape::class.simpleName ?: "Unknown"
+                val paramList = listOfNotNull(
+                        (shape as? BoxShape)?.position?.name?.first()?.toString(),
+                        if (shape.labels.isEmpty()) null else "L"
+                )
+                val params = if (paramList.isEmpty()) "" else {
+                    "[${paramList.joinToString(", ")}]"
+                }
+                return buildString {
+                    append("$type$params(${shape.id?.toInt()}: ${shape.width} x ${shape.height})")
+                    if (shape is BoxShape) {
+                        for (child in shape.shapes) {
+                            append("\n")
+                            append(log(child).prependIndent("| "))
+                        }
+                    }
+                }
+            }
+
+            console.log(log(pictogram))
+        }
+    }
 }
