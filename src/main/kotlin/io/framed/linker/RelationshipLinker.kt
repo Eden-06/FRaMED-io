@@ -95,7 +95,7 @@ class RelationshipLinker(
             return source != target && (
                     (target is RoleTypeLinker && source is RoleTypeLinker) ||
                             (target is ClassLinker && source is ClassLinker)
-                    )
+                    ) && source isConnectable target
         }
 
         override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is Relationship
