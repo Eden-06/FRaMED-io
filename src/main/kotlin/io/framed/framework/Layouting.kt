@@ -7,7 +7,9 @@ object Layouting {
     fun autoLayout(container: BoxShape, connections: Set<Connection>) {
         val graph = Dagre.getGraph()
         graph.setDefaultEdgeLabel()
-        graph.setGraph(dagreGraphOptions { })
+        graph.setGraph(dagreGraphOptions {
+            nodesep = 30
+        })
         val list = container.shapes.mapNotNull { shape ->
             val id = shape.id ?: return@mapNotNull null
             graph.setNode(id, dagreNodeOptions {
@@ -37,6 +39,9 @@ object Layouting {
             val options = graph.node(id)
             shape.top = options.top
             shape.left = options.left
+            shape.top = options.top - (shape.height/2)
+            shape.left = options.left - (shape.width/2)
+            /*
             if (shape.left < minX) {
                 minX = shape.left
             }
@@ -49,6 +54,7 @@ object Layouting {
             if ((shape.top + shape.height) > maxY) {
                 maxY = (shape.top + shape.height)
             }
+            */
         }
         container.parent?.height = (minY + maxY + container.topOffset - (container.parent?.topOffset ?: 0.0))
         container.parent?.width = (minX + maxX + container.leftOffset - (container.parent?.leftOffset ?: 0.0))
