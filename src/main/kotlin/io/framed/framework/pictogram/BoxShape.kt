@@ -20,7 +20,7 @@ class BoxShape(id: Long?) : Shape(id) {
     private val shapeMap: MutableMap<Shape, List<EventListener<*>>> = mutableMapOf()
 
     val shapes: List<Shape>
-            get() = internalShapes
+        get() = internalShapes
 
     val onAdd = EventHandler<Shape>()
     val onRemove = EventHandler<Shape>()
@@ -63,6 +63,7 @@ class BoxShape(id: Long?) : Shape(id) {
 
     val onAutoSize = EventHandler<Unit>()
     fun autoSize(allowDownsize: Boolean = false) {
+        if (ignoreRender || shapes.any { layer != it.layer }) return
 
         val verticalPadding = (style.padding?.left ?: 0.0) + (style.padding?.right ?: 0.0)
         val horizontalPadding = (style.padding?.top ?: 0.0) + (style.padding?.bottom ?: 0.0)
@@ -75,9 +76,9 @@ class BoxShape(id: Long?) : Shape(id) {
                 var maxWidth = 80.0
                 var maxHeight = 0.0
 
-                for (child in shapes) {
-                    maxHeight = max(maxHeight, child.top + child.height)
-                    maxWidth = max(maxWidth, child.left + child.width)
+                for (shape in shapes) {
+                    maxHeight = max(maxHeight, shape.top + shape.height)
+                    maxWidth = max(maxWidth, shape.left + shape.width)
                 }
 
                 newHeight = maxHeight
