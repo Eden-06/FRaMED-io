@@ -167,7 +167,12 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
         return linker
     }
 
-    fun checkBorder() {
+    fun updatePorts(autoPosition: Boolean = false) {
+        if (autoPosition) {
+            borderShapes.clear()
+            borderBox.clear()
+        }
+
         val directIdList = shapeLinkers.map { it.id }
         var neededBorderViews = connectionManager.connections
                 .mapNotNull {
@@ -220,7 +225,7 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
             borderBox += shape
             borderShapes += shape
 
-            if (isNew) {
+            if (isNew || autoPosition) {
                 // Find connection
                 val connection = connectionManager.connections
                         .find {

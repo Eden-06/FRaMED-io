@@ -173,7 +173,8 @@ class PackageLinker(
             button("Auto layout") {
                 Layouting.autoLayout(
                         container,
-                        connectionManager.connections.asSequence().map { it.pictogram }.toSet()
+                        connectionManager.connections.asSequence().map { it.pictogram }.toSet(),
+                        this@PackageLinker
                 )
             }
             button("Reset zoom") {
@@ -188,7 +189,8 @@ class PackageLinker(
             button("Auto layout") {
                 Layouting.autoLayout(
                         autoLayoutBox,
-                        connectionManager.connections.asSequence().map { it.pictogram }.toSet()
+                        connectionManager.connections.asSequence().map { it.pictogram }.toSet(),
+                        this@PackageLinker
                 )
             }
         }
@@ -233,21 +235,21 @@ class PackageLinker(
         if (linker in children) {
             children -= linker
         } else super.remove(linker)
-        checkBorder()
+        updatePorts()
     }
 
 
     override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
         val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this, connectionManager)
         children += linker
-        checkBorder()
+        updatePorts()
         return linker
     }
 
 
     override fun redraw(linker: ShapeLinker<*, *>) {
         children.redraw(linker)
-        checkBorder()
+        updatePorts()
     }
 
     override fun ContextMenu.onOpen(event: ContextEvent) {
@@ -273,9 +275,9 @@ class PackageLinker(
         LinkerManager.setup(this)
         connectionManager.addModel(this)
 
-        connectionManager.onConnectionAdd { checkBorder() }
-        connectionManager.onConnectionRemove { checkBorder() }
-        checkBorder()
+        connectionManager.onConnectionAdd { updatePorts() }
+        connectionManager.onConnectionRemove { updatePorts() }
+        updatePorts()
     }
 
     companion object : LinkerInfoItem {

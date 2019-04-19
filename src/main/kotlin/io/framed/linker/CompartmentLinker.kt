@@ -217,7 +217,8 @@ class CompartmentLinker(
             button("Auto layout") {
                 Layouting.autoLayout(
                         container,
-                        connectionManager.connections.asSequence().map { it.pictogram }.toSet()
+                        connectionManager.connections.asSequence().map { it.pictogram }.toSet(),
+                        this@CompartmentLinker
                 )
             }
             button("Reset zoom") {
@@ -232,7 +233,8 @@ class CompartmentLinker(
             button("Auto layout") {
                 Layouting.autoLayout(
                         autoLayoutBox,
-                        connectionManager.connections.asSequence().map { it.pictogram }.toSet()
+                        connectionManager.connections.asSequence().map { it.pictogram }.toSet(),
+                        this@CompartmentLinker
                 )
             }
         }
@@ -272,7 +274,7 @@ class CompartmentLinker(
             in children -> children -= linker
             else -> super.remove(linker)
         }
-        checkBorder()
+        updatePorts()
     }
 
     override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
@@ -282,13 +284,13 @@ class CompartmentLinker(
             is MethodLinker -> methods.add(linker)
             else -> children += linker
         }
-        checkBorder()
+        updatePorts()
         return linker
     }
 
     override fun redraw(linker: ShapeLinker<*, *>) {
         children.redraw(linker)
-        checkBorder()
+        updatePorts()
     }
 
     override fun ContextMenu.onOpen(event: ContextEvent) {
@@ -355,9 +357,9 @@ class CompartmentLinker(
         LinkerManager.setup(this)
         connectionManager.addModel(this)
 
-        connectionManager.onConnectionAdd { checkBorder() }
-        connectionManager.onConnectionRemove { checkBorder() }
-        checkBorder()
+        connectionManager.onConnectionAdd { updatePorts() }
+        connectionManager.onConnectionRemove { updatePorts() }
+        updatePorts()
 
         updateSidebarAttributes()
         updateSidebarMethods()
