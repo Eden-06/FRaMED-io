@@ -113,6 +113,10 @@ class CompartmentLinker(
         layerProperty.onChange {
             updatePreviewType()
         }
+
+        onAction {
+            ControllerManager.display(this@CompartmentLinker)
+        }
     }
 
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {

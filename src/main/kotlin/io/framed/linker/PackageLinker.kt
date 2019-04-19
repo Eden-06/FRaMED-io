@@ -88,6 +88,10 @@ class PackageLinker(
         layerProperty.onChange {
             updatePreviewType()
         }
+
+        onAction {
+            ControllerManager.display(this@PackageLinker)
+        }
     }
 
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {

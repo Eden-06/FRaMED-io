@@ -95,6 +95,13 @@ class HtmlBoxShape(
                 height = shape.height
             }
         }
+
+        onDblClick {
+            if (!shape.onAction.isEmpty()) {
+                shape.onAction.emit(Unit)
+                it.stopPropagation()
+            }
+        }
     }
 
     override val view: ViewCollection<View<*>, *> = positionView.listView {

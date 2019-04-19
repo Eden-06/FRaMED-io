@@ -24,6 +24,7 @@ class BoxShape(id: Long?) : Shape(id) {
 
     val onAdd = EventHandler<Shape>()
     val onRemove = EventHandler<Shape>()
+    val onAction = EventHandler<Unit>()
 
     operator fun plusAssign(shape: Shape) = add(shape)
     fun add(shape: Shape) {

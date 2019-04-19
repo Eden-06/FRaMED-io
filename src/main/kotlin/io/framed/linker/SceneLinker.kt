@@ -102,6 +102,10 @@ class SceneLinker(
         layerProperty.onChange {
             updatePreviewType()
         }
+
+        onAction {
+            ControllerManager.display(this@SceneLinker)
+        }
     }
 
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
