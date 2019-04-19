@@ -7,9 +7,7 @@ import de.westermann.kobserve.property.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.Sidebar
-import io.framed.framework.view.SidebarGroup
-import io.framed.framework.view.sidebar
+import io.framed.framework.view.*
 import io.framed.model.*
 import kotlin.math.roundToInt
 
@@ -42,6 +40,10 @@ class EventLinker(
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
         iconShape(symbolProperty)
         textShape(descriptionProperty)
+
+        style {
+            padding = box(0.0, 0.0, 0.0, 30.0)
+        }
 
         ignoreLabels = true
     }
@@ -109,5 +111,6 @@ class EventLinker(
         }
 
         override val name: String = "Event"
+        override val icon: Icon = FramedIcon.EVENT
     }
 }

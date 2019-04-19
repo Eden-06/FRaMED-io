@@ -1,6 +1,7 @@
 package io.framed.linker
 
 import de.westermann.kobserve.property.FunctionAccessor
+import de.westermann.kobserve.property.constProperty
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
@@ -15,7 +16,7 @@ import io.framed.model.*
 class RoleTypeLinker(
         override val model: RoleType,
         override val parent: ModelLinker<*, *, *>
-) : PreviewLinker<RoleType, BoxShape, TextShape> {
+) : PreviewLinker<RoleType, BoxShape, BoxShape> {
 
     override val nameProperty = property(model::name)
             .validate(RegexValidator.IDENTIFIER::validate)
@@ -73,7 +74,16 @@ class RoleTypeLinker(
         resizeable = true
     }
 
-    override val preview: TextShape = textShape(nameProperty)
+    override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
+        iconShape(constProperty(icon))
+        textShape(nameProperty)
+
+        style {
+            padding = box(0.0, 0.0, 0.0, 30.0)
+        }
+
+        ignoreLabels = true
+    }
 
     private val isCompleteViewStringProperty = pictogram.data("complete-view")
     private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
@@ -245,5 +255,6 @@ class RoleTypeLinker(
         }
 
         override val name: String = "RoleType"
+        override val icon: Icon = FramedIcon.ROLETYPE
     }
 }

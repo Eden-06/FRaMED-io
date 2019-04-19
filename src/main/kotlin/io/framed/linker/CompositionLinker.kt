@@ -5,7 +5,7 @@ import de.westermann.kobserve.property.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.MaterialIcon
+import io.framed.framework.view.FramedIcon
 import io.framed.framework.view.sidebar
 import io.framed.model.Composition
 
@@ -90,7 +90,7 @@ class CompositionLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ConnectionInfo("Composition", MaterialIcon.ADD)
+        override val info = ConnectionInfo("Composition", FramedIcon.COMPOSITION)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is RoleTypeLinker || source is ClassLinker

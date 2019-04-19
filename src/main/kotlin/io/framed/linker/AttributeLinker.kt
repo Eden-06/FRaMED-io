@@ -10,6 +10,8 @@ import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.History
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.trackHistory
+import io.framed.framework.view.FramedIcon
+import io.framed.framework.view.Icon
 import io.framed.framework.view.sidebar
 import io.framed.model.*
 
@@ -118,6 +120,8 @@ class AttributeLinker(
         }
 
         override val name: String = "Attribute"
+        override val icon: Icon = FramedIcon.ATTRIBUTE
+
         override val isConnectable = false
     }
 }

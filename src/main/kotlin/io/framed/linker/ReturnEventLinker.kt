@@ -7,9 +7,7 @@ import de.westermann.kobserve.property.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.Sidebar
-import io.framed.framework.view.SidebarGroup
-import io.framed.framework.view.sidebar
+import io.framed.framework.view.*
 import io.framed.model.Compartment
 import io.framed.model.EventType
 import io.framed.model.ReturnEvent
@@ -107,5 +105,6 @@ class ReturnEventLinker(
         }
 
         override val name: String = "Return event"
+        override val icon: Icon = FramedIcon.RETURNEVENT
     }
 }

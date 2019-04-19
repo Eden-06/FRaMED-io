@@ -1,11 +1,6 @@
 package io.framed.framework.view
 
-import de.westermann.kobserve.property.join
-import de.westermann.kobserve.property.readOnly
-import io.framed.framework.pictogram.BoxShape
-import io.framed.framework.pictogram.Shape
 import org.w3c.dom.HTMLDivElement
-import kotlin.math.roundToInt
 
 /**
  * @author lars

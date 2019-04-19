@@ -7,7 +7,6 @@ import io.framed.framework.pictogram.Pictogram
 import io.framed.framework.util.History
 import io.framed.framework.util.async
 import io.framed.framework.view.ContextMenu
-import io.framed.framework.view.MaterialIcon
 
 object LinkerManager {
     private fun setupPictogram(linker: Linker<*, *>, pictogram: Pictogram) {
@@ -116,7 +115,7 @@ object LinkerManager {
     fun contextMenu(linker: ShapeLinker<*, *>, contextMenu: ContextMenu) {
         for (item in linkerItemList) {
             if (item.canCreateIn(linker.model)) {
-                contextMenu.addItem(MaterialIcon.ADD, "Create ${item.name}") {
+                contextMenu.addItem(item.icon, "Create ${item.name}") {
                     val new = linker.add(item.createModel())
                     new.focus(it.target)
 

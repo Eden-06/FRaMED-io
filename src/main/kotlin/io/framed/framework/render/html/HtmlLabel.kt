@@ -20,7 +20,6 @@ class HtmlLabel(
     val listeners = mutableListOf<EventListener<*>>()
 
     fun remove() {
-        println("Remove label")
         for (reference in listeners) {
             reference.detach()
         }
@@ -79,7 +78,6 @@ class HtmlLabel(
     }
 
     init {
-        println("create label")
         if (boundShape != null) {
             listeners += boundShape.topProperty.onChange.reference {
                 view.top = boundShape.top

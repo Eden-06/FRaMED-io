@@ -1,6 +1,7 @@
 package io.framed.linker
 
 import de.westermann.kobserve.property.FunctionAccessor
+import de.westermann.kobserve.property.constProperty
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
@@ -15,7 +16,7 @@ import io.framed.model.*
 class ClassLinker(
         override val model: Class,
         override val parent: ModelLinker<*, *, *>
-) : PreviewLinker<Class, BoxShape, TextShape> {
+) : PreviewLinker<Class, BoxShape, BoxShape> {
 
     override val nameProperty = property(model::name)
             .validate(RegexValidator.IDENTIFIER::validate)
@@ -71,7 +72,16 @@ class ClassLinker(
         resizeable = true
     }
 
-    override val preview: TextShape = textShape(nameProperty)
+    override val preview: BoxShape = boxShape(BoxShape.Position.HORIZONTAL) {
+        iconShape(constProperty(icon))
+        textShape(nameProperty)
+
+        style {
+            padding = box(0.0, 0.0, 0.0, 30.0)
+        }
+
+        ignoreLabels = true
+    }
 
     private val isCompleteViewStringProperty = pictogram.data("complete-view")
     private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
@@ -243,5 +253,6 @@ class ClassLinker(
         }
 
         override val name: String = "Class"
+        override val icon: Icon = FramedIcon.CLASS
     }
 }

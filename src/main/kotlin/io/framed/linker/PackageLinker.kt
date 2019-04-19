@@ -1,9 +1,6 @@
 package io.framed.linker
 
-import de.westermann.kobserve.property.FunctionAccessor
-import de.westermann.kobserve.property.mapBinding
-import de.westermann.kobserve.property.property
-import de.westermann.kobserve.property.validate
+import de.westermann.kobserve.property.*
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
@@ -17,7 +14,7 @@ class PackageLinker(
         override val model: Package,
         override val connectionManager: ConnectionManager,
         override val parent: ModelLinker<*, *, *>? = null
-) : ModelLinker<Package, BoxShape, TextShape> {
+) : ModelLinker<Package, BoxShape, BoxShape> {
 
     override val nameProperty = property(model::name)
             .validate(RegexValidator.IDENTIFIER::validate)
@@ -93,7 +90,16 @@ class PackageLinker(
         }
     }
 
-    override val preview = textShape(nameProperty)
+    override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
+        iconShape(constProperty(icon))
+        textShape(nameProperty)
+
+        style {
+            padding = box(0.0, 0.0, 0.0, 30.0)
+        }
+
+        ignoreLabels = true
+    }
 
     private val isCompleteViewStringProperty = pictogram.data("complete-view")
     private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
@@ -284,5 +290,6 @@ class PackageLinker(
         }
 
         override val name: String = "Package"
+        override val icon: Icon = FramedIcon.PACKAGE
     }
 }

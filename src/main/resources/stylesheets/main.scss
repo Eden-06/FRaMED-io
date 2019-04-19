@@ -710,9 +710,15 @@ table {
       padding: 0.5rem;
       overflow: hidden;
       text-align: center;
+      white-space: nowrap;
 
       * {
         white-space: nowrap;
+      }
+
+      .icon-view {
+        width: 2rem;
+        display: inline-block;
       }
 
       &:hover::before {
@@ -820,4 +826,12 @@ table {
       }
     }
   }
+}
+
+.framed-icons {
+  vertical-align: middle;
+  opacity: 0.54;
+  height: 20px;
+  width: 20px;
+  margin-bottom: 2px;
 }

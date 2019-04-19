@@ -218,6 +218,8 @@ class MethodLinker(
         }
 
         override val name: String = "Method"
+        override val icon: Icon = FramedIcon.METHOD
+
         override val isConnectable = false
     }
 

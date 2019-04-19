@@ -4,7 +4,7 @@ import de.westermann.kobserve.property.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
-import io.framed.framework.view.MaterialIcon
+import io.framed.framework.view.FramedIcon
 import io.framed.framework.view.sidebar
 import io.framed.model.Aggregation
 
@@ -96,7 +96,7 @@ class AggregationLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ConnectionInfo("Aggregation", MaterialIcon.ADD)
+        override val info = ConnectionInfo("Aggregation", FramedIcon.AGGREGATION)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is RoleTypeLinker || source is ClassLinker

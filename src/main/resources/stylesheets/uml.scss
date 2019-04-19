@@ -266,9 +266,10 @@
 }
 
 .horizontal-view {
-  clear: left;
+  position: relative;
 
-  & > * {
-    float: left;
+  & > *:first-child {
+    position: absolute;
+    margin-left: -30px;
   }
 }
