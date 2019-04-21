@@ -10,6 +10,7 @@ import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
 import io.framed.framework.util.*
 import org.w3c.dom.HTMLDivElement
+import kotlin.js.Date
 import kotlin.math.roundToInt
 
 /**
@@ -178,7 +179,30 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                     println(it.toString() + (it.description?.let { ": $it" } ?: ""))
                 }
             }
-            item(MaterialIcon.INFO_OUTLINE, "About") {}
+            item(MaterialIcon.INFO_OUTLINE, "About") {
+                dialog {
+                    title = "About - FRaMED-io"
+
+                    with(contentView) {
+                        classes += "about"
+                        textView("Version")
+                        listView {
+                            loadAjaxFile("version") {
+                                val data = it.split("\n", limit=3)
+                                textView(Date(data[1].substringAfter(":").trim()).toLocaleString())
+                                textView(data[0].substringAfter(" ").trim().take(12))
+                                //textView(data[2])
+
+                                open()
+                            }
+                        }
+                    }
+
+                    addButton("Close", true) {
+                        close()
+                    }
+                }
+            }
         }
     }
 

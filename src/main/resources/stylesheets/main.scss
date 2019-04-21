@@ -835,3 +835,15 @@ table {
   width: 20px;
   margin-bottom: 2px;
 }
+
+.about {
+  & > .text-view {
+    display: block;
+    font-size: 1.1rem;
+    padding-bottom: 0.2rem;
+  }
+
+  & > .list-view > .text-view {
+    display: block;
+  }
+}
