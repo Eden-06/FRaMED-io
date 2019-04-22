@@ -189,8 +189,8 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                         listView {
                             loadAjaxFile("version") {
                                 val data = it.split("\n", limit=3)
-                                textView(Date(data[1].substringAfter(":").trim()).toLocaleString())
-                                textView(data[0].substringAfter(" ").trim().take(12))
+                                textView(data[0])
+                                textView(Date(data[1]).toLocaleString())
                                 //textView(data[2])
 
                                 open()
@@ -263,6 +263,7 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
     const val PAN_WIDTH = 16
 
     init {
+        Root.clear()
         Root += this
 
         renderer.onZoom {
