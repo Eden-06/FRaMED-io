@@ -9,6 +9,7 @@ import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.*
 import io.framed.model.Attribute
+import io.framed.model.Compartment
 import io.framed.model.Package
 import io.framed.model.Scene
 
@@ -326,7 +327,7 @@ class SceneLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreateIn(container: ModelElement<*>): Boolean {
-            return container is Package
+            return container is Package || container is Compartment || container is Scene
         }
 
         override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Scene
