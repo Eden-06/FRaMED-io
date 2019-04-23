@@ -106,6 +106,5 @@ node {
 clean.doFirst() {
     delete "web/website"
     delete "web/node_modules"
-    delete "web/package-lock.json"
     delete "out"
 }
