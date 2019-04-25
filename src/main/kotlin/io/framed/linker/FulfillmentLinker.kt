@@ -20,9 +20,6 @@ class FulfillmentLinker(
     override val nameProperty = property(model::name).trackHistory()
     override val name by nameProperty
 
-    private val sourceCardinalityProperty = property(model::sourceCardinality).trackHistory()
-    private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
-
     override val sourceIdProperty = property(model::sourceId).trackHistory()
     override val targetIdProperty = property(model::targetId).trackHistory()
 
@@ -50,8 +47,6 @@ class FulfillmentLinker(
 
         group("General") {
             input("Name", nameProperty)
-            input("Source cardinality", sourceCardinalityProperty)
-            input("Target cardinality", targetCardinalityProperty)
         }
     }
 
@@ -63,12 +58,6 @@ class FulfillmentLinker(
         if ("name" !in ids) {
             pictogram.labels += Label(id = "name", position = 0.5)
         }
-        if ("source" !in ids) {
-            pictogram.labels += Label(id = "source", position = -30.0)
-        }
-        if ("target" !in ids) {
-            pictogram.labels += Label(id = "target", position = 31.0)
-        }
 
         for (label in pictogram.labels) {
             if (label.textProperty.isBound) {
@@ -76,14 +65,6 @@ class FulfillmentLinker(
             }
             when {
                 label.id == "name" -> label.textProperty.bindBidirectional(nameProperty)
-                label.id == "source" -> {
-                    label.textProperty.bindBidirectional(sourceCardinalityProperty)
-                    label.autocomplete = CardinalityPreset.STRING_VALUES
-                }
-                label.id == "target" -> {
-                    label.textProperty.bindBidirectional(targetCardinalityProperty)
-                    label.autocomplete = CardinalityPreset.STRING_VALUES
-                }
             }
         }
 

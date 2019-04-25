@@ -21,19 +21,7 @@ class Fulfillment() : ModelConnection<Fulfillment>() {
      */
     var name: String = ""
 
-    /**
-     * Cardinality for the source side of this connection.
-     */
-    var sourceCardinality: String = ""
-
-    /**
-     * Cardinality for the target side of this connection.
-     */
-    var targetCardinality: String = ""
-
     override fun copy() = Fulfillment().also { new ->
         new.name = name
-        new.sourceCardinality = sourceCardinality
-        new.targetCardinality = targetCardinality
     }
 }
