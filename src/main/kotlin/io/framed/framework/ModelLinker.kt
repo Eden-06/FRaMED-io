@@ -20,6 +20,10 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
 
     val shapeLinkers: Set<ShapeLinker<*, *>>
 
+    fun generateChildrenIdList(): List<Long> = shapeLinkers.flatMap {
+        (if (it is ModelLinker<*,*,*>) it.generateChildrenIdList() else emptyList()) + it.id
+    }
+
     val connectionManager: ConnectionManager
 
     val container: BoxShape
@@ -168,12 +172,8 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     }
 
     fun updatePorts(autoPosition: Boolean = false) {
-        if (autoPosition) {
-            borderShapes.clear()
-            borderBox.clear()
-        }
+        val directIdList = generateChildrenIdList()
 
-        val directIdList = shapeLinkers.map { it.id }
         var neededBorderViews = connectionManager.connections
                 .mapNotNull {
                     val s = it.sourceIdProperty.value
@@ -206,6 +206,12 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
             }
         }
 
+        val autoLayout: MutableSet<Shape> = mutableSetOf()
+
+        if (autoPosition) {
+            autoLayout += borderShapes
+        }
+
         for (id in neededBorderViews) {
             val shape = iconShape(property<Icon?>(null), id = -id) {
                 style {
@@ -220,57 +226,60 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
             }
 
             // Check if it is a new border view
-            val isNew = -id !in borderBox.layer
+            if (-id !in borderBox.layer) {
+                autoLayout += shape
+            }
 
             borderBox += shape
             borderShapes += shape
+        }
 
-            if (isNew || autoPosition) {
-                // Find connection
-                val connection = connectionManager.connections
-                        .find {
-                            val s = it.sourceIdProperty.value
-                            val t = it.targetIdProperty.value
+        for (shape in autoLayout) {
+            val id = -(shape.id ?: continue)
+            // Find connection
+            val connection = connectionManager.connections
+                    .find {
+                        val s = it.sourceIdProperty.value
+                        val t = it.targetIdProperty.value
 
-                            (s == id || t == id) && (
-                                    (s in directIdList && t !in directIdList) ||
-                                            (s !in directIdList && t in directIdList))
-                        }
+                        (s == id || t == id) && (
+                                (s in directIdList && t !in directIdList) ||
+                                        (s !in directIdList && t in directIdList))
+                    }
 
-                if (connection != null) {
-                    // Get source and target shape
-                    val source = connectionManager.getLinkerById(connection.sourceIdProperty.value)
-                    val target = connectionManager.getLinkerById(connection.targetIdProperty.value)
+            if (connection != null) {
+                // Get source and target shape
+                val source = connectionManager.getLinkerById(connection.sourceIdProperty.value)
+                val target = connectionManager.getLinkerById(connection.targetIdProperty.value)
 
-                    if (source != null && target != null) {
-                        val d = pictogram.dimension
-                        val s = source.pictogram.center
-                        val t = target.pictogram.center
+                if (source != null && target != null) {
+                    val d = pictogram.dimension
+                    val s = source.pictogram.center
+                    val t = target.pictogram.center
 
-                        // Calculate intersection points with the four dimension lines
-                        val points = listOf(
-                                d.left to calcIntersection(s.x, s.y, t.x, t.y, d.left),
-                                d.left + d.width to calcIntersection(s.x, s.y, t.x, t.y, d.left + d.width),
-                                calcIntersection(s.y, s.x, t.y, t.x, d.top) to d.top,
-                                calcIntersection(s.y, s.x, t.y, t.x, d.top + d.height) to d.top + d.height
-                        ).mapNotNull { (x, y) ->
-                            if (x == null || y == null) null else Point(x, y)
-                        }.filter {
-                            it in d
-                        }
+                    // Calculate intersection points with the four dimension lines
+                    val points = listOf(
+                            d.left to calcIntersection(s.x, s.y, t.x, t.y, d.left),
+                            d.left + d.width to calcIntersection(s.x, s.y, t.x, t.y, d.left + d.width),
+                            calcIntersection(s.y, s.x, t.y, t.x, d.top) to d.top,
+                            calcIntersection(s.y, s.x, t.y, t.x, d.top + d.height) to d.top + d.height
+                    ).mapNotNull { (x, y) ->
+                        if (x == null || y == null) null else Point(x, y)
+                    }.filter {
+                        it in d
+                    }
 
-                        // Find the nearest intersection to the outer element
-                        val nearest = if (source.id == id) {
-                            points.minBy { it.distance(t) }
-                        } else {
-                            points.minBy { it.distance(s) }
-                        }
+                    // Find the nearest intersection to the outer element
+                    val nearest = if (source.id == id) {
+                        points.minBy { it.distance(t) }
+                    } else {
+                        points.minBy { it.distance(s) }
+                    }
 
-                        // Set the position
-                        if (nearest != null) {
-                            shape.left = nearest.x - pictogram.leftOffset
-                            shape.top = nearest.y - pictogram.topOffset
-                        }
+                    // Set the position
+                    if (nearest != null) {
+                        shape.left = nearest.x - pictogram.leftOffset
+                        shape.top = nearest.y - pictogram.topOffset
                     }
                 }
             }
