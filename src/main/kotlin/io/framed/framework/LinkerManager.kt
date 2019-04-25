@@ -4,6 +4,7 @@ import de.westermann.kobserve.property.FunctionAccessor
 import de.westermann.kobserve.property.FunctionProperty
 import io.framed.framework.pictogram.ConnectionInfo
 import io.framed.framework.pictogram.Pictogram
+import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.History
 import io.framed.framework.util.async
 import io.framed.framework.view.ContextMenu
@@ -119,9 +120,16 @@ object LinkerManager {
                     val new = linker.add(item.createModel())
                     new.focus(it.target)
 
-                    val (left, top) = if (it.target == linker.pictogram) {
-                        linker.pictogram.left to linker.pictogram.top
-                    } else 0.0 to 0.0
+                    val left: Double
+                    val top: Double
+
+                    if (it.target == linker.pictogram) {
+                        left = linker.pictogram.leftOffset - linker.pictogram.root.left
+                        top = linker.pictogram.topOffset - linker.pictogram.root.top
+                    } else {
+                        left = 0.0
+                        top = 0.0
+                    }
                     new.pictogram.left = it.diagram.x - left
                     new.pictogram.top = it.diagram.y - top
                 }
@@ -158,3 +166,6 @@ object LinkerManager {
                 ?: throw UnsupportedOperationException("Could not find linker for model of type ${type.name}")
     }
 }
+
+private val Shape.root: Shape
+    get() = parent?.root ?: this

@@ -123,7 +123,7 @@ class SceneLinker(
     private val isCompleteViewStringProperty = pictogram.data("complete-view")
     private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
         val default: Boolean
-            get() = pictogram.parent?.parent == null
+            get() = true
 
         override fun set(value: Boolean): Boolean {
             if (value == default) {
@@ -147,7 +147,7 @@ class SceneLinker(
             return true
         }
 
-        override fun get(): Boolean = isFlatPreviewStringProperty.value?.toBoolean() ?: false
+        override fun get(): Boolean = isFlatPreviewStringProperty.value?.toBoolean() ?: true
     }, isFlatPreviewStringProperty)
     private var isFlatPreview by isFlatPreviewProperty
 
