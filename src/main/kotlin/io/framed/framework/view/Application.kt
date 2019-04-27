@@ -110,6 +110,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }.open()
         }
         */
+        action(ToolBar.Side.RIGHT, MaterialIcon.TOUCH_APP, "Touch control") {
+            renderer.navigationView.touchControl = !renderer.navigationView.touchControl
+        }.inactiveProperty.bind(!renderer.navigationView.touchControlProperty)
+
+        separator(ToolBar.Side.RIGHT)
+
         action(ToolBar.Side.RIGHT, MaterialIcon.GRID_ON, "Toggle grid") {
             renderer.navigationView.renderGrid = !renderer.navigationView.renderGrid
         }.inactiveProperty.bind(!renderer.navigationView.renderGridProperty)

@@ -25,14 +25,6 @@ import kotlin.math.roundToInt
  */
 class NavigationView : View<HTMLDivElement>("div") {
 
-    /**
-     * Set the zoom and pan mode.
-     *
-     * mouse control: zoom with scroll, pan with mouse.
-     * touchpad control: zoom with scroll + ctrl, pan with scroll or mouse.
-     */
-    var touchpadControl: Boolean = false
-
     private val background = (document.createElement("canvas") as HTMLCanvasElement).also { background ->
         html.appendChild(background)
     }
@@ -45,6 +37,13 @@ class NavigationView : View<HTMLDivElement>("div") {
         }
     }
     var renderGrid by renderGridProperty
+
+    val touchControlProperty = property(window.localStorage["touch-control"]?.toBoolean() ?: false).also { property ->
+        property.onChange {
+            window.localStorage["touch-control"] = property.value.toString()
+        }
+    }
+    var touchControl by touchControlProperty
 
     /**
      * Html model to apply transformations.
@@ -295,10 +294,9 @@ class NavigationView : View<HTMLDivElement>("div") {
      */
     private val moveStartListener = object : EventListener {
         override fun handleEvent(event: Event) {
-            (event as? MouseEvent)?.let { e ->
-
-                if (e.ctrlKey) {
-                    moveStart = mouseToCanvas(e.point())
+            if (event is MouseEvent) {
+                if (event.ctrlKey) {
+                    moveStart = mouseToCanvas(event.point())
 
                     window.addEventListener("mousemove", selectPerformListener)
 
@@ -308,12 +306,18 @@ class NavigationView : View<HTMLDivElement>("div") {
                     selectBox.left = moveStart.x
                     container += selectBox
                 } else {
-                    moveStart = e.point()
+                    moveStart = event.point()
 
                     window.addEventListener("mousemove", movePerformListener)
                 }
                 window.addEventListener("mouseup", moveEndListener)
                 window.addEventListener("mouseleave", moveEndListener)
+            } else if (event is TouchEvent) {
+                val touch = event.touches[0] ?: return
+                moveStart = touch.point()
+                window.addEventListener("touchmove", movePerformListener)
+                window.addEventListener("touchend", moveEndListener)
+                window.addEventListener("touchcancel", moveEndListener)
             }
         }
     }
@@ -324,8 +328,13 @@ class NavigationView : View<HTMLDivElement>("div") {
     private val movePerformListener = object : EventListener {
         override fun handleEvent(event: Event) {
             event.preventDefault()
-            (event as? MouseEvent)?.let { e ->
-                val mouse = e.point()
+            if (event is MouseEvent) {
+                val mouse = event.point()
+                panBy((mouse - moveStart) / zoom)
+                moveStart = mouse
+            } else if (event is TouchEvent) {
+                val touch = event.touches[0] ?: return
+                val mouse = touch.point()
                 panBy((mouse - moveStart) / zoom)
                 moveStart = mouse
             }
@@ -369,6 +378,10 @@ class NavigationView : View<HTMLDivElement>("div") {
             window.removeEventListener("mousemove", selectPerformListener)
             window.removeEventListener("mouseup", this)
             window.removeEventListener("mouseleave", this)
+
+            window.removeEventListener("touchmove", movePerformListener)
+            window.removeEventListener("touchend", this)
+            window.removeEventListener("touchcancel", this)
         }
     }
 
@@ -395,11 +408,11 @@ class NavigationView : View<HTMLDivElement>("div") {
                     else -> Point(e.deltaX, e.deltaY)
                 }
 
-                if (!touchpadControl || e.ctrlKey) {
+                if (!touchControl || e.ctrlKey) {
                     e.point() - Point(offsetLeft, offsetTop) / Point(clientWidth, clientHeight)
-                    zoomBy(delta.y / 150 * zoom, (e.point() - Point(offsetLeft, offsetTop)) / Point(clientWidth, clientHeight))
+                    zoomBy(-delta.y / 150 * zoom, (e.point() - Point(offsetLeft, offsetTop)) / Point(clientWidth, clientHeight))
                 } else {
-                    panBy(-delta)
+                    panBy(-delta * 1.5)
                 }
             }
         }
@@ -407,6 +420,7 @@ class NavigationView : View<HTMLDivElement>("div") {
 
     init {
         html.addEventListener("mousedown", moveStartListener)
+        html.addEventListener("touchstart", moveStartListener)
         html.addEventListener("wheel", scrollListener)
 
         onClick {
