@@ -23,7 +23,14 @@ enum class FramedIcon(private val src: String) : Icon {
     CLASS("class"),
     PACKAGE("package"),
     COMPARTMENT("compartment"),
-    SCENE("scene");
+    SCENE("scene"),
+
+    EVENT_STANDARD("event_standard"),
+    EVENT_TIMER("event_timer"),
+    EVENT_MESSAGE("event_message"),
+    EVENT_ERROR("event_error"),
+    EVENT_CONDITION("event_condition"),
+    EVENT_SIGNAL("event_signal");
 
     override val element: Element
         get() = document.createElement("img").also {

@@ -18,6 +18,9 @@ class EventLinker(
 
     private val typeProperty = property(model::type).trackHistory()
     private val symbolProperty = typeProperty.mapBinding { it.symbol }
+    private val symbolNoBlankProperty = typeProperty.mapBinding {
+        if (it == EventType.STANDARD) FramedIcon.EVENT else it.symbol
+    }
 
     override val nameProperty: ReadOnlyProperty<String> = typeProperty.mapBinding { it.printableName }
     override val name: String by nameProperty
@@ -33,12 +36,12 @@ class EventLinker(
                 color = box(color(0, 0, 0, 0.3))
                 radius = box(22.0)
             }
-            padding = box(10.0, 13.0)
+            padding = box(10.0, 10.0)
         }
     }
 
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
-        iconShape(symbolProperty)
+        iconShape(symbolNoBlankProperty)
         textShape(descriptionProperty)
 
         style {
