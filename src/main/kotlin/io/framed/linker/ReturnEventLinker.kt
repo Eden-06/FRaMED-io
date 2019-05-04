@@ -91,7 +91,7 @@ class ReturnEventLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreateIn(container: ModelElement<*>): Boolean {
-            return container is Compartment || container is Scene
+            return container is Scene
         }
 
         override fun isLinkerFor(element: ModelElement<*>): Boolean = element is ReturnEvent

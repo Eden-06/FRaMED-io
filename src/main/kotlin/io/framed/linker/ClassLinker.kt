@@ -239,7 +239,7 @@ class ClassLinker(
 
     companion object : LinkerInfoItem {
         override fun canCreateIn(container: ModelElement<*>): Boolean {
-            return container is Package || container is Compartment
+            return container is Package
         }
 
         override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Class
@@ -247,7 +247,7 @@ class ClassLinker(
 
         override fun createModel(): ModelElement<*> = Class()
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is Class && parent is ModelLinker<*, *, *>) {
+            if (model is Class && (parent is ModelLinker<*, *, *>)) {
                 return ClassLinker(model, parent)
             } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
         }

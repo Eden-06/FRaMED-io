@@ -2,6 +2,7 @@ package io.framed.framework
 
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Connection
+import io.framed.framework.pictogram.IconShape
 import io.framed.framework.pictogram.Shape
 
 object Layouting {
@@ -13,6 +14,7 @@ object Layouting {
             marginx = 12
             marginy = 12
         })
+        console.log(container.shapes)
         val list = container.shapes.mapNotNull { shape ->
             val id = shape.id ?: return@mapNotNull null
             graph.setNode(id, dagreNodeOptions {
@@ -24,6 +26,8 @@ object Layouting {
             fun findChildren(shape: Shape): List<Long> {
                 return if (shape is BoxShape) {
                     listOfNotNull(shape.id) + shape.shapes.flatMap { findChildren(it) }
+                } else if(shape is IconShape) {
+                    listOfNotNull(shape.id)
                 } else {
                     emptyList()
                 }
@@ -35,6 +39,8 @@ object Layouting {
         for (connection in connections) {
             val source = connection.source.value
             val target = connection.target.value
+
+            console.log(source, target)
 
             var sourceId: Long? = null
             var targetId: Long? = null

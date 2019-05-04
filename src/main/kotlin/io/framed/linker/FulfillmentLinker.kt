@@ -79,11 +79,14 @@ class FulfillmentLinker(
         override val info = ConnectionInfo("Fulfillment", FramedIcon.FULFILLMENT)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is ClassLinker || source is CompartmentLinker
+            return source is ClassLinker || source is CompartmentLinker || source is RoleTypeLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) && target is RoleTypeLinker
+            if(source !is RoleTypeLinker){
+                return canStart(source) && target is RoleTypeLinker
+            }
+            return canStart(source) && target is RoleTypeLinker && target.parent != source.parent
         }
 
         override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is Fulfillment
