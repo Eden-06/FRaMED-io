@@ -265,12 +265,12 @@ class HtmlRelation(
     @Suppress("UNCHECKED_CAST")
     private val sourceAnchorString: Array<Any>
         get() = (renderer.htmlConnections.anchors[sourceView]?.map { it.jsPlumb }?.toTypedArray()
-                ?: ALL_SIDES_STRING) as Array<Any>
+                ?: ALL_SIDES_ARRAY) as Array<Any>
 
     @Suppress("UNCHECKED_CAST")
     private val targetAnchorString: Array<Any>
         get() = (renderer.htmlConnections.anchors[targetView]?.map { it.jsPlumb }?.toTypedArray()
-                ?: ALL_SIDES_STRING) as Array<Any>
+                ?: ALL_SIDES_ARRAY) as Array<Any>
 
     lateinit var sourceView: View<*>
     lateinit var targetView: View<*>
@@ -296,15 +296,19 @@ class HtmlRelation(
 
     companion object {
         val ALL_SIDES = setOf(RelationSide.TOP, RelationSide.LEFT, RelationSide.BOTTOM, RelationSide.RIGHT)
-        val ALL_SIDES_STRING = ALL_SIDES.map {
-            it.jsPlumb
+        val ALL_SIDES_ARRAY = ALL_SIDES.flatMap { side ->
+            listOf(
+                    side.jsPlumb.map { if (it == 0.5) 0.25 else it }.toTypedArray(),
+                    side.jsPlumb,
+                    side.jsPlumb.map { if (it == 0.5) 0.75 else it }.toTypedArray()
+            )
         }.toTypedArray()
     }
 }
 
-enum class RelationSide(val jsPlumb: String) {
-    TOP("Top"),
-    LEFT("Left"),
-    BOTTOM("Bottom"),
-    RIGHT("Right")
+enum class RelationSide(val jsPlumb: Array<Double>) {
+    TOP(arrayOf(0.5, 0.0, 0.0, -1.0)),
+    LEFT(arrayOf(0.0, 0.5, -1.0, 0.0)),
+    BOTTOM(arrayOf(0.5, 1.0, 0.0, 1.0)),
+    RIGHT(arrayOf(1.0, 0.5, 1.0, 0.0))
 }
