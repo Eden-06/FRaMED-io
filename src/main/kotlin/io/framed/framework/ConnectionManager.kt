@@ -37,7 +37,8 @@ interface ConnectionManager {
         val sourceLinker = getLinkerById(source) ?: return emptyList()
         val targetLinker = getLinkerById(target) ?: return emptyList()
 
-        return LinkerManager.linkerConnectionList.asSequence().filter { it.canCreate(sourceLinker, targetLinker) }.map { it.info }.toList()
+        return LinkerManager.linkerConnectionList.asSequence()
+                .filter { it.canCreate(sourceLinker, targetLinker) }.map { it.info }.toList()
     }
 
     fun isConnectable(shape: Long): Boolean {

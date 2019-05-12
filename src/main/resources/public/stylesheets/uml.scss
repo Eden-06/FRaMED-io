@@ -23,6 +23,10 @@
   &:before {
     background: inherit;
   }
+
+  & ~ * {
+    clear: left;
+  }
 }
 
 .border-box {

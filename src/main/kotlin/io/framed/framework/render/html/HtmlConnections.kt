@@ -8,11 +8,10 @@ import io.framed.framework.jsPlumbTargetOptionsInit
 import io.framed.framework.pictogram.Connection
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.ViewModel
-import io.framed.framework.util.Dimension
 import io.framed.framework.util.async
-import io.framed.framework.util.point
 import io.framed.framework.view.*
 import org.w3c.dom.HTMLElement
+import kotlin.browser.document
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -25,6 +24,8 @@ class HtmlConnections(
 
     val listeners = mutableListOf<EventListener<*>>()
     private val endpointMap = mutableMapOf<Shape, EndpointItem>()
+    private val endpointReverseMap = mutableMapOf<HTMLElement, Shape>()
+
     var relations: Map<Connection, HtmlRelation> = emptyMap()
     val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
     var jsPlumbList: List<Pair<JsPlumbInstance, ViewCollection<View<*>, *>>> = emptyList()
@@ -46,36 +47,67 @@ class HtmlConnections(
         listeners.clear()
         relations = emptyMap()
         endpointMap.clear()
+        endpointReverseMap.clear()
         anchors.clear()
         isConnecting = null
     }
+
+    private var createSourceShape: Shape? = null
+    private var createTargetShape: Shape? = null
 
     fun createJsPlumb(container: ViewCollection<View<*>, *>): JsPlumbInstance {
         val instance = JsPlumb.getInstance().apply {
             setContainer(container.html)
 
+            var reference: EventListener<*>? = null
+
             setZoom(htmlRenderer.zoom)
             bind("beforeDrop") { info: dynamic ->
-                val source = htmlRenderer.getShapeById(info.sourceId as String)?.id ?: return@bind false
-                val target = htmlRenderer.getShapeById(info.targetId as String)?.id ?: return@bind false
+                val source = createSourceShape?.id
+                        ?: htmlRenderer.getShapeById(info.sourceId as String)?.id
+                        ?: return@bind false
+                val target = createTargetShape?.id
+                        ?: htmlRenderer.getShapeById(info.targetId as String)?.id
+                        ?: return@bind false
 
                 htmlRenderer.viewModel.handler.createConnection(source, target)
+
+                reference?.detach()
+
+                createTargetShape?.let { endpointMap[it]?.let { it.view.classes -= "drop-target" } }
+                createSourceShape = null
+                createTargetShape = null
 
                 return@bind false
             }
 
             bind("beforeDrag") { info: dynamic ->
                 val source = htmlRenderer.getShapeById(info.sourceId as String) ?: return@bind true
+                createSourceShape = source
+                createTargetShape = null
+
+                reference = Root.onMouseMove.reference {
+                    checkMousePosition()
+                }
+
                 updateEndpoints(source)
 
                 return@bind true
             }
 
             bind("connectionDragStop") {
+                createTargetShape?.let { endpointMap[it]?.let { it.view.classes -= "drop-target" } }
+                createSourceShape = null
+                createTargetShape = null
+                reference?.detach()
                 updateEndpoints()
             }
 
             bind("connectionAborted") {
+                createTargetShape?.let { endpointMap[it]?.let { it.view.classes -= "drop-target" } }
+                createSourceShape = null
+                createTargetShape = null
+                reference?.detach()
                 updateEndpoints()
             }
 
@@ -183,6 +215,31 @@ class HtmlConnections(
         view.classes["target-disabled"] = !enabled
     }
 
+    private fun checkMousePosition() {
+        if (jsTypeOf(document::elementsFromPoint) != "function") return
+
+        val position = Root.mousePosition
+        val elements = document.elementsFromPoint(position.x, position.y)
+
+        for (element in elements) {
+            val shape = endpointReverseMap[element] ?: continue
+            val entry = endpointMap[shape] ?: continue
+
+            createTargetShape?.let { endpointMap[it]?.let { it.view.classes -= "drop-target" } }
+
+            // Change break to continue to allow connections to visible hidden elements
+            if (isConnecting == shape || "target-disabled" in entry.view.classes) break
+
+            entry.view.classes += "drop-target"
+            createTargetShape = shape
+
+            return
+        }
+
+        createTargetShape?.let { endpointMap[it]?.let { it.view.classes -= "drop-target" } }
+        createTargetShape = null
+    }
+
     private fun createEndpointInternal(shape: Shape, canStart: Boolean) {
         if (shape in endpointMap) return
 
@@ -214,23 +271,8 @@ class HtmlConnections(
             allowLoopback = false
         })
 
-        val references = mutableListOf<EventListener<*>>()
-        references += view.onMouseEnter.reference {
-            if (isConnecting != null && isConnecting != shape && "target-disabled" !in view.classes) {
-                view.classes += "drop-target"
-
-                var reference: EventListener<*>? = null
-                reference = Root.onMouseMove.reference { event ->
-                    val dimension = Dimension(shape.leftOffset, shape.topOffset, shape.width, shape.height)
-                    val can = htmlRenderer.navigationView.mouseToCanvas(event.point())
-                    if (can !in dimension || event.buttons == 0.toShort()) {
-                        view.classes -= "drop-target"
-                        reference?.detach()
-                    }
-                }
-            }
-        }
-        endpointMap[shape] = EndpointItem(view, handler?.html, references, jsPlumbInstance)
+        endpointMap[shape] = EndpointItem(view, handler?.html, jsPlumbInstance)
+        endpointReverseMap[view.html] = shape
 
         setSourceEnabled(shape, true)
         setTargetEnabled(shape, true)
@@ -245,16 +287,13 @@ class HtmlConnections(
         val view = endpointItem.view
         val html = view.html
 
-        for (reference in endpointItem.references) {
-            reference.detach()
-        }
-
         view.classes -= "source-disabled"
         view.classes -= "target-disabled"
 
         jsPlumbInstance.unmakeSource(html)
         jsPlumbInstance.unmakeTarget(html)
         endpointMap -= shape
+        endpointReverseMap -= html
     }
 
     private fun drawRelation(relation: Connection) {
@@ -294,7 +333,6 @@ class HtmlConnections(
     class EndpointItem(
             val view: View<*>,
             val handler: HTMLElement?,
-            val references: List<EventListener<*>>,
             val jsPlumbInstance: JsPlumbInstance
     )
 }
