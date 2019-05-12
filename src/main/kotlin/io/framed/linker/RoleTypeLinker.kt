@@ -23,6 +23,8 @@ class RoleTypeLinker(
             .trackHistory()
     override var name by nameProperty
 
+    val occurrenceConstraintProperty = property(model::occurrenceConstraint).trackHistory()
+
     val attributes: LinkerShapeBox<Attribute, AttributeLinker> = shapeBox(model::attributes)
     val methods: LinkerShapeBox<Method, MethodLinker> = shapeBox(model::methods)
 
@@ -117,6 +119,7 @@ class RoleTypeLinker(
         title("RoleType")
         group("General") {
             input("Name", nameProperty)
+            input("Occurrence", occurrenceConstraintProperty, CardinalityPreset.STRING_VALUES)
         }
         sidebarAttributes = group("Attributes") {
             collapse()
@@ -207,6 +210,22 @@ class RoleTypeLinker(
         }
 
         sidebarMethods.toForeground(sidebarMethodsAdd)
+    }
+
+    override fun updateLabelBindings() {
+        var label = pictogram.labels.find { it.id == "occurrence" }
+        if (label == null) {
+            label = Label(id = "occurrence")
+            label.autocomplete = CardinalityPreset.STRING_VALUES
+            pictogram.labels += label
+        }
+
+        if (label.textProperty.isBound) {
+            label.textProperty.unbind()
+        }
+        label.textProperty.bindBidirectional(occurrenceConstraintProperty)
+
+        super.updateLabelBindings()
     }
 
     init {

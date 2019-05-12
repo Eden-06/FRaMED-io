@@ -22,6 +22,11 @@ class RoleType() : ModelElement<RoleType>() {
     var name: String = "UnnamedRole"
 
     /**
+     * Occurrence constraint of this roleType
+     */
+    var occurrenceConstraint: String = ""
+
+    /**
      * List of roleType attributes
      */
     @Serializable(with = PolymorphicListSerializer::class)

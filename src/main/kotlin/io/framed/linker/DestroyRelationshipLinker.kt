@@ -77,12 +77,6 @@ class DestroyRelationshipLinker(
         if ("name" !in ids) {
             pictogram.labels += Label(id = "name", position = 0.5)
         }
-        if ("source" !in ids) {
-            pictogram.labels += Label(id = "source", position = -30.0)
-        }
-        if ("target" !in ids) {
-            pictogram.labels += Label(id = "target", position = 31.0)
-        }
 
         for (label in pictogram.labels) {
             if (label.textProperty.isBound) {

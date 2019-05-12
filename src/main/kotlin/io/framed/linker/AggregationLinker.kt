@@ -51,8 +51,8 @@ class AggregationLinker(
 
         group("General") {
             input("Name", nameProperty)
-            input("Source cardinality", sourceCardinalityProperty)
-            input("Target cardinality", targetCardinalityProperty)
+            input("Source cardinality", sourceCardinalityProperty, CardinalityPreset.STRING_VALUES)
+            input("Target cardinality", targetCardinalityProperty, CardinalityPreset.STRING_VALUES)
         }
     }
 

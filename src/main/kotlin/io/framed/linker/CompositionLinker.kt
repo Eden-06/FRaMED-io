@@ -21,7 +21,6 @@ class CompositionLinker(
     override val nameProperty = property(model::name).trackHistory()
     override val name by nameProperty
 
-    private val sourceCardinalityProperty = property(model::sourceCardinality).mapBinding { it }
     private val targetCardinalityProperty = property(model::targetCardinality).trackHistory()
 
     override val sourceIdProperty = property(model::sourceId).trackHistory()
@@ -52,8 +51,7 @@ class CompositionLinker(
 
         group("General") {
             input("Name", nameProperty)
-            input("Source cardinality", sourceCardinalityProperty)
-            input("Target cardinality", targetCardinalityProperty)
+            input("Target cardinality", targetCardinalityProperty, CardinalityPreset.STRING_VALUES)
         }
     }
 
