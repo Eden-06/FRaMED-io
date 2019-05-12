@@ -32,7 +32,7 @@ class ReturnEventLinker(
             background = color(255, 255, 255)
             border {
                 style = Border.BorderStyle.SOLID
-                width = box(1.0)
+                width = box(Border.DEFAULT_WIDTH)
                 color = box(color(0, 0, 0, 0.3))
                 radius = box(20.0)
 

@@ -48,7 +48,7 @@ class PackageLinker(
                 notch = true
                 border {
                     style = Border.BorderStyle.SOLID
-                    width = box(1.0, 1.0, 0.0, 1.0)
+                    width = box(Border.DEFAULT_WIDTH, Border.DEFAULT_WIDTH, 0.0, Border.DEFAULT_WIDTH)
                     color = box(color(0, 0, 0, 0.3))
                 }
             }
@@ -58,7 +58,7 @@ class PackageLinker(
             style {
                 border {
                     style = Border.BorderStyle.SOLID
-                    width = box(1.0)
+                    width = box(Border.DEFAULT_WIDTH)
                     color = box(color(0, 0, 0, 0.3))
                 }
                 padding = box(8.0)
@@ -77,7 +77,7 @@ class PackageLinker(
             background = color("#fffbd9")
             border {
                 style = Border.BorderStyle.SOLID
-                width = box(0.0, 0.0, 1.0, 0.0)
+                width = box(0.0, 0.0, Border.DEFAULT_WIDTH, 0.0)
                 color = box(color(0, 0, 0, 0.3))
             }
             topNotch = true

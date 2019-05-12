@@ -59,7 +59,7 @@ class SceneLinker(
             style {
                 border {
                     style = Border.BorderStyle.SOLID
-                    width = box(1.0, 0.0, 0.0, 0.0)
+                    width = box(Border.DEFAULT_WIDTH, 0.0, 0.0, 0.0)
                     color = box(color(0, 0, 0, 0.3))
                 }
                 padding = box(8.0)
@@ -70,7 +70,7 @@ class SceneLinker(
             style {
                 border {
                     style = Border.BorderStyle.SOLID
-                    width = box(1.0, 0.0, 0.0, 0.0)
+                    width = box(Border.DEFAULT_WIDTH, 0.0, 0.0, 0.0)
                     color = box(color(0, 0, 0, 0.3))
                 }
                 padding = box(8.0)
@@ -92,7 +92,7 @@ class SceneLinker(
             }
             border {
                 style = Border.BorderStyle.SOLID
-                width = box(1.0)
+                width = box(Border.DEFAULT_WIDTH)
                 color = box(color(0, 0, 0, 0.3))
                 leftDoubleBar = true
             }

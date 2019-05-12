@@ -18,6 +18,10 @@ class Border(
     }
 
     //fun toCss(): String = "$style ${width}px ${color.toCss()}"
+
+    companion object {
+        const val DEFAULT_WIDTH = 2.0
+    }
 }
 
 //fun border(init: Border.() -> Unit):Border = Border().also(init)
