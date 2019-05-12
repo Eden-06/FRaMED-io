@@ -216,6 +216,8 @@ class HtmlRelation(
                         connection.onSidebar.emit(SidebarEvent(connection))
                     }
                 }
+
+                it.focus = isSelected
             }
         }
 
@@ -239,7 +241,7 @@ class HtmlRelation(
                     strokeWidth = style.paintStyle.strokeWidth
                     fill = style.paintStyle.fill.toCss()
                 }
-                val location = style.length * style.foldback +1
+                val location = style.length * style.foldback + 1
             }))
         }
 

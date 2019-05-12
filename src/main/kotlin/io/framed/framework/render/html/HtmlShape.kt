@@ -116,6 +116,9 @@ abstract class HtmlShape(
         labels = shape.labels.map { label ->
             val htmlLabel = HtmlLabel(htmlRenderer, label, container, shape)
             container += htmlLabel.view
+
+            htmlLabel.focusProperty.bind(positionView.selectedViewProperty)
+
             htmlLabel
         }.toSet()
     }

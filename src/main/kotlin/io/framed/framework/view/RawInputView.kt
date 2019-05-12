@@ -116,8 +116,10 @@ class RawInputView() : View<HTMLInputElement>("input") {
     fun sizeMatchText() {
         sizeMatch = true
         size = max(value.length, 1)
+        classes["empty"] = value.isBlank()
         onChange {
             size = max(value.length, 1)
+            classes["empty"] = value.isBlank()
         }
     }
 

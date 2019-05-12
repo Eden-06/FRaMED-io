@@ -11,7 +11,8 @@ import kotlin.reflect.KProperty
  * @author lars
  */
 class ClassDelegate(
-        className: String? = null
+        className: String? = null,
+        container: View<*>? = null
 ) {
 
     private lateinit var container: View<*>
@@ -21,6 +22,14 @@ class ClassDelegate(
     operator fun getValue(container: View<*>, property: KProperty<*>): Property<Boolean> {
         if (!this::container.isInitialized) {
             this.container = container
+        }
+
+        return getValue(Unit, property)
+    }
+
+    operator fun getValue(c: Any?, property: KProperty<*>): Property<Boolean> {
+        if (!this::container.isInitialized) {
+            throw IllegalArgumentException()
         }
 
         if (!this::paramName.isInitialized) {
@@ -45,6 +54,9 @@ class ClassDelegate(
     init {
         if (className != null) {
             this.paramName = className
+        }
+        if (container != null) {
+            this.container = container
         }
     }
 }

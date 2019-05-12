@@ -5,10 +5,7 @@ import io.framed.framework.pictogram.Label
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.util.Point
 import io.framed.framework.util.async
-import io.framed.framework.view.InputView
-import io.framed.framework.view.Root
-import io.framed.framework.view.View
-import io.framed.framework.view.ViewCollection
+import io.framed.framework.view.*
 
 class HtmlLabel(
         private val htmlRenderer: HtmlRenderer,
@@ -76,6 +73,9 @@ class HtmlLabel(
             label.topProperty.value = marginTop + event.delta.y
         }
     }
+
+    val focusProperty by ClassDelegate(container = view)
+    var focus by focusProperty
 
     init {
         if (boundShape != null) {
