@@ -2,7 +2,6 @@ package io.framed.framework
 
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Connection
-import io.framed.framework.pictogram.IconShape
 import io.framed.framework.pictogram.Shape
 
 object Layouting {
@@ -10,7 +9,8 @@ object Layouting {
         val graph = Dagre.getGraph()
         graph.setDefaultEdgeLabel()
         graph.setGraph(dagreGraphOptions {
-            nodesep = 30
+            nodesep = 50
+            rankSep = 100
             marginx = 12
             marginy = 12
         })
@@ -23,15 +23,8 @@ object Layouting {
                 width = shape.width
             })
 
-            fun findChildren(shape: Shape): List<Long> {
-                return if (shape is BoxShape) {
-                    listOfNotNull(shape.id) + shape.shapes.flatMap { findChildren(it) }
-                } else if(shape is IconShape) {
-                    listOfNotNull(shape.id)
-                } else {
-                    emptyList()
-                }
-            }
+            fun findChildren(shape: Shape): List<Long> = listOfNotNull(shape.id) +
+                    if (shape is BoxShape) shape.shapes.flatMap { findChildren(it) } else emptyList()
 
             id to findChildren(shape).toSet()
         }.toMap()

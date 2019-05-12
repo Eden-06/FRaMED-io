@@ -86,7 +86,7 @@ class FulfillmentLinker(
             if(source !is RoleTypeLinker){
                 return canStart(source) && target is RoleTypeLinker
             }
-            return canStart(source) && target is RoleTypeLinker && target.parent != source.parent
+            return canStart(source) && target is RoleTypeLinker && source.parent == target.parent.parent
         }
 
         override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is Fulfillment

@@ -175,10 +175,26 @@ fun HtmlShape.borderPosition(
         listeners += shape.leftProperty.onChange.reference {
             left = shape.left
 
+            var anchor = emptySet<RelationSide>()
+            if (shape.top <= 0.0) anchor += RelationSide.TOP
+            if (shape.left <= 0.0) anchor += RelationSide.LEFT
+            if (shape.top >= container.clientHeight) anchor += RelationSide.BOTTOM
+            if (shape.left >= container.clientWidth) anchor += RelationSide.RIGHT
+            if (anchor.isEmpty()) anchor = HtmlRelation.ALL_SIDES
+            htmlRenderer.htmlConnections.limitSide(view, anchor)
+
             revalidate()
         }
         listeners += shape.topProperty.onChange.reference {
             top = shape.top
+
+            var anchor = emptySet<RelationSide>()
+            if (shape.top <= 0.0) anchor += RelationSide.TOP
+            if (shape.left <= 0.0) anchor += RelationSide.LEFT
+            if (shape.top >= container.clientHeight) anchor += RelationSide.BOTTOM
+            if (shape.left >= container.clientWidth) anchor += RelationSide.RIGHT
+            if (anchor.isEmpty()) anchor = HtmlRelation.ALL_SIDES
+            htmlRenderer.htmlConnections.limitSide(view, anchor)
 
             revalidate()
         }
@@ -266,12 +282,11 @@ fun HtmlShape.borderPosition(
             shape.top = newTop
 
             var anchor = emptySet<RelationSide>()
-            if (newTop <= 0.0) anchor += RelationSide.TOP
-            if (newLeft <= 0.0) anchor += RelationSide.LEFT
-            if (newTop >= parentHeight) anchor += RelationSide.BOTTOM
-            if (newLeft >= parentWidth) anchor += RelationSide.RIGHT
+            if (shape.top <= 0.0) anchor += RelationSide.TOP
+            if (shape.left <= 0.0) anchor += RelationSide.LEFT
+            if (shape.top >= container.clientHeight) anchor += RelationSide.BOTTOM
+            if (shape.left >= container.clientWidth) anchor += RelationSide.RIGHT
             if (anchor.isEmpty()) anchor = HtmlRelation.ALL_SIDES
-
             htmlRenderer.htmlConnections.limitSide(view, anchor)
         }
 
