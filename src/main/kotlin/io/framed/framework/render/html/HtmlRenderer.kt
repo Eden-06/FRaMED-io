@@ -178,26 +178,40 @@ class HtmlRenderer(
         }
 
         if (incrementSnap?.first != view) incrementSnap = null
-        val currentCenter = Point(view.left + view.marginLeft, view.top + view.marginTop)
+        val currentTopLeft = Point(view.left + view.marginLeft, view.top + view.marginTop)
 
-        val center = (incrementSnap?.second ?: currentCenter) + delta
-        incrementSnap = view to center
+        val topLeft = (incrementSnap?.second ?: currentTopLeft) + delta
+        incrementSnap = view to topLeft
+
+        val visible = navigationView.viewBox.let { it.copy(left = -it.left, top = -it.top) }
 
         val ignore = selected
-        val otherViews = (unselected)
+        val otherViews = unselected
+                .asSequence()
                 .filter { it.isChildOf(parent) }
-                .flatMap {
-                    listOf(
-                            it to Point(it.left, it.top),
-                            it to Point(it.left + it.width / 2, it.top + it.height / 2),
-                            it to Point(it.left + it.width, it.top + it.height)
+                .map {
+                    it to Dimension(
+                            it.positionView?.left ?: 0.0,
+                            it.positionView?.top ?: 0.0,
+                            it.positionView?.width ?: 0.0,
+                            it.positionView?.height ?: 0.0
                     )
                 }
+                .filter {
+                    it.second in visible
+                }
+                .flatMap { (it, dim) ->
+                    sequenceOf(
+                            it to Point(dim.left, dim.top),
+                            it to Point(dim.left + dim.width / 2, dim.top + dim.height / 2),
+                            it to Point(dim.left + dim.width, dim.top + dim.height)
+                    )
+                }.toList()
 
         val points = listOf(
-                center,
-                Point(center.x + view.width / 2, center.y + view.height / 2),
-                Point(center.x + view.width, center.y + view.height)
+                topLeft,
+                Point(topLeft.x + view.width / 2, topLeft.y + view.height / 2),
+                Point(topLeft.x + view.width, topLeft.y + view.height)
         ).map { it to snapPoint(it, SnapDirection.BOTH, parent, ignore, otherViews) }
 
         val (sourceX, snapX) = points.minBy { (point, result) ->
@@ -218,7 +232,7 @@ class HtmlRenderer(
         val snap = Point(snapX.point.x, snapY.point.y)
         val source = Point(sourceX.x, sourceY.y)
 
-        delta = snap - source + (center - currentCenter)
+        delta = snap - source + (topLeft - currentTopLeft)
 
         if (snapToView) {
             var vLines = emptySet<Double>()
