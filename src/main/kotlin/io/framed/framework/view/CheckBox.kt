@@ -16,8 +16,8 @@ import org.w3c.dom.events.EventListener
  */
 class CheckBox(label: String, property: ReadOnlyProperty<Boolean>) : View<HTMLDivElement>("div") {
 
-    private val checkbox = View.createView<HTMLInputElement>("input")
-    private val htmlLabel = View.createView<HTMLLabelElement>("label")
+    private val checkbox = createView<HTMLInputElement>("input")
+    private val htmlLabel = createView<HTMLLabelElement>("label")
 
     var label: String
         get() = htmlLabel.textContent ?: ""
@@ -45,9 +45,9 @@ class CheckBox(label: String, property: ReadOnlyProperty<Boolean>) : View<HTMLDi
         }
 
     var readOnly: Boolean
-        get() = checkbox.readOnly
+        get() = checkbox.disabled
         set(value) {
-            checkbox.readOnly = value
+            checkbox.disabled = value
         }
 
     init {

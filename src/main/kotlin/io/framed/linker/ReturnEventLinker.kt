@@ -6,6 +6,7 @@ import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
 import io.framed.framework.*
 import io.framed.framework.pictogram.*
+import io.framed.framework.util.advanced
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.Compartment
@@ -42,8 +43,6 @@ class ReturnEventLinker(
         }
     }
 
-    private lateinit var sidebarViewGroup: SidebarGroup
-
     override val sidebar = sidebar {
         title("Event")
 
@@ -54,18 +53,7 @@ class ReturnEventLinker(
             input("Description", descriptionProperty)
         }
 
-        sidebarViewGroup = group("Layout") {
-            input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
-                "x=${left.roundToInt()}, y=${top.roundToInt()}"
-            })
-            input("Size", pictogram.widthProperty.join(pictogram.heightProperty) { width, height ->
-                "width=${width.roundToInt()}, height=${height.roundToInt()}"
-            })
-        }
-    }
-
-    override fun Sidebar.onOpen(event: SidebarEvent) {
-        sidebarViewGroup.display = event.target == pictogram
+        advanced(pictogram)
     }
 
     override val contextMenu = defaultContextMenu()
