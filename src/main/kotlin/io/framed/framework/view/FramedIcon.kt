@@ -42,6 +42,6 @@ enum class FramedIcon(private val src: String) : Icon {
         }
 
     companion object {
-        private const val PATH = "/public/icons/"
+        private const val PATH = "public/icons/"
     }
 }
