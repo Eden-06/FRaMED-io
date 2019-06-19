@@ -2,6 +2,8 @@ package io.framed.framework.util
 
 import de.westermann.kobserve.event.EventHandler
 import de.westermann.kobserve.property.join
+import de.westermann.kobserve.property.mapBinding
+import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.readOnly
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Shape
@@ -166,6 +168,7 @@ fun Exception.log() {
 
 fun Sidebar.advanced(pictogram: Shape) {
     group("Advanced") {
+        input("Identifier", property(pictogram.id).mapBinding { it.toString() })
         input("Position", pictogram.leftProperty.join(pictogram.topProperty) { left, top ->
             "x=${left.roundToInt()}, y=${top.roundToInt()}"
         })

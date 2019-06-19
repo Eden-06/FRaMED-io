@@ -24,4 +24,7 @@ class Layer {
     }
 
     operator fun contains(id: Long): Boolean = id in data
+
+    val ids: Set<Long>
+    get() = data.keys
 }

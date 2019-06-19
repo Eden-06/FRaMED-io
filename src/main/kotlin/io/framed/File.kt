@@ -26,7 +26,13 @@ class File(
         get() = root.name.toLowerCase()
 
     fun maxId(): Long {
-        return max(root.maxId(), connections.maxId())
+        return max(
+                root.maxId(),
+                max(
+                        connections.maxId(),
+                        layer.values.flatMap { it.ids }.max() ?: 0L
+                )
+        )
     }
 
     fun toJSON(): String {
