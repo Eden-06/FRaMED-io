@@ -304,7 +304,7 @@ class HtmlConnections(
         if (anchors[view] != anchor) {
             anchors[view] = anchor
             relations.values.forEach {
-                if (it.sourceView == view || it.targetView == view) {
+                if (it::sourceView.isInitialized && it.sourceView == view || it::targetView.isInitialized && it.targetView == view) {
                     it.draw()
                 }
             }

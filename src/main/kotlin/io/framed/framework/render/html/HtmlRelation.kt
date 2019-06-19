@@ -264,13 +264,21 @@ class HtmlRelation(
 
     @Suppress("UNCHECKED_CAST")
     private val sourceAnchorString: Array<Any>
-        get() = (renderer.htmlConnections.anchors[sourceView]?.map { it.jsPlumb }?.toTypedArray()
-                ?: ALL_SIDES_ARRAY) as Array<Any>
+        get() {
+            val array = if (this::sourceView.isInitialized) {
+                renderer.htmlConnections.anchors[sourceView]?.map { it.jsPlumb }?.toTypedArray()
+            } else null
+            return (array ?: ALL_SIDES_ARRAY) as Array<Any>
+        }
 
     @Suppress("UNCHECKED_CAST")
     private val targetAnchorString: Array<Any>
-        get() = (renderer.htmlConnections.anchors[targetView]?.map { it.jsPlumb }?.toTypedArray()
-                ?: ALL_SIDES_ARRAY) as Array<Any>
+        get() {
+            val array = if (this::targetView.isInitialized) {
+                renderer.htmlConnections.anchors[targetView]?.map { it.jsPlumb }?.toTypedArray()
+            } else null
+            return (array ?: ALL_SIDES_ARRAY) as Array<Any>
+        }
 
     lateinit var sourceView: View<*>
     lateinit var targetView: View<*>
