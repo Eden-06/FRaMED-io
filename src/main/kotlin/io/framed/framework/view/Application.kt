@@ -4,7 +4,7 @@ import de.westermann.kobserve.not
 import de.westermann.kobserve.property.FunctionAccessor
 import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
-import io.framed.File
+import io.framed.Project
 import io.framed.framework.Controller
 import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
@@ -130,20 +130,20 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
     }
 
     private val menuBar = menuBar {
-        menu("File") {
+        menu("Project") {
             item(null, "New…") {
-                ControllerManager.file = File.empty()
+                ControllerManager.project = Project.empty()
             }
             item(MaterialIcon.FOLDER_OPEN, "Open", Shortcut("O", Shortcut.Modifier.CTRL)) {
                 loadLocalFile { content ->
-                    val file = File.fromJSON(content)
+                    val file = Project.fromJSON(content)
                     if (file != null) {
-                        ControllerManager.file = file
+                        ControllerManager.project = file
                     }
                 }
             }
             item(MaterialIcon.SAVE, "Save", Shortcut("S", Shortcut.Modifier.CTRL)) {
-                val file = ControllerManager.file
+                val file = ControllerManager.project
                 triggerDownload("${file.name}.json", file.toJSON())
             }
         }

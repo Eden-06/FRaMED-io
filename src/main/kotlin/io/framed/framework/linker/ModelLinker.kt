@@ -1,8 +1,12 @@
-package io.framed.framework
+package io.framed.framework.linker
 
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
+import io.framed.framework.ConnectionManager
+import io.framed.framework.Copy
+import io.framed.framework.model.ModelConnection
+import io.framed.framework.model.ModelElement
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.History
 import io.framed.framework.util.Point
@@ -12,6 +16,11 @@ import io.framed.framework.view.textView
 import kotlin.math.absoluteValue
 
 /**
+ * This interface adds control methods to the [Linker].
+ *
+ * A [ModelLinker] is a Linker which can be represented as a tab. It allows auto layout and copy paste.
+ * A ModelLinker can be shown in flat- or list-preview. The root Linker must be an ModelLinker
+ *
  * @author lars
  */
 interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker<M, P, R> {
@@ -21,9 +30,12 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     val shapeLinkers: Set<ShapeLinker<*, *>>
 
     fun generateChildrenIdList(): List<Long> = shapeLinkers.flatMap {
-        (if (it is ModelLinker<*,*,*>) it.generateChildrenIdList() else emptyList()) + it.id
+        (if (it is ModelLinker<*, *, *>) it.generateChildrenIdList() else emptyList()) + it.id
     }
 
+    /**
+     * Reference to the [ConnectionManager] of the project.
+     */
     val connectionManager: ConnectionManager
 
     val container: BoxShape
@@ -171,6 +183,9 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
         return linker
     }
 
+    /**
+     * Check all children and connections to create or delete ports.
+     */
     fun updatePorts(autoPosition: Boolean = false) {
         val directIdList = generateChildrenIdList()
 

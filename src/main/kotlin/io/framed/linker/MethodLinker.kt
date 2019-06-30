@@ -4,6 +4,12 @@ import de.westermann.kobserve.property.FunctionAccessor
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
+import io.framed.framework.linker.Linker
+import io.framed.framework.linker.LinkerInfoItem
+import io.framed.framework.linker.LinkerManager
+import io.framed.framework.linker.ShapeLinker
+import io.framed.framework.model.ModelElement
+import io.framed.framework.pictogram.ElementInfo
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.History
@@ -203,6 +209,8 @@ class MethodLinker(
 
     companion object : LinkerInfoItem {
 
+        override val info = ElementInfo("Method", FramedIcon.METHOD)
+
         override fun canCreateIn(container: ModelElement<*>): Boolean {
             return container is Class || container is Compartment || container is RoleType
         }
@@ -214,11 +222,8 @@ class MethodLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Method && parent is ShapeLinker<*, *>) {
                 return MethodLinker(model, parent)
-            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
+            } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
         }
-
-        override val name: String = "Method"
-        override val icon: Icon = FramedIcon.METHOD
 
         override val isConnectable = false
     }

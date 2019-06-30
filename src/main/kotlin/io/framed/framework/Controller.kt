@@ -3,13 +3,21 @@ package io.framed.framework
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
+import io.framed.framework.linker.ModelLinker
+import io.framed.framework.model.ModelElement
 import io.framed.framework.pictogram.*
 
+/**
+ * Represents a tab.
+ */
 class Controller(
         val linker: ModelLinker<*, *, *>,
         private val layer: Layer
 ) {
 
+    /**
+     * Intermediate object to handle actions of the renderer.
+     */
     val handler = object : ViewModelHandler {
 
         override fun isConnectable(shape: Long): Boolean =
@@ -49,11 +57,17 @@ class Controller(
         }
     }
 
+    /**
+     * Renderable object of this controller.
+     */
     val viewModel: ViewModel = ViewModel(linker.container, handler).also { viewModel ->
         viewModel.layer = layer
         viewModel.connections = linker.connectionManager.connections.asSequence().map { it.pictogram }.toSet()
     }
 
+    /**
+     * Name of the tab.
+     */
     val tabNameProperty: Property<String> = linker.nameProperty
 
     init {
@@ -66,13 +80,19 @@ class Controller(
         linker.connectionManager.init()
     }
 
+    /**
+     * The clipboard is shared between all controller to allow interaction between tabs.
+     */
     companion object {
-        val clipboardProperty = property(emptyList<Copy>())
+        private val clipboardProperty = property(emptyList<Copy>())
         var clipboard by clipboardProperty
         val clipboardEmptyProperty = clipboardProperty.mapBinding { it.isEmpty() }
     }
 }
 
+/**
+ * Helper class to manage clipboard entries.
+ */
 data class Copy(
         val original: ModelElement<*>,
         val copy: ModelElement<*>,

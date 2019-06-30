@@ -1,7 +1,7 @@
 package io.framed.model
 
 import io.framed.PolymorphicSetSerializer
-import io.framed.framework.ModelConnection
+import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
 @Serializable

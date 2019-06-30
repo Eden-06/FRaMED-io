@@ -1,16 +1,16 @@
-package io.framed.framework
+package io.framed.framework.model
 
 import kotlinx.serialization.Serializable
 
 /**
- * Base model interface for easier access.
+ * Base class for all model elements.
  *
  * @author lars
  */
 @Serializable
 abstract class ModelElement<M : ModelElement<M>> {
 
-    val id: Long = lastId ++
+    val id: Long = lastId++
 
     abstract fun copy(): M
     open fun maxId(): Long = id

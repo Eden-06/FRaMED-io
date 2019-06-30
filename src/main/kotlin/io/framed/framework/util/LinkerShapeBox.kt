@@ -5,9 +5,9 @@ import de.westermann.kobserve.event.EventHandler
 import de.westermann.kobserve.event.EventListener
 import de.westermann.kobserve.property.property
 import io.framed.framework.ConnectionManager
-import io.framed.framework.ModelElement
-import io.framed.framework.PreviewLinker
-import io.framed.framework.ShapeLinker
+import io.framed.framework.model.ModelElement
+import io.framed.framework.linker.PreviewLinker
+import io.framed.framework.linker.ShapeLinker
 import io.framed.framework.pictogram.BoxShape
 import kotlin.js.Date
 import kotlin.reflect.KMutableProperty0

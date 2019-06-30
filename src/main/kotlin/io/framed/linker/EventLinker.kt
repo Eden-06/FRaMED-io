@@ -1,16 +1,16 @@
 package io.framed.linker
 
 import de.westermann.kobserve.ReadOnlyProperty
-import de.westermann.kobserve.property.join
 import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
 import io.framed.framework.*
+import io.framed.framework.linker.*
+import io.framed.framework.model.ModelElement
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.advanced
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
 import io.framed.model.*
-import kotlin.math.roundToInt
 
 class EventLinker(
         override val model: Event,
@@ -87,6 +87,9 @@ class EventLinker(
     }
 
     companion object : LinkerInfoItem {
+
+        override val info = ElementInfo("Event", FramedIcon.EVENT)
+
         override fun canCreateIn(container: ModelElement<*>): Boolean {
             return container is Package || container is Compartment || container is Scene
         }
@@ -98,10 +101,7 @@ class EventLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Event && parent is ModelLinker<*, *, *>) {
                 return EventLinker(model, parent)
-            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
+            } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
         }
-
-        override val name: String = "Event"
-        override val icon: Icon = FramedIcon.EVENT
     }
 }

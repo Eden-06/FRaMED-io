@@ -4,6 +4,12 @@ import io.framed.framework.view.ListView
 import io.framed.framework.view.RawInputView
 import io.framed.framework.view.TextView
 
+/**
+ * Helper class to create an completion list for text inputs.
+ *
+ * @param input The text input of the autocomplete.
+ * @param container The completion list container.
+ */
 sealed class AutocompleteHandler(val input: RawInputView, val container: ListView) {
 
     abstract fun update(partial: String)

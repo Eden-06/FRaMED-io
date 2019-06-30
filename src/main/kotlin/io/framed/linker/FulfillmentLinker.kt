@@ -2,6 +2,11 @@ package io.framed.linker
 
 import de.westermann.kobserve.property.property
 import io.framed.framework.*
+import io.framed.framework.linker.ConnectionLinker
+import io.framed.framework.linker.Linker
+import io.framed.framework.linker.LinkerInfoConnection
+import io.framed.framework.linker.LinkerManager
+import io.framed.framework.model.ModelConnection
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.FramedIcon
@@ -76,7 +81,7 @@ class FulfillmentLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ConnectionInfo("Fulfillment", FramedIcon.FULFILLMENT)
+        override val info = ElementInfo("Fulfillment", FramedIcon.FULFILLMENT)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is ClassLinker || source is CompartmentLinker || source is RoleTypeLinker

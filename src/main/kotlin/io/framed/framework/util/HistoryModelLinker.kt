@@ -1,7 +1,7 @@
 package io.framed.framework.util
 
 import io.framed.framework.ControllerManager
-import io.framed.framework.ModelLinker
+import io.framed.framework.linker.ModelLinker
 
 class HistoryModelLinker(
         private val oldModel: ModelLinker<*, *, *>,

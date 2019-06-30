@@ -1,5 +1,6 @@
-package io.framed.framework
+package io.framed.framework.linker
 
+import io.framed.framework.model.ModelElement
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.SidebarEvent
@@ -7,6 +8,10 @@ import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
 
 /**
+ * Base interface for all linker that are represented by a graphical shape other than a connection.
+ *
+ * This interface adds a tree structure to the linker to allow parent children relationships.
+ *
  * @author lars
  */
 interface ShapeLinker<M : ModelElement<M>, P : Shape> : Linker<M, P> {
@@ -29,9 +34,15 @@ interface ShapeLinker<M : ModelElement<M>, P : Shape> : Linker<M, P> {
     fun remove(linker: ShapeLinker<*, *>): Unit = throw UnsupportedOperationException()
     fun add(model: ModelElement<*>): ShapeLinker<*, *> = throw  UnsupportedOperationException()
 
+    /**
+     * Set of all known type names of this linker and all children.
+     */
     val subTypes: Set<String>
         get() = emptySet()
 
+    /**
+     * Try to autocomplete the [partial] by known type names.
+     */
     fun getTypeSubset(partial: String): List<String> {
         val parent = parent
         return parent?.getTypeSubset(partial)

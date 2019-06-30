@@ -3,9 +3,9 @@ package io.framed.framework.util
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.event.EventHandler
 import de.westermann.kobserve.property.property
-import io.framed.framework.ConnectionLinker
+import io.framed.framework.linker.ConnectionLinker
 import io.framed.framework.ConnectionManager
-import io.framed.framework.ModelConnection
+import io.framed.framework.model.ModelConnection
 import kotlin.reflect.KMutableProperty0
 
 class LinkerConnectionBox<M : ModelConnection<out M>, L : ConnectionLinker<out M>>(

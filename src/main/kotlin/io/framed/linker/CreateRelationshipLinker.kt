@@ -2,6 +2,11 @@ package io.framed.linker
 
 import de.westermann.kobserve.property.property
 import io.framed.framework.*
+import io.framed.framework.linker.ConnectionLinker
+import io.framed.framework.linker.Linker
+import io.framed.framework.linker.LinkerInfoConnection
+import io.framed.framework.linker.LinkerManager
+import io.framed.framework.model.ModelConnection
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.FramedIcon
@@ -90,7 +95,7 @@ class CreateRelationshipLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ConnectionInfo("Create Relationship", FramedIcon.EVENTRELATIONSHIP)
+        override val info = ElementInfo("Create Relationship", FramedIcon.EVENTRELATIONSHIP)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is EventLinker || source is ReturnEventLinker

@@ -1,6 +1,10 @@
 package io.framed
 
 import io.framed.framework.*
+import io.framed.framework.linker.LinkerInfoConnection
+import io.framed.framework.linker.LinkerInfoItem
+import io.framed.framework.linker.LinkerManager
+import io.framed.framework.model.ModelElement
 import io.framed.framework.util.loadAjaxFile
 import io.framed.framework.view.Application
 import io.framed.linker.*
@@ -48,9 +52,9 @@ fun init() {
     // Startup ui
     Application.init()
 
-    // Load demo file
+    // Load demo project
     loadAjaxFile("demo.json") {
-        ControllerManager.file = File.fromJSON(it) ?: File.empty()
+        ControllerManager.project = Project.fromJSON(it) ?: Project.empty()
     }
 }
 

@@ -1,9 +1,13 @@
 package io.framed.framework
 
+import io.framed.framework.linker.ModelLinker
 import io.framed.framework.pictogram.BoxShape
 import io.framed.framework.pictogram.Connection
 import io.framed.framework.pictogram.Shape
 
+/**
+ * Perform auto layouting.
+ */
 object Layouting {
     fun autoLayout(container: BoxShape, connections: Set<Connection>, modelLinker: ModelLinker<*, *, *>) {
         val graph = Dagre.getGraph()

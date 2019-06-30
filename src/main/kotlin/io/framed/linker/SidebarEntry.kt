@@ -2,8 +2,8 @@ package io.framed.linker
 
 import de.westermann.kobserve.Property
 import de.westermann.kobserve.event.EventListener
-import io.framed.framework.ModelElement
-import io.framed.framework.ShapeLinker
+import io.framed.framework.model.ModelElement
+import io.framed.framework.linker.ShapeLinker
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.view.*
 

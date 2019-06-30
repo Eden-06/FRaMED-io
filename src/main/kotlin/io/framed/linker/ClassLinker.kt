@@ -5,6 +5,8 @@ import de.westermann.kobserve.property.constProperty
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
+import io.framed.framework.linker.*
+import io.framed.framework.model.ModelElement
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.*
@@ -73,7 +75,7 @@ class ClassLinker(
     }
 
     override val preview: BoxShape = boxShape(BoxShape.Position.HORIZONTAL) {
-        iconShape(constProperty(icon))
+        iconShape(constProperty(info.icon))
         textShape(nameProperty)
 
         style {
@@ -238,6 +240,9 @@ class ClassLinker(
     }
 
     companion object : LinkerInfoItem {
+
+        override val info = ElementInfo("Class", FramedIcon.CLASS)
+
         override fun canCreateIn(container: ModelElement<*>): Boolean {
             return container is Package
         }
@@ -249,10 +254,7 @@ class ClassLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Class && (parent is ModelLinker<*, *, *>)) {
                 return ClassLinker(model, parent)
-            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
+            } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
         }
-
-        override val name: String = "Class"
-        override val icon: Icon = FramedIcon.CLASS
     }
 }

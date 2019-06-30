@@ -2,6 +2,8 @@ package io.framed.linker
 
 import de.westermann.kobserve.property.*
 import io.framed.framework.*
+import io.framed.framework.linker.*
+import io.framed.framework.model.ModelElement
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.*
@@ -95,7 +97,7 @@ class PackageLinker(
     }
 
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
-        iconShape(constProperty(icon))
+        iconShape(constProperty(info.icon))
         textShape(nameProperty)
 
         style {
@@ -281,6 +283,9 @@ class PackageLinker(
     }
 
     companion object : LinkerInfoItem {
+
+        override val info = ElementInfo("Package", FramedIcon.PACKAGE)
+
         override fun canCreateIn(container: ModelElement<*>): Boolean {
             return container is Package
         }
@@ -292,10 +297,7 @@ class PackageLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Package && parent is ModelLinker<*, *, *> && connectionManager != null) {
                 return PackageLinker(model, connectionManager, parent)
-            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
+            } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
         }
-
-        override val name: String = "Package"
-        override val icon: Icon = FramedIcon.PACKAGE
     }
 }

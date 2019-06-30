@@ -2,7 +2,7 @@ package io.framed.model
 
 import io.framed.PolymorphicListSerializer
 import io.framed.PolymorphicSetSerializer
-import io.framed.framework.ModelElement
+import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Serializable
 
 /**

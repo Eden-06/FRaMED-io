@@ -1,7 +1,7 @@
 package io.framed.framework.pictogram
 
 import de.westermann.kobserve.ReadOnlyProperty
-import io.framed.framework.Linker
+import io.framed.framework.linker.Linker
 import io.framed.framework.view.Icon
 
 /**

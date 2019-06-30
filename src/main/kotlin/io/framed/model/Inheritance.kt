@@ -1,6 +1,6 @@
 package io.framed.model
 
-import io.framed.framework.ModelConnection
+import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
 /**
@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Inheritance() : ModelConnection<Inheritance> (){
+class Inheritance() : ModelConnection<Inheritance>(){
 
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId

@@ -5,13 +5,18 @@ import de.westermann.kobserve.property.FunctionProperty
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.*
+import io.framed.framework.linker.Linker
+import io.framed.framework.linker.LinkerInfoItem
+import io.framed.framework.linker.LinkerManager
+import io.framed.framework.linker.ShapeLinker
+import io.framed.framework.model.ModelElement
+import io.framed.framework.pictogram.ElementInfo
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.pictogram.textShape
 import io.framed.framework.util.History
 import io.framed.framework.util.RegexValidator
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.FramedIcon
-import io.framed.framework.view.Icon
 import io.framed.framework.view.sidebar
 import io.framed.model.*
 
@@ -105,6 +110,9 @@ class AttributeLinker(
     }
 
     companion object : LinkerInfoItem {
+
+        override val info = ElementInfo("Attribute", FramedIcon.ATTRIBUTE)
+
         override fun canCreateIn(container: ModelElement<*>): Boolean {
             return container is Class || container is Compartment || container is Scene || container is RoleType
         }
@@ -116,11 +124,8 @@ class AttributeLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Attribute && parent is ShapeLinker<*, *>) {
                 return AttributeLinker(model, parent)
-            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
+            } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
         }
-
-        override val name: String = "Attribute"
-        override val icon: Icon = FramedIcon.ATTRIBUTE
 
         override val isConnectable = false
     }

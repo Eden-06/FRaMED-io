@@ -1,8 +1,12 @@
 package io.framed.linker
 
-import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
 import io.framed.framework.*
+import io.framed.framework.linker.ConnectionLinker
+import io.framed.framework.linker.Linker
+import io.framed.framework.linker.LinkerInfoConnection
+import io.framed.framework.linker.LinkerManager
+import io.framed.framework.model.ModelConnection
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.FramedIcon
@@ -88,7 +92,7 @@ class CompositionLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ConnectionInfo("Composition", FramedIcon.COMPOSITION)
+        override val info = ElementInfo("Composition", FramedIcon.COMPOSITION)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is RoleTypeLinker || source is ClassLinker

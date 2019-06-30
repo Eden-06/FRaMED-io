@@ -1,19 +1,18 @@
 package io.framed.linker
 
 import de.westermann.kobserve.ReadOnlyProperty
-import de.westermann.kobserve.property.join
 import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
 import io.framed.framework.*
+import io.framed.framework.linker.*
+import io.framed.framework.model.ModelElement
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.advanced
 import io.framed.framework.util.trackHistory
 import io.framed.framework.view.*
-import io.framed.model.Compartment
 import io.framed.model.EventType
 import io.framed.model.ReturnEvent
 import io.framed.model.Scene
-import kotlin.math.roundToInt
 
 class ReturnEventLinker(
         override val model: ReturnEvent,
@@ -78,6 +77,9 @@ class ReturnEventLinker(
     }
 
     companion object : LinkerInfoItem {
+
+        override val info = ElementInfo("Return event", FramedIcon.RETURNEVENT)
+
         override fun canCreateIn(container: ModelElement<*>): Boolean {
             return container is Scene
         }
@@ -89,10 +91,7 @@ class ReturnEventLinker(
         override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is ReturnEvent && parent is ModelLinker<*, *, *>) {
                 return ReturnEventLinker(model, parent)
-            } else throw IllegalArgumentException("Cannot create $name linker for model element ${model::class}")
+            } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
         }
-
-        override val name: String = "Return event"
-        override val icon: Icon = FramedIcon.RETURNEVENT
     }
 }

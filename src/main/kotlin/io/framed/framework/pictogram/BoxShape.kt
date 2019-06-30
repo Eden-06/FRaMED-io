@@ -2,7 +2,7 @@ package io.framed.framework.pictogram
 
 import de.westermann.kobserve.event.EventHandler
 import de.westermann.kobserve.event.EventListener
-import io.framed.framework.Linker
+import io.framed.framework.linker.Linker
 import kotlin.math.max
 
 /**

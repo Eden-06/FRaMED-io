@@ -2,7 +2,11 @@ package io.framed.linker
 
 import de.westermann.kobserve.event.EventHandler
 import io.framed.framework.*
-import io.framed.framework.pictogram.ConnectionInfo
+import io.framed.framework.linker.ConnectionLinker
+import io.framed.framework.linker.LinkerManager
+import io.framed.framework.linker.ModelLinker
+import io.framed.framework.model.ModelConnection
+import io.framed.framework.pictogram.ElementInfo
 import io.framed.framework.util.LinkerConnectionBox
 import io.framed.framework.view.CyclicChooser
 import io.framed.framework.view.iconView
@@ -54,7 +58,7 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
     }
 
 
-    override fun createConnection(source: Long, target: Long, type: ConnectionInfo): ConnectionLinker<*> {
+    override fun createConnection(source: Long, target: Long, type: ElementInfo): ConnectionLinker<*> {
         val model = LinkerManager.createConnectionModelByType(type, source, target)
         val linker = LinkerManager.createLinker<ConnectionLinker<*>>(model, this)
         connectionBox += linker

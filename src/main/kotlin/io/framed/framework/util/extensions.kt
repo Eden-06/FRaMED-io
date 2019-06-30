@@ -80,7 +80,7 @@ fun triggerDownload(filename: String, content: String) {
 
 fun loadLocalFile(success: (String) -> Unit) {
     val element = document.createElement("input") as HTMLInputElement
-    element.type = "file"
+    element.type = "project"
     element.style.display = "none"
     element.addEventListener("change", object : EventListener {
         override fun handleEvent(event: dynamic) {
@@ -199,5 +199,7 @@ fun Sidebar.advanced(pictogram: Shape) {
 
             console.log(log(pictogram))
         }
+
+        collapse()
     }
 }
