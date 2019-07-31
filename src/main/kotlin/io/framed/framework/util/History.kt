@@ -6,6 +6,9 @@ import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
 import kotlin.js.Date
 
+/**
+ * Global history access.
+ */
 object History {
 
     private var list: List<HistoryGroup> = emptyList()
@@ -15,6 +18,9 @@ object History {
     private var ignoreTime = 0.0
     private var ignore = false
 
+    /**
+     * Add a history item to the current queue.
+     */
     fun push(historyItem: HistoryItem) {
         val top = list.getOrNull(pointer - 1)
 
@@ -38,14 +44,29 @@ object History {
         }
     }
 
+    /**
+     * Clear the history queue.
+     */
     fun clear() {
         list = emptyList()
         pointer = 0
     }
 
+    /**
+     * BooleanProperty that describes if their is an history item in the queue that can be undone.
+     */
     val canUndoProperty = pointerProperty.mapBinding { it > 0 }
+
+    /**
+     * Boolean that describes if their is an history item in the queue that can be undone.
+     */
     val canUndo by canUndoProperty
 
+    /**
+     * Undo the current history item in the queue.
+     *
+     * @throws IllegalStateException if their is no item that can be undone.
+     */
     fun undo() {
         if (!canUndo) {
             throw IllegalStateException()
@@ -58,9 +79,21 @@ object History {
         }
     }
 
+    /**
+     * BooleanProperty that describes if their is an history item in the queue that can be redone.
+     */
     val canRedoProperty = pointerProperty.mapBinding { it < list.size }
+
+    /**
+     * Boolean that describes if their is an history item in the queue that can be redone.
+     */
     val canRedo by canRedoProperty
 
+    /**
+     * Redo the current history item in the queue.
+     *
+     * @throws IllegalStateException if their is no item that can be redone.
+     */
     fun redo() {
         if (!canRedo) {
             throw IllegalStateException()
@@ -73,6 +106,9 @@ object History {
         }
     }
 
+    /**
+     * Fires when the redo or undo state is changing.
+     */
     val onChange = EventHandler<Unit>()
 
     private var lastCanRedo = false
@@ -86,6 +122,9 @@ object History {
         }
     }
 
+    /**
+     * Start a grouping block. All push operations within this block will be grouped to one history item.
+     */
     fun group(description: String, block: () -> Unit) {
         val top = list.getOrNull(pointer - 1)
 
@@ -106,6 +145,9 @@ object History {
         group.endGroup()
     }
 
+    /**
+     * Start an ignoring block. All push operations within this block will be ignored and will not affect the queue.
+     */
     fun ignore(block: () -> Unit) {
         ignoreTime = Date.now()
         ignore = true
@@ -116,6 +158,9 @@ object History {
     }
 }
 
+/**
+ * Helper function that listens to the @receiver and tracks it's changes to the history.
+ */
 fun <P : Property<T>, T> P.trackHistory(grouping: Any? = null): P {
     var oldValue = get()
 

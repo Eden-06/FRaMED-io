@@ -85,7 +85,16 @@ class CheckBox(label: String, property: ReadOnlyProperty<Boolean>) : View<HTMLDi
     }
 
     enum class Type {
-        CHECKBOX, SWITCH
+
+        /**
+         * A classical checkbox with a check mark.
+         */
+        CHECKBOX,
+
+        /**
+         * A modern on/off switch.
+         */
+        SWITCH
     }
 }
 
