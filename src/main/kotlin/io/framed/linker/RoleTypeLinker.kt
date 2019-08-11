@@ -89,6 +89,9 @@ class RoleTypeLinker(
         ignoreLabels = true
     }
 
+    /**
+     * Specify if this view should be displayed in the complete view or only the name.
+     */
     private val isCompleteViewStringProperty = pictogram.data("complete-view")
     private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
         val default: Boolean

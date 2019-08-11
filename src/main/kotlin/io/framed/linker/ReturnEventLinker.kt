@@ -34,7 +34,7 @@ class ReturnEventLinker(
                 style = Border.BorderStyle.SOLID
                 width = box(Border.DEFAULT_WIDTH)
                 color = box(color(0, 0, 0, 0.3))
-                radius = box(20.0)
+                radius = box(30.0)
 
                 double = true
             }

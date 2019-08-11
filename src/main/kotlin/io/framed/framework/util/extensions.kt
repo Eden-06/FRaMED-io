@@ -80,7 +80,7 @@ fun triggerDownload(filename: String, content: String) {
 
 fun loadLocalFile(success: (String) -> Unit) {
     val element = document.createElement("input") as HTMLInputElement
-    element.type = "project"
+    element.type = "file"
     element.style.display = "none"
     element.addEventListener("change", object : EventListener {
         override fun handleEvent(event: dynamic) {

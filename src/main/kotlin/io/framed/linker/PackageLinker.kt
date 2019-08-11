@@ -107,6 +107,9 @@ class PackageLinker(
         ignoreLabels = true
     }
 
+    /**
+     * Specify if this view should be displayed in the complete view or only the name.
+     */
     private val isCompleteViewStringProperty = pictogram.data("complete-view")
     private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
         val default: Boolean
@@ -126,6 +129,9 @@ class PackageLinker(
         }
     }, isCompleteViewStringProperty)
 
+    /**
+     * Specify if the content should be displayed in flat preview or not.
+     */
     private val isFlatPreviewStringProperty = pictogram.data("flat-preview")
     private val isFlatPreviewProperty = property(object : FunctionAccessor<Boolean> {
         override fun set(value: Boolean): Boolean {

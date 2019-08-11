@@ -122,6 +122,9 @@ class SceneLinker(
         ignoreLabels = true
     }
 
+    /**
+     * Specify if this view should be displayed in the complete view or only the name.
+     */
     private val isCompleteViewStringProperty = pictogram.data("complete-view")
     private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
         val default: Boolean
@@ -141,6 +144,9 @@ class SceneLinker(
         }
     }, isCompleteViewStringProperty)
 
+    /**
+     * Specify if the content should be displayed in flat preview or not.
+     */
     private val isFlatPreviewStringProperty = pictogram.data("flat-preview")
     private val isFlatPreviewProperty = property(object : FunctionAccessor<Boolean> {
         override fun set(value: Boolean): Boolean {
@@ -275,6 +281,9 @@ class SceneLinker(
         contextStepOut.display = event.target != pictogram
     }
 
+    /**
+     * Update the sidebar attribute overview. Add/remove missing/old items.
+     */
     private fun updateSidebarAttributes() {
         while (sidebarAttributesList.size > attributes.linkers.size) {
             val last = sidebarAttributesList.last()

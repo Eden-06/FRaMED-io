@@ -38,9 +38,9 @@ class HtmlIconShape(
         } else if (position == BoxShape.Position.BORDER) {
             borderPosition(view, parent?.parent as HtmlBoxShape)
 
-            shape.property.onChange.reference {
-                view.zIndex = if (shape.property.value == null) -1 else null
-            }.emit(Unit)
+            // shape.property.onChange.reference {
+            //     view.zIndex = if (shape.property.value == null) -1 else null
+            // }.emit(Unit)
         }
 
         init()

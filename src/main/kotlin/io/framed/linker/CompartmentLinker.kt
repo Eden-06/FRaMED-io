@@ -132,6 +132,9 @@ class CompartmentLinker(
         ignoreLabels = true
     }
 
+    /**
+     * Specify if this view should be displayed in the complete view or only the name.
+     */
     private val isCompleteViewStringProperty = pictogram.data("complete-view")
     private val isCompleteViewProperty = property(object : FunctionAccessor<Boolean> {
         val default: Boolean
@@ -151,6 +154,9 @@ class CompartmentLinker(
         }
     }, isCompleteViewStringProperty)
 
+    /**
+     * Specify if the content should be displayed in flat preview or not.
+     */
     private val isFlatPreviewStringProperty = pictogram.data("flat-preview")
     private val isFlatPreviewProperty = property(object : FunctionAccessor<Boolean> {
         override fun set(value: Boolean): Boolean {
@@ -300,7 +306,9 @@ class CompartmentLinker(
         contextStepOut.display = event.target != pictogram
     }
 
-
+    /**
+     * Update the sidebar attribute overview. Add/remove missing/old items.
+     */
     private fun updateSidebarAttributes() {
         while (sidebarAttributesList.size > attributes.linkers.size) {
             val last = sidebarAttributesList.last()
@@ -319,6 +327,9 @@ class CompartmentLinker(
         sidebarAttributes.toForeground(sidebarAttributesAdd)
     }
 
+    /**
+     * Update the sidebar method overview. Add/remove missing/old items.
+     */
     private fun updateSidebarMethods() {
         while (sidebarMethodsList.size > methods.linkers.size) {
             val last = sidebarMethodsList.last()
