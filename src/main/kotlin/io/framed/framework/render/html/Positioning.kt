@@ -213,9 +213,15 @@ fun HtmlShape.borderPosition(
 
         parentHtmlBoxShape.shape.widthProperty.onChange {
             onDrag.emit(View.DragEvent(Point.ZERO, false))
+            async {
+                onDrag.emit(View.DragEvent(Point.ZERO, false))
+            }
         }
         parentHtmlBoxShape.shape.heightProperty.onChange {
             onDrag.emit(View.DragEvent(Point.ZERO, false))
+            async {
+                onDrag.emit(View.DragEvent(Point.ZERO, false))
+            }
         }
 
         allowDrag = true
