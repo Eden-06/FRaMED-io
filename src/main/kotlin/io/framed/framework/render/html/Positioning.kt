@@ -219,15 +219,18 @@ fun HtmlShape.borderPosition(
         }
 
         allowDrag = true
-        onContext { event ->
-            shape.id?.let { id ->
-                val hid = abs(id)
-                val v = htmlRenderer.selectable.find { it.id == hid }
-                v?.positionView?.onContext?.emit(event)
+        if (!shape.hasContextMenu) {
+            onContext { event ->
+                shape.id?.let { id ->
+                    val hid = abs(id)
+                    val v = htmlRenderer.selectable.find { it.id == hid }
+                    v?.positionView?.onContext?.emit(event)
+                }
             }
         }
         onMouseDown { event ->
             event.stopPropagation()
+            htmlRenderer.selectView(htmlShape, event.ctrlKey, false)
             shape.id?.let { id ->
                 val hid = abs(id)
                 val v = htmlRenderer.selectable.find { it.id == hid }

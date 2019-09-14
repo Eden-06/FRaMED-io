@@ -33,7 +33,6 @@ abstract class HtmlShape(
                 it.stopPropagation()
                 it.preventDefault()
                 val diagram = htmlRenderer.snapPoint(htmlRenderer.navigationView.mouseToCanvas(it.point())).point
-                htmlRenderer
                 shape.onContextMenu.emit(ContextEvent(it.point(), diagram, shape))
             }
         }
