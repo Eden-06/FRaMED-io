@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Parameter() : ModelElement<Parameter>() {
+class Parameter() : ModelElement() {
 
     constructor(init: (Parameter) -> Unit) : this() {
         init(this)

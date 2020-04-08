@@ -1,15 +1,15 @@
 package io.framed.model
 
-import io.framed.PolymorphicListSerializer
-import io.framed.PolymorphicSetSerializer
 import io.framed.framework.model.ModelElement
+import kotlinx.serialization.ContextualSerialization
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
 /**
  * Model class for a bros scene.
  */
 @Serializable
-class Scene() : ModelElement<Scene>() {
+class Scene() : ModelElement() {
 
     constructor(init: (Scene) -> Unit) : this() {
         init(this)
@@ -23,12 +23,10 @@ class Scene() : ModelElement<Scene>() {
     /**
      * List of scene attributes
      */
-    @Serializable(with = PolymorphicListSerializer::class)
-    var attributes: List<Attribute> = emptyList()
+    var attributes: List<@Polymorphic Attribute> = emptyList()
 
 
-    @Serializable(with = PolymorphicSetSerializer::class)
-    var children: Set<ModelElement<*>> = emptySet()
+    var children: Set<ModelElement> = emptySet()
 
     override fun maxId(): Long = listOf(
             id,

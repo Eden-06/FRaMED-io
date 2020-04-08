@@ -106,11 +106,11 @@ class CreateRelationshipLinker(
                     (source is ReturnEventLinker && (target is RoleTypeLinker || target is SceneLinker) && source.parent.parent == target.parent)
         }
 
-        override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is CreateRelationship
+        override fun isLinkerFor(element: ModelConnection): Boolean = element is CreateRelationship
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is CreateRelationshipLinker
 
-        override fun createModel(source: Long, target: Long): ModelConnection<*> = CreateRelationship(source, target)
-        override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
+        override fun createModel(source: Long, target: Long): ModelConnection = CreateRelationship(source, target)
+        override fun createLinker(model: ModelConnection, connectionManager: ConnectionManager): ConnectionLinker<*> =
                 if (model is CreateRelationship) CreateRelationshipLinker(model, connectionManager)
                 else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
     }

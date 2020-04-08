@@ -20,12 +20,12 @@ interface LinkerInfoItem {
     /**
      * Check if this model type can be placed inside of a [container].
      */
-    fun canCreateIn(container: ModelElement<*>): Boolean
+    fun canCreateIn(container: ModelElement): Boolean
 
     /**
      * Check if a given model element belongs to this model type.
      */
-    fun isLinkerFor(element: ModelElement<*>): Boolean
+    fun isLinkerFor(element: ModelElement): Boolean
 
     /**
      * Check if a given linker instance belongs to this model type.
@@ -35,12 +35,12 @@ interface LinkerInfoItem {
     /**
      * Create a model instance of this model type.
      */
-    fun createModel(): ModelElement<*>
+    fun createModel(): ModelElement
 
     /**
      * Create a linker instance of this model type based on the [model].
      */
-    fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *>
+    fun createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *>
 
     /**
      * Specifies if this model type can be source or target of a connection.

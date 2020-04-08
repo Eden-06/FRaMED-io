@@ -211,15 +211,15 @@ class MethodLinker(
 
         override val info = ElementInfo("Method", FramedIcon.METHOD)
 
-        override fun canCreateIn(container: ModelElement<*>): Boolean {
+        override fun canCreateIn(container: ModelElement): Boolean {
             return container is Class || container is Compartment || container is RoleType
         }
 
-        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Method
+        override fun isLinkerFor(element: ModelElement): Boolean = element is Method
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is MethodLinker
 
-        override fun createModel(): ModelElement<*> = Method()
-        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+        override fun createModel(): ModelElement = Method()
+        override fun createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Method && parent is ShapeLinker<*, *>) {
                 return MethodLinker(model, parent)
             } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")

@@ -127,7 +127,7 @@ object LinkerManager {
     var linkerItemList: List<LinkerInfoItem> = emptyList()
     var linkerConnectionList: List<LinkerInfoConnection> = emptyList()
 
-    fun itemLinkerFor(element: ModelElement<*>): LinkerInfoItem {
+    fun itemLinkerFor(element: ModelElement): LinkerInfoItem {
         return linkerItemList.find { it.isLinkerFor(element) }
                 ?: throw NoSuchElementException("Cannot find linker info for model ${element::class.simpleName}")
     }
@@ -167,7 +167,7 @@ object LinkerManager {
     /**
      * Create a [Linker] instance for the given [model].
      */
-    inline fun <reified L : Linker<*, *>> createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager? = null): L {
+    inline fun <reified L : Linker<*, *>> createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager? = null): L {
         val linker = linkerItemList.firstOrNull { it.isLinkerFor(model) && it.canCreateIn(parent.model) }
                 ?.createLinker(model, parent, connectionManager)
                 ?: throw UnsupportedOperationException("Could not find linker for model of type ${model::class.simpleName}")
@@ -182,7 +182,7 @@ object LinkerManager {
     /**
      * Create a [Linker] instance for the given model [model].
      */
-    inline fun <reified L : Linker<*, *>> createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): L {
+    inline fun <reified L : Linker<*, *>> createLinker(model: ModelConnection, connectionManager: ConnectionManager): L {
         val linker = linkerConnectionList.firstOrNull { it.isLinkerFor(model) }
                 ?.createLinker(model, connectionManager)
                 ?: throw UnsupportedOperationException("Could not find linker for model of type ${model::class.simpleName}")
@@ -197,7 +197,7 @@ object LinkerManager {
     /**
      * Create a [ModelConnection] by the given [type], [source] and [target].
      */
-    fun createConnectionModelByType(type: ElementInfo, source: Long, target: Long): ModelConnection<*> {
+    fun createConnectionModelByType(type: ElementInfo, source: Long, target: Long): ModelConnection {
         return linkerConnectionList.firstOrNull { it.info == type }?.createModel(source, target)
                 ?: throw NoSuchElementException("Could not find connection linker for model of type ${type.name}")
     }

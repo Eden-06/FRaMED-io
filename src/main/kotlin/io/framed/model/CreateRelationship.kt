@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * @author Sebastian
  */
 @Serializable
-class CreateRelationship() : ModelConnection<CreateRelationship>() {
+class CreateRelationship() : ModelConnection() {
 
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId

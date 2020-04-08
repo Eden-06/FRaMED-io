@@ -12,7 +12,7 @@ import io.framed.framework.pictogram.BoxShape
 import kotlin.js.Date
 import kotlin.reflect.KMutableProperty0
 
-sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
+sealed class LinkerShapeBox<M : ModelElement, L : ShapeLinker<out M, *>>(
         private val connectionManager: ConnectionManager?
 ) {
     private var listeners: List<EventListener<*>> = emptyList()
@@ -184,7 +184,7 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
     operator fun minusAssign(linker: L) = remove(linker)
     operator fun contains(linker: L) = linker in linkers
 
-    class SetShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
+    class SetShapeBox<M : ModelElement, L : ShapeLinker<out M, *>>(
             kProperty: KMutableProperty0<Set<M>>,
             connectionManager: ConnectionManager? = null
     ) : LinkerShapeBox<M, L>(connectionManager) {
@@ -203,7 +203,7 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
         }
     }
 
-    class ListShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
+    class ListShapeBox<M : ModelElement, L : ShapeLinker<out M, *>>(
             kProperty: KMutableProperty0<List<M>>,
             connectionManager: ConnectionManager? = null
     ) : LinkerShapeBox<M, L>(connectionManager) {
@@ -227,13 +227,13 @@ sealed class LinkerShapeBox<M : ModelElement<out M>, L : ShapeLinker<out M, *>>(
     }
 }
 
-fun <M : ModelElement<out M>, L : ShapeLinker<out M, *>> shapeBox(
+fun <M : ModelElement, L : ShapeLinker<out M, *>> shapeBox(
         kProperty: KMutableProperty0<List<M>>,
         connectionManager: ConnectionManager? = null,
         init: (LinkerShapeBox<M, L>) -> Unit = {}
 ): LinkerShapeBox<M, L> = LinkerShapeBox.ListShapeBox<M, L>(kProperty, connectionManager).also(init)
 
-fun <M : ModelElement<out M>, L : ShapeLinker<out M, *>> shapeBox(
+fun <M : ModelElement, L : ShapeLinker<out M, *>> shapeBox(
         kProperty: KMutableProperty0<Set<M>>,
         connectionManager: ConnectionManager? = null,
         init: (LinkerShapeBox<M, L>) -> Unit = {}

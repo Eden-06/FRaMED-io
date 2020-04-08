@@ -25,7 +25,7 @@ class PackageLinker(
 
     override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
 
-    private val children = shapeBox(model::children, connectionManager) { box ->
+    private val children = shapeBox<ModelElement, ShapeLinker<out ModelElement, out Shape>>(model::children, connectionManager) { box ->
         box.view = container
         box.onChildrenChange {
             updateSize()
@@ -247,7 +247,7 @@ class PackageLinker(
     }
 
 
-    override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
+    override fun add(model: ModelElement): ShapeLinker<*, *> {
         val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this, connectionManager)
         children += linker
         updatePorts()
@@ -292,15 +292,15 @@ class PackageLinker(
 
         override val info = ElementInfo("Package", FramedIcon.PACKAGE)
 
-        override fun canCreateIn(container: ModelElement<*>): Boolean {
+        override fun canCreateIn(container: ModelElement): Boolean {
             return container is Package
         }
 
-        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Package
+        override fun isLinkerFor(element: ModelElement): Boolean = element is Package
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is PackageLinker
 
-        override fun createModel(): ModelElement<*> = Package()
-        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+        override fun createModel(): ModelElement = Package()
+        override fun createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Package && parent is ModelLinker<*, *, *> && connectionManager != null) {
                 return PackageLinker(model, connectionManager, parent)
             } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")

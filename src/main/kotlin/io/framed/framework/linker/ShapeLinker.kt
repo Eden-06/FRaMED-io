@@ -14,7 +14,7 @@ import io.framed.framework.view.textView
  *
  * @author lars
  */
-interface ShapeLinker<M : ModelElement<M>, P : Shape> : Linker<M, P> {
+interface ShapeLinker<M : ModelElement, P : Shape> : Linker<M, P> {
     val parent: ShapeLinker<*, *>?
 
     override fun delete() {
@@ -32,7 +32,7 @@ interface ShapeLinker<M : ModelElement<M>, P : Shape> : Linker<M, P> {
     }
 
     fun remove(linker: ShapeLinker<*, *>): Unit = throw UnsupportedOperationException()
-    fun add(model: ModelElement<*>): ShapeLinker<*, *> = throw  UnsupportedOperationException()
+    fun add(model: ModelElement): ShapeLinker<*, *> = throw  UnsupportedOperationException()
 
     /**
      * Set of all known type names of this linker and all children.

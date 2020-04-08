@@ -21,7 +21,7 @@ import io.framed.framework.view.contextMenu
  *
  * @author lars
  */
-interface Linker<M : ModelElement<M>, P : Pictogram> {
+interface Linker<M : ModelElement, P : Pictogram> {
 
     /**
      * Reference to the view-model

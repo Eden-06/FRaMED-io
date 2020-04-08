@@ -157,7 +157,7 @@ class ClassLinker(
 
     override val contextMenu = defaultContextMenu()
 
-    override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
+    override fun add(model: ModelElement): ShapeLinker<*, *> {
         val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this)
         when (linker) {
             is AttributeLinker -> attributes.add(linker)
@@ -252,15 +252,15 @@ class ClassLinker(
 
         override val info = ElementInfo("Class", FramedIcon.CLASS)
 
-        override fun canCreateIn(container: ModelElement<*>): Boolean {
+        override fun canCreateIn(container: ModelElement): Boolean {
             return container is Package
         }
 
-        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Class
+        override fun isLinkerFor(element: ModelElement): Boolean = element is Class
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is ClassLinker
 
-        override fun createModel(): ModelElement<*> = Class()
-        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+        override fun createModel(): ModelElement = Class()
+        override fun createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Class && (parent is ModelLinker<*, *, *>)) {
                 return ClassLinker(model, parent)
             } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")

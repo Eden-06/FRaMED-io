@@ -1,7 +1,7 @@
 package io.framed.model
 
-import io.framed.PolymorphicListSerializer
 import io.framed.framework.model.ModelElement
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
 /**
@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Class() : ModelElement<Class>() {
+class Class() : ModelElement() {
 
     constructor(init: (Class) -> Unit) : this() {
         init(this)
@@ -24,14 +24,12 @@ class Class() : ModelElement<Class>() {
     /**
      * List of class attributes
      */
-    @Serializable(with = PolymorphicListSerializer::class)
-    var attributes: List<Attribute> = emptyList()
+    var attributes: List<@Polymorphic Attribute> = emptyList()
 
     /**
      * List of class methods
      */
-    @Serializable(with = PolymorphicListSerializer::class)
-    var methods: List<Method> = emptyList()
+    var methods: List<@Polymorphic Method> = emptyList()
 
     override fun maxId(): Long = listOf(
             id,

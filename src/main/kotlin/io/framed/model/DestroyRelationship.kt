@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * @author Sebastian
  */
 @Serializable
-class DestroyRelationship() : ModelConnection<DestroyRelationship>() {
+class DestroyRelationship() : ModelConnection() {
 
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId

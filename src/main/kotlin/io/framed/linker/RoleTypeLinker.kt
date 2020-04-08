@@ -162,7 +162,7 @@ class RoleTypeLinker(
 
     override val contextMenu = defaultContextMenu()
 
-    override fun add(model: ModelElement<*>): ShapeLinker<*, *> {
+    override fun add(model: ModelElement): ShapeLinker<*, *> {
         val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this)
         when (linker) {
             is AttributeLinker -> attributes.add(linker)
@@ -267,15 +267,15 @@ class RoleTypeLinker(
 
         override val info = ElementInfo("Role type", FramedIcon.ROLETYPE)
 
-        override fun canCreateIn(container: ModelElement<*>): Boolean {
+        override fun canCreateIn(container: ModelElement): Boolean {
             return container is Compartment || container is Scene
         }
 
-        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is RoleType
+        override fun isLinkerFor(element: ModelElement): Boolean = element is RoleType
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is RoleTypeLinker
 
-        override fun createModel(): ModelElement<*> = RoleType()
-        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+        override fun createModel(): ModelElement = RoleType()
+        override fun createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is RoleType && parent is ModelLinker<*, *, *>) {
                 return RoleTypeLinker(model, parent)
             } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")

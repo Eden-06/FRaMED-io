@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Inheritance() : ModelConnection<Inheritance>(){
+class Inheritance() : ModelConnection(){
 
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId

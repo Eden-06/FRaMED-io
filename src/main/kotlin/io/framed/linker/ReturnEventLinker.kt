@@ -80,15 +80,15 @@ class ReturnEventLinker(
 
         override val info = ElementInfo("Return event", FramedIcon.RETURNEVENT)
 
-        override fun canCreateIn(container: ModelElement<*>): Boolean {
+        override fun canCreateIn(container: ModelElement): Boolean {
             return container is Scene
         }
 
-        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is ReturnEvent
+        override fun isLinkerFor(element: ModelElement): Boolean = element is ReturnEvent
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is ReturnEventLinker
 
-        override fun createModel(): ModelElement<*> = ReturnEvent()
-        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+        override fun createModel(): ModelElement = ReturnEvent()
+        override fun createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is ReturnEvent && parent is ModelLinker<*, *, *>) {
                 return ReturnEventLinker(model, parent)
             } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")

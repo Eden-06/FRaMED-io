@@ -4,12 +4,14 @@ import io.framed.framework.*
 import io.framed.framework.linker.LinkerInfoConnection
 import io.framed.framework.linker.LinkerInfoItem
 import io.framed.framework.linker.LinkerManager
+import io.framed.framework.model.ModelConnection
 import io.framed.framework.model.ModelElement
 import io.framed.framework.util.loadAjaxFile
 import io.framed.framework.view.Application
 import io.framed.linker.*
 import io.framed.model.*
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.modules.SerializersModule
 import kotlin.browser.window
 
 /**
@@ -27,27 +29,23 @@ fun main() {
  * Startup the application
  */
 fun init() {
-    // Register relations
-    register(RelationshipLinker, Relationship.serializer())
-    register(FulfillmentLinker, Fulfillment.serializer())
-    register(CompositionLinker, Composition.serializer())
-    register(AggregationLinker, Aggregation.serializer())
-    register(InheritanceLinker, Inheritance.serializer())
-    register(CreateRelationshipLinker, CreateRelationship.serializer())
-    register(DestroyRelationshipLinker, DestroyRelationship.serializer())
+    LinkerManager.register(RelationshipLinker)
+    LinkerManager.register(FulfillmentLinker)
+    LinkerManager.register(CompositionLinker)
+    LinkerManager.register(AggregationLinker)
+    LinkerManager.register(InheritanceLinker)
+    LinkerManager.register(CreateRelationshipLinker)
+    LinkerManager.register(DestroyRelationshipLinker)
 
-    // Register model elements
-    // The order is important for the context menu
-    register(Parameter.serializer())
-    register(AttributeLinker, Attribute.serializer())
-    register(MethodLinker, Method.serializer())
-    register(RoleTypeLinker, RoleType.serializer())
-    register(EventLinker, Event.serializer())
-    register(ReturnEventLinker, ReturnEvent.serializer())
-    register(ClassLinker, Class.serializer())
-    register(PackageLinker, Package.serializer())
-    register(CompartmentLinker, Compartment.serializer())
-    register(SceneLinker, Scene.serializer())
+    LinkerManager.register(AttributeLinker)
+    LinkerManager.register(MethodLinker)
+    LinkerManager.register(RoleTypeLinker)
+    LinkerManager.register(EventLinker)
+    LinkerManager.register(ReturnEventLinker)
+    LinkerManager.register(ClassLinker)
+    LinkerManager.register(PackageLinker)
+    LinkerManager.register(CompartmentLinker)
+    LinkerManager.register(SceneLinker)
 
     // Startup ui
     Application.init()
@@ -56,41 +54,4 @@ fun init() {
     loadAjaxFile("demo.json") {
         ControllerManager.project = Project.fromJSON(it) ?: Project.empty()
     }
-}
-
-const val PACKAGE_NAME = "io.framed.model"
-
-/**
- * Register model element for polymorphic serializer. Through reified generic parameter and common package
- * the instance and qualified name can be inferred.
- *
- * @param serializer The serializer instance. A generator function is automatically created by the `Serializable` annotation.
- */
-inline fun <reified M : ModelElement<M>> register(serializer: KSerializer<M>) {
-    val className = M::class.simpleName!!
-    PolymorphicSerializer.registerSerializer(M::class, serializer, "$PACKAGE_NAME.$className")
-}
-
-/**
- * Register linkerInfo and serializer in one step to prevent omitting one of it.
- * @see register
- *
- * @param info LinkerInfoItem of a model shape
- * @param serializer The serializer instance. A generator function is automatically created by the `Serializable` annotation.
- */
-inline fun <reified M : ModelElement<M>> register(info: LinkerInfoItem, serializer: KSerializer<M>) {
-    register(serializer)
-    LinkerManager.register(info)
-}
-
-/**
- * Register linkerInfo and serializer in one step to prevent omitting one of it.
- * @see register
- *
- * @param info LinkerInfoConnection of a model relation
- * @param serializer The serializer instance. A generator function is automatically created by the `Serializable` annotation.
- */
-inline fun <reified M : ModelElement<M>> register(info: LinkerInfoConnection, serializer: KSerializer<M>) {
-    register(serializer)
-    LinkerManager.register(info)
 }

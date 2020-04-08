@@ -110,11 +110,11 @@ class DestroyRelationshipLinker(
             return canStart(source) && target is EventLinker && source isSibling target
         }
 
-        override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is DestroyRelationship
+        override fun isLinkerFor(element: ModelConnection): Boolean = element is DestroyRelationship
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is DestroyRelationshipLinker
 
-        override fun createModel(source: Long, target: Long): ModelConnection<*> = DestroyRelationship(source, target)
-        override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
+        override fun createModel(source: Long, target: Long): ModelConnection = DestroyRelationship(source, target)
+        override fun createLinker(model: ModelConnection, connectionManager: ConnectionManager): ConnectionLinker<*> =
                 if (model is DestroyRelationship) DestroyRelationshipLinker(model, connectionManager)
                 else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
     }

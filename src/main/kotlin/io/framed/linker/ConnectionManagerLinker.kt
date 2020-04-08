@@ -20,13 +20,13 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
     override val connections: Set<ConnectionLinker<*>>
         get() = connectionBox.linkers
 
-    private val connectionBox = LinkerConnectionBox(modelConnections::connections, this)
+    private val connectionBox = LinkerConnectionBox<ModelConnection, ConnectionLinker<out ModelConnection>>(modelConnections::connections, this)
 
     override fun addModel(modelLinker: ModelLinker<*, *, *>) {
         modelLinkers += modelLinker
     }
 
-    override fun add(model: ModelConnection<*>) {
+    override fun add(model: ModelConnection) {
         connectionBox += LinkerManager.createLinker(model, this)
     }
 
@@ -56,7 +56,6 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
             }
         }
     }
-
 
     override fun createConnection(source: Long, target: Long, type: ElementInfo): ConnectionLinker<*> {
         val model = LinkerManager.createConnectionModelByType(type, source, target)

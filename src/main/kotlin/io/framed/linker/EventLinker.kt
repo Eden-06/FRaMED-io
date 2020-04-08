@@ -90,15 +90,15 @@ class EventLinker(
 
         override val info = ElementInfo("Event", FramedIcon.EVENT)
 
-        override fun canCreateIn(container: ModelElement<*>): Boolean {
+        override fun canCreateIn(container: ModelElement): Boolean {
             return container is Package || container is Compartment || container is Scene
         }
 
-        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Event
+        override fun isLinkerFor(element: ModelElement): Boolean = element is Event
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is EventLinker
 
-        override fun createModel(): ModelElement<*> = Event()
-        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+        override fun createModel(): ModelElement = Event()
+        override fun createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Event && parent is ModelLinker<*, *, *>) {
                 return EventLinker(model, parent)
             } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")

@@ -105,11 +105,11 @@ class CompositionLinker(
                     ) && source isConnectable target
         }
 
-        override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is Composition
+        override fun isLinkerFor(element: ModelConnection): Boolean = element is Composition
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is CompositionLinker
 
-        override fun createModel(source: Long, target: Long): ModelConnection<*> = Composition(source, target)
-        override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
+        override fun createModel(source: Long, target: Long): ModelConnection = Composition(source, target)
+        override fun createLinker(model: ModelConnection, connectionManager: ConnectionManager): ConnectionLinker<*> =
                 if (model is Composition) CompositionLinker(model, connectionManager)
                 else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
     }

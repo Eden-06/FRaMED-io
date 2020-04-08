@@ -8,6 +8,6 @@ import io.framed.framework.pictogram.Shape
  *
  * @author lars
  */
-interface PreviewLinker<M : ModelElement<M>, P : Shape, R : Shape> : ShapeLinker<M, P> {
+interface PreviewLinker<M : ModelElement, P : Shape, R : Shape> : ShapeLinker<M, P> {
     val preview: R
 }

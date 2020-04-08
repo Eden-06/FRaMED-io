@@ -30,7 +30,7 @@ interface LinkerInfoConnection {
     /**
      * Check if a given model element belongs to this connection type.
      */
-    fun isLinkerFor(element: ModelConnection<*>): Boolean
+    fun isLinkerFor(element: ModelConnection): Boolean
 
     /**
      * Check if a given linker instance belongs to this connection type.
@@ -40,12 +40,12 @@ interface LinkerInfoConnection {
     /**
      * Create a model instance of this connection type between [source] and [target].
      */
-    fun createModel(source: Long, target: Long): ModelConnection<*>
+    fun createModel(source: Long, target: Long): ModelConnection
 
     /**
      * Create a linker instance of this connection type based on the [model].
      */
-    fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*>
+    fun createLinker(model: ModelConnection, connectionManager: ConnectionManager): ConnectionLinker<*>
 
     /**
      * Check if two linker are siblings.

@@ -196,8 +196,10 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                             loadAjaxFile("version") {
                                 val data = it.split("\n", limit=3)
                                 textView(data[0])
-                                textView(Date(data[1]).toLocaleString())
-                                //textView(data[2])
+                                try {
+                                    textView(Date(data[1]).toLocaleString())
+                                    //textView(data[2])
+                                } catch (e: Exception){}
 
                                 open()
                             }

@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * The model defines an model of the modeling language
  */
 @Serializable
-class ReturnEvent() : ModelElement<ReturnEvent>() {
+class ReturnEvent() : ModelElement() {
 
     constructor(init: (ReturnEvent) -> Unit) : this() {
         init(this)

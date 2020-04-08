@@ -1,6 +1,5 @@
 package io.framed.model
 
-import io.framed.PolymorphicSetSerializer
 import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Serializable
 
@@ -10,7 +9,7 @@ import kotlinx.serialization.Serializable
  * It contains classes, connections, role types and nested packages.
  */
 @Serializable
-class Package() : ModelElementMetadata<Package>() {
+class Package() : ModelElementMetadata() {
 
     constructor(init: (Package) -> Unit) : this() {
         init(this)
@@ -21,8 +20,7 @@ class Package() : ModelElementMetadata<Package>() {
      */
     var name: String = "UnnamedPackage"
 
-    @Serializable(with = PolymorphicSetSerializer::class)
-    var children: Set<ModelElement<*>> = emptySet()
+    var children: Set<ModelElement> = emptySet()
 
     override fun maxId(): Long = listOf(
             id,

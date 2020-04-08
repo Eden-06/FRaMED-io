@@ -1,16 +1,17 @@
 package io.framed
 
+import io.framed.framework.model.ModelConnection
 import io.framed.framework.model.ModelElement
 import io.framed.framework.pictogram.Layer
 import io.framed.framework.util.log
 import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
-import io.framed.model.Connections
-import io.framed.model.Package
+import io.framed.model.*
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.modules.SerializersModule
 import kotlin.math.max
 
 /**
@@ -18,13 +19,12 @@ import kotlin.math.max
  */
 @Serializable
 class Project(
-        @Serializable(with = PolymorphicSerializer::class)
+        @Polymorphic
         val root: Package,
         val connections: Connections,
         val layer: Map<Long, Layer>
 ) {
 
-    @Transient
     val name: String
         get() = root.name.toLowerCase()
 
@@ -47,11 +47,51 @@ class Project(
     }
 
     companion object {
+        private val messageModule = SerializersModule {
+            // Register relations
+            polymorphic(ModelConnection::class) {
+                Relationship::class with Relationship.serializer()
+                Fulfillment::class with Fulfillment.serializer()
+                Composition::class with Composition.serializer()
+                Aggregation::class with Aggregation.serializer()
+                Inheritance::class with Inheritance.serializer()
+                CreateRelationship::class with CreateRelationship.serializer()
+                DestroyRelationship::class with DestroyRelationship.serializer()
+            }
+
+            polymorphic(ModelElement::class) {
+                // Register model elements
+                Parameter::class with Parameter.serializer()
+                Attribute::class with Attribute.serializer()
+                Method::class with Method.serializer()
+                RoleType::class with RoleType.serializer()
+                Event::class with Event.serializer()
+                ReturnEvent::class with ReturnEvent.serializer()
+                Class::class with Class.serializer()
+                Package::class with Package.serializer()
+                Compartment::class with Compartment.serializer()
+                Scene::class with Scene.serializer()
+            }
+
+            polymorphic(Attribute::class) {
+                Attribute::class with Attribute.serializer()
+            }
+            polymorphic(Method::class) {
+                Method::class with Method.serializer()
+            }
+            polymorphic(Parameter::class) {
+                Parameter::class with Parameter.serializer()
+            }
+            polymorphic(Package::class) {
+                Package::class with Package.serializer()
+            }
+        }
         private val json = Json(
                 JsonConfiguration.Stable.copy(
-                        strictMode = false,
-                        prettyPrint = true
-                )
+                        prettyPrint = true,
+                        useArrayPolymorphism = true
+                ),
+                context = messageModule
         )
 
         fun fromJSON(content: String): Project? {

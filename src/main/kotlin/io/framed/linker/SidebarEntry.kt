@@ -8,7 +8,7 @@ import io.framed.framework.pictogram.TextShape
 import io.framed.framework.view.*
 
 
-class SidebarEntry<T : ModelElement<T>>(
+class SidebarEntry<T : ModelElement>(
         private val sidebarGroup: SidebarGroup,
         private var param: ShapeLinker<T, TextShape>
 ) {

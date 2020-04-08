@@ -9,6 +9,6 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-abstract class ModelElementMetadata<M : ModelElementMetadata<M>> : ModelElement<M>() {
+abstract class ModelElementMetadata : ModelElement() {
     val metadata: Metadata = Metadata()
 }

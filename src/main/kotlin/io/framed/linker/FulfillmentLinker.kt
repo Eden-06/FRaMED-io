@@ -94,11 +94,11 @@ class FulfillmentLinker(
             return canStart(source) && target is RoleTypeLinker && source.parent == target.parent.parent
         }
 
-        override fun isLinkerFor(element: ModelConnection<*>): Boolean = element is Fulfillment
+        override fun isLinkerFor(element: ModelConnection): Boolean = element is Fulfillment
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is FulfillmentLinker
 
-        override fun createModel(source: Long, target: Long): ModelConnection<*> = Fulfillment(source, target)
-        override fun createLinker(model: ModelConnection<*>, connectionManager: ConnectionManager): ConnectionLinker<*> =
+        override fun createModel(source: Long, target: Long): ModelConnection = Fulfillment(source, target)
+        override fun createLinker(model: ModelConnection, connectionManager: ConnectionManager): ConnectionLinker<*> =
                 if (model is Fulfillment) FulfillmentLinker(model, connectionManager)
                 else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
     }

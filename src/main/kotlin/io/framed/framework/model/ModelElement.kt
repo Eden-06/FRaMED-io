@@ -8,14 +8,22 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-abstract class ModelElement<M : ModelElement<M>> {
+abstract class ModelElement {
 
     val id: Long = lastId++
 
-    abstract fun copy(): M
+    abstract fun copy(): ModelElement
+
+
     open fun maxId(): Long = id
 
     companion object {
         var lastId: Long = 0
     }
+}
+
+inline fun <reified T: ModelElement> T.copyGeneric():T {
+    val element = copy()
+    if (element is T) return element
+    throw IllegalStateException()
 }

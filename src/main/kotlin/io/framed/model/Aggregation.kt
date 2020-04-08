@@ -9,9 +9,9 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Aggregation() : ModelConnection<Aggregation>() {
+class Aggregation() : ModelConnection() {
 
-    constructor(sourceId: Long, targetId: Long): this() {
+    constructor(sourceId: Long, targetId: Long) : this() {
         this.sourceId = sourceId
         this.targetId = targetId
     }

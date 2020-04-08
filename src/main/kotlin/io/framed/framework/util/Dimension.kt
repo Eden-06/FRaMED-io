@@ -18,23 +18,18 @@ data class Dimension(
 
     constructor(position: Point, size: Point = Point.ZERO) : this(position.x, position.y, size.x, size.y)
 
-    @Transient
     val position: Point
         get() = Point(left, top)
 
-    @Transient
     val size: Point
         get() = Point(width, height)
 
-    @Transient
     val right: Double
         get() = left + width
 
-    @Transient
     val bottom: Double
         get() = top + height
 
-    @Transient
     val edges: Set<Point>
         get() = setOf(
                 Point(left, top),
@@ -43,7 +38,6 @@ data class Dimension(
                 Point(right, bottom)
         )
 
-    @Transient
     val normalized: Dimension
         get() {
             val l = min(left, right)

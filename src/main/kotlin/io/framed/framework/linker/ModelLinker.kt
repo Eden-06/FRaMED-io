@@ -23,7 +23,7 @@ import kotlin.math.absoluteValue
  *
  * @author lars
  */
-interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker<M, P, R> {
+interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M, P, R> {
 
     override val nameProperty: Property<String>
 
@@ -155,7 +155,7 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
     fun paste(target: Long?, elements: List<Copy>, targetContainer: Pictogram?) {
         fun paste() {
             for ((_, element, layerData) in elements) {
-                if (element is ModelConnection<*>) {
+                if (element is ModelConnection) {
                     connectionManager.add(element)
                 } else if (LinkerManager.itemLinkerFor(element).canCreateIn(model)) {
                     add(element, layerData ?: LayerData(), container)
@@ -177,7 +177,7 @@ interface ModelLinker<M : ModelElement<M>, P : Shape, R : Shape> : PreviewLinker
         }
     }
 
-    fun add(model: ModelElement<*>, layerData: LayerData, container: Pictogram): ShapeLinker<*, *> {
+    fun add(model: ModelElement, layerData: LayerData, container: Pictogram): ShapeLinker<*, *> {
         val linker = add(model)
         linker.pictogram.import(layerData)
         return linker

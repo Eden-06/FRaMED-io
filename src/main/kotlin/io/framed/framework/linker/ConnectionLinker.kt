@@ -12,7 +12,7 @@ import io.framed.framework.util.History
  * Base interface for all connection linker. All connection linker have to implement this interface.
  * @author lars
  */
-interface ConnectionLinker<M : ModelConnection<M>> : Linker<M, Connection> {
+interface ConnectionLinker<M : ModelConnection> : Linker<M, Connection> {
 
     /**
      * Reference to the parent connection manager

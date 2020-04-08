@@ -6,7 +6,9 @@ import kotlinx.serialization.Serializable
  * Base class for all model connections.
  */
 @Serializable
-abstract class ModelConnection<M : ModelConnection<M>>() : ModelElement<M>() {
+abstract class ModelConnection : ModelElement() {
+
+    abstract override fun copy(): ModelConnection
 
     var sourceId: Long = id
     var targetId: Long = id

@@ -20,7 +20,7 @@ interface ConnectionManager {
     val shapes: Set<ShapeLinker<*, *>>
         get() = modelLinkers.flatMap { it.shapeLinkers }.toSet()
 
-    fun add(model: ModelConnection<*>)
+    fun add(model: ModelConnection)
     fun remove(linker: ConnectionLinker<*>)
 
     val onConnectionAdd: EventHandler<ConnectionLinker<*>>

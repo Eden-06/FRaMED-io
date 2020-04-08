@@ -94,7 +94,7 @@ class Controller(
  * Helper class to manage clipboard entries.
  */
 data class Copy(
-        val original: ModelElement<*>,
-        val copy: ModelElement<*>,
+        val original: ModelElement,
+        val copy: ModelElement,
         val layerData: LayerData? = null
 )

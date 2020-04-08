@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * @author lars
  */
 @Serializable
-class Composition() : ModelConnection<Composition>() {
+class Composition() : ModelConnection() {
 
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId

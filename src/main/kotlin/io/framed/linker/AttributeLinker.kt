@@ -113,15 +113,15 @@ class AttributeLinker(
 
         override val info = ElementInfo("Attribute", FramedIcon.ATTRIBUTE)
 
-        override fun canCreateIn(container: ModelElement<*>): Boolean {
+        override fun canCreateIn(container: ModelElement): Boolean {
             return container is Class || container is Compartment || container is Scene || container is RoleType
         }
 
-        override fun isLinkerFor(element: ModelElement<*>): Boolean = element is Attribute
+        override fun isLinkerFor(element: ModelElement): Boolean = element is Attribute
         override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is AttributeLinker
 
-        override fun createModel(): ModelElement<*> = Attribute()
-        override fun createLinker(model: ModelElement<*>, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
+        override fun createModel(): ModelElement = Attribute()
+        override fun createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
             if (model is Attribute && parent is ShapeLinker<*, *>) {
                 return AttributeLinker(model, parent)
             } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
