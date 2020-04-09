@@ -12,6 +12,8 @@ import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.get
 import org.w3c.dom.set
 import kotlin.browser.document
+import kotlin.dom.addClass
+import kotlin.dom.removeClass
 
 /**
  * Base class for html views. Each view is represented by a html element.
@@ -371,7 +373,11 @@ abstract class View<V : HTMLElement>(view: V) {
 
     companion object {
 
-        var disableDrag = false
+        var disableDrag: Boolean = false
+            set(value) {
+                field = value
+                Root.classes["no-select"] = value
+            }
 
         /**
          * Create html element by tag name.

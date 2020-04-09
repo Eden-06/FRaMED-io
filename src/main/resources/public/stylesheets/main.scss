@@ -13,6 +13,10 @@ body, html {
   font-family: Roboto, Arial, sans-serif;
 }
 
+body.no-select * {
+  user-select: none;
+}
+
 .resize-ew * {
   cursor: ew-resize;
 }
