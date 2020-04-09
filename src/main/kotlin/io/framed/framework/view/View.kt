@@ -371,6 +371,8 @@ abstract class View<V : HTMLElement>(view: V) {
 
     companion object {
 
+        var disableDrag = false
+
         /**
          * Create html element by tag name.
          */

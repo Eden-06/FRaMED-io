@@ -67,11 +67,10 @@ fun HtmlShape.absolutePosition(
         }
 
         allowDrag = true
-        disableDrag = false
 
         onMouseDown { event ->
             if(!event.target?.asDynamic().nodeName.equals("INPUT")){
-                allowDrag = true
+                View.disableDrag = false
                 event.stopPropagation()
                 htmlRenderer.selectView(htmlShape, event.ctrlKey, false)
                 container.toForeground(view)
@@ -90,7 +89,7 @@ fun HtmlShape.absolutePosition(
                     htmlRenderer.stopDragView()
                 }
             } else {
-                allowDrag = false
+                View.disableDrag = true
             }
         }
         onClick { event ->
@@ -101,7 +100,7 @@ fun HtmlShape.absolutePosition(
             htmlRenderer.selectView(htmlShape, event.ctrlKey, true)
         }
         onDrag { e ->
-            if(allowDrag){
+            if(!View.disableDrag){
                 var event = e
                 if (event.direct) {
                     event = htmlRenderer.directDragView(event, view, container)
@@ -123,6 +122,7 @@ fun HtmlShape.absolutePosition(
         }
         onMouseUp {
             allowDrag = true
+            View.disableDrag = false
             canDrop?.let { target ->
                 htmlRenderer.viewModel.handler.dropShape(shape.id ?: return@onMouseUp, target.id ?: return@onMouseUp)
             }

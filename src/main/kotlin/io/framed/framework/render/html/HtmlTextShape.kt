@@ -28,12 +28,18 @@ class HtmlTextShape(
             focus()
         }
         onFocusEnter {
-            val downEvent = document.createEvent("MouseEvents")
-            downEvent.initEvent("mousedown", bubbles = true, cancelable = true);
-            html.dispatchEvent(downEvent)
-            val upEvent = document.createEvent("MouseEvents")
-            upEvent.initEvent("mouseup", bubbles = true, cancelable = true);
-            html.dispatchEvent(upEvent)
+            if(View.disableDrag){
+                val downEvent = document.createEvent("MouseEvents")
+                downEvent.initEvent("mousedown", bubbles = true, cancelable = true);
+                html.dispatchEvent(downEvent)
+                val upEvent = document.createEvent("MouseEvents")
+                upEvent.initEvent("mouseup", bubbles = true, cancelable = true);
+                html.dispatchEvent(upEvent)
+            } else {
+                it.preventDefault()
+                it.stopPropagation()
+                blur()
+            }
         }
         onFocusLeave {
             value = shape.property.value
