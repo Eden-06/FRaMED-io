@@ -122,6 +122,7 @@ fun HtmlShape.absolutePosition(
             }
         }
         onMouseUp {
+            allowDrag = true
             canDrop?.let { target ->
                 htmlRenderer.viewModel.handler.dropShape(shape.id ?: return@onMouseUp, target.id ?: return@onMouseUp)
             }
