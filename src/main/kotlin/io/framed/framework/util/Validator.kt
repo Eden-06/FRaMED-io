@@ -6,5 +6,6 @@ class RegexValidator(private val regex: Regex) {
 
     companion object {
         val IDENTIFIER = RegexValidator("[a-zA-Z]([a-zA-Z0-9_])*".toRegex())
+        val SCENENAME = RegexValidator("[a-zA-Z\\s]([a-zA-Z0-9_\\s])*".toRegex())
     }
 }

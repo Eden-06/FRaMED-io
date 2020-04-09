@@ -30,18 +30,13 @@ abstract class HtmlShape(
     fun events(view: View<*>, shape: Shape) {
         if (shape.hasContextMenu) {
             view.onContext {
-                it.stopPropagation()
-                it.preventDefault()
                 val diagram = htmlRenderer.snapPoint(htmlRenderer.navigationView.mouseToCanvas(it.point())).point
                 shape.onContextMenu.emit(ContextEvent(it.point(), diagram, shape))
             }
         }
         if (shape.hasSidebar) {
             view.onMouseDown {
-                if (!it.defaultPrevented) {
-                    it.preventDefault()
-                    shape.onSidebar.emit(SidebarEvent(shape))
-                }
+                shape.onSidebar.emit(SidebarEvent(shape))
             }
             resizer?.onMouseDown?.addListener {
                 shape.onSidebar.emit(SidebarEvent(shape))

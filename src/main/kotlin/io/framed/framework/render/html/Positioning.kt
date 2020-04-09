@@ -10,6 +10,7 @@ import io.framed.framework.view.View
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.reflect.typeOf
 
 
 fun HtmlShape.absolutePosition(
@@ -66,23 +67,30 @@ fun HtmlShape.absolutePosition(
         }
 
         allowDrag = true
+        disableDrag = false
+
         onMouseDown { event ->
-            event.stopPropagation()
-            htmlRenderer.selectView(htmlShape, event.ctrlKey, false)
-            container.toForeground(view)
+            if(!event.target?.asDynamic().nodeName.equals("INPUT")){
+                allowDrag = true
+                event.stopPropagation()
+                htmlRenderer.selectView(htmlShape, event.ctrlKey, false)
+                container.toForeground(view)
 
-            var markView = true
-            async(200) {
-                if (markView) {
-                    htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, container)
+                var markView = true
+                async(200) {
+                    if (markView) {
+                        htmlRenderer.directDragView(View.DragEvent(Point.ZERO, true), view, container)
+                    }
                 }
-            }
 
-            var reference: EventListener<*>? = null
-            reference = Root.onMouseUp.reference {
-                markView = false
-                reference?.detach()
-                htmlRenderer.stopDragView()
+                var reference: EventListener<*>? = null
+                reference = Root.onMouseUp.reference {
+                    markView = false
+                    reference?.detach()
+                    htmlRenderer.stopDragView()
+                }
+            } else {
+                allowDrag = false
             }
         }
         onClick { event ->
@@ -93,24 +101,25 @@ fun HtmlShape.absolutePosition(
             htmlRenderer.selectView(htmlShape, event.ctrlKey, true)
         }
         onDrag { e ->
-            var event = e
-            if (event.direct) {
-                event = htmlRenderer.directDragView(event, view, container)
-                canDrop = htmlRenderer.checkDrop(shape)
-            }
+            if(allowDrag){
+                var event = e
+                if (event.direct) {
+                    event = htmlRenderer.directDragView(event, view, container)
+                    canDrop = htmlRenderer.checkDrop(shape)
+                }
 
-            val newLeft = left + event.delta.x
-            val newTop = top + event.delta.y
+                val newLeft = left + event.delta.x
+                val newTop = top + event.delta.y
 
-            shape.left = minLeft?.let { max(it, newLeft) } ?: newLeft
-            shape.top = minTop?.let { max(it, newTop) } ?: newTop
+                shape.left = minLeft?.let { max(it, newLeft) } ?: newLeft
+                shape.top = minTop?.let { max(it, newTop) } ?: newTop
 
-            if (event.direct) {
-                (htmlRenderer.selected - htmlShape).forEach {
-                    if (it.isDraggable) it.drag(event.delta)
+                if (event.direct) {
+                    (htmlRenderer.selected - htmlShape).forEach {
+                        if (it.isDraggable) it.drag(event.delta)
+                    }
                 }
             }
-
         }
         onMouseUp {
             canDrop?.let { target ->

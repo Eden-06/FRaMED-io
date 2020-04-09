@@ -254,6 +254,8 @@ abstract class View<V : HTMLElement>(view: V) {
     var highlightedView by highlightedViewProperty
 
     var allowDrag = false
+    var disableDrag = false
+
     val onDrag = EventHandler<DragEvent>()
 
     var minTop: Double? = null
@@ -346,6 +348,7 @@ abstract class View<V : HTMLElement>(view: V) {
                 Root.onMouseLeave += dragEnd
             }
         }
+
         onMouseUp {
             isMouseDown = false
         }

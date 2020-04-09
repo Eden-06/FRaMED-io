@@ -25,7 +25,7 @@ class SceneLinker(
 ) : ModelLinker<Scene, BoxShape, BoxShape> {
 
     override val nameProperty = property(model::name)
-            .validate(RegexValidator.IDENTIFIER::validate)
+            .validate(RegexValidator.SCENENAME::validate)
             .trackHistory()
     override var name by nameProperty
 
