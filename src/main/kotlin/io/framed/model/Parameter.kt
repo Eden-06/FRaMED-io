@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.export.Visitor
 import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Serializable
 
@@ -49,5 +50,9 @@ class Parameter() : ModelElement() {
     override fun copy() = Parameter { new ->
         new.name = name
         new.type = type
+    }
+
+    override fun <T> acceptVisitor(visitor: Visitor<T>) {
+        visitor.visit(this)
     }
 }

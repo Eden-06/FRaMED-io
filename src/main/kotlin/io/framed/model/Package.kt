@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.export.Visitor
 import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Serializable
 
@@ -30,5 +31,9 @@ class Package() : ModelElementMetadata() {
     override fun copy(): Package = Package { new ->
         new.name = name
         new.children = children.map { it.copy() }.toSet()
+    }
+
+    override fun <T> acceptVisitor(visitor: Visitor<T>) {
+        visitor.visit(this)
     }
 }

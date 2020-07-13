@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.export.Visitor
 import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
@@ -35,5 +36,9 @@ class Composition() : ModelConnection() {
         new.name = name
         new.sourceCardinality = sourceCardinality
         new.targetCardinality = targetCardinality
+    }
+
+    override fun <T> acceptVisitor(visitor: Visitor<T>) {
+        visitor.visit(this)
     }
 }

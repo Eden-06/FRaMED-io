@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.export.Visitor
 import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
@@ -23,5 +24,9 @@ class Fulfillment() : ModelConnection() {
 
     override fun copy() = Fulfillment().also { new ->
         new.name = name
+    }
+
+    override fun <T> acceptVisitor(visitor: Visitor<T>) {
+        visitor.visit(this)
     }
 }

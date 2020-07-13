@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.export.Visitor
 import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
@@ -41,5 +42,9 @@ class Class() : ModelElement() {
         new.name = name
         new.attributes = attributes.map { it.copy() }
         new.methods = methods.map { it.copy() }
+    }
+
+    override fun <T> acceptVisitor(visitor: Visitor<T>) {
+        visitor.visit(this)
     }
 }

@@ -1,5 +1,7 @@
 package io.framed.framework.model
 
+import io.framed.export.ProjectTreeVisitor
+import io.framed.export.Visitor
 import kotlinx.serialization.Serializable
 
 /**
@@ -14,6 +16,7 @@ abstract class ModelElement {
 
     abstract fun copy(): ModelElement
 
+    abstract fun <T> acceptVisitor(visitor: Visitor<T>)
 
     open fun maxId(): Long = id
 

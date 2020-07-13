@@ -1,5 +1,6 @@
 package io.framed.model
 
+import io.framed.export.Visitor
 import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Serializable
 
@@ -28,5 +29,9 @@ class Attribute() : ModelElement() {
     override fun copy() = Attribute { new ->
         new.name = name
         new.type = type
+    }
+
+    override fun <T> acceptVisitor(visitor: Visitor<T>) {
+        visitor.visit(this)
     }
 }

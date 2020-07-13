@@ -5,6 +5,7 @@ import de.westermann.kobserve.property.FunctionAccessor
 import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
 import io.framed.Project
+import io.framed.export.XmiExporter
 import io.framed.framework.Controller
 import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
@@ -145,6 +146,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             item(MaterialIcon.SAVE, "Save", Shortcut("S", Shortcut.Modifier.CTRL)) {
                 val file = ControllerManager.project
                 triggerDownload("${file.name}.json", file.toJSON())
+            }
+            item(MaterialIcon.IMPORT_EXPORT, "Export") {
+                println("Call")
+                val project = ControllerManager.project
+                val visitor = XmiExporter()
+                triggerDownload("${project.name}.ecore", project.visit(visitor))
             }
         }
         menu("Edit") {
