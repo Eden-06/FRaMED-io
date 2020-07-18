@@ -1,7 +1,7 @@
 plugins {
     kotlin("js") version "1.3.71"
     kotlin("plugin.serialization") version "1.3.71"
-    id("com.github.node-gradle.node") version "2.2.3"
+    id("com.github.node-gradle.node") version "2.2.4"
     id("org.kravemir.gradle.sass") version "1.2.4"
 }
 
@@ -35,6 +35,7 @@ sass {
 
 // Config node js environment
 node {
+    version = "10.21.0"
     download = true
     workDir = file("${project.projectDir}/build/node")
     npmWorkDir = file("${project.projectDir}/web")
