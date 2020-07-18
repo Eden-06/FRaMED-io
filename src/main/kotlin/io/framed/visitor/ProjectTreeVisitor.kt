@@ -1,43 +1,37 @@
-package io.framed.export
+package io.framed.visitor
 
 import io.framed.Project
 import io.framed.model.*
 
 
-// TODO Rekursiv????
 abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
 
     var output : T = startObject
 
-    override fun visit(project: Project): T {
+    override fun getResult(): T {
+        return output
+    }
 
+    override fun visit(project: Project) {
         traverseProjectPreorder(project)
         for (connection in project.connections.connections) {
-            println(connection::class.js)
             connection.acceptVisitor(this)
         }
-        for (modelElement in project.root.children) {
-            modelElement.acceptVisitor(this)
-        }
+        project.root.acceptVisitor(this)
         traverseProjectPostorder(project)
-        println("Finish visiting")
-        print(this.output)
-        return this.output
     }
 
-    override fun visit(aggregation: Aggregation) : T {
+    override fun visit(aggregation: Aggregation) {
         traverseAggregationPreorder(aggregation)
         traverseAggregationPostorder(aggregation)
-        return this.output
     }
 
-    override fun visit(attribute: Attribute) : T {
+    override fun visit(attribute: Attribute)  {
         traverseAttributePreorder(attribute)
         traverseAttributePostorder(attribute)
-        return this.output
     }
 
-    override fun visit(compartment: Compartment) : T {
+    override fun visit(compartment: Compartment)  {
         traverseCompartmentPreorder(compartment)
         for (attribute in compartment.attributes) {
             attribute.acceptVisitor(this)
@@ -49,10 +43,9 @@ abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
             element.acceptVisitor(this)
         }
         traverseCompartmentPostorder(compartment)
-        return this.output
     }
 
-    override fun visit(clazz: Class) : T {
+    override fun visit(clazz: Class)  {
         traverseClassPreorder(clazz)
         for (attribute in clazz.attributes) {
             attribute.acceptVisitor(this)
@@ -61,103 +54,90 @@ abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
             method.acceptVisitor(this)
         }
         traverseClassPostorder(clazz)
-        return this.output
     }
 
-    override fun visit(composition: Composition) : T {
+    override fun visit(composition: Composition)  {
         traverseCompositionPreorder(composition)
         traverseCompositionPostorder(composition)
-        return this.output
     }
 
-    override fun visit(connections: Connections) : T {
+    override fun visit(connections: Connections)  {
         traverseConnectionsPreorder(connections)
         for (connection in connections.connections) {
             connection.acceptVisitor(this)
         }
         traverseConnectionsPostorder(connections)
-        return this.output
     }
 
-    override fun visit(createRelationship: CreateRelationship) : T {
+    override fun visit(createRelationship: CreateRelationship)  {
         traverseCreateRelationshipPreorder(createRelationship)
         traverseCreateRelationshipPostorder(createRelationship)
-        return this.output
     }
 
-    override fun visit(destroyRelationship: DestroyRelationship) : T {
+    override fun visit(destroyRelationship: DestroyRelationship)  {
         traverseDestroyRelationshipPreorder(destroyRelationship)
         traverseDestroyRelationshipPostorder(destroyRelationship)
-        return this.output
     }
 
-    override fun visit(event: Event) : T {
+    override fun visit(event: Event)  {
         traverseEventPreorder(event)
         traverseEventPostorder(event)
-        return this.output
     }
 
-    override fun visit(eventType: EventType) : T {
+    override fun visit(eventType: EventType)  {
         TODO("Not yet implemented")
     }
 
-    override fun visit(fulfillment: Fulfillment) : T {
+    override fun visit(fulfillment: Fulfillment)  {
         traverseFulfillmentPreorder(fulfillment)
         traverseFulfillmentPostorder(fulfillment)
-        return this.output
     }
 
-    override fun visit(inheritance: Inheritance) : T {
+    override fun visit(inheritance: Inheritance)  {
         traverseInheritancePreorder(inheritance)
         traverseInheritancePostorder(inheritance)
-        return this.output
     }
 
-    override fun visit(metadata: Metadata) : T {
+    override fun visit(metadata: Metadata)  {
         TODO("Not yet implemented")
     }
 
-    override fun visit(method: Method) : T {
+    override fun visit(method: Method)  {
         traverseMethodPreorder(method)
         for (parameter in method.parameters) {
             parameter.acceptVisitor(this)
         }
         traverseMethodPostorder(method)
-        return this.output
     }
 
-    override fun visit(modelElementMetadata: ModelElementMetadata) : T {
+    override fun visit(modelElementMetadata: ModelElementMetadata)  {
         TODO("Not yet implemented")
     }
 
-    override fun visit(packageObj: Package) : T {
+    override fun visit(packageObj: Package)  {
         traversePackagePreorder(packageObj)
         for (modelElement in packageObj.children) {
             modelElement.acceptVisitor(this)
         }
         traversePackagePostorder(packageObj)
-        return this.output
     }
 
-    override fun visit(parameter: Parameter) : T {
+    override fun visit(parameter: Parameter)  {
         traverseParameterPreorder(parameter)
         traverseParameterPostorder(parameter)
-        return this.output
     }
 
-    override fun visit(relationship: Relationship) : T {
+    override fun visit(relationship: Relationship)  {
         traverseRelationshipPreorder(relationship)
         traverseRelationshipPostorder(relationship)
-        return this.output
     }
 
-    override fun visit(returnEvent: ReturnEvent) : T {
+    override fun visit(returnEvent: ReturnEvent)  {
         traverseReturnEventPreorder(returnEvent)
         traverseReturnEventPostorder(returnEvent)
-        return this.output
     }
 
-    override fun visit(roleType: RoleType) : T {
+    override fun visit(roleType: RoleType)  {
         traverseRoleTypePreorder(roleType)
         for (method in roleType.methods) {
             method.acceptVisitor(this)
@@ -166,10 +146,9 @@ abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
             attribute.acceptVisitor(this)
         }
         traverseRoleTypePostorder(roleType)
-        return this.output
     }
 
-    override fun visit(scene: Scene) : T {
+    override fun visit(scene: Scene)  {
         traverseScenePreorder(scene)
         for (attribute in scene.attributes) {
             attribute.acceptVisitor(this)
@@ -178,7 +157,6 @@ abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
             child.acceptVisitor(this)
         }
         traverseScenePostorder(scene)
-        return this.output
     }
 
     abstract fun traverseProjectPreorder(project: Project)

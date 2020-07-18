@@ -1,7 +1,6 @@
 package io.framed.framework.model
 
-import io.framed.export.ProjectTreeVisitor
-import io.framed.export.Visitor
+import io.framed.visitor.Visitor
 import kotlinx.serialization.Serializable
 
 /**

@@ -11,6 +11,7 @@ import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
 import io.framed.framework.util.*
 import org.w3c.dom.HTMLDivElement
+import kotlin.js.Console
 import kotlin.js.Date
 import kotlin.math.roundToInt
 
@@ -148,10 +149,10 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                 triggerDownload("${file.name}.json", file.toJSON())
             }
             item(MaterialIcon.IMPORT_EXPORT, "Export") {
-                println("Call")
                 val project = ControllerManager.project
                 val visitor = XmiExporter()
-                triggerDownload("${project.name}.ecore", project.visit(visitor))
+                visitor.visit(project)
+                triggerDownload("${project.name}.ecore", visitor.getResult())
             }
         }
         menu("Edit") {

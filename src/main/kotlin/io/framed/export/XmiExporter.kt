@@ -2,16 +2,14 @@ package io.framed.export
 
 import io.framed.Project
 import io.framed.model.*
+import io.framed.visitor.ProjectTreeVisitor
 
 class XmiExporter : ProjectTreeVisitor<String>("") {
     
     override fun traverseProjectPreorder(project: Project) {
-        println("Start visiting")
     }
 
     override fun traverseProjectPostorder(project: Project) {
-        println("Finish visiting")
-        print(this.output)
     }
 
     override fun traverseAggregationPreorder(aggregation: Aggregation) {
@@ -31,7 +29,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseCompartmentPreorder(compartment: Compartment) {
-        output += "<compartment name=\"" + compartment.name + "\">\n";
+        output += "<compartment name=\"" + compartment.name + "\">\n"
     }
 
     override fun traverseCompartmentPostorder(compartment: Compartment) {
@@ -47,7 +45,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseCompositionPreorder(composition: Composition) {
-        output += "<composition>" + composition.name + "\"</composition>\n"
+        output += "<composition>" + composition.name + "</composition>\n"
     }
 
     override fun traverseCompositionPostorder(composition: Composition) {
@@ -135,7 +133,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traversePackagePreorder(packageObj: Package) {
-        output += "<package name=\"" + packageObj.name + ">\n"
+        output += "<package name=\"" + packageObj.name + "\">\n"
     }
 
     override fun traversePackagePostorder(packageObj: Package) {
@@ -167,7 +165,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseRoleTypePreorder(roleType: RoleType) {
-        output += "<roleType name=\"" + roleType.name + ">\n"
+        output += "<roleType name=\"" + roleType.name + "\">\n"
     }
 
     override fun traverseRoleTypePostorder(roleType: RoleType) {
@@ -175,7 +173,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseScenePreorder(scene: Scene) {
-        output += "<scene name=\"" + scene.name + ">\n"
+        output += "<scene name=\"" + scene.name + "\">\n"
     }
 
     override fun traverseScenePostorder(scene: Scene) {
