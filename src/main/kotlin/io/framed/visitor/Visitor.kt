@@ -3,6 +3,9 @@ package io.framed.visitor
 import io.framed.Project
 import io.framed.model.*
 
+/**
+ * Provides an interface for visitors that are able to visit all model structures and return a (generic) result.
+ */
 interface Visitor<T> {
     fun getResult() : T
 

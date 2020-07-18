@@ -3,7 +3,10 @@ package io.framed.visitor
 import io.framed.Project
 import io.framed.model.*
 
-
+/**
+ * Abstract implementation of a Visitor that traverses the project tree and provides an interface to preorder as well
+ * as postorder traversal.
+ */
 abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
 
     var output : T = startObject
