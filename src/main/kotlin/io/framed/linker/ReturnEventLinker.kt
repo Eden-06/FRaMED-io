@@ -46,7 +46,7 @@ class ReturnEventLinker(
         title("Event")
 
         group("General") {
-            select("Type", EventType.values().toList(), typeProperty) {
+            select("io.framed.exporter.crom.crom.Type", EventType.values().toList(), typeProperty) {
                 it.printableName
             }
             input("Description", descriptionProperty)

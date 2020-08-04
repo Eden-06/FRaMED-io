@@ -6,7 +6,7 @@ import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
 /**
- * Model class for an uml model.
+ * io.framed.exporter.crom.crom.Model class for an uml model.
  *
  * @author lars
  */
