@@ -1,11 +1,11 @@
-package io.framed.visitor
+package io.framed.exporter.visitor
 
 import io.framed.Project
 import io.framed.framework.model.ModelElement
 import io.framed.model.*
 
 /**
- * Abstract implementation of a Visitor that traverses the project tree (while traversing the Package of a project
+ * Abstract implementation of a Visitor that traverses the project tree (while traversing the "Package" of a project
  * two times in the beginning) and provides an interface to preorder as well as postorder traversal.
  */
 abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
@@ -123,7 +123,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
         for (modelElement in packageObj.children) {
             modelElement.acceptVisitor(this)
         }
-        // Double traversal because Types have to be initialized beforehand
+        // Double traversal because Types have to be detected beforehand
         for (modelElement in packageObj.children) {
             modelElement.acceptVisitor(this)
         }

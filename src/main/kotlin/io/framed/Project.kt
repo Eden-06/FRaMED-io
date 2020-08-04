@@ -6,7 +6,7 @@ import io.framed.framework.pictogram.Layer
 import io.framed.framework.util.log
 import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
-import io.framed.visitor.Visitor
+import io.framed.exporter.visitor.Visitor
 import io.framed.model.*
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable

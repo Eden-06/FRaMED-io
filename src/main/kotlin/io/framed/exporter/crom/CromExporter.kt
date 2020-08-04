@@ -1,16 +1,15 @@
-package io.framed.export
+package io.framed.exporter.crom
 
 import io.framed.Project
-import io.framed.framework.model.ModelElement
+import io.framed.exporter.crom.model.ModelElement
 import io.framed.model.*
-import io.framed.visitor.ProjectTreeVisitor
+import io.framed.exporter.visitor.ProjectTreeVisitor
 
 /**
  * Implementation of a ProjectTreeVisitor that exports the project to CROM (Compartment Role Object Model).
  */
 class CromExporter : ProjectTreeVisitor<String>("") {
 
-    // TODO ModelElementID --> "CROMElement"
     var elementLookupTable = HashMap<Long, ModelElement>()
 
     override fun traverseProjectPreorder(project: Project) {

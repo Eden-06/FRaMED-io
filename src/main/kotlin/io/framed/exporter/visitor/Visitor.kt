@@ -1,4 +1,4 @@
-package io.framed.visitor
+package io.framed.exporter.visitor
 
 import io.framed.Project
 import io.framed.model.*
