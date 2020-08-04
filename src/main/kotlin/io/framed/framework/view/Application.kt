@@ -5,13 +5,12 @@ import de.westermann.kobserve.property.FunctionAccessor
 import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
 import io.framed.Project
-import io.framed.export.XmiExporter
+import io.framed.export.CromExporter
 import io.framed.framework.Controller
 import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
 import io.framed.framework.util.*
 import org.w3c.dom.HTMLDivElement
-import kotlin.js.Console
 import kotlin.js.Date
 import kotlin.math.roundToInt
 
@@ -150,9 +149,9 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }
             item(MaterialIcon.IMPORT_EXPORT, "Export") {
                 val project = ControllerManager.project
-                val visitor = XmiExporter()
+                val visitor = CromExporter()
                 visitor.visit(project)
-                triggerDownload("${project.name}.ecore", visitor.getResult())
+                triggerDownload("${project.name}.ecore", visitor.getResultAndReset())
             }
         }
         menu("Edit") {

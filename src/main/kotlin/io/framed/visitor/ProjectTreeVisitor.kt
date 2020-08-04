@@ -1,26 +1,32 @@
 package io.framed.visitor
 
 import io.framed.Project
+import io.framed.framework.model.ModelElement
 import io.framed.model.*
 
 /**
- * Abstract implementation of a Visitor that traverses the project tree and provides an interface to preorder as well
- * as postorder traversal.
+ * Abstract implementation of a Visitor that traverses the project tree (while traversing the Package of a project
+ * two times in the beginning) and provides an interface to preorder as well as postorder traversal.
  */
-abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
+abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
 
-    var output : T = startObject
+    protected var result : T = initialValue
 
-    override fun getResult(): T {
-        return output
+    private var parentStack : ArrayList<ModelElement> = ArrayList()
+
+    override fun getResultAndReset(): T {
+        val finalResult = result
+        result = initialValue
+        parentStack = ArrayList()
+        return finalResult
     }
 
     override fun visit(project: Project) {
         traverseProjectPreorder(project)
+        project.root.acceptVisitor(this)
         for (connection in project.connections.connections) {
             connection.acceptVisitor(this)
         }
-        project.root.acceptVisitor(this)
         traverseProjectPostorder(project)
     }
 
@@ -36,6 +42,7 @@ abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
 
     override fun visit(compartment: Compartment)  {
         traverseCompartmentPreorder(compartment)
+        parentStack.add(compartment)
         for (attribute in compartment.attributes) {
             attribute.acceptVisitor(this)
         }
@@ -45,17 +52,20 @@ abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
         for (element in compartment.children) {
             element.acceptVisitor(this)
         }
+        parentStack.removeAt(parentStack.lastIndex)
         traverseCompartmentPostorder(compartment)
     }
 
     override fun visit(clazz: Class)  {
         traverseClassPreorder(clazz)
+        parentStack.add(clazz)
         for (attribute in clazz.attributes) {
             attribute.acceptVisitor(this)
         }
         for (method in clazz.methods) {
             method.acceptVisitor(this)
         }
+        parentStack.removeAt(parentStack.lastIndex)
         traverseClassPostorder(clazz)
     }
 
@@ -87,10 +97,6 @@ abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
         traverseEventPostorder(event)
     }
 
-    override fun visit(eventType: EventType)  {
-        TODO("Not yet implemented")
-    }
-
     override fun visit(fulfillment: Fulfillment)  {
         traverseFulfillmentPreorder(fulfillment)
         traverseFulfillmentPostorder(fulfillment)
@@ -101,27 +107,27 @@ abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
         traverseInheritancePostorder(inheritance)
     }
 
-    override fun visit(metadata: Metadata)  {
-        TODO("Not yet implemented")
-    }
-
     override fun visit(method: Method)  {
         traverseMethodPreorder(method)
+        parentStack.add(method)
         for (parameter in method.parameters) {
             parameter.acceptVisitor(this)
         }
+        parentStack.removeAt(parentStack.lastIndex)
         traverseMethodPostorder(method)
-    }
-
-    override fun visit(modelElementMetadata: ModelElementMetadata)  {
-        TODO("Not yet implemented")
     }
 
     override fun visit(packageObj: Package)  {
         traversePackagePreorder(packageObj)
+        parentStack.add(packageObj)
         for (modelElement in packageObj.children) {
             modelElement.acceptVisitor(this)
         }
+        // Double traversal because Types have to be initialized beforehand
+        for (modelElement in packageObj.children) {
+            modelElement.acceptVisitor(this)
+        }
+        parentStack.removeAt(parentStack.lastIndex)
         traversePackagePostorder(packageObj)
     }
 
@@ -142,112 +148,120 @@ abstract class ProjectTreeVisitor<T>(startObject : T) : Visitor<T> {
 
     override fun visit(roleType: RoleType)  {
         traverseRoleTypePreorder(roleType)
+        parentStack.add(roleType)
         for (method in roleType.methods) {
             method.acceptVisitor(this)
         }
         for (attribute in roleType.attributes) {
             attribute.acceptVisitor(this)
         }
+        parentStack.removeAt(parentStack.lastIndex)
         traverseRoleTypePostorder(roleType)
     }
 
     override fun visit(scene: Scene)  {
         traverseScenePreorder(scene)
+        parentStack.add(scene)
         for (attribute in scene.attributes) {
             attribute.acceptVisitor(this)
         }
         for (child in scene.children) {
             child.acceptVisitor(this)
         }
+        parentStack.removeAt(parentStack.lastIndex)
         traverseScenePostorder(scene)
     }
 
-    abstract fun traverseProjectPreorder(project: Project)
+    protected fun getParent() : ModelElement {
+        return parentStack[parentStack.lastIndex]
+    }
 
-    abstract fun traverseProjectPostorder(project: Project)
+    protected abstract fun traverseProjectPreorder(project: Project)
 
-    abstract fun traverseAggregationPreorder(aggregation: Aggregation)
+    protected abstract fun traverseProjectPostorder(project: Project)
 
-    abstract fun traverseAggregationPostorder(aggregation: Aggregation)
+    protected abstract fun traverseAggregationPreorder(aggregation: Aggregation)
 
-    abstract fun traverseAttributePreorder(attribute: Attribute)
+    protected abstract fun traverseAggregationPostorder(aggregation: Aggregation)
 
-    abstract fun traverseAttributePostorder(attribute: Attribute)
+    protected abstract fun traverseAttributePreorder(attribute: Attribute)
 
-    abstract fun traverseCompartmentPreorder(compartment: Compartment)
+    protected abstract fun traverseAttributePostorder(attribute: Attribute)
 
-    abstract fun traverseCompartmentPostorder(compartment: Compartment)
+    protected abstract fun traverseCompartmentPreorder(compartment: Compartment)
 
-    abstract fun traverseClassPreorder(clazz: Class)
+    protected abstract fun traverseCompartmentPostorder(compartment: Compartment)
 
-    abstract fun traverseClassPostorder(clazz: Class)
+    protected abstract fun traverseClassPreorder(clazz: Class)
 
-    abstract fun traverseCompositionPreorder(composition: Composition)
+    protected abstract fun traverseClassPostorder(clazz: Class)
 
-    abstract fun traverseCompositionPostorder(composition: Composition)
+    protected abstract fun traverseCompositionPreorder(composition: Composition)
 
-    abstract fun traverseConnectionsPreorder(connections: Connections)
+    protected abstract fun traverseCompositionPostorder(composition: Composition)
 
-    abstract fun traverseConnectionsPostorder(connections: Connections)
+    protected abstract fun traverseConnectionsPreorder(connections: Connections)
 
-    abstract fun traverseCreateRelationshipPreorder(createRelationship: CreateRelationship)
+    protected abstract fun traverseConnectionsPostorder(connections: Connections)
 
-    abstract fun traverseCreateRelationshipPostorder(createRelationship: CreateRelationship)
+    protected abstract fun traverseCreateRelationshipPreorder(createRelationship: CreateRelationship)
 
-    abstract fun traverseDestroyRelationshipPreorder(destroyRelationship: DestroyRelationship)
+    protected abstract fun traverseCreateRelationshipPostorder(createRelationship: CreateRelationship)
 
-    abstract fun traverseDestroyRelationshipPostorder(destroyRelationship: DestroyRelationship)
+    protected abstract fun traverseDestroyRelationshipPreorder(destroyRelationship: DestroyRelationship)
 
-    abstract fun traverseEventPreorder(event: Event)
+    protected abstract fun traverseDestroyRelationshipPostorder(destroyRelationship: DestroyRelationship)
 
-    abstract fun traverseEventPostorder(event: Event)
+    protected abstract fun traverseEventPreorder(event: Event)
 
-    abstract fun traverseEventTypePreorder(eventType: EventType)
+    protected abstract fun traverseEventPostorder(event: Event)
 
-    abstract fun traverseEventTypePostorder(eventType: EventType)
+    protected abstract fun traverseEventTypePreorder(eventType: EventType)
 
-    abstract fun traverseFulfillmentPreorder(fulfillment: Fulfillment)
+    protected abstract fun traverseEventTypePostorder(eventType: EventType)
 
-    abstract fun traverseFulfillmentPostorder(fulfillment: Fulfillment)
+    protected abstract fun traverseFulfillmentPreorder(fulfillment: Fulfillment)
 
-    abstract fun traverseInheritancePreorder(inheritance: Inheritance)
+    protected abstract fun traverseFulfillmentPostorder(fulfillment: Fulfillment)
 
-    abstract fun traverseInheritancePostorder(inheritance: Inheritance)
+    protected abstract fun traverseInheritancePreorder(inheritance: Inheritance)
 
-    abstract fun traverseMetadataPreorder(metadata: Metadata)
+    protected abstract fun traverseInheritancePostorder(inheritance: Inheritance)
 
-    abstract fun traverseMetadataPostorder(metadata: Metadata)
+    protected abstract fun traverseMetadataPreorder(metadata: Metadata)
 
-    abstract fun traverseModelElementMetadataPreorder(modelElementMetadata: ModelElementMetadata)
+    protected abstract fun traverseMetadataPostorder(metadata: Metadata)
 
-    abstract fun traverseModelElementMetadataPostorder(modelElementMetadata: ModelElementMetadata)
+    protected abstract fun traverseModelElementMetadataPreorder(modelElementMetadata: ModelElementMetadata)
 
-    abstract fun traverseMethodPreorder(method: Method)
+    protected abstract fun traverseModelElementMetadataPostorder(modelElementMetadata: ModelElementMetadata)
 
-    abstract fun traverseMethodPostorder(method: Method)
+    protected abstract fun traverseMethodPreorder(method: Method)
 
-    abstract fun traversePackagePreorder(packageObj: Package)
+    protected abstract fun traverseMethodPostorder(method: Method)
 
-    abstract fun traversePackagePostorder(packageObj: Package)
+    protected abstract fun traversePackagePreorder(packageObj: Package)
 
-    abstract fun traverseParameterPreorder(parameter: Parameter)
+    protected abstract fun traversePackagePostorder(packageObj: Package)
 
-    abstract fun traverseParameterPostorder(parameter: Parameter)
+    protected abstract fun traverseParameterPreorder(parameter: Parameter)
 
-    abstract fun traverseRelationshipPreorder(relationship: Relationship)
+    protected abstract fun traverseParameterPostorder(parameter: Parameter)
 
-    abstract fun traverseRelationshipPostorder(relationship: Relationship)
+    protected abstract fun traverseRelationshipPreorder(relationship: Relationship)
 
-    abstract fun traverseReturnEventPreorder(returnEvent: ReturnEvent)
+    protected abstract fun traverseRelationshipPostorder(relationship: Relationship)
 
-    abstract fun traverseReturnEventPostorder(returnEvent: ReturnEvent)
+    protected abstract fun traverseReturnEventPreorder(returnEvent: ReturnEvent)
 
-    abstract fun traverseRoleTypePreorder(roleType: RoleType)
+    protected abstract fun traverseReturnEventPostorder(returnEvent: ReturnEvent)
 
-    abstract fun traverseRoleTypePostorder(roleType: RoleType)
+    protected abstract fun traverseRoleTypePreorder(roleType: RoleType)
 
-    abstract fun traverseScenePreorder(scene: Scene)
+    protected abstract fun traverseRoleTypePostorder(roleType: RoleType)
 
-    abstract fun traverseScenePostorder(scene: Scene)
+    protected abstract fun traverseScenePreorder(scene: Scene)
+
+    protected abstract fun traverseScenePostorder(scene: Scene)
 
 }

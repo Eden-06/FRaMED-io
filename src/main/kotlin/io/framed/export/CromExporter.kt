@@ -1,14 +1,18 @@
 package io.framed.export
 
 import io.framed.Project
+import io.framed.framework.model.ModelElement
 import io.framed.model.*
 import io.framed.visitor.ProjectTreeVisitor
 
 /**
- * Implementation of a ProjectTreeVisitor that exports the project to XMI in CROM (Compartment Role Object Model).
+ * Implementation of a ProjectTreeVisitor that exports the project to CROM (Compartment Role Object Model).
  */
-class XmiExporter : ProjectTreeVisitor<String>("") {
-    
+class CromExporter : ProjectTreeVisitor<String>("") {
+
+    // TODO ModelElementID --> "CROMElement"
+    var elementLookupTable = HashMap<Long, ModelElement>()
+
     override fun traverseProjectPreorder(project: Project) {
     }
 
@@ -16,7 +20,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseAggregationPreorder(aggregation: Aggregation) {
-        output += "<aggregation>" + aggregation.name + "</aggregation>\n"
+        result += "<aggregation>" + aggregation.name + "</aggregation>\n"
     }
 
     override fun traverseAggregationPostorder(aggregation: Aggregation) {
@@ -24,7 +28,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseAttributePreorder(attribute: Attribute) {
-        output += "<attribute>" + attribute.name + "</attribute>\n"
+        result += "<attribute>" + attribute.name + "</attribute>\n"
     }
 
     override fun traverseAttributePostorder(attribute: Attribute) {
@@ -32,23 +36,23 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseCompartmentPreorder(compartment: Compartment) {
-        output += "<compartment name=\"" + compartment.name + "\">\n"
+        result += "<compartment name=\"" + compartment.name + "\">\n"
     }
 
     override fun traverseCompartmentPostorder(compartment: Compartment) {
-        output += "</compartment>\n"
+        result += "</compartment>\n"
     }
 
     override fun traverseClassPreorder(clazz: Class) {
-        output += "<class name=\"" + clazz.name + "\">\n"
+        result += "<class name=\"" + clazz.name + "\">\n"
     }
 
     override fun traverseClassPostorder(clazz: Class) {
-        output += "</class>\n"
+        result += "</class>\n"
     }
 
     override fun traverseCompositionPreorder(composition: Composition) {
-        output += "<composition>" + composition.name + "</composition>\n"
+        result += "<composition>" + composition.name + "</composition>\n"
     }
 
     override fun traverseCompositionPostorder(composition: Composition) {
@@ -56,15 +60,15 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseConnectionsPreorder(connections: Connections) {
-        output += "<connections>\n"
+        result += "<connections>\n"
     }
 
     override fun traverseConnectionsPostorder(connections: Connections) {
-        output += "</connections>\n"
+        result += "</connections>\n"
     }
 
     override fun traverseCreateRelationshipPreorder(createRelationship: CreateRelationship) {
-        output += "<createRelationship>" + createRelationship.name + "</createRelationship>\n"
+        result += "<createRelationship>" + createRelationship.name + "</createRelationship>\n"
     }
 
     override fun traverseCreateRelationshipPostorder(createRelationship: CreateRelationship) {
@@ -72,7 +76,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseDestroyRelationshipPreorder(destroyRelationship: DestroyRelationship) {
-        output += "<destroyRelationship>" + destroyRelationship.name + "</destroyRelationship>\n"
+        result += "<destroyRelationship>" + destroyRelationship.name + "</destroyRelationship>\n"
     }
 
     override fun traverseDestroyRelationshipPostorder(destroyRelationship: DestroyRelationship) {
@@ -80,7 +84,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseEventPreorder(event: Event) {
-        output += "<event>" + event.desc + "</event>"
+        result += "<event>" + event.desc + "</event>"
     }
 
     override fun traverseEventPostorder(event: Event) {
@@ -96,7 +100,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseFulfillmentPreorder(fulfillment: Fulfillment) {
-        output += "<fulfillment>" + fulfillment.name + "</fulfillment>\n"
+        result += "<fulfillment>" + fulfillment.name + "</fulfillment>\n"
     }
 
     override fun traverseFulfillmentPostorder(fulfillment: Fulfillment) {
@@ -104,7 +108,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseInheritancePreorder(inheritance: Inheritance) {
-        output += "<inheritance>" + inheritance.name + "</inheritance>\n"
+        result += "<inheritance>" + inheritance.name + "</inheritance>\n"
     }
 
     override fun traverseInheritancePostorder(inheritance: Inheritance) {
@@ -128,23 +132,23 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseMethodPreorder(method: Method) {
-        output += "<method>\n"
+        result += "<method>\n"
     }
 
     override fun traverseMethodPostorder(method: Method) {
-        output += "</method>\n"
+        result += "</method>\n"
     }
 
     override fun traversePackagePreorder(packageObj: Package) {
-        output += "<package name=\"" + packageObj.name + "\">\n"
+        result += "<package name=\"" + packageObj.name + "\">\n"
     }
 
     override fun traversePackagePostorder(packageObj: Package) {
-        output += "</package>\n"
+        result += "</package>\n"
     }
 
     override fun traverseParameterPreorder(parameter: Parameter) {
-        output += "<parameter>" + parameter.name + "</parameter>\n"
+        result += "<parameter>" + parameter.name + "</parameter>\n"
     }
 
     override fun traverseParameterPostorder(parameter: Parameter) {
@@ -152,7 +156,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseRelationshipPreorder(relationship: Relationship) {
-        output += "<relationship>" + relationship.name + "</relationship>\n"
+        result += "<relationship>" + relationship.name + "</relationship>\n"
     }
 
     override fun traverseRelationshipPostorder(relationship: Relationship) {
@@ -160,7 +164,7 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseReturnEventPreorder(returnEvent: ReturnEvent) {
-        output += "<returnEvent>" + returnEvent.desc + "</returnEvent>\n"
+        result += "<returnEvent>" + returnEvent.desc + "</returnEvent>\n"
     }
 
     override fun traverseReturnEventPostorder(returnEvent: ReturnEvent) {
@@ -168,18 +172,18 @@ class XmiExporter : ProjectTreeVisitor<String>("") {
     }
 
     override fun traverseRoleTypePreorder(roleType: RoleType) {
-        output += "<roleType name=\"" + roleType.name + "\">\n"
+        result += "<roleType name=\"" + roleType.name + "\">\n"
     }
 
     override fun traverseRoleTypePostorder(roleType: RoleType) {
-        output += "</roleType>\n"
+        result += "</roleType>\n"
     }
 
     override fun traverseScenePreorder(scene: Scene) {
-        output += "<scene name=\"" + scene.name + "\">\n"
+        result += "<scene name=\"" + scene.name + "\">\n"
     }
 
     override fun traverseScenePostorder(scene: Scene) {
-        output += "</scene>\n"
+        result += "</scene>\n"
     }
 }

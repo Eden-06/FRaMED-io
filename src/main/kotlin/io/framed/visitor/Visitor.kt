@@ -7,7 +7,7 @@ import io.framed.model.*
  * Provides an interface for visitors that are able to visit all model structures and return a (generic) result.
  */
 interface Visitor<T> {
-    fun getResult() : T
+    fun getResultAndReset() : T
 
     fun visit(project: Project)
 
@@ -29,17 +29,11 @@ interface Visitor<T> {
 
     fun visit(event: Event)
 
-    fun visit(eventType: EventType)
-
     fun visit(fulfillment: Fulfillment)
 
     fun visit(inheritance: Inheritance)
 
-    fun visit(metadata: Metadata)
-
     fun visit(method: Method)
-
-    fun visit(modelElementMetadata: ModelElementMetadata)
 
     fun visit(packageObj: Package)
 
