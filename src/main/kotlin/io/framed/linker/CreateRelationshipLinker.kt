@@ -47,7 +47,7 @@ class CreateRelationshipLinker(
     }
 
     override val sidebar = sidebar {
-        title("Create io.framed.export.crom.Relationship")
+        title("Create io.framed.exporter.crom.crom.Relationship")
 
         group("General") {
             input("Name", nameProperty)
@@ -95,7 +95,7 @@ class CreateRelationshipLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ElementInfo("Create io.framed.export.crom.Relationship", FramedIcon.EVENTRELATIONSHIP)
+        override val info = ElementInfo("Create io.framed.exporter.crom.crom.Relationship", FramedIcon.EVENTRELATIONSHIP)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is EventLinker || source is ReturnEventLinker

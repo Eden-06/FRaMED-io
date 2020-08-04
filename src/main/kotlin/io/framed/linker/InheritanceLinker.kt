@@ -81,7 +81,7 @@ class InheritanceLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ElementInfo("io.framed.export.crom.Inheritance", FramedIcon.INHERITANCE)
+        override val info = ElementInfo("io.framed.exporter.crom.crom.Inheritance", FramedIcon.INHERITANCE)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is ClassLinker

@@ -1,12 +1,12 @@
 package io.framed.model
 
-import io.framed.visitor.Visitor
+import io.framed.exporter.visitor.Visitor
 import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
 /**
- * io.framed.export.crom.Model class for an uml class.
+ * io.framed.exporter.crom.crom.Model class for an uml class.
  *
  * @author lars
  */

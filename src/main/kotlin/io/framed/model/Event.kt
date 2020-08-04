@@ -1,6 +1,6 @@
 package io.framed.model
 
-import io.framed.visitor.Visitor
+import io.framed.exporter.visitor.Visitor
 import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Serializable
 
@@ -15,7 +15,7 @@ class Event() : ModelElement() {
     }
 
     /**
-     * io.framed.export.crom.Type of the model
+     * io.framed.exporter.crom.crom.Type of the model
      */
     var type: EventType = EventType.STANDARD
     /**

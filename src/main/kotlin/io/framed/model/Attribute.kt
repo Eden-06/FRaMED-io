@@ -1,11 +1,11 @@
 package io.framed.model
 
-import io.framed.visitor.Visitor
+import io.framed.exporter.visitor.Visitor
 import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
- * io.framed.export.crom.Model class for an uml model.
+ * io.framed.exporter.crom.crom.Model class for an uml model.
  *
  * @author lars
  */
@@ -22,7 +22,7 @@ class Attribute() : ModelElement() {
     var name: String = "unnamed"
 
     /**
-     * io.framed.export.crom.Type of this model.
+     * io.framed.exporter.crom.crom.Type of this model.
      */
     var type: String = ""
 

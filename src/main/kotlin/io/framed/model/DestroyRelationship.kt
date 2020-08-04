@@ -1,11 +1,11 @@
 package io.framed.model
 
-import io.framed.visitor.Visitor
+import io.framed.exporter.visitor.Visitor
 import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
 /**
- * io.framed.export.crom.Model class for an BROS destroy relation
+ * io.framed.exporter.crom.crom.Model class for an BROS destroy relation
  *
  * @author Sebastian
  */

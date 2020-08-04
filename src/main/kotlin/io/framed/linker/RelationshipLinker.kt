@@ -42,7 +42,7 @@ class RelationshipLinker(
     }
 
     override val sidebar = sidebar {
-        title("io.framed.export.crom.Relationship")
+        title("io.framed.exporter.crom.crom.Relationship")
 
         group("General") {
             input("Name", nameProperty)
@@ -90,7 +90,7 @@ class RelationshipLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ElementInfo("io.framed.export.crom.Relationship", FramedIcon.RELATIONSHIP)
+        override val info = ElementInfo("io.framed.exporter.crom.crom.Relationship", FramedIcon.RELATIONSHIP)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is RoleTypeLinker || source is ClassLinker

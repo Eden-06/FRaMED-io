@@ -182,7 +182,7 @@ class MethodLinker(
         title("Method")
         group("General") {
             input("Name", nameProperty)
-            input("io.framed.export.crom.Type", typeProperty, this@MethodLinker::getTypeSubset)
+            input("io.framed.exporter.crom.crom.Type", typeProperty, this@MethodLinker::getTypeSubset)
         }
         sidebarParameters = group("Parameters") {
             sidebarParametersAdd = custom {
