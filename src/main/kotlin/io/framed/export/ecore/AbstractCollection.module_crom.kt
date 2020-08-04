@@ -1,21 +1,9 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 
-import kotlin.js.*
-import kotlin.js.Json
-import org.khronos.webgl.*
-import org.w3c.dom.*
-import org.w3c.dom.events.*
-import org.w3c.dom.parsing.*
-import org.w3c.dom.svg.*
-import org.w3c.dom.url.*
-import org.w3c.fetch.*
-import org.w3c.files.*
-import org.w3c.notifications.*
-import org.w3c.performance.*
-import org.w3c.workers.*
-import org.w3c.xhr.*
+package io.framed.export.ecore
 
-external open class AbstractCollection<T>(owner: InternalEObject = definedExternally, featureId: Number = definedExternally, oppositeFeatureId: Number = definedExternally) : ArrayList<T>, EcoreEList<T>, Collection<T> {
+//abstract external class io.framed.export.ecore.AbstractCollection<T>(owner: io.framed.export.ecore.InternalEObject = definedExternally, featureId: Number = definedExternally, oppositeFeatureId: Number = definedExternally) : kotlin.collections.io.framed.export.ecore.ArrayList<T>, io.framed.export.ecore.EcoreEList<T>, kotlin.collections.io.framed.export.ecore.Collection<T> {
+abstract external class AbstractCollection<T>(owner: InternalEObject = definedExternally, featureId: Number = definedExternally, oppositeFeatureId: Number = definedExternally) : EcoreEList<T>, Collection<T> {
     open var owner: Any
     open var featureId: Any
     open var oppositeFeatureId: Any
@@ -38,7 +26,7 @@ external open class AbstractCollection<T>(owner: InternalEObject = definedExtern
     open var getInverseFeatureClass: () -> Function<*>
     open var dispatchNotification: (notification: Notification) -> Unit
     open var addUnique: (element: T) -> Unit
-    open var sortedBy: (lambda: (T: Any) -> T2) -> Unit
+    open var sortedBy: (lambda: (T: Any) -> Any) -> Unit
     open var equals: (c: Collection<T>) -> Boolean
     open var notEquals: (c: Collection<T>) -> Boolean
     open var size: () -> Number

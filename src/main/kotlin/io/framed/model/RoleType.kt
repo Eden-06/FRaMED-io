@@ -6,7 +6,7 @@ import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
 /**
- * Model roleType for an uml roleType.
+ * io.framed.export.crom.Model roleType for an uml roleType.
  *
  * @author lars
  */

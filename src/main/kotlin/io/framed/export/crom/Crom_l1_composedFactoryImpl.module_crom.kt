@@ -1,21 +1,11 @@
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 
-import kotlin.js.*
-import kotlin.js.Json
-import org.khronos.webgl.*
-import org.w3c.dom.*
-import org.w3c.dom.events.*
-import org.w3c.dom.parsing.*
-import org.w3c.dom.svg.*
-import org.w3c.dom.url.*
-import org.w3c.fetch.*
-import org.w3c.files.*
-import org.w3c.notifications.*
-import org.w3c.performance.*
-import org.w3c.workers.*
-import org.w3c.xhr.*
+package io.framed.export.crom
 
-open external class Crom_l1_composedFactoryImpl : EFactoryImpl, Crom_l1_composedFactory {
+import io.framed.export.ecore.EDataType
+import io.framed.export.ecore.EFactoryImpl
+
+abstract external class Crom_l1_composedFactoryImpl : EFactoryImpl, Crom_l1_composedFactory {
     open var createModel: () -> Model
     open var createRigidType: () -> RigidType
     open var createGroup: () -> Group
@@ -59,9 +49,6 @@ open external class Crom_l1_composedFactoryImpl : EFactoryImpl, Crom_l1_composed
     open var createTypedElement: () -> TypedElement
     open var createParthoodConstraint: () -> ParthoodConstraint
     open var createAbstractRoleRef: () -> AbstractRoleRef
-    open fun create(eClass: EClass): EObject
-    open fun createFromString(eDataType: EDataType, initialValue: String): Any
-    open fun convertToString(eDataType: EDataType, instanceValue: Any): String
     open fun createDirectionFromString(eDataType: EDataType, initialValue: String): Direction
     open fun convertDirectionToString(eDataType: EDataType, instanceValue: Any): String
     open fun createParthoodFromString(eDataType: EDataType, initialValue: String): Parthood

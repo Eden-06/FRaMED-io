@@ -95,11 +95,11 @@ class AttributeLinker(
     override val pictogram = textShape(lineProperty)
 
     override val sidebar = sidebar {
-        title("Attribute")
+        title("io.framed.export.crom.Attribute")
 
         group("General") {
             input("Name", nameProperty)
-            input("Type", typeProperty, this@AttributeLinker::getTypeSubset)
+            input("io.framed.export.crom.Type", typeProperty, this@AttributeLinker::getTypeSubset)
         }
     }
 
@@ -111,7 +111,7 @@ class AttributeLinker(
 
     companion object : LinkerInfoItem {
 
-        override val info = ElementInfo("Attribute", FramedIcon.ATTRIBUTE)
+        override val info = ElementInfo("io.framed.export.crom.Attribute", FramedIcon.ATTRIBUTE)
 
         override fun canCreateIn(container: ModelElement): Boolean {
             return container is Class || container is Compartment || container is Scene || container is RoleType

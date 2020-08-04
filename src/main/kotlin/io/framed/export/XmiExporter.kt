@@ -5,7 +5,7 @@ import io.framed.model.*
 import io.framed.visitor.ProjectTreeVisitor
 
 /**
- * Implementation of a ProjectTreeVisitor that exports the project to XMI in CROM (Compartment Role Object Model).
+ * Implementation of a ProjectTreeVisitor that exports the project to XMI in CROM (Compartment Role Object io.framed.export.crom.Model).
  */
 class XmiExporter : ProjectTreeVisitor<String>("") {
     

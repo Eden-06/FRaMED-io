@@ -5,7 +5,7 @@ import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
 /**
- * Model class for an BROS create relation
+ * io.framed.export.crom.Model class for an BROS create relation
  *
  * @author Sebastian
  */

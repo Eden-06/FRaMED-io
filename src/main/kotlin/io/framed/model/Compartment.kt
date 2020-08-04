@@ -6,7 +6,7 @@ import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
 /**
- * Model class for an crom compartment.
+ * io.framed.export.crom.Model class for an crom compartment.
  *
  * @author Sebastian
  */
