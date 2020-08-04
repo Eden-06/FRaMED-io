@@ -1,7 +1,7 @@
 package io.framed.exporter.crom
 
 import io.framed.Project
-import io.framed.exporter.crom.model.ModelElement
+import io.framed.exporter.crom.crom.ModelElement
 import io.framed.model.*
 import io.framed.exporter.visitor.ProjectTreeVisitor
 
