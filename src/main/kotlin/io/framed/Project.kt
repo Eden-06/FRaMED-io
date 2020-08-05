@@ -42,14 +42,6 @@ class Project(
                 )
         )
     }
-
-    fun <T> acceptVisitor(visitor: Visitor<T>) {
-        js("console.log(\"Hello World!\");")
-        js("console.log(\"Hello World2!\");")
-
-        visitor.visit(this)
-    }
-
     fun toJSON(): String {
         return json.stringify(serializer(), this) + "\n"
     }
