@@ -10,18 +10,18 @@ import io.framed.model.*
  * @param T the type of the result
  * @property initialValue the pre-initialization for the result (e.g. an empty string)
  */
-abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
+abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor<T> {
 
     /**
      * The result of the traversal
      */
-    protected var result : T = initialValue
+    protected var result: T = initialValue
 
     /**
      * A stack that contains the parent element of the element that is currently traversed at the top,
      * so that the parent element of a ModelElement can be called in each traversal method.
      */
-    private var parentStack : ArrayList<ModelElement> = ArrayList()
+    private var parentStack: ArrayList<ModelElement> = ArrayList()
 
     /**
      * Returns the result of the traversal and resets the result value to its initial value.
@@ -47,12 +47,12 @@ abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
         traverseAggregationPostorder(aggregation)
     }
 
-    override fun visit(attribute: Attribute)  {
+    override fun visit(attribute: Attribute) {
         traverseAttributePreorder(attribute)
         traverseAttributePostorder(attribute)
     }
 
-    override fun visit(compartment: Compartment)  {
+    override fun visit(compartment: Compartment) {
         traverseCompartmentPreorder(compartment)
         parentStack.add(compartment)
         for (attribute in compartment.attributes) {
@@ -68,7 +68,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
         traverseCompartmentPostorder(compartment)
     }
 
-    override fun visit(clazz: Class)  {
+    override fun visit(clazz: Class) {
         traverseClassPreorder(clazz)
         parentStack.add(clazz)
         for (attribute in clazz.attributes) {
@@ -81,12 +81,12 @@ abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
         traverseClassPostorder(clazz)
     }
 
-    override fun visit(composition: Composition)  {
+    override fun visit(composition: Composition) {
         traverseCompositionPreorder(composition)
         traverseCompositionPostorder(composition)
     }
 
-    override fun visit(connections: Connections)  {
+    override fun visit(connections: Connections) {
         traverseConnectionsPreorder(connections)
         for (connection in connections.connections) {
             connection.acceptVisitor(this)
@@ -94,32 +94,32 @@ abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
         traverseConnectionsPostorder(connections)
     }
 
-    override fun visit(createRelationship: CreateRelationship)  {
+    override fun visit(createRelationship: CreateRelationship) {
         traverseCreateRelationshipPreorder(createRelationship)
         traverseCreateRelationshipPostorder(createRelationship)
     }
 
-    override fun visit(destroyRelationship: DestroyRelationship)  {
+    override fun visit(destroyRelationship: DestroyRelationship) {
         traverseDestroyRelationshipPreorder(destroyRelationship)
         traverseDestroyRelationshipPostorder(destroyRelationship)
     }
 
-    override fun visit(event: Event)  {
+    override fun visit(event: Event) {
         traverseEventPreorder(event)
         traverseEventPostorder(event)
     }
 
-    override fun visit(fulfillment: Fulfillment)  {
+    override fun visit(fulfillment: Fulfillment) {
         traverseFulfillmentPreorder(fulfillment)
         traverseFulfillmentPostorder(fulfillment)
     }
 
-    override fun visit(inheritance: Inheritance)  {
+    override fun visit(inheritance: Inheritance) {
         traverseInheritancePreorder(inheritance)
         traverseInheritancePostorder(inheritance)
     }
 
-    override fun visit(method: Method)  {
+    override fun visit(method: Method) {
         traverseMethodPreorder(method)
         parentStack.add(method)
         for (parameter in method.parameters) {
@@ -129,7 +129,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
         traverseMethodPostorder(method)
     }
 
-    override fun visit(packageObj: Package)  {
+    override fun visit(packageObj: Package) {
         traversePackagePreorder(packageObj)
         parentStack.add(packageObj)
         for (modelElement in packageObj.children) {
@@ -143,22 +143,22 @@ abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
         traversePackagePostorder(packageObj)
     }
 
-    override fun visit(parameter: Parameter)  {
+    override fun visit(parameter: Parameter) {
         traverseParameterPreorder(parameter)
         traverseParameterPostorder(parameter)
     }
 
-    override fun visit(relationship: Relationship)  {
+    override fun visit(relationship: Relationship) {
         traverseRelationshipPreorder(relationship)
         traverseRelationshipPostorder(relationship)
     }
 
-    override fun visit(returnEvent: ReturnEvent)  {
+    override fun visit(returnEvent: ReturnEvent) {
         traverseReturnEventPreorder(returnEvent)
         traverseReturnEventPostorder(returnEvent)
     }
 
-    override fun visit(roleType: RoleType)  {
+    override fun visit(roleType: RoleType) {
         traverseRoleTypePreorder(roleType)
         parentStack.add(roleType)
         for (method in roleType.methods) {
@@ -171,7 +171,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
         traverseRoleTypePostorder(roleType)
     }
 
-    override fun visit(scene: Scene)  {
+    override fun visit(scene: Scene) {
         traverseScenePreorder(scene)
         parentStack.add(scene)
         for (attribute in scene.attributes) {
@@ -184,7 +184,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
         traverseScenePostorder(scene)
     }
 
-    protected fun getParent() : ModelElement {
+    protected fun getParent(): ModelElement {
         return parentStack[parentStack.lastIndex]
     }
 
