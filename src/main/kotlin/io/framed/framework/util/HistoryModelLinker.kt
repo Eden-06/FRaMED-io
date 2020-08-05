@@ -7,7 +7,7 @@ class HistoryModelLinker(
         private val oldModel: ModelLinker<*, *, *>,
         private val newModel: ModelLinker<*, *, *>
 ) : HistoryItem {
-    override val description: String = "io.framed.exporter.crom.ecore.Switch tab"
+    override val description: String = "io.framed.exporter.ecore.Switch tab"
 
     override fun undo() {
         ControllerManager.display(oldModel)

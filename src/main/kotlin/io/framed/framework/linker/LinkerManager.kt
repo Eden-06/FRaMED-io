@@ -78,7 +78,7 @@ object LinkerManager {
             })
 
             linker.sidebar.group("Structure") {
-                select("io.framed.exporter.crom.crom.Type", convert, infoProperty) {
+                select("io.framed.exporter.crom.Type", convert, infoProperty) {
                     it.name
                 }
             }

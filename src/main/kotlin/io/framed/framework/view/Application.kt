@@ -5,7 +5,7 @@ import de.westermann.kobserve.property.FunctionAccessor
 import de.westermann.kobserve.property.mapBinding
 import de.westermann.kobserve.property.property
 import io.framed.Project
-import io.framed.exporter.crom.CromExporter
+import io.framed.exporter.CromExporter
 import io.framed.framework.Controller
 import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer

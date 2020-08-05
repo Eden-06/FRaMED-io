@@ -5,7 +5,7 @@ import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
- * io.framed.exporter.crom.crom.Model class for an uml package (package is a reserved keyword).
+ * io.framed.exporter.crom.Model class for an uml package (package is a reserved keyword).
  *
  * It contains classes, connections, role types and nested packages.
  */

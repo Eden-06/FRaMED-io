@@ -6,7 +6,7 @@ import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
 /**
- * io.framed.exporter.crom.crom.Model class for a bros scene.
+ * io.framed.exporter.crom.Model class for a bros scene.
  */
 @Serializable
 class Scene() : ModelElement() {

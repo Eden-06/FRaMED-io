@@ -1,0 +1,8 @@
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
+
+package io.framed.exporter.ecore
+
+abstract external class EOperationImpl : EOperationBase {
+    open var operationID: Number
+    open var setOperationID: (id: Number) -> Unit
+}

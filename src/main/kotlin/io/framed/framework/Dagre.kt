@@ -107,11 +107,11 @@ external interface DagreGraphOptions {
      */
     var nodesep: Int
     /**
-     * io.framed.exporter.crom.crom.Direction for rank nodes. Can be TB, BT, LR, or RL, where T = top, B = bottom, L = left, and R = right.
+     * io.framed.exporter.crom.Direction for rank nodes. Can be TB, BT, LR, or RL, where T = top, B = bottom, L = left, and R = right.
      */
     var rankdir: String
     /**
-     * io.framed.exporter.crom.crom.Type of algorithm to assigns a rank to each node in the input graph. Possible values: `network-simplex`, `tight-tree` or `longest-path`
+     * io.framed.exporter.crom.Type of algorithm to assigns a rank to each node in the input graph. Possible values: `network-simplex`, `tight-tree` or `longest-path`
      */
     var ranker: String
     /**

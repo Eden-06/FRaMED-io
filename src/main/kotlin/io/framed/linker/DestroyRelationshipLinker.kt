@@ -16,7 +16,7 @@ import io.framed.framework.view.sidebar
 import io.framed.model.DestroyRelationship
 
 /**
- * io.framed.exporter.crom.crom.Model class for an crom compartment.
+ * io.framed.exporter.crom.Model class for an crom compartment.
  *
  * @author Sebastian
  */
@@ -52,7 +52,7 @@ class DestroyRelationshipLinker(
     }
 
     override val sidebar = sidebar {
-        title("Destroy io.framed.exporter.crom.crom.Relationship")
+        title("Destroy io.framed.exporter.crom.Relationship")
 
         group("General") {
             input("Name", nameProperty)
@@ -100,7 +100,7 @@ class DestroyRelationshipLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ElementInfo("Destroy io.framed.exporter.crom.crom.Relationship", FramedIcon.EVENTRELATIONSHIP)
+        override val info = ElementInfo("Destroy io.framed.exporter.crom.Relationship", FramedIcon.EVENTRELATIONSHIP)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is RoleTypeLinker || source is SceneLinker

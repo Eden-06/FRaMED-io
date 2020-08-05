@@ -48,7 +48,7 @@ class FulfillmentLinker(
     }
 
     override val sidebar = sidebar {
-        title("io.framed.exporter.crom.crom.Fulfillment")
+        title("io.framed.exporter.crom.Fulfillment")
 
         group("General") {
             input("Name", nameProperty)
@@ -81,7 +81,7 @@ class FulfillmentLinker(
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ElementInfo("io.framed.exporter.crom.crom.Fulfillment", FramedIcon.FULFILLMENT)
+        override val info = ElementInfo("io.framed.exporter.crom.Fulfillment", FramedIcon.FULFILLMENT)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is ClassLinker || source is CompartmentLinker || source is RoleTypeLinker
