@@ -151,7 +151,7 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                 val project = ControllerManager.project
                 val visitor = CromExporter()
                 visitor.visit(project)
-                triggerDownload("${project.name}.ecore", visitor.getResultAndReset())
+                triggerDownload("${project.name}.xml", visitor.getResultAndReset())
             }
         }
         menu("Edit") {
