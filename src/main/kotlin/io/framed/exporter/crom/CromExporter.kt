@@ -10,7 +10,11 @@ import io.framed.exporter.visitor.ProjectTreeVisitor
  */
 class CromExporter : ProjectTreeVisitor<String>("") {
 
-    var elementLookupTable = HashMap<Long, ModelElement>()
+    /**
+     * Mapping of Framed.io element ID to CROM ModelElement.
+     * The lookup table is e.g. used for finding CROM ModelElements matching Framed.io IDs in relationships.
+     */
+    private var elementLookupTable = HashMap<Long, ModelElement>()
 
     override fun traverseProjectPreorder(project: Project) {
     }

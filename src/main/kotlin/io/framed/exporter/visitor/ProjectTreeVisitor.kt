@@ -7,14 +7,26 @@ import io.framed.model.*
 /**
  * Abstract implementation of a Visitor that traverses the project tree (while traversing the "Package" of a project
  * two times in the beginning) and provides an interface to preorder as well as postorder traversal.
+ * @param T the type of the result
+ * @property initialValue the pre-initialization for the result (e.g. an empty string)
  */
 abstract class ProjectTreeVisitor<T>(val initialValue : T) : Visitor<T> {
 
+    /**
+     * The result of the traversal
+     */
     protected var result : T = initialValue
 
+    /**
+     * A stack that contains the parent element of the element that is currently traversed at the top,
+     * so that the parent element of a ModelElement can be called in each traversal method.
+     */
     private var parentStack : ArrayList<ModelElement> = ArrayList()
 
-    override fun getResultAndReset(): T {
+    /**
+     * Returns the result of the traversal and resets the result value to its initial value.
+     */
+    fun getResultAndReset(): T {
         val finalResult = result
         result = initialValue
         parentStack = ArrayList()
