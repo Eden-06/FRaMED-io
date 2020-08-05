@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 abstract external class EObjectBase : BasicEObjectImpl, EObject {
     override fun eIsSet(feature: EStructuralFeature): Boolean
     override fun eContainmentFeature(): EReference

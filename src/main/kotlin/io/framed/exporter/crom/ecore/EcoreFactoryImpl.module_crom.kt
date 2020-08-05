@@ -2,7 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
 import kotlin.js.Date
 
 abstract external class EcoreFactoryImpl : EFactoryImpl, EcoreFactory {

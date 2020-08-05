@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 //abstract external class io.framed.exporter.crom.ecore.AbstractCollection<T>(owner: io.framed.exporter.crom.ecore.InternalEObject = definedExternally, featureId: Number = definedExternally, oppositeFeatureId: Number = definedExternally) : kotlin.collections.io.framed.exporter.crom.ecore.ArrayList<T>, io.framed.exporter.crom.ecore.EcoreEList<T>, kotlin.collections.io.framed.exporter.crom.ecore.Collection<T> {
 abstract external class AbstractCollection<T>(owner: InternalEObject = definedExternally, featureId: Number = definedExternally, oppositeFeatureId: Number = definedExternally) : EcoreEList<T>, Collection<T> {
     open var owner: Any

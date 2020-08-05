@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 abstract external class EClassBase : EClassifierImpl, EClass {
     open var _abstract: Any
     open var _interface: Any

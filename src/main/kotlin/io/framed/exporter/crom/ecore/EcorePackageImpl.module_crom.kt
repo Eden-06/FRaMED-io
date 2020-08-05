@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 abstract external class EcorePackageImpl : EPackageImpl, EcorePackage {
     open var isCreated: Any
     open var createPackageContents: () -> Unit

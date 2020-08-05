@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 external interface EObject : Notifier {
     fun eIsSet(feature: EStructuralFeature): Boolean
     fun eContainmentFeature(): EReference

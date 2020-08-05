@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 abstract external class EAnnotationBase : EModelElementImpl, EAnnotation {
     open var _source: Any
     open var _details: Any

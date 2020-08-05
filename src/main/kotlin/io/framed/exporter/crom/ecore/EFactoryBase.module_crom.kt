@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 abstract external class EFactoryBase : EModelElementImpl, EFactory {
     open var _ePackage: Any
     override fun createFromString(eDataType: EDataType, literalValue: String): Any

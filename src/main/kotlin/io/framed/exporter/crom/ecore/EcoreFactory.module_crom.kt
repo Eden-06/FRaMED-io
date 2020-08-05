@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 external interface EcoreFactory : EFactory {
     fun createEAttribute(): EAttribute
     fun createEAnnotation(): EAnnotation

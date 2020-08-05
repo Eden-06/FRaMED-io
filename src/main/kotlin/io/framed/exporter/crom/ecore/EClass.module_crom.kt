@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 external interface EClass : EClassifier {
     var abstract: Boolean
     var `interface`: Boolean

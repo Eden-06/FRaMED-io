@@ -2,8 +2,6 @@
 
 package io.framed.exporter.crom.ecore
 
-import io.framed.export.ecore.*
-
 abstract external class BasicEObjectImpl : BasicNotifierImpl, EObject, InternalEObject {
     open var _uuid: String
     open var _eContainer: InternalEObject
