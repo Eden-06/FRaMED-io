@@ -6,7 +6,7 @@ import io.framed.model.*
 
 /**
  * Abstract implementation of a Visitor that traverses the project tree (while traversing the "Package" of a project
- * two times in the beginning) and provides an interface to preorder as well as postorder traversal.
+ * two times in the beginning) and provides an interface to preorder as well as postorder traversal of each element.
  * @param T the type of the result
  * @property initialValue the pre-initialization for the result (e.g. an empty string)
  */
