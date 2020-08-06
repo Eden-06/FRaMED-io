@@ -25,6 +25,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor<T> {
 
     /**
      * Returns the result of the traversal and resets the result value to its initial value.
+     * @return the result of the traversal
      */
     fun getResultAndReset(): T {
         val finalResult = result
@@ -184,6 +185,10 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor<T> {
         traverseScenePostorder(scene)
     }
 
+    /**
+     * Returns the parent of the currently traversed element (which is the top element of the stack)
+     * @return the parent of the currently traversed element
+     */
     protected fun getParent(): ModelElement {
         return parentStack[parentStack.lastIndex]
     }
