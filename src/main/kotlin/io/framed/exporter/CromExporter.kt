@@ -1,6 +1,7 @@
 package io.framed.exporter
 
 import io.framed.Project
+import io.framed.exporter.crom.Crom_l1_composedFactoryImpl
 import io.framed.exporter.crom.ModelElement
 import io.framed.exporter.visitor.ProjectTreeVisitor
 import io.framed.model.*
@@ -15,6 +16,11 @@ class CromExporter : ProjectTreeVisitor<String>("") {
      * The lookup table is e.g. used for finding CROM ModelElements matching Framed.io IDs in relationships.
      */
     private var elementLookupTable = HashMap<Long, ModelElement>()
+
+    /**
+     * Factory, that creates CROM elements
+     */
+    private val factory = Crom_l1_composedFactoryImpl.Crom_l1_composedFactoryImpl()
 
     override fun traverseProjectPreorder(project: Project) {
     }

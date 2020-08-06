@@ -5,7 +5,11 @@ package io.framed.exporter.crom
 import io.framed.exporter.ecore.EDataType
 import io.framed.exporter.ecore.EFactoryImpl
 
+@JsModule("crom")
+@JsNonModule
+@JsName("crom")
 abstract external class Crom_l1_composedFactoryImpl : EFactoryImpl, Crom_l1_composedFactory {
+
     open var createModel: () -> Model
     open var createRigidType: () -> RigidType
     open var createGroup: () -> Group
@@ -55,7 +59,6 @@ abstract external class Crom_l1_composedFactoryImpl : EFactoryImpl, Crom_l1_comp
     open fun convertParthoodToString(eDataType: EDataType, instanceValue: Any): String
 
     companion object {
-        var eINSTANCE: Any
-        fun init(): Crom_l1_composedFactory
+        open fun Crom_l1_composedFactoryImpl(): Crom_l1_composedFactoryImpl
     }
 }
