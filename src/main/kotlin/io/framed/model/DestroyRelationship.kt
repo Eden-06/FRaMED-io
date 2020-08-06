@@ -5,7 +5,7 @@ import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
 /**
- * io.framed.exporter.crom.Model class for an BROS destroy relation
+ * Model class for an BROS destroy relation
  *
  * @author Sebastian
  */

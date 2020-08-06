@@ -5,7 +5,7 @@ import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
 /**
- * io.framed.exporter.crom.Model class for an uml connection.
+ * Model class for an uml connection.
  *
  * @author lars
  */

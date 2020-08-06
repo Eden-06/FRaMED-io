@@ -121,7 +121,7 @@ class RoleTypeLinker(
     private val sidebarMethodsList: MutableList<SidebarEntry<Method>> = mutableListOf()
 
     override val sidebar = sidebar {
-        title("io.framed.exporter.crom.RoleType")
+        title("RoleType")
         group("General") {
             input("Name", nameProperty)
             input("Occurrence", occurrenceConstraintProperty, CardinalityPreset.STRING_VALUES)

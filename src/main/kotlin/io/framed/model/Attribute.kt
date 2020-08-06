@@ -5,7 +5,7 @@ import io.framed.framework.model.ModelElement
 import kotlinx.serialization.Serializable
 
 /**
- * io.framed.exporter.crom.Model class for an uml model.
+ * Model class for an uml model.
  *
  * @author lars
  */
@@ -22,7 +22,7 @@ class Attribute() : ModelElement() {
     var name: String = "unnamed"
 
     /**
-     * io.framed.exporter.crom.Type of this model.
+     * Type of this model.
      */
     var type: String = ""
 

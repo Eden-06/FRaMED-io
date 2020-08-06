@@ -15,7 +15,7 @@ class Event() : ModelElement() {
     }
 
     /**
-     * io.framed.exporter.crom.Type of the model
+     * Type of the model
      */
     var type: EventType = EventType.STANDARD
     /**
