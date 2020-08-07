@@ -1,13 +1,15 @@
 package io.framed.exporter.visitor
 
 import io.framed.Project
-import io.framed.exporter.crom.Crom_l1_composedFactoryImpl
 import io.framed.framework.model.ModelElement
 import io.framed.model.*
 
 /**
  * Abstract implementation of a Visitor that traverses the project tree (while traversing the "Package" of a project
  * two times in the beginning) and provides an interface to preorder as well as postorder traversal of each element.
+ * This traversal guarantees that the Types which are needed by ModelElements are traversed before traversing those
+ * ModelElements.
+ *
  * @param T the type of the result
  * @property initialValue the pre-initialization for the result (e.g. an empty string)
  */
@@ -24,7 +26,11 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
      */
     private var parentStack: ArrayList<ModelElement> = ArrayList()
 
-    private var typesInitialized: Boolean = false
+    /**
+     * For Relationships and Elements with Types, those Types need to be traversed beforehand.
+     * This flag indicates that this already happened so traversal can proceed.
+     */
+    private var typesTraversed: Boolean = false
 
     /**
      * Returns the result of the traversal and resets the result value to its initial value.
@@ -47,17 +53,15 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
     }
 
     override fun visit(aggregation: Aggregation) {
-        if (!typesInitialized) return
+        if (!typesTraversed) return
 
-        traverseAggregationBeforeChildren(aggregation)
-        traverseAggregationAfterChildren(aggregation)
+        traverseAggregation(aggregation)
     }
 
     override fun visit(attribute: Attribute) {
-        if (!typesInitialized) return
+        if (!typesTraversed) return
 
-        traverseAttributeBeforeChildren(attribute)
-        traverseAttributeAfterChildren(attribute)
+        traverseAttribute(attribute)
     }
 
     override fun visit(compartment: Compartment) {
@@ -90,10 +94,9 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
     }
 
     override fun visit(composition: Composition) {
-        if (!typesInitialized) return
+        if (!typesTraversed) return
 
-        traverseCompositionBeforeChildren(composition)
-        traverseCompositionAfterChildren(composition)
+        traverseComposition(composition)
     }
 
     override fun visit(connections: Connections) {
@@ -105,35 +108,36 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
     }
 
     override fun visit(createRelationship: CreateRelationship) {
-        if (!typesInitialized) return
+        if (!typesTraversed) return
 
-        traverseCreateRelationshipBeforeChildren(createRelationship)
-        traverseCreateRelationshipAfterChildren(createRelationship)
+        traverseCreateRelationship(createRelationship)
     }
 
     override fun visit(destroyRelationship: DestroyRelationship) {
-        if (!typesInitialized) return
+        if (!typesTraversed) return
 
-        traverseDestroyRelationshipBeforeChildren(destroyRelationship)
-        traverseDestroyRelationshipAfterChildren(destroyRelationship)
+        traverseDestroyRelationship(destroyRelationship)
     }
 
     override fun visit(event: Event) {
-        traverseEventBeforeChildren(event)
-        traverseEventAfterChildren(event)
+        traverseEvent(event)
     }
 
     override fun visit(fulfillment: Fulfillment) {
-        traverseFulfillmentBeforeChildren(fulfillment)
-        traverseFulfillmentAfterChildren(fulfillment)
+        if (!typesTraversed) return
+
+        traverseFulfillment(fulfillment)
     }
 
     override fun visit(inheritance: Inheritance) {
-        traverseInheritanceBeforeChildren(inheritance)
-        traverseInheritanceAfterChildren(inheritance)
+        if (!typesTraversed) return
+
+        traverseInheritance(inheritance)
     }
 
     override fun visit(method: Method) {
+        if (!typesTraversed) return
+
         traverseMethodBeforeChildren(method)
         parentStack.add(method)
         for (parameter in method.parameters) {
@@ -149,6 +153,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
         for (modelElement in packageObj.children) {
             modelElement.acceptVisitor(this)
         }
+        typesTraversed = true
         // Double traversal because Types have to be detected beforehand
         for (modelElement in packageObj.children) {
             modelElement.acceptVisitor(this)
@@ -158,18 +163,19 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
     }
 
     override fun visit(parameter: Parameter) {
-        traverseParameterBeforeChildren(parameter)
-        traverseParameterAfterChildren(parameter)
+        if (!typesTraversed) return
+
+        traverseParameter(parameter)
     }
 
     override fun visit(relationship: Relationship) {
-        traverseRelationshipBeforeChildren(relationship)
-        traverseRelationshipAfterChildren(relationship)
+        if (!typesTraversed) return
+
+        traverseRelationship(relationship)
     }
 
     override fun visit(returnEvent: ReturnEvent) {
-        traverseReturnEventBeforeChildren(returnEvent)
-        traverseReturnEventAfterChildren(returnEvent)
+        traverseReturnEvent(returnEvent)
     }
 
     override fun visit(roleType: RoleType) {
@@ -210,13 +216,9 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
 
     protected abstract fun traverseProjectAfterChildren(project: Project)
 
-    protected abstract fun traverseAggregationBeforeChildren(aggregation: Aggregation)
+    protected abstract fun traverseAggregation(aggregation: Aggregation)
 
-    protected abstract fun traverseAggregationAfterChildren(aggregation: Aggregation)
-
-    protected abstract fun traverseAttributeBeforeChildren(attribute: Attribute)
-
-    protected abstract fun traverseAttributeAfterChildren(attribute: Attribute)
+    protected abstract fun traverseAttribute(attribute: Attribute)
 
     protected abstract fun traverseCompartmentBeforeChildren(compartment: Compartment)
 
@@ -226,45 +228,27 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
 
     protected abstract fun traverseClassAfterChildren(clazz: Class)
 
-    protected abstract fun traverseCompositionBeforeChildren(composition: Composition)
-
-    protected abstract fun traverseCompositionAfterChildren(composition: Composition)
+    protected abstract fun traverseComposition(composition: Composition)
 
     protected abstract fun traverseConnectionsBeforeChildren(connections: Connections)
 
     protected abstract fun traverseConnectionsAfterChildren(connections: Connections)
 
-    protected abstract fun traverseCreateRelationshipBeforeChildren(createRelationship: CreateRelationship)
+    protected abstract fun traverseCreateRelationship(createRelationship: CreateRelationship)
 
-    protected abstract fun traverseCreateRelationshipAfterChildren(createRelationship: CreateRelationship)
+    protected abstract fun traverseDestroyRelationship(destroyRelationship: DestroyRelationship)
 
-    protected abstract fun traverseDestroyRelationshipBeforeChildren(destroyRelationship: DestroyRelationship)
+    protected abstract fun traverseEvent(event: Event)
 
-    protected abstract fun traverseDestroyRelationshipAfterChildren(destroyRelationship: DestroyRelationship)
+    protected abstract fun traverseEventType(eventType: EventType)
 
-    protected abstract fun traverseEventBeforeChildren(event: Event)
+    protected abstract fun traverseFulfillment(fulfillment: Fulfillment)
 
-    protected abstract fun traverseEventAfterChildren(event: Event)
+    protected abstract fun traverseInheritance(inheritance: Inheritance)
 
-    protected abstract fun traverseEventTypeBeforeChildren(eventType: EventType)
+    protected abstract fun traverseMetadata(metadata: Metadata)
 
-    protected abstract fun traverseEventTypeAfterChildren(eventType: EventType)
-
-    protected abstract fun traverseFulfillmentBeforeChildren(fulfillment: Fulfillment)
-
-    protected abstract fun traverseFulfillmentAfterChildren(fulfillment: Fulfillment)
-
-    protected abstract fun traverseInheritanceBeforeChildren(inheritance: Inheritance)
-
-    protected abstract fun traverseInheritanceAfterChildren(inheritance: Inheritance)
-
-    protected abstract fun traverseMetadataBeforeChildren(metadata: Metadata)
-
-    protected abstract fun traverseMetadataAfterChildren(metadata: Metadata)
-
-    protected abstract fun traverseModelElementMetadataBeforeChildren(modelElementMetadata: ModelElementMetadata)
-
-    protected abstract fun traverseModelElementMetadataAfterChildren(modelElementMetadata: ModelElementMetadata)
+    protected abstract fun traverseModelElementMetadata(modelElementMetadata: ModelElementMetadata)
 
     protected abstract fun traverseMethodBeforeChildren(method: Method)
 
@@ -274,17 +258,11 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
 
     protected abstract fun traversePackageAfterChildren(packageObj: Package)
 
-    protected abstract fun traverseParameterBeforeChildren(parameter: Parameter)
+    protected abstract fun traverseParameter(parameter: Parameter)
 
-    protected abstract fun traverseParameterAfterChildren(parameter: Parameter)
+    protected abstract fun traverseRelationship(relationship: Relationship)
 
-    protected abstract fun traverseRelationshipBeforeChildren(relationship: Relationship)
-
-    protected abstract fun traverseRelationshipAfterChildren(relationship: Relationship)
-
-    protected abstract fun traverseReturnEventBeforeChildren(returnEvent: ReturnEvent)
-
-    protected abstract fun traverseReturnEventAfterChildren(returnEvent: ReturnEvent)
+    protected abstract fun traverseReturnEvent(returnEvent: ReturnEvent)
 
     protected abstract fun traverseRoleTypeBeforeChildren(roleType: RoleType)
 

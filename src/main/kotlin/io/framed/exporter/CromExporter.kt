@@ -28,20 +28,12 @@ class CromExporter : ProjectTreeVisitor<String>("") {
     override fun traverseProjectAfterChildren(project: Project) {
     }
 
-    override fun traverseAggregationBeforeChildren(aggregation: Aggregation) {
+    override fun traverseAggregation(aggregation: Aggregation) {
         result += "<aggregation>" + aggregation.name + "</aggregation>\n"
     }
 
-    override fun traverseAggregationAfterChildren(aggregation: Aggregation) {
-        return
-    }
-
-    override fun traverseAttributeBeforeChildren(attribute: Attribute) {
+    override fun traverseAttribute(attribute: Attribute) {
         result += "<attribute>" + attribute.name + "</attribute>\n"
-    }
-
-    override fun traverseAttributeAfterChildren(attribute: Attribute) {
-        return
     }
 
     override fun traverseCompartmentBeforeChildren(compartment: Compartment) {
@@ -60,12 +52,8 @@ class CromExporter : ProjectTreeVisitor<String>("") {
         result += "</class>\n"
     }
 
-    override fun traverseCompositionBeforeChildren(composition: Composition) {
+    override fun traverseComposition(composition: Composition) {
         result += "<composition>" + composition.name + "</composition>\n"
-    }
-
-    override fun traverseCompositionAfterChildren(composition: Composition) {
-        return
     }
 
     override fun traverseConnectionsBeforeChildren(connections: Connections) {
@@ -76,67 +64,35 @@ class CromExporter : ProjectTreeVisitor<String>("") {
         result += "</connections>\n"
     }
 
-    override fun traverseCreateRelationshipBeforeChildren(createRelationship: CreateRelationship) {
+    override fun traverseCreateRelationship(createRelationship: CreateRelationship) {
         result += "<createRelationship>" + createRelationship.name + "</createRelationship>\n"
     }
 
-    override fun traverseCreateRelationshipAfterChildren(createRelationship: CreateRelationship) {
-        return
-    }
-
-    override fun traverseDestroyRelationshipBeforeChildren(destroyRelationship: DestroyRelationship) {
+    override fun traverseDestroyRelationship(destroyRelationship: DestroyRelationship) {
         result += "<destroyRelationship>" + destroyRelationship.name + "</destroyRelationship>\n"
     }
 
-    override fun traverseDestroyRelationshipAfterChildren(destroyRelationship: DestroyRelationship) {
-        return
-    }
-
-    override fun traverseEventBeforeChildren(event: Event) {
+    override fun traverseEvent(event: Event) {
         result += "<event>" + event.desc + "</event>"
     }
 
-    override fun traverseEventAfterChildren(event: Event) {
+    override fun traverseEventType(eventType: EventType) {
         return
     }
 
-    override fun traverseEventTypeBeforeChildren(eventType: EventType) {
-        return
-    }
-
-    override fun traverseEventTypeAfterChildren(eventType: EventType) {
-        return
-    }
-
-    override fun traverseFulfillmentBeforeChildren(fulfillment: Fulfillment) {
+    override fun traverseFulfillment(fulfillment: Fulfillment) {
         result += "<fulfillment>" + fulfillment.name + "</fulfillment>\n"
     }
 
-    override fun traverseFulfillmentAfterChildren(fulfillment: Fulfillment) {
-        return
-    }
-
-    override fun traverseInheritanceBeforeChildren(inheritance: Inheritance) {
+    override fun traverseInheritance(inheritance: Inheritance) {
         result += "<inheritance>" + inheritance.name + "</inheritance>\n"
     }
 
-    override fun traverseInheritanceAfterChildren(inheritance: Inheritance) {
+    override fun traverseMetadata(metadata: Metadata) {
         return
     }
 
-    override fun traverseMetadataBeforeChildren(metadata: Metadata) {
-        return
-    }
-
-    override fun traverseMetadataAfterChildren(metadata: Metadata) {
-        return
-    }
-
-    override fun traverseModelElementMetadataBeforeChildren(modelElementMetadata: ModelElementMetadata) {
-        return
-    }
-
-    override fun traverseModelElementMetadataAfterChildren(modelElementMetadata: ModelElementMetadata) {
+    override fun traverseModelElementMetadata(modelElementMetadata: ModelElementMetadata) {
         return
     }
 
@@ -156,28 +112,16 @@ class CromExporter : ProjectTreeVisitor<String>("") {
         result += "</package>\n"
     }
 
-    override fun traverseParameterBeforeChildren(parameter: Parameter) {
+    override fun traverseParameter(parameter: Parameter) {
         result += "<parameter>" + parameter.name + "</parameter>\n"
     }
 
-    override fun traverseParameterAfterChildren(parameter: Parameter) {
-        return
-    }
-
-    override fun traverseRelationshipBeforeChildren(relationship: Relationship) {
+    override fun traverseRelationship(relationship: Relationship) {
         result += "<relationship>" + relationship.name + "</relationship>\n"
     }
 
-    override fun traverseRelationshipAfterChildren(relationship: Relationship) {
-        return
-    }
-
-    override fun traverseReturnEventBeforeChildren(returnEvent: ReturnEvent) {
+    override fun traverseReturnEvent(returnEvent: ReturnEvent) {
         result += "<returnEvent>" + returnEvent.desc + "</returnEvent>\n"
-    }
-
-    override fun traverseReturnEventAfterChildren(returnEvent: ReturnEvent) {
-        return
     }
 
     override fun traverseRoleTypeBeforeChildren(roleType: RoleType) {
