@@ -43,7 +43,7 @@ class Method() : ModelElement() {
         new.parameters = parameters.map { it.copy() }
     }
 
-    override fun <T> acceptVisitor(visitor: Visitor<T>) {
+    override fun acceptVisitor(visitor: Visitor) {
         visitor.visit(this)
     }
 }

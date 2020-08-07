@@ -15,7 +15,7 @@ abstract class ModelElement {
 
     abstract fun copy(): ModelElement
 
-    abstract fun <T> acceptVisitor(visitor: Visitor<T>)
+    abstract fun acceptVisitor(visitor: Visitor)
 
     open fun maxId(): Long = id
 

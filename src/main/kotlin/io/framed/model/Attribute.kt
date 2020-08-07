@@ -31,7 +31,7 @@ class Attribute() : ModelElement() {
         new.type = type
     }
 
-    override fun <T> acceptVisitor(visitor: Visitor<T>) {
+    override fun acceptVisitor(visitor: Visitor) {
         visitor.visit(this)
     }
 }

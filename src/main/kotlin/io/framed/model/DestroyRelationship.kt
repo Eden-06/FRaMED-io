@@ -26,7 +26,7 @@ class DestroyRelationship() : ModelConnection() {
         new.name = name
     }
 
-    override fun <T> acceptVisitor(visitor: Visitor<T>) {
+    override fun acceptVisitor(visitor: Visitor) {
         visitor.visit(this)
     }
 }

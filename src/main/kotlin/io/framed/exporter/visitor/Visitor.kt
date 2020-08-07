@@ -6,7 +6,7 @@ import io.framed.model.*
 /**
  * Provides an interface for visitors that are able to visit all model structures and return a (generic) result.
  */
-interface Visitor<T> {
+interface Visitor {
 
     fun visit(project: Project)
 
