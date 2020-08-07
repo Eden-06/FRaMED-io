@@ -22,177 +22,177 @@ class CromExporter : ProjectTreeVisitor<String>("") {
      */
     private val factory = Crom_l1_composedFactoryImpl.Crom_l1_composedFactoryImpl()
 
-    override fun traverseProjectPreorder(project: Project) {
+    override fun traverseProjectBeforeChildren(project: Project) {
     }
 
-    override fun traverseProjectPostorder(project: Project) {
+    override fun traverseProjectAfterChildren(project: Project) {
     }
 
-    override fun traverseAggregationPreorder(aggregation: Aggregation) {
+    override fun traverseAggregationBeforeChildren(aggregation: Aggregation) {
         result += "<aggregation>" + aggregation.name + "</aggregation>\n"
     }
 
-    override fun traverseAggregationPostorder(aggregation: Aggregation) {
+    override fun traverseAggregationAfterChildren(aggregation: Aggregation) {
         return
     }
 
-    override fun traverseAttributePreorder(attribute: Attribute) {
+    override fun traverseAttributeBeforeChildren(attribute: Attribute) {
         result += "<attribute>" + attribute.name + "</attribute>\n"
     }
 
-    override fun traverseAttributePostorder(attribute: Attribute) {
+    override fun traverseAttributeAfterChildren(attribute: Attribute) {
         return
     }
 
-    override fun traverseCompartmentPreorder(compartment: Compartment) {
+    override fun traverseCompartmentBeforeChildren(compartment: Compartment) {
         result += "<compartment name=\"" + compartment.name + "\">\n"
     }
 
-    override fun traverseCompartmentPostorder(compartment: Compartment) {
+    override fun traverseCompartmentAfterChildren(compartment: Compartment) {
         result += "</compartment>\n"
     }
 
-    override fun traverseClassPreorder(clazz: Class) {
+    override fun traverseClassBeforeChildren(clazz: Class) {
         result += "<class name=\"" + clazz.name + "\">\n"
     }
 
-    override fun traverseClassPostorder(clazz: Class) {
+    override fun traverseClassAfterChildren(clazz: Class) {
         result += "</class>\n"
     }
 
-    override fun traverseCompositionPreorder(composition: Composition) {
+    override fun traverseCompositionBeforeChildren(composition: Composition) {
         result += "<composition>" + composition.name + "</composition>\n"
     }
 
-    override fun traverseCompositionPostorder(composition: Composition) {
+    override fun traverseCompositionAfterChildren(composition: Composition) {
         return
     }
 
-    override fun traverseConnectionsPreorder(connections: Connections) {
+    override fun traverseConnectionsBeforeChildren(connections: Connections) {
         result += "<connections>\n"
     }
 
-    override fun traverseConnectionsPostorder(connections: Connections) {
+    override fun traverseConnectionsAfterChildren(connections: Connections) {
         result += "</connections>\n"
     }
 
-    override fun traverseCreateRelationshipPreorder(createRelationship: CreateRelationship) {
+    override fun traverseCreateRelationshipBeforeChildren(createRelationship: CreateRelationship) {
         result += "<createRelationship>" + createRelationship.name + "</createRelationship>\n"
     }
 
-    override fun traverseCreateRelationshipPostorder(createRelationship: CreateRelationship) {
+    override fun traverseCreateRelationshipAfterChildren(createRelationship: CreateRelationship) {
         return
     }
 
-    override fun traverseDestroyRelationshipPreorder(destroyRelationship: DestroyRelationship) {
+    override fun traverseDestroyRelationshipBeforeChildren(destroyRelationship: DestroyRelationship) {
         result += "<destroyRelationship>" + destroyRelationship.name + "</destroyRelationship>\n"
     }
 
-    override fun traverseDestroyRelationshipPostorder(destroyRelationship: DestroyRelationship) {
+    override fun traverseDestroyRelationshipAfterChildren(destroyRelationship: DestroyRelationship) {
         return
     }
 
-    override fun traverseEventPreorder(event: Event) {
+    override fun traverseEventBeforeChildren(event: Event) {
         result += "<event>" + event.desc + "</event>"
     }
 
-    override fun traverseEventPostorder(event: Event) {
+    override fun traverseEventAfterChildren(event: Event) {
         return
     }
 
-    override fun traverseEventTypePreorder(eventType: EventType) {
+    override fun traverseEventTypeBeforeChildren(eventType: EventType) {
         return
     }
 
-    override fun traverseEventTypePostorder(eventType: EventType) {
+    override fun traverseEventTypeAfterChildren(eventType: EventType) {
         return
     }
 
-    override fun traverseFulfillmentPreorder(fulfillment: Fulfillment) {
+    override fun traverseFulfillmentBeforeChildren(fulfillment: Fulfillment) {
         result += "<fulfillment>" + fulfillment.name + "</fulfillment>\n"
     }
 
-    override fun traverseFulfillmentPostorder(fulfillment: Fulfillment) {
+    override fun traverseFulfillmentAfterChildren(fulfillment: Fulfillment) {
         return
     }
 
-    override fun traverseInheritancePreorder(inheritance: Inheritance) {
+    override fun traverseInheritanceBeforeChildren(inheritance: Inheritance) {
         result += "<inheritance>" + inheritance.name + "</inheritance>\n"
     }
 
-    override fun traverseInheritancePostorder(inheritance: Inheritance) {
+    override fun traverseInheritanceAfterChildren(inheritance: Inheritance) {
         return
     }
 
-    override fun traverseMetadataPreorder(metadata: Metadata) {
+    override fun traverseMetadataBeforeChildren(metadata: Metadata) {
         return
     }
 
-    override fun traverseMetadataPostorder(metadata: Metadata) {
+    override fun traverseMetadataAfterChildren(metadata: Metadata) {
         return
     }
 
-    override fun traverseModelElementMetadataPreorder(modelElementMetadata: ModelElementMetadata) {
+    override fun traverseModelElementMetadataBeforeChildren(modelElementMetadata: ModelElementMetadata) {
         return
     }
 
-    override fun traverseModelElementMetadataPostorder(modelElementMetadata: ModelElementMetadata) {
+    override fun traverseModelElementMetadataAfterChildren(modelElementMetadata: ModelElementMetadata) {
         return
     }
 
-    override fun traverseMethodPreorder(method: Method) {
+    override fun traverseMethodBeforeChildren(method: Method) {
         result += "<method>\n"
     }
 
-    override fun traverseMethodPostorder(method: Method) {
+    override fun traverseMethodAfterChildren(method: Method) {
         result += "</method>\n"
     }
 
-    override fun traversePackagePreorder(packageObj: Package) {
+    override fun traversePackageBeforeChildren(packageObj: Package) {
         result += "<package name=\"" + packageObj.name + "\">\n"
     }
 
-    override fun traversePackagePostorder(packageObj: Package) {
+    override fun traversePackageAfterChildren(packageObj: Package) {
         result += "</package>\n"
     }
 
-    override fun traverseParameterPreorder(parameter: Parameter) {
+    override fun traverseParameterBeforeChildren(parameter: Parameter) {
         result += "<parameter>" + parameter.name + "</parameter>\n"
     }
 
-    override fun traverseParameterPostorder(parameter: Parameter) {
+    override fun traverseParameterAfterChildren(parameter: Parameter) {
         return
     }
 
-    override fun traverseRelationshipPreorder(relationship: Relationship) {
+    override fun traverseRelationshipBeforeChildren(relationship: Relationship) {
         result += "<relationship>" + relationship.name + "</relationship>\n"
     }
 
-    override fun traverseRelationshipPostorder(relationship: Relationship) {
+    override fun traverseRelationshipAfterChildren(relationship: Relationship) {
         return
     }
 
-    override fun traverseReturnEventPreorder(returnEvent: ReturnEvent) {
+    override fun traverseReturnEventBeforeChildren(returnEvent: ReturnEvent) {
         result += "<returnEvent>" + returnEvent.desc + "</returnEvent>\n"
     }
 
-    override fun traverseReturnEventPostorder(returnEvent: ReturnEvent) {
+    override fun traverseReturnEventAfterChildren(returnEvent: ReturnEvent) {
         return
     }
 
-    override fun traverseRoleTypePreorder(roleType: RoleType) {
+    override fun traverseRoleTypeBeforeChildren(roleType: RoleType) {
         result += "<roleType name=\"" + roleType.name + "\">\n"
     }
 
-    override fun traverseRoleTypePostorder(roleType: RoleType) {
+    override fun traverseRoleTypeAfterChildren(roleType: RoleType) {
         result += "</roleType>\n"
     }
 
-    override fun traverseScenePreorder(scene: Scene) {
+    override fun traverseSceneBeforeChildren(scene: Scene) {
         result += "<scene name=\"" + scene.name + "\">\n"
     }
 
-    override fun traverseScenePostorder(scene: Scene) {
+    override fun traverseSceneAfterChildren(scene: Scene) {
         result += "</scene>\n"
     }
 }
