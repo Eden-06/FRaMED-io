@@ -148,10 +148,8 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                 triggerDownload("${file.name}.json", file.toJSON())
             }
             item(MaterialIcon.IMPORT_EXPORT, "Export") {
-                val project = ControllerManager.project
-                val visitor = CromExporter()
-                visitor.visit(project)
-                triggerDownload("${project.name}.xml", visitor.getResultAndReset())
+                val result = CromExporter.exportToCrom(ControllerManager.project)
+                triggerDownload("${ControllerManager.project.name}.xml", result)
             }
         }
         menu("Edit") {

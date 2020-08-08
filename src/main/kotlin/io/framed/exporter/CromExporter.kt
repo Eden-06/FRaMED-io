@@ -9,7 +9,15 @@ import io.framed.model.*
 /**
  * Implementation of a ProjectTreeVisitor that exports the project to CROM (Compartment Role Object Model).
  */
-class CromExporter : ProjectTreeVisitor<String>("") {
+class CromExporter private constructor(): ProjectTreeVisitor<String>("") {
+
+    companion object {
+        fun exportToCrom(project: Project): String {
+            val exporter = CromExporter()
+            exporter.visit(project)
+            return exporter.getResultAndReset()
+        }
+    }
 
     /**
      * Mapping of Framed.io element ID to CROM ModelElement.
