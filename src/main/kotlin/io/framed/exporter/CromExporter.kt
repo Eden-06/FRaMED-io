@@ -22,8 +22,8 @@ class CromExporter private constructor() : ProjectTreeVisitor<Model>(
 
 
     /**
-     * Mapping of Framed.io element ID to CROM ModelElement.
-     * The lookup table is e.g. used for finding CROM ModelElements matching Framed.io IDs in relationships.
+     * Mapping of Framed.io element ID to CROM model element.
+     * The lookup table is e.g. used for finding CROM model element matching Framed.io IDs in relationships.
      */
     private var elementLookupTable: MutableMap<Long, InternalEObject> = HashMap()
 
@@ -34,8 +34,9 @@ class CromExporter private constructor() : ProjectTreeVisitor<Model>(
     private var typeLookupTable: MutableMap<String, RigidType> = HashMap()
 
     /**
-     * Mapping of type name to CROM type element.
-     * The lookup table is e.g. used for finding CROM Types from FRaMED.io type names.
+     * Mapping of a CROM model element to its parent element.
+     * The lookup table is e.g. used to find the parents of relationship sources, to attach the relationship to the
+     * parent.
      */
     private var cromElementParentTable: MutableMap<InternalEObject, InternalEObject> = HashMap()
 
