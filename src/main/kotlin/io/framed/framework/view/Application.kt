@@ -149,7 +149,7 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             }
             item(MaterialIcon.IMPORT_EXPORT, "Export") {
                 val result = CromExporter.exportToCrom(ControllerManager.project)
-                triggerDownload("${ControllerManager.project.name}.xml", result)
+                js("console.log(result)")
             }
         }
         menu("Edit") {

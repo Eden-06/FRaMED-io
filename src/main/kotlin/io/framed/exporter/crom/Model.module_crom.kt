@@ -3,8 +3,9 @@
 package io.framed.exporter.crom
 
 import io.framed.exporter.ecore.InternalEObject
+import io.framed.exporter.ecore.Set
 
 external interface Model : InternalEObject {
-    var elements: Any
-    var relations: Any
+    var elements: Set<ModelElement>
+    var relations: Set<Relation>
 }

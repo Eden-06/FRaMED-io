@@ -2,8 +2,10 @@
 
 package io.framed.exporter.crom
 
+import io.framed.exporter.ecore.Set
+
 external interface Operation : TypedElement {
     var operation: String
-    var params: Any
-    var owner: Any
+    var params: Set<Parameter>
+    var owner: Type
 }

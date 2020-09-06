@@ -7,5 +7,5 @@ import io.framed.exporter.ecore.InternalEObject
 external interface Place : InternalEObject {
     var lower: Number
     var upper: Number
-    var holder: Any
+    var holder: RoleType
 }

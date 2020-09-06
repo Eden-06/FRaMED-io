@@ -3,6 +3,6 @@
 package io.framed.exporter.crom
 
 external interface Fulfillment : Relation {
-    var filled: Any
-    var filler: Any
+    var filled: AbstractRole
+    var filler: RigidType
 }

@@ -3,5 +3,5 @@
 package io.framed.exporter.crom
 
 external interface Attribute : TypedElement {
-    var owner: Any
+    var owner: Type
 }

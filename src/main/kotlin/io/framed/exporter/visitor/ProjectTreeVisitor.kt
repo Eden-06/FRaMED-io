@@ -66,7 +66,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
     }
 
     override fun visit(compartment: Compartment) {
-        traverseCompartmentBeforeChildren(compartment)
+        if (!typesTraversed) traverseCompartmentBeforeChildren(compartment)
         parentStack.add(compartment)
         for (attribute in compartment.attributes) {
             attribute.acceptVisitor(this)
@@ -78,11 +78,11 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
             element.acceptVisitor(this)
         }
         parentStack.removeAt(parentStack.lastIndex)
-        traverseCompartmentAfterChildren(compartment)
+        if (!typesTraversed) traverseCompartmentAfterChildren(compartment)
     }
 
     override fun visit(clazz: Class) {
-        traverseClassBeforeChildren(clazz)
+        if (!typesTraversed) traverseClassBeforeChildren(clazz)
         parentStack.add(clazz)
         for (attribute in clazz.attributes) {
             attribute.acceptVisitor(this)
@@ -91,7 +91,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
             method.acceptVisitor(this)
         }
         parentStack.removeAt(parentStack.lastIndex)
-        traverseClassAfterChildren(clazz)
+        if (!typesTraversed) traverseClassAfterChildren(clazz)
     }
 
     override fun visit(composition: Composition) {
@@ -121,6 +121,7 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
     }
 
     override fun visit(event: Event) {
+        if (typesTraversed) return
         traverseEvent(event)
     }
 
@@ -137,15 +138,13 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
     }
 
     override fun visit(method: Method) {
-        if (!typesTraversed) return
-
-        traverseMethodBeforeChildren(method)
+        if (typesTraversed) traverseMethodBeforeChildren(method)
         parentStack.add(method)
         for (parameter in method.parameters) {
             parameter.acceptVisitor(this)
         }
         parentStack.removeAt(parentStack.lastIndex)
-        traverseMethodAfterChildren(method)
+        if (typesTraversed) traverseMethodAfterChildren(method)
     }
 
     override fun visit(packageObj: Package) {
@@ -176,11 +175,12 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
     }
 
     override fun visit(returnEvent: ReturnEvent) {
+        if (typesTraversed) return
         traverseReturnEvent(returnEvent)
     }
 
     override fun visit(roleType: RoleType) {
-        traverseRoleTypeBeforeChildren(roleType)
+        if (!typesTraversed) traverseRoleTypeBeforeChildren(roleType)
         parentStack.add(roleType)
         for (method in roleType.methods) {
             method.acceptVisitor(this)
@@ -189,11 +189,11 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
             attribute.acceptVisitor(this)
         }
         parentStack.removeAt(parentStack.lastIndex)
-        traverseRoleTypeAfterChildren(roleType)
+        if (!typesTraversed) traverseRoleTypeAfterChildren(roleType)
     }
 
     override fun visit(scene: Scene) {
-        traverseSceneBeforeChildren(scene)
+        if (!typesTraversed) traverseSceneBeforeChildren(scene)
         parentStack.add(scene)
         for (attribute in scene.attributes) {
             attribute.acceptVisitor(this)
@@ -202,14 +202,16 @@ abstract class ProjectTreeVisitor<T>(val initialValue: T) : Visitor {
             child.acceptVisitor(this)
         }
         parentStack.removeAt(parentStack.lastIndex)
-        traverseSceneAfterChildren(scene)
+        if (!typesTraversed) traverseSceneAfterChildren(scene)
     }
 
     /**
      * Returns the parent of the currently traversed element (which is the top element of the stack)
      * @return the parent of the currently traversed element
      */
-    protected fun getParent(): ModelElement {
+    protected fun getParent(): ModelElement? {
+        if (parentStack.isEmpty()) return null
+
         return parentStack[parentStack.lastIndex]
     }
 

@@ -2,11 +2,14 @@
 
 package io.framed.exporter.crom
 
+import io.framed.exporter.ecore.OrderedSet
+import io.framed.exporter.ecore.Set
+
 external interface CompartmentType : RigidType {
-    var parts: Any
-    var relationships: Any
-    var constraints: Any
+    var parts: Set<Part>
+    var relationships: OrderedSet<Relationship>
+    var constraints: OrderedSet<Constraint>
     var tr_extends: CompartmentType
-    var contains: Any
-    var fulfillments: Any
+    var contains: OrderedSet<CompartmentType>
+    var fulfillments: OrderedSet<Fulfillment>
 }

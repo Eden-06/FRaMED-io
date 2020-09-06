@@ -3,5 +3,5 @@
 package io.framed.exporter.crom
 
 external interface IntraRelationshipConstraint : RelationshipConstraint {
-    var relation: Any
+    var relation: Relationship
 }

@@ -53,12 +53,26 @@ abstract external class Crom_l1_composedFactoryImpl : EFactoryImpl, Crom_l1_comp
     open var createTypedElement: () -> TypedElement
     open var createParthoodConstraint: () -> ParthoodConstraint
     open var createAbstractRoleRef: () -> AbstractRoleRef
-    open fun createDirectionFromString(eDataType: EDataType, initialValue: String): Direction
-    open fun convertDirectionToString(eDataType: EDataType, instanceValue: Any): String
-    open fun createParthoodFromString(eDataType: EDataType, initialValue: String): Parthood
-    open fun convertParthoodToString(eDataType: EDataType, instanceValue: Any): String
+    open fun createDirectionFromString(eDataType: EDataType?, initialValue: String): Direction
+    open fun convertDirectionToString(eDataType: EDataType?, instanceValue: Any): String
+    open fun createParthoodFromString(eDataType: EDataType?, initialValue: String): Parthood
+    open fun convertParthoodToString(eDataType: EDataType?, instanceValue: Any): String
+    open var Crom_l1_composedFactoryImpl : InternalFactoryImpl
 
     companion object {
         open fun Crom_l1_composedFactoryImpl(): Crom_l1_composedFactoryImpl
     }
+}
+
+abstract external class InternalFactoryImpl {
+
+    open var prototype: EnumConverter
+}
+
+abstract external class EnumConverter {
+
+    open fun convertDirectionToString(eDataType: EDataType?, instanceValue: Direction): String
+    open fun convertParthoodToString(eDataType: EDataType?, instanceValue: Parthood): String
+    open fun createDirectionFromString(eDataType: EDataType?, instanceValue: String): Direction
+    open fun createParthoodFromString(eDataType: EDataType?, instanceValue: String): Parthood
 }

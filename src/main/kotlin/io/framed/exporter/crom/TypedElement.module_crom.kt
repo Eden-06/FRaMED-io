@@ -3,5 +3,5 @@
 package io.framed.exporter.crom
 
 external interface TypedElement : NamedElement {
-    var type: Any
+    var type: RigidType
 }

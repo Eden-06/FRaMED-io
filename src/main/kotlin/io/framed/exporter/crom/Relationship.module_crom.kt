@@ -3,8 +3,8 @@
 package io.framed.exporter.crom
 
 external interface Relationship : Relation, NamedElement {
-    var direction: Any
-    var first: Any
-    var second: Any
-    var tr_constraints: Any
+    var direction: Direction
+    var first: Place
+    var second: Place
+    var tr_constraints: Set<IntraRelationshipConstraint>
 }

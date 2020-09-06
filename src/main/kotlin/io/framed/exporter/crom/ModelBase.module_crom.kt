@@ -3,10 +3,11 @@
 package io.framed.exporter.crom
 
 import io.framed.exporter.ecore.BasicEObjectImpl
+import io.framed.exporter.ecore.Set
 
 abstract external class ModelBase : BasicEObjectImpl, Model {
-    open var _elements: Any
-    open var _relations: Any
+    open var _elements: Set<ModelElement>
+    open var _relations: Set<Relation>
 
 companion object {
         var eStaticClass: Any

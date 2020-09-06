@@ -2,7 +2,9 @@
 
 package io.framed.exporter.crom
 
+import io.framed.exporter.ecore.Set
+
 external interface Type : RelationTarget {
-    var attributes: Any
-    var operations: Any
+    var attributes: Set<Attribute>
+    var operations: Set<Operation>
 }

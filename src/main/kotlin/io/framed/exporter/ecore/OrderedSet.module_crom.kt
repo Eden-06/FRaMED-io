@@ -2,8 +2,8 @@
 
 package io.framed.exporter.ecore
 
-abstract external class OrderedSet<T> : AbstractCollection<T> {
-    override var isUnique: () -> Boolean
+external class OrderedSet<T> : AbstractCollection<T> {
+    var isUnique: () -> Boolean
     open var at: (index: Number) -> T
     open var select: (lambda: (element: T) -> Boolean) -> OrderedSet<T>
     open var collect: (lambda: (element: T) -> Any) -> OrderedSet<Any>
