@@ -106,7 +106,6 @@ class CromExporter private constructor() : ProjectTreeVisitor<Model>(
         val cromParent = elementLookupTable[parent.id] as Type?
             ?: error("Element with id " + parent.id + " cannot be found.")
 
-        js("console.log(cromParent.name)")
         cromAttribute.owner = cromParent
         cromParent.attributes.add(cromAttribute)
     }
@@ -347,8 +346,8 @@ class CromExporter private constructor() : ProjectTreeVisitor<Model>(
             val lower = getLowerFromCardinalityString(roleType.occurrenceConstraint)
             val upper = getUpperFromCardinalityString(roleType.occurrenceConstraint)
 
-            if (lower != "*") part.lower = lower.toInt()
-            if (upper != "*") part.upper = upper.toInt()
+            part.lower = lower
+            part.upper = upper
         }
 
         part.whole = cromParent
@@ -403,26 +402,25 @@ class CromExporter private constructor() : ProjectTreeVisitor<Model>(
         val lower = getLowerFromCardinalityString(cardinality)
         val upper = getUpperFromCardinalityString(cardinality)
 
-        if (lower != "*") second.lower = lower.toInt()
-        if (upper != "*") second.upper = upper.toInt()
+        second.lower = lower
+        second.upper = upper
         return second
     }
 
     /**
      * Gets the lower cardinality as a number from a cardinalities String or *
      */
-    private fun getLowerFromCardinalityString(cardinalities: String): String {
+    private fun getLowerFromCardinalityString(cardinalities: String): Int {
         val cardinalitiesArr = cardinalities.trim().split("..")
 
         if (cardinalitiesArr.size > 2) error("Only 2 cardinalities at maximum are allowed.")
         if (cardinalitiesArr.isEmpty()) error("Cardinalities are required and not set.")
 
         try {
-            cardinalitiesArr[0].toInt()
-            return cardinalitiesArr[0]
+            return cardinalitiesArr[0].toInt()
         } catch (e: NumberFormatException) {
             if (cardinalitiesArr[0] == "*") {
-                return "*"
+                return -1
             }
             error("$cardinalitiesArr contains invalid cardinalities.")
         }
@@ -431,18 +429,17 @@ class CromExporter private constructor() : ProjectTreeVisitor<Model>(
     /**
      * Gets the upper cardinality from a cardinalities String or -1 for *-Cardinality
      */
-    private fun getUpperFromCardinalityString(cardinalities: String): String {
+    private fun getUpperFromCardinalityString(cardinalities: String): Int {
         val cardinalitiesArr = cardinalities.trim().split("..")
 
         if (cardinalitiesArr.size > 2) error("Only 2 cardinalities at maximum are allowed.")
         if (cardinalitiesArr.isEmpty()) error("Cardinalities are required and not set.")
 
         try {
-            cardinalitiesArr[cardinalitiesArr.lastIndex].toInt()
-            return cardinalitiesArr[cardinalitiesArr.lastIndex]
+            return cardinalitiesArr[cardinalitiesArr.lastIndex].toInt()
         } catch (e: NumberFormatException) {
             if (cardinalitiesArr[cardinalitiesArr.lastIndex] == "*") {
-                return "*"
+                return -1
             }
             error("$cardinalitiesArr contains invalid cardinalities.")
         }
