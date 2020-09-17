@@ -2,7 +2,7 @@ package io.framed.exporter
 
 import io.framed.Project
 import io.framed.exporter.crom.*
-import io.framed.exporter.ecore.InternalEObject
+import io.framed.exporter.ecore.*
 import io.framed.exporter.visitor.ProjectTreeVisitor
 import io.framed.model.*
 import io.framed.model.Attribute
@@ -17,7 +17,7 @@ import io.framed.model.RoleType
  */
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 class CromExporter private constructor() : ProjectTreeVisitor<Model>(
-    Crom_l1_composedFactoryImpl.Crom_l1_composedFactoryImpl().createModel()
+    CromJs.Crom_l1_composedFactoryImpl().createModel()
 ) {
 
 
@@ -43,13 +43,20 @@ class CromExporter private constructor() : ProjectTreeVisitor<Model>(
     /**
      * Factory, that creates CROM elements
      */
-    private val factory = Crom_l1_composedFactoryImpl.Crom_l1_composedFactoryImpl()
+    private val factory = CromJs.Crom_l1_composedFactoryImpl()
 
     companion object {
         fun exportToCrom(project: Project): Model {
             val exporter = CromExporter()
             exporter.visit(project)
-            return exporter.getResultAndReset()
+            val result = exporter.getResultAndReset()
+
+            // According IntelliJ, the "CromJs" prefixes are not needed before EcorePackageImpl and EcoreFactoryImpl.
+            // However: without those, the transpiled JS code does not work.
+            val xmiRes = CromJs.Companion.XmiResource(CromJs.EcorePackageImpl.eINSTANCE, CromJs.EcoreFactoryImpl.eINSTANCE)
+            // XMI serialization does not work at the moment as it prints errors.
+            // val xmi = xmiRes.save(arrayOf(result))
+            return result
         }
     }
 

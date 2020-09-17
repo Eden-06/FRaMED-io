@@ -58,10 +58,6 @@ abstract external class Crom_l1_composedFactoryImpl : EFactoryImpl, Crom_l1_comp
     open fun createParthoodFromString(eDataType: EDataType?, initialValue: String): Parthood
     open fun convertParthoodToString(eDataType: EDataType?, instanceValue: Any): String
     open var Crom_l1_composedFactoryImpl : InternalFactoryImpl
-
-    companion object {
-        open fun Crom_l1_composedFactoryImpl(): Crom_l1_composedFactoryImpl
-    }
 }
 
 abstract external class InternalFactoryImpl {
