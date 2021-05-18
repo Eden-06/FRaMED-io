@@ -1,6 +1,9 @@
 language: java
 jdk:
   - openjdk11
+dist: xenial
+services:
+  - xvfb
 before_install:
   - chmod +x gradlew
   - chmod +x gradle/wrapper/gradle-wrapper.jar

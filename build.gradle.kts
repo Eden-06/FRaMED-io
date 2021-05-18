@@ -109,6 +109,12 @@ tasks.named("clean") {
     }
 }
 
+/*tasks.named("test") {
+    onlyIf {
+        project.hasProperty("runTests")
+    }
+}*/
+
 kotlin.target.browser {
     testTask {
         useKarma {
