@@ -21,6 +21,8 @@ dependencies {
 
     // Observable library with EventHandler, Properties and ObservableLists
     implementation("de.westermann:KObserve-js:0.9.3")
+
+    testImplementation(kotlin("test-js"))
 }
 
 // Config sass build
@@ -104,5 +106,13 @@ tasks.named("clean") {
         delete("web/website")
         delete("web/node_modules")
         delete("out")
+    }
+}
+
+kotlin.target.browser {
+    testTask {
+        useKarma {
+            useFirefox()
+        }
     }
 }
