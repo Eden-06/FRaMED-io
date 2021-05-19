@@ -36,6 +36,9 @@ fun init() {
     LinkerManager.register(InheritanceLinker)
     LinkerManager.register(CreateRelationshipLinker)
     LinkerManager.register(DestroyRelationshipLinker)
+    LinkerManager.register(ImplicationLinker)
+    LinkerManager.register(EquivalenceLinker)
+    LinkerManager.register(ProhibitionLinker)
 
     LinkerManager.register(AttributeLinker)
     LinkerManager.register(MethodLinker)
