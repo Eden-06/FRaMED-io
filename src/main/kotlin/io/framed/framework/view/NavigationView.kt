@@ -65,7 +65,7 @@ class NavigationView : View<HTMLDivElement>("div") {
     var zoom: Double = 1.0
         private set(value) {
             val old = field
-            field = min(zoomSteps.max() ?: 1.0, max(zoomSteps.min() ?: 1.0, value))
+            field = min(zoomSteps.maxOrNull() ?: 1.0, max(zoomSteps.minOrNull() ?: 1.0, value))
 
             if (old != field) {
                 onZoom.emit(field)

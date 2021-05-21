@@ -67,15 +67,15 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
         //Left block
         action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_IN, "Zoom in", Shortcut("+", Shortcut.Modifier.CTRL)) { _ ->
-            val nextStep = NavigationView.zoomSteps.asSequence().filter { it > zoom }.min()
-                    ?: NavigationView.zoomSteps.max()
+            val nextStep = NavigationView.zoomSteps.asSequence().filter { it > zoom }.minOrNull()
+                    ?: NavigationView.zoomSteps.maxOrNull()
             if (nextStep != null) {
                 renderer.zoom = nextStep
             }
         }
         action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_OUT, "Zoom out", Shortcut("-", Shortcut.Modifier.CTRL)) { _ ->
-            val nextStep = NavigationView.zoomSteps.asSequence().filter { it < zoom }.max()
-                    ?: NavigationView.zoomSteps.min()
+            val nextStep = NavigationView.zoomSteps.asSequence().filter { it < zoom }.maxOrNull()
+                    ?: NavigationView.zoomSteps.minOrNull()
             if (nextStep != null) {
                 renderer.zoom = nextStep
             }

@@ -5,11 +5,11 @@ before_install:
   - chmod +x gradlew
   - chmod +x gradle/wrapper/gradle-wrapper.jar
 script:
-  - ./gradlew build
+  - ./gradlew dist
 deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
-  local_dir: web/website
+  local_dir: dist
   on:
     branch: master

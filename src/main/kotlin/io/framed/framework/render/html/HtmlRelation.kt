@@ -123,7 +123,7 @@ class HtmlRelation(
             targetView = targetViewNew
         }
 
-        val zIndex = listOfNotNull(sourceView.zIndex, targetView.zIndex).max() ?: 0
+        val zIndex = listOfNotNull(sourceView.zIndex, targetView.zIndex).maxOrNull() ?: 0
 
         // Click area
         connections += jsPlumbInstance.connect(jsPlumbConnect {

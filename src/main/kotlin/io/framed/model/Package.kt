@@ -24,8 +24,8 @@ class Package() : ModelElementMetadata() {
 
     override fun maxId(): Long = listOf(
             id,
-            children.map { it.maxId() }.max() ?: 0
-    ).max() ?: id
+            children.map { it.maxId() }.maxOrNull() ?: 0
+    ).maxOrNull() ?: id
 
     override fun copy(): Package = Package { new ->
         new.name = name

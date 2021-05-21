@@ -286,9 +286,9 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
                     // Find the nearest intersection to the outer element
                     val nearest = if (source.id == id) {
-                        points.minBy { it.distance(t) }
+                        points.minByOrNull { it.distance(t) }
                     } else {
-                        points.minBy { it.distance(s) }
+                        points.minByOrNull { it.distance(s) }
                     }
 
                     // Set the position
