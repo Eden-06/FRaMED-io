@@ -8,7 +8,6 @@ plugins {
 apply(from = "version-file.gradle")
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
@@ -18,9 +17,6 @@ dependencies {
 
     // Serialization library
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
-
-    // Observable library with EventHandler, Properties and ObservableLists
-    implementation("de.westermann:KObserve-js:0.9.3")
 }
 
 // Config sass build
