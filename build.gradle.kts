@@ -129,15 +129,23 @@ tasks.named("browserProductionExecutableDistributeResources") {
     dependsOn("compileSass")
 }
 
+tasks.named("developmentExecutableCompileSync") {
+    dependsOn("compileSass")
+}
+
 tasks.named("productionExecutableCompileSync") {
     dependsOn("compileSass")
 }
 
-tasks.named("jsJar") {
+tasks.named("browserDevelopmentRun") {
     dependsOn("compileSass")
 }
 
-tasks.named("browserDevelopmentRun") {
+tasks.named("browserProductionRun") {
+    dependsOn("compileSass")
+}
+
+tasks.named("jsJar") {
     dependsOn("compileSass")
 }
 
@@ -154,6 +162,33 @@ tasks.create<Sync>("dist") {
 
     val file =
         tasks.named("browserProductionWebpack")
+            .get().outputs.files.files.first { it.name == "${project.name}.js" }
+    val sourceMap = file.resolveSibling("${project.name}.js.map")
+    from(
+        file,
+        sourceMap,
+        Callable { zipTree(tasks.get("jsJar").outputs.files.first()) }
+    )
+
+    exclude(
+        "${project.name}-js/**",
+        "${project.name}-js.js",
+        "${project.name}-js.js.map",
+        "${project.name}-js.meta.js",
+        "package.json",
+        "META-INF/**",
+        "**/*.scss",
+        "default/**"
+    )
+
+    into("${projectDir}/dist/")
+}
+
+tasks.create<Sync>("distDevelopment") {
+    dependsOn("browserDevelopmentWebpack", "jsJar")
+
+    val file =
+        tasks.named("browserDevelopmentWebpack")
             .get().outputs.files.files.first { it.name == "${project.name}.js" }
     val sourceMap = file.resolveSibling("${project.name}.js.map")
     from(
