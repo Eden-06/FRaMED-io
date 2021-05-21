@@ -16,7 +16,7 @@ import io.framed.framework.util.point
 import io.framed.framework.view.*
 import org.w3c.dom.get
 import org.w3c.dom.set
-import kotlin.browser.window
+import kotlinx.browser.window
 import kotlin.math.abs
 import kotlin.math.roundToInt
 

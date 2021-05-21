@@ -11,7 +11,7 @@ import io.framed.framework.pictogram.ViewModel
 import io.framed.framework.util.async
 import io.framed.framework.view.*
 import org.w3c.dom.HTMLElement
-import kotlin.browser.document
+import kotlinx.browser.document
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set

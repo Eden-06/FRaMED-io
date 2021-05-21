@@ -1,7 +1,7 @@
 package io.framed.framework.view
 
 import org.w3c.dom.HTMLElement
-import kotlin.dom.clear
+import kotlinx.dom.clear
 
 /**
  * @author lars

@@ -63,8 +63,8 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
         val connectionCount = connectionManager.listConnections(elementLinker.id).size
 
-        val elementName = elementLinker.model::class.simpleName?.toLowerCase() ?: "element"
-        val targetName = targetLinker.model::class.simpleName?.toLowerCase() ?: "container"
+        val elementName = elementLinker.model::class.simpleName?.lowercase() ?: "element"
+        val targetName = targetLinker.model::class.simpleName?.lowercase() ?: "container"
 
         if (connectionCount > 0) {
             dialog {

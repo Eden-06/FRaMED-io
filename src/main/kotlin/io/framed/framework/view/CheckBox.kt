@@ -30,9 +30,9 @@ class CheckBox(label: String, property: ReadOnlyProperty<Boolean>) : View<HTMLDi
     var type = Type.CHECKBOX
         set(value) {
             Type.values().forEach {
-                classes -= "type-${it.name.toLowerCase()}"
+                classes -= "type-${it.name.lowercase()}"
             }
-            classes += "type-${value.name.toLowerCase()}"
+            classes += "type-${value.name.lowercase()}"
             field = value
         }
 
@@ -62,7 +62,7 @@ class CheckBox(label: String, property: ReadOnlyProperty<Boolean>) : View<HTMLDi
         })
 
         val id = "checkbox-${lastId++}"
-        classes += "type-${Type.CHECKBOX.name.toLowerCase()}"
+        classes += "type-${Type.CHECKBOX.name.lowercase()}"
 
         checkbox.id = id
         htmlLabel.htmlFor = id

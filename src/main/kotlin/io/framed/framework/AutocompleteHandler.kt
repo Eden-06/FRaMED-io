@@ -20,7 +20,7 @@ sealed class AutocompleteHandler(val input: RawInputView, val container: ListVie
         private var autocompleteMap: Map<String, TextView> = emptyMap()
 
         override fun update(partial: String) {
-            val str = partial.toLowerCase()
+            val str = partial.lowercase()
             for ((key, view) in autocompleteMap) {
                 view.display = showAll || key.contains(str)
             }
@@ -40,7 +40,7 @@ sealed class AutocompleteHandler(val input: RawInputView, val container: ListVie
 
                 container += textView
 
-                autocompleteMap += txt.toLowerCase() to textView
+                autocompleteMap += txt.lowercase() to textView
             }
 
             update(input.value)
@@ -51,7 +51,7 @@ sealed class AutocompleteHandler(val input: RawInputView, val container: ListVie
 
         var last: String = ""
         override fun update(partial: String) {
-            val dataset = completer(partial.toLowerCase()) - last
+            val dataset = completer(partial.lowercase()) - last
             last = partial
 
             container.clear()

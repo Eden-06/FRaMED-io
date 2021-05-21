@@ -27,7 +27,7 @@ class Project(
 ) {
 
     val name: String
-        get() = root.name.toLowerCase()
+        get() = root.name.lowercase()
 
     /**
      * Calculate the largest id of all model elements.

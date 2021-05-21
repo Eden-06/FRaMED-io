@@ -3,7 +3,7 @@ package io.framed.framework.view
 import io.framed.framework.util.Point
 import io.framed.framework.util.point
 import org.w3c.dom.HTMLElement
-import kotlin.browser.document
+import kotlinx.browser.document
 
 /**
  * @author lars

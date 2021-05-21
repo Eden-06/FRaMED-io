@@ -4,7 +4,7 @@ import de.westermann.kobserve.property.property
 import io.framed.framework.pictogram.ContextEvent
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.KeyboardEvent
-import kotlin.browser.window
+import kotlinx.browser.window
 import kotlin.math.min
 
 /**

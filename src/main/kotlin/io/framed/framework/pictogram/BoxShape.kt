@@ -93,7 +93,7 @@ class BoxShape(id: Long?) : Shape(id) {
                 }
 
                 newHeight = shapes.filter { it.visible }.maxByOrNull { it.height }?.height ?: 0.0
-                newWidth = shapes.filter { it.visible }.sumByDouble { it.width }
+                newWidth = shapes.filter { it.visible }.sumOf { it.width }
             }
             Position.VERTICAL -> {
                 for (shape in shapes) {
@@ -102,7 +102,7 @@ class BoxShape(id: Long?) : Shape(id) {
                     }
                 }
 
-                newHeight = shapes.filter { it.visible }.sumByDouble { it.height }
+                newHeight = shapes.filter { it.visible }.sumOf { it.height }
                 newWidth = shapes.filter { it.visible }.maxByOrNull { it.width }?.width ?: 0.0
             }
             Position.BORDER -> {

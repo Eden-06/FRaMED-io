@@ -91,8 +91,6 @@ class ObservableObjectSet<T>(
     override fun retainAll(elements: Collection<T>): Boolean {
         var isChanged = false
 
-        var index = 0
-
         val iterator = set.iterator()
         while (iterator.hasNext()) {
             val element = iterator.next()
