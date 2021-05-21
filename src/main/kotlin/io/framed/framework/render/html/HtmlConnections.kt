@@ -56,7 +56,7 @@ class HtmlConnections(
     private var createTargetShape: Shape? = null
 
     fun createJsPlumb(container: ViewCollection<View<*>, *>): JsPlumbInstance {
-        val instance = JsPlumb.getInstance().apply {
+        val instance = JsPlumb.JsPlumb.getInstance().apply {
             setContainer(container.html)
 
             var reference: EventListener<*>? = null

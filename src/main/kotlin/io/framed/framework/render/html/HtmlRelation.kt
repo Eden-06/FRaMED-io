@@ -5,6 +5,7 @@ import io.framed.framework.*
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.Dimension
 import io.framed.framework.util.Point
+import io.framed.framework.util.dynamicOf
 import io.framed.framework.util.point
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
@@ -131,9 +132,9 @@ class HtmlRelation(
             target = targetView.html
 
             anchors = arrayOf(sourceAnchorString, targetAnchorString)
-            connector = arrayOf("Flowchart", object {
-                val cornerRadius = 5
-            })
+            connector = arrayOf("Flowchart", dynamicOf(
+                "cornerRadius" to 5
+            ))
             endpoint = "Blank"
 
             paintStyle = jsPlumbPaintStyle {
@@ -192,9 +193,9 @@ class HtmlRelation(
                 arrayOf("Straight")
             }
             ConnectionLine.Type.RECTANGLE -> {
-                arrayOf("Flowchart", object {
-                    val cornerRadius = 5
-                })
+                arrayOf("Flowchart", dynamicOf(
+                    "cornerRadius" to 5
+                ))
             }
         }
         endpoint = "Blank"
@@ -222,41 +223,43 @@ class HtmlRelation(
         }
 
         var overlays = labels.map { label ->
-            arrayOf("Custom", object {
-                val create: (dynamic) -> HTMLElement = {
-                    label.view.html
-                }
-                val cssClass = label.view.classes.toString()
-                val location = label.label.positionProperty.value
-            })
+            val createFunction: (dynamic) -> HTMLElement = {
+                label.view.html
+            }
+            arrayOf("Custom", dynamicOf(
+                "create" to createFunction,
+                "cssClass" to label.view.classes.toString(),
+                        "location" to label.label.positionProperty.value
+
+            ))
         }
 
         connection.sourceStyle?.let { style ->
-            overlays += listOf(arrayOf("Arrow", object {
-                val width = style.width
-                val length = style.length
-                val foldback = style.foldback
-                val paintStyle = jsPlumbPaintStyle {
+            overlays += listOf(arrayOf("Arrow", dynamicOf(
+                "width" to style.width,
+                "length" to style.length,
+                "foldback" to style.foldback,
+                "paintStyle" to jsPlumbPaintStyle {
                     stroke = style.paintStyle.stroke.toCss()
                     strokeWidth = style.paintStyle.strokeWidth
                     fill = style.paintStyle.fill.toCss()
-                }
-                val location = style.length * style.foldback + 1
-            }))
+                },
+                "location" to style.length * style.foldback + 1,
+            )))
         }
 
         connection.targetStyle?.let { style ->
-            overlays += listOf(arrayOf("Arrow", object {
-                val width = style.width
-                val length = style.length
-                val foldback = style.foldback
-                val paintStyle = jsPlumbPaintStyle {
+            overlays += listOf(arrayOf("Arrow", dynamicOf(
+                "width" to style.width,
+                "length" to style.length,
+                "foldback" to style.foldback,
+                "paintStyle" to jsPlumbPaintStyle {
                     stroke = style.paintStyle.stroke.toCss()
                     strokeWidth = style.paintStyle.strokeWidth
                     fill = style.paintStyle.fill.toCss()
-                }
-                val location = 1
-            }))
+                },
+                "location" to 1,
+            )))
         }
 
         connectInit.overlays = overlays.toTypedArray()

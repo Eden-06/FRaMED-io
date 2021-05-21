@@ -203,3 +203,11 @@ fun Sidebar.advanced(pictogram: Shape) {
         collapse()
     }
 }
+
+fun dynamicOf(vararg entries: Pair<String, *>): dynamic {
+    val dyn = js("{}")
+    for ((key, value) in entries) {
+        dyn[key] = value
+    }
+    return dyn
+}
