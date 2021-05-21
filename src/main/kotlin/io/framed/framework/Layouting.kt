@@ -10,7 +10,7 @@ import io.framed.framework.pictogram.Shape
  */
 object Layouting {
     fun autoLayout(container: BoxShape, connections: Set<Connection>, modelLinker: ModelLinker<*, *, *>) {
-        val graph = Dagre.getGraph()
+        val graph = Graph()
         graph.setDefaultEdgeLabel()
         graph.setGraph(dagreGraphOptions {
             nodesep = 50

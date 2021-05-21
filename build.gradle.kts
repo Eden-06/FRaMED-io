@@ -51,6 +51,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
 
     implementation(npm("jsplumb", "2.15.5"))
+    implementation(npm("dagre", "0.8.5"))
     implementation(devNpm("sass", "1.33.0"))
 }
 
