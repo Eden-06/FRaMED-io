@@ -1,6 +1,5 @@
 import java.text.SimpleDateFormat
-import java.util.TimeZone
-import java.util.Date
+import java.util.*
 
 plugins {
     kotlin("js") version "1.5.0"
@@ -71,7 +70,6 @@ val generateBuildInformation = tasks.create("generateBuildInformation") {
     doLast {
         val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
         format.timeZone = TimeZone.getTimeZone("UTC")
-        val buildTime = format.format(Date())
 
         @Suppress("UNCHECKED_CAST") val git = project.ext["gitProps"] as Map<String, String>
 
@@ -99,6 +97,8 @@ val generateBuildInformation = tasks.create("generateBuildInformation") {
         )
     }
 
+    outputs.upToDateWhen { false }
+    outputs.cacheIf { false }
     outputs.files(webpackFile)
 }
 
