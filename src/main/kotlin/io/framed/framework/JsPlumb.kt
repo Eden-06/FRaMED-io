@@ -17,8 +17,8 @@ import org.w3c.dom.svg.SVGSVGElement
 /**
  * jsPlumb root object.
  */
-@JsName("jsPlumb")
-@JsModule("jsPlumb")
+@JsName("jsplumb")
+@JsModule("jsplumb")
 @JsNonModule
 external object JsPlumb {
     @JsName("jsPlumb")
