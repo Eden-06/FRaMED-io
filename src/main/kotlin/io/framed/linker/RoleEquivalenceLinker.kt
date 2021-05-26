@@ -13,18 +13,18 @@ import io.framed.framework.view.FramedIcon
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
-import io.framed.model.Implication
+import io.framed.model.RoleEquivalence
 
 /**
- * ImplicationLinker for the Implication role connection.
+ * EquivalenceLinker for the Equivalence role connection.
  *
  * @author David Oberacker
  */
 
-class ImplicationLinker(
-        override val model: Implication,
-        override val manager: ConnectionManager
-) : ConnectionLinker<Implication> {
+class RoleEquivalenceLinker(
+    override val model: RoleEquivalence,
+    override val manager: ConnectionManager
+) : ConnectionLinker<RoleEquivalence> {
 
     override val nameProperty = property(model::name).trackHistory()
     override val name by nameProperty
@@ -37,10 +37,20 @@ class ImplicationLinker(
             stroke = Color(0, 0, 0)
             strokeWidth = 1
 
-            dashArray = arrayOf(5, 5)
+            dashArray = arrayOf(4, 4)
         }
 
-        sourceStyle = null
+        sourceStyle = connectionEnd {
+            width = 15
+            length = 15
+            foldback = 1.0
+            direction = -1
+            location = 0.0
+            paintStyle {
+                stroke = Color(0, 0, 0)
+                strokeWidth = 1
+            }
+        }
         targetStyle = connectionEnd {
             width = 15
             length = 15
@@ -48,13 +58,12 @@ class ImplicationLinker(
             paintStyle {
                 stroke = Color(0, 0, 0)
                 strokeWidth = 1
-                fill = Color(255, 255, 255)
             }
         }
     }
 
     override val sidebar = sidebar {
-        title("Role Implication")
+        title("Role Equivalence")
 
         group("General") {
             input("Name", nameProperty)
@@ -62,7 +71,7 @@ class ImplicationLinker(
     }
 
     override val contextMenu = contextMenu {
-        title = "Connection"
+        title = "Role Equivalence"
         addItem(MaterialIcon.DELETE, "Delete") {
             delete()
         }
@@ -88,26 +97,29 @@ class ImplicationLinker(
     }
 
     init {
-        LinkerManager.setup(this, ImplicationLinker)
+        LinkerManager.setup(this, RoleEquivalenceLinker)
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ElementInfo("Implication", FramedIcon.IMPLICATION)
+        override val info = ElementInfo("Role Equivalence", FramedIcon.EQUIVALENCE)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is RoleTypeLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) && target is RoleTypeLinker && source != target
+            return canStart(source) &&
+                    target is RoleTypeLinker &&
+                    source != target &&
+                    source.parent == target.parent
         }
 
-        override fun isLinkerFor(element: ModelConnection): Boolean = element is Implication
-        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is ImplicationLinker
+        override fun isLinkerFor(element: ModelConnection): Boolean = element is RoleEquivalence
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is RoleEquivalenceLinker
 
-        override fun createModel(source: Long, target: Long): ModelConnection = Implication(source, target)
+        override fun createModel(source: Long, target: Long): ModelConnection = RoleEquivalence(source, target)
         override fun createLinker(model: ModelConnection, connectionManager: ConnectionManager): ConnectionLinker<*> =
-            if (model is Implication) ImplicationLinker(model, connectionManager)
+            if (model is RoleEquivalence) RoleEquivalenceLinker(model, connectionManager)
             else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
     }
 }

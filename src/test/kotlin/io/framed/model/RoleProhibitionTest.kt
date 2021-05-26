@@ -9,34 +9,34 @@ import kotlin.test.*
  * This tests setup relies on the companion object variable of the ModelElement for the id counting.
  * This can result in failures in test execution.
  *
- * @see Prohibition
+ * @see RoleProhibition
  * @author David Oberacker
  */
-class ProhibitionTest {
+class RoleProhibitionTest {
 
-    private var prohibition1 : Prohibition? = null
-    private var prohibition2 : Prohibition? = null
-    private var prohibition3 : Prohibition? = null
+    private var roleProhibition1 : RoleProhibition? = null
+    private var roleProhibition2 : RoleProhibition? = null
+    private var roleProhibition3 : RoleProhibition? = null
 
     @BeforeTest
     fun setUpTest() {
         ModelElement.lastId = 0
 
-        prohibition1 = Prohibition()
-        prohibition2 = Prohibition(10, 100)
-        prohibition3 = Prohibition()
+        roleProhibition1 = RoleProhibition()
+        roleProhibition2 = RoleProhibition(10, 100)
+        roleProhibition3 = RoleProhibition()
     }
 
     @AfterTest
     fun tearDownTest() {
-        prohibition1 = null
-        prohibition2 = null
-        prohibition3 = null
+        roleProhibition1 = null
+        roleProhibition2 = null
+        roleProhibition3 = null
     }
 
     @Test
     fun constructorTest() {
-        prohibition1?.let { pro: Prohibition ->
+        roleProhibition1?.let { pro: RoleProhibition ->
             assertEquals( "", pro.name,
                 "The initial default name does not match")
             assertEquals( 0, pro.sourceId,
@@ -47,7 +47,7 @@ class ProhibitionTest {
             fail("Prohibition1 object is null. Test setup failed")
         }
 
-        prohibition2?.let { pro: Prohibition ->
+        roleProhibition2?.let { pro: RoleProhibition ->
             assertEquals( 10, pro.sourceId,
                 "The explicitly set source id does not match")
             assertEquals( 100, pro.targetId,
@@ -56,7 +56,7 @@ class ProhibitionTest {
             fail("Prohibition2 object is null. Test setup failed")
         }
 
-        prohibition3?.let { pro: Prohibition ->
+        roleProhibition3?.let { pro: RoleProhibition ->
             assertEquals( 2, pro.sourceId,
                 "The counted up source id does not match")
             assertEquals( 2, pro.targetId,
@@ -69,7 +69,7 @@ class ProhibitionTest {
     @Test
     fun copyTest() {
 
-        prohibition1?.let { pro: Prohibition ->
+        roleProhibition1?.let { pro: RoleProhibition ->
             val prohibition4 = pro.copy()
 
             assertEquals(pro.name, prohibition4.name,

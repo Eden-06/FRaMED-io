@@ -13,7 +13,7 @@ import io.framed.framework.view.FramedIcon
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
-import io.framed.model.Prohibition
+import io.framed.model.RoleProhibition
 
 /**
  * ProhibitionLinker for the Prohibition role connection.
@@ -21,10 +21,10 @@ import io.framed.model.Prohibition
  * @author David Oberacker
  */
 
-class ProhibitionLinker(
-        override val model: Prohibition,
-        override val manager: ConnectionManager
-) : ConnectionLinker<Prohibition> {
+class RoleProhibitionLinker(
+    override val model: RoleProhibition,
+    override val manager: ConnectionManager
+) : ConnectionLinker<RoleProhibition> {
 
     override val nameProperty = property(model::name).trackHistory()
     override val name by nameProperty
@@ -43,25 +43,23 @@ class ProhibitionLinker(
 
         sourceStyle = connectionEnd {
             width = 15
-            length = 15
-            foldback = 0.1
+            length = 1
+            foldback = 0.0
             paintStyle {
                 stroke = Color(0, 0, 0)
                 strokeWidth = 1
-                fill = Color(255, 255, 255)
             }
             location = 0.05
             direction = 1
         }
         targetStyle = connectionEnd {
             width = 15
-            length = 15
-            foldback = 0.1
+            length = 1
+            foldback = 0.0
 
             paintStyle {
                 stroke = Color(0, 0, 0)
                 strokeWidth = 1
-                fill = Color(255, 255, 255)
             }
             location = 0.95
             direction = -1
@@ -77,7 +75,7 @@ class ProhibitionLinker(
     }
 
     override val contextMenu = contextMenu {
-        title = "Connection"
+        title = "Role Prohibition"
         addItem(MaterialIcon.DELETE, "Delete") {
             delete()
         }
@@ -103,26 +101,29 @@ class ProhibitionLinker(
     }
 
     init {
-        LinkerManager.setup(this, ProhibitionLinker)
+        LinkerManager.setup(this, RoleProhibitionLinker)
     }
 
     companion object : LinkerInfoConnection {
-        override val info = ElementInfo("Prohibition", FramedIcon.PROHIBITION)
+        override val info = ElementInfo("Role Prohibition", FramedIcon.PROHIBITION)
 
         override fun canStart(source: Linker<*, *>): Boolean {
             return source is RoleTypeLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) && target is RoleTypeLinker && source != target
+            return canStart(source) &&
+                    target is RoleTypeLinker &&
+                    source != target &&
+                    source.parent == target.parent
         }
 
-        override fun isLinkerFor(element: ModelConnection): Boolean = element is Prohibition
-        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is ProhibitionLinker
+        override fun isLinkerFor(element: ModelConnection): Boolean = element is RoleProhibition
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is RoleProhibitionLinker
 
-        override fun createModel(source: Long, target: Long): ModelConnection = Prohibition(source, target)
+        override fun createModel(source: Long, target: Long): ModelConnection = RoleProhibition(source, target)
         override fun createLinker(model: ModelConnection, connectionManager: ConnectionManager): ConnectionLinker<*> =
-            if (model is Prohibition) ProhibitionLinker(model, connectionManager)
+            if (model is RoleProhibition) RoleProhibitionLinker(model, connectionManager)
             else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
     }
 }

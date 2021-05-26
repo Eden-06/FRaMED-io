@@ -10,33 +10,33 @@ import kotlin.test.*
  * It alters the value of the global counter to the value 0 before each test.
  * This side effect has to be recognized by other tests.
  *
- * @see Implication
+ * @see RoleImplication
  * @author David Oberacker
  */
-class ImplicationTest {
-    private var implication1 : Implication? = null
-    private var implication2 : Implication? = null
-    private var implication3 : Implication? = null
+class RoleImplicationTest {
+    private var roleImplication1 : RoleImplication? = null
+    private var roleImplication2 : RoleImplication? = null
+    private var roleImplication3 : RoleImplication? = null
 
     @BeforeTest
     fun setUpTest() {
         ModelElement.lastId = 0
 
-        implication1 = Implication()
-        implication2 = Implication(99, 76)
-        implication3 = Implication()
+        roleImplication1 = RoleImplication()
+        roleImplication2 = RoleImplication(99, 76)
+        roleImplication3 = RoleImplication()
     }
 
     @AfterTest
     fun tearDownTest() {
-        implication1 = null
-        implication2 = null
-        implication3 = null
+        roleImplication1 = null
+        roleImplication2 = null
+        roleImplication3 = null
     }
 
     @Test
     fun constructorTest() {
-        implication1?.let { it: Implication ->
+        roleImplication1?.let { it: RoleImplication ->
             assertEquals( "", it.name,
                 "The initial default name does not match")
             assertEquals( 0, it.sourceId,
@@ -47,7 +47,7 @@ class ImplicationTest {
             fail("Implication1 object is null. Test setup failed")
         }
 
-        implication2?.let { it: Implication ->
+        roleImplication2?.let { it: RoleImplication ->
             assertEquals( 99, it.sourceId,
                 "The explicitly set source id does not match")
             assertEquals( 76, it.targetId,
@@ -56,7 +56,7 @@ class ImplicationTest {
             fail("Implication2 object is null. Test setup failed")
         }
 
-        implication3?.let { it: Implication ->
+        roleImplication3?.let { it: RoleImplication ->
             assertEquals( 2, it.sourceId,
                 "The counted up source id does not match")
             assertEquals( 2, it.targetId,
@@ -68,7 +68,7 @@ class ImplicationTest {
 
     @Test
     fun copyTest() {
-        implication1?.let { it: Implication ->
+        roleImplication1?.let { it: RoleImplication ->
             val inheritance4 = it.copy()
 
             assertEquals(it.name, inheritance4.name,

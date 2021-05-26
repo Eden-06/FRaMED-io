@@ -3,13 +3,15 @@ package io.framed.model
 import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
+
 /**
- * Role equivalence.
+ * Role implication.
  *
  * @author David Oberacker
  */
 @Serializable
-class Equivalence() : ModelConnection() {
+class RoleImplication() : ModelConnection() {
+
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId
         this.targetId = targetId
@@ -20,7 +22,7 @@ class Equivalence() : ModelConnection() {
      */
     var name: String = ""
 
-    override fun copy() = Equivalence().also { new ->
+    override fun copy() = RoleImplication().also { new ->
         new.name = name
     }
 }

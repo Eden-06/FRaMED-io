@@ -5,9 +5,9 @@
   <path id="svg_1" stroke-width="2" stroke="#000000" fill="none" d="m14.31344,10.80313l2.0054,0"/>
   <path id="svg_7" stroke-width="2" stroke="#000000" fill="none" d="m7.24825,10.83919l2.42399,0"/>
   <path id="svg_8" stroke-width="2" stroke="#000000" fill="none" d="m10.73644,10.81786l2.19673,0"/>
-  <line transform="rotate(-45, 17.3315, 8.61579)" id="svg_12" y2="8.61255" x2="14.57973" y1="8.61904" x1="20.08318" stroke-width="2" stroke="#000000" fill="none"/>
-  <line transform="rotate(45, 17.4931, 12.9829)" id="svg_13" y2="12.97817" x2="14.77217" y1="12.98772" x1="20.21413" stroke-width="2" stroke="#000000" fill="none"/>
-  <line transform="rotate(45, 6.10161, 8.89018)" id="svg_16" y2="8.8854" x2="3.38063" y1="8.89495" x1="8.82259" stroke-width="2" stroke="#000000" fill="none"/>
-  <line transform="rotate(-45, 6.1104, 13.0496)" id="svg_17" y2="13.04639" x2="3.35872" y1="13.05287" x1="8.86217" stroke-width="2" stroke="#000000" fill="none"/>
+  <line transform="rotate(-90, 17.3315, 8.61579)" id="svg_12" y2="8.61255" x2="14.57973" y1="8.61904" x1="20.08318" stroke-width="2" stroke="#000000" fill="none"/>
+  <line transform="rotate(90, 17.3315, 12.9829)" id="svg_13" y2="12.97817" x2="14.77217" y1="12.98772" x1="20.21413" stroke-width="2" stroke="#000000" fill="none"/>
+  <line transform="rotate(90, 6.10161, 8.89018)" id="svg_16" y2="8.8854" x2="3.38063" y1="8.89495" x1="8.82259" stroke-width="2" stroke="#000000" fill="none"/>
+  <line transform="rotate(-90, 6.10161, 13.0496)" id="svg_17" y2="13.04639" x2="3.35872" y1="13.05287" x1="8.86217" stroke-width="2" stroke="#000000" fill="none"/>
  </g>
 </svg>

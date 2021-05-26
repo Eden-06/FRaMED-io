@@ -3,14 +3,13 @@ package io.framed.model
 import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
-
 /**
- * Role implication.
+ * Prohibition role constraint for role types.
  *
  * @author David Oberacker
  */
 @Serializable
-class Implication() : ModelConnection() {
+class RoleProhibition() : ModelConnection() {
 
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId
@@ -22,7 +21,7 @@ class Implication() : ModelConnection() {
      */
     var name: String = ""
 
-    override fun copy() = Implication().also { new ->
-        new.name = name
+    override fun copy() = RoleProhibition().also {
+            new -> new.name = name
     }
 }

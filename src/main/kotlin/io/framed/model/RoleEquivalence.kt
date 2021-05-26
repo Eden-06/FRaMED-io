@@ -4,13 +4,12 @@ import io.framed.framework.model.ModelConnection
 import kotlinx.serialization.Serializable
 
 /**
- * Prohibition role constraint for role types.
+ * Role equivalence.
  *
  * @author David Oberacker
  */
 @Serializable
-class Prohibition() : ModelConnection() {
-
+class RoleEquivalence() : ModelConnection() {
     constructor(sourceId: Long, targetId: Long): this() {
         this.sourceId = sourceId
         this.targetId = targetId
@@ -21,7 +20,7 @@ class Prohibition() : ModelConnection() {
      */
     var name: String = ""
 
-    override fun copy() = Prohibition().also {
-            new -> new.name = name
+    override fun copy() = RoleEquivalence().also { new ->
+        new.name = name
     }
 }
