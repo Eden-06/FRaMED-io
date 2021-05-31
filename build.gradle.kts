@@ -32,7 +32,16 @@ repositories {
 
 kotlin {
     js(IR) {
-        browser()
+        browser {
+            testTask {
+                enabled = true
+                useKarma {
+                    useFirefox()
+                    useChrome()
+                    useChromeHeadless()
+                }
+            }
+        }
         binaries.executable()
 
         compilations.all {

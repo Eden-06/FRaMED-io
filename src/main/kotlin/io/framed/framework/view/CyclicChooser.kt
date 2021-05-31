@@ -16,9 +16,7 @@ class CyclicChooser<T>(
 
     private fun calc(width: Double, height: Double, angle: Int): Point {
         val shortAngle = (angle % 360)
-
         val pi = (angle % 360) / 180.0 * PI
-
         val a = width / 2
         val b = height / 2
 
@@ -26,37 +24,32 @@ class CyclicChooser<T>(
         val signY = if (shortAngle in 0 until 180) -1 else 1
 
         val h = tan(pi)
-
         val x = signX * (a * b) / sqrt(b * b + a * a * h * h)
-
         val i = (x / a)
         val y = signY * sqrt(1 - i * i) * b
 
-
-
-        val x_tl = x - a
-        val y_tl = y + b
-
-        return Point(x_tl, y_tl)
+        return Point(x, y)
     }
 
     private fun keyListener(event: KeyboardEvent) {
-        when (event.keyCode) {
-            27 -> {
-                close()
-            }
-            37, 65 -> selectDirection(Direction.LEFT)
-            38, 87 -> selectDirection(Direction.UP)
-            39, 68 -> selectDirection(Direction.RIGHT)
-            40, 83 -> selectDirection(Direction.DOWN)
+
+        val keyCode = event.keyCode
+
+        if (keyCode == 27) {
+            close()
+        } else if (keyCode in 48..57) {
+            selectDirection(keyCode - 48)
         }
     }
 
     private var positionMap: Map<IntRange, View<*>> = emptyMap()
 
-    private fun selectDirection(direction: Direction) {
+    private fun selectDirection(index: Int) {
+        val part = 360 / data.size
+        val angle = (part * index) + 90
+
         positionMap.filterKeys {
-            direction.angle in it
+            angle in it
         }.values.firstOrNull()?.let {
             it.onClick.emit(js("{}"))
             close()
@@ -100,15 +93,13 @@ class CyclicChooser<T>(
 
             val part = 360 / views.size
             positionMap = views.mapIndexed { index, view ->
-                val angle = part * index
-
-                val pos = calc(width * 1.5* 1.8, height * 1.5*  2.4, angle)
-
+                val angle = (part * index) + 90
+                val pos = calc(width * 2.0, height * 6.0, angle)
                 view.top = pos.y
                 view.left = pos.x
 
-                view.marginTop = -(height / 2.0)
-                view.marginLeft = -(width / 2.0)
+                view.marginTop = -(height / 1.8)
+                view.marginLeft = -(width / 1.8)
 
                 view.width = width
                 view.height = height
@@ -119,11 +110,4 @@ class CyclicChooser<T>(
     }
 
     private fun Int.rangeBy(distance: Int): IntRange = (this - distance / 2)..(this + distance / 2)
-
-    enum class Direction(val angle: Int) {
-        LEFT(180),
-        UP(90),
-        RIGHT(0),
-        DOWN(270)
-    }
 }
