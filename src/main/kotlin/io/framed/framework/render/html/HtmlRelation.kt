@@ -243,7 +243,7 @@ class HtmlRelation(
                     stroke = style.paintStyle.stroke.toCss()
                     strokeWidth = style.paintStyle.strokeWidth
                     fill = style.paintStyle.fill.toCss()
-                }
+                },
                 "location" to style.location,
                 "direction" to style.direction,
             )))
@@ -258,10 +258,10 @@ class HtmlRelation(
                     stroke = style.paintStyle.stroke.toCss()
                     strokeWidth = style.paintStyle.strokeWidth
                     fill = style.paintStyle.fill.toCss()
-                }
+                },
                 "location" to style.location,
                 "direction" to style.direction,
-            }))
+            )))
         }
 
         connectInit.overlays = overlays.toTypedArray()

@@ -233,6 +233,8 @@ kotlin.target.browser {
     testTask {
         useKarma {
             useFirefox()
+            useChrome()
+            useChromeHeadless()
         }
     }
 }

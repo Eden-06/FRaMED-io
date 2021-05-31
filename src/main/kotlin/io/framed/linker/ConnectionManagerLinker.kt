@@ -9,7 +9,6 @@ import io.framed.framework.model.ModelConnection
 import io.framed.framework.pictogram.ElementInfo
 import io.framed.framework.util.LinkerConnectionBox
 import io.framed.framework.view.CyclicChooser
-import io.framed.framework.view.FramedIcon
 import io.framed.framework.view.iconView
 import io.framed.framework.view.textView
 import io.framed.model.Connections
@@ -40,7 +39,6 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
     override val onConnectionAdd = EventHandler<ConnectionLinker<*>>()
     override val onConnectionRemove = EventHandler<ConnectionLinker<*>>()
 
-    //TODO: Cleanup this code. The has to be a better design for this.
     override fun createConnection(source: Long, target: Long) {
         val types = canConnectionCreate(source, target)
         if (types.isEmpty()) return
@@ -48,45 +46,12 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
         if (types.size == 1) {
             createConnection(source, target, types.first())
         } else {
+            CyclicChooser(types) { type ->
+                iconView(type.icon)
+                textView(type.name)
 
-            val typeListPair = types.partition { type ->
-                type.name.contains("Equivalence") or
-                        type.name.contains("Implication") or
-                        type.name.contains("Prohibition")
-            }
-
-            if (typeListPair.first.isEmpty()) {
-                CyclicChooser(types) { type ->
-                    iconView(type.icon)
-                    textView(type.name)
-
-                    onClick {
-                        createConnection(source, target, type)
-                    }
-                }
-            } else {
-                val selectionList = mutableListOf<ElementInfo>()
-                selectionList.addAll(typeListPair.second)
-                selectionList.add(ElementInfo("Constraints", FramedIcon.PROHIBITION))
-
-                CyclicChooser(selectionList) { type ->
-                    iconView(type.icon)
-                    textView(type.name)
-
-                    onClick {
-                        if (type.name.matches("Constraints")) {
-                            CyclicChooser(typeListPair.first) { type ->
-                                iconView(type.icon)
-                                textView(type.name)
-
-                                onClick {
-                                    createConnection(source, target, type)
-                                }
-                            }
-                        } else {
-                            createConnection(source, target, type)
-                        }
-                    }
+                onClick {
+                    createConnection(source, target, type)
                 }
             }
         }
@@ -107,4 +72,3 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
         }
     }
 }
-

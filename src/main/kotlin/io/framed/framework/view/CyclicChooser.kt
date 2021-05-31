@@ -16,7 +16,9 @@ class CyclicChooser<T>(
 
     private fun calc(width: Double, height: Double, angle: Int): Point {
         val shortAngle = (angle % 360)
+
         val pi = (angle % 360) / 180.0 * PI
+
         val a = width / 2
         val b = height / 2
 
@@ -24,11 +26,18 @@ class CyclicChooser<T>(
         val signY = if (shortAngle in 0 until 180) -1 else 1
 
         val h = tan(pi)
+
         val x = signX * (a * b) / sqrt(b * b + a * a * h * h)
+
         val i = (x / a)
         val y = signY * sqrt(1 - i * i) * b
 
-        return Point(x, y)
+
+
+        val x_tl = x - a
+        val y_tl = y + b
+
+        return Point(x_tl, y_tl)
     }
 
     private fun keyListener(event: KeyboardEvent) {
@@ -92,7 +101,9 @@ class CyclicChooser<T>(
             val part = 360 / views.size
             positionMap = views.mapIndexed { index, view ->
                 val angle = part * index
-                val pos = calc(width * 1.8, height * 2.4, angle)
+
+                val pos = calc(width * 1.5* 1.8, height * 1.5*  2.4, angle)
+
                 view.top = pos.y
                 view.left = pos.x
 
