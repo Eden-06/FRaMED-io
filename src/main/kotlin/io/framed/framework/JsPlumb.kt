@@ -17,9 +17,12 @@ import org.w3c.dom.svg.SVGSVGElement
 /**
  * jsPlumb root object.
  */
-@JsName("jsPlumb")
-external class JsPlumb {
-    companion object {
+@JsName("jsplumb")
+@JsModule("jsplumb")
+@JsNonModule
+external object JsPlumb {
+    @JsName("jsPlumb")
+    object JsPlumb {
         /**
          * Create a new jsPlumb instance.
          *

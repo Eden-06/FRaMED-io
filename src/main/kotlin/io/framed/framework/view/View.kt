@@ -11,7 +11,7 @@ import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.get
 import org.w3c.dom.set
-import kotlin.browser.document
+import kotlinx.browser.document
 import kotlin.dom.addClass
 import kotlin.dom.removeClass
 

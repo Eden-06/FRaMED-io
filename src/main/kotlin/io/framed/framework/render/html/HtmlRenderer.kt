@@ -16,7 +16,7 @@ import io.framed.framework.util.point
 import io.framed.framework.view.*
 import org.w3c.dom.get
 import org.w3c.dom.set
-import kotlin.browser.window
+import kotlinx.browser.window
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -214,14 +214,14 @@ class HtmlRenderer(
                 Point(topLeft.x + view.width, topLeft.y + view.height)
         ).map { it to snapPoint(it, SnapDirection.BOTH, parent, ignore, otherViews) }
 
-        val (sourceX, snapX) = points.minBy { (point, result) ->
+        val (sourceX, snapX) = points.minByOrNull { (point, result) ->
             if (result.snapToViewX) {
                 abs(point.x - result.point.x)
             } else {
                 Double.MAX_VALUE
             }
         } ?: points.first()
-        val (sourceY, snapY) = points.minBy { (point, result) ->
+        val (sourceY, snapY) = points.minByOrNull { (point, result) ->
             if (result.snapToViewY) {
                 abs(point.y - result.point.y)
             } else {
@@ -310,7 +310,7 @@ class HtmlRenderer(
                         }
                         .filter { it.delta < threshold }
                 if (foundX.isNotEmpty()) {
-                    val (_, min, _) = foundX.minBy { it.delta } ?: foundX.first()
+                    val (_, min, _) = foundX.minByOrNull { it.delta } ?: foundX.first()
                     newPx = min.x
 
                     snapToViewX = true
@@ -325,7 +325,7 @@ class HtmlRenderer(
                         }
                         .filter { it.delta < threshold }
                 if (foundY.isNotEmpty()) {
-                    val (_, min, _) = foundY.minBy { it.delta } ?: foundY.first()
+                    val (_, min, _) = foundY.minByOrNull { it.delta } ?: foundY.first()
                     newPy = min.y
 
                     snapToViewY = true

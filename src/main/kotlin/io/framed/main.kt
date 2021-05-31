@@ -5,7 +5,10 @@ import io.framed.framework.linker.LinkerManager
 import io.framed.framework.util.loadAjaxFile
 import io.framed.framework.view.Application
 import io.framed.linker.*
-import kotlin.browser.window
+import io.framed.model.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.browser.window
 
 /**
  * Entry point of the application.

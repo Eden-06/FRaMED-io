@@ -9,6 +9,6 @@ class Connections {
     var connections: Set<ModelConnection> = emptySet()
 
     fun maxId(): Long = listOfNotNull(
-            connections.maxBy { it.id }?.id
-    ).max() ?: 0
+            connections.maxByOrNull { it.id }?.id
+    ).maxOrNull() ?: 0
 }

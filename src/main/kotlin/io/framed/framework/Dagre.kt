@@ -4,24 +4,15 @@ package io.framed.framework
  * The class connects the Dagre-library to the middleware.
  * @author Sebastian
  */
-class Dagre {
-    companion object {
-        /**
-         * Get a new directed Dagre Graph.
-         */
-        @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-        fun getGraph(): DagreGraph {
-            return js("new dagre.graphlib.Graph()") as DagreGraph
-        }
 
-        /**
-         * The method sorts all nodes according to the current options.
-         */
-        @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-        fun layout(graph: DagreGraph) {
-            js("dagre").layout(graph)
-        }
-    }
+/**
+ * The method sorts all nodes according to the current options.
+ */
+@JsModule("dagre")
+@JsNonModule
+@JsName("dagre")
+external object Dagre {
+    fun layout(graph: DagreGraph)
 }
 
 /**
@@ -35,6 +26,7 @@ external interface DagreEdge {
     var minlen: Int
     var sourceId: Long
     var targetId: Long
+
     /**
      * The weight to assign edges. Higher weight edges are generally made shorter and straighter than lower weight edges.
      */
@@ -94,26 +86,32 @@ external interface DagreGraphOptions {
      * Alignment for rank nodes. Can be UL, UR, DL, or DR, where U = up, D = down, L = left, and R = right.
      */
     var align: DagreGraphAlign
+
     /**
      * Number of pixels to use as a margin around the left and right of the graph.
      */
     var marginx: Int
+
     /**
      * Number of pixels to use as a margin around the top and bottom of the graph.
      */
     var marginy: Int
+
     /**
      * Number of pixels that separate nodes horizontally in the layout.
      */
     var nodesep: Int
+
     /**
      * Direction for rank nodes. Can be TB, BT, LR, or RL, where T = top, B = bottom, L = left, and R = right.
      */
     var rankdir: String
+
     /**
      * Type of algorithm to assigns a rank to each node in the input graph. Possible values: `network-simplex`, `tight-tree` or `longest-path`
      */
     var ranker: String
+
     /**
      * Number of pixels between each rank in the layout.
      */
@@ -155,8 +153,10 @@ external interface DagreNodeOptions {
     var width: Double
     var height: Double
     var label: String
+
     @JsName("y")
     var top: Double
+
     @JsName("x")
     var left: Double
 }
@@ -169,6 +169,7 @@ external interface DagreOutputGraph {
      * height of the output graph
      */
     var height: Double
+
     /**
      * width of the output graph
      */

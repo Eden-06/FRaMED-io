@@ -10,7 +10,6 @@ import io.framed.framework.ControllerManager
 import io.framed.framework.render.html.HtmlRenderer
 import io.framed.framework.util.*
 import org.w3c.dom.HTMLDivElement
-import kotlin.js.Date
 import kotlin.math.roundToInt
 
 /**
@@ -67,15 +66,15 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
 
         //Left block
         action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_IN, "Zoom in", Shortcut("+", Shortcut.Modifier.CTRL)) { _ ->
-            val nextStep = NavigationView.zoomSteps.asSequence().filter { it > zoom }.min()
-                    ?: NavigationView.zoomSteps.max()
+            val nextStep = NavigationView.zoomSteps.asSequence().filter { it > zoom }.minOrNull()
+                ?: NavigationView.zoomSteps.maxOrNull()
             if (nextStep != null) {
                 renderer.zoom = nextStep
             }
         }
         action(ToolBar.Side.LEFT, MaterialIcon.ZOOM_OUT, "Zoom out", Shortcut("-", Shortcut.Modifier.CTRL)) { _ ->
-            val nextStep = NavigationView.zoomSteps.asSequence().filter { it < zoom }.max()
-                    ?: NavigationView.zoomSteps.min()
+            val nextStep = NavigationView.zoomSteps.asSequence().filter { it < zoom }.maxOrNull()
+                ?: NavigationView.zoomSteps.minOrNull()
             if (nextStep != null) {
                 renderer.zoom = nextStep
             }
@@ -87,7 +86,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                 History.undo()
             }
         }.inactiveProperty.bind(!History.canUndoProperty)
-        action(ToolBar.Side.LEFT, MaterialIcon.REDO, "Redo", Shortcut("Z", Shortcut.Modifier.CTRL, Shortcut.Modifier.SHIFT)) { _ ->
+        action(
+            ToolBar.Side.LEFT,
+            MaterialIcon.REDO,
+            "Redo",
+            Shortcut("Z", Shortcut.Modifier.CTRL, Shortcut.Modifier.SHIFT)
+        ) { _ ->
             if (History.canRedo) {
                 History.redo()
             }
@@ -128,7 +132,6 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
             renderer.snapToView = !renderer.snapToView
         }.inactiveProperty.bind(!renderer.snapToViewProperty)
     }
-
     private val menuBar = menuBar {
         menu("Project") {
             item(null, "New…") {
@@ -186,6 +189,7 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                 }
             }
             item(MaterialIcon.INFO_OUTLINE, "About") {
+
                 dialog {
                     title = "About - FRaMED-io"
 
@@ -193,18 +197,12 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
                         classes += "about"
                         textView("Version")
                         listView {
-                            loadAjaxFile("version") {
-                                val data = it.split("\n", limit=3)
-                                textView(data[0])
-                                try {
-                                    textView(Date(data[1]).toLocaleString())
-                                    //textView(data[2])
-                                } catch (e: Exception){}
-
-                                open()
-                            }
+                            textView(vcsCommitHash + if (vcsDirty) " - dirty" else "")
+                            textView(vcsCommitTime)
                         }
                     }
+
+                    open()
 
                     addButton("Close", true) {
                         close()
@@ -304,4 +302,32 @@ object Application : ViewCollection<View<*>, HTMLDivElement>("div") {
      */
     fun init() {
     }
+
+
+    @Suppress("unused")
+    val vcsBranch = js("VCS_BRANCH").unsafeCast<String>()
+
+    @Suppress("unused")
+    val vcsCommitHash = js("VCS_COMMIT_HASH").unsafeCast<String>()
+
+    @Suppress("unused")
+    val vcsCommitMessage = js("VCS_COMMIT_MESSAGE").unsafeCast<String>()
+
+    @Suppress("unused")
+    val vcsCommitTime = js("VCS_COMMIT_TIME").unsafeCast<String>()
+
+    @Suppress("unused")
+    val vcsTags = js("VCS_TAGS").unsafeCast<String>()
+
+    @Suppress("unused")
+    val vcsLastTag = js("VCS_LAST_TAG").unsafeCast<String>()
+
+    @Suppress("unused")
+    val vcsLastTagDiff = js("VCS_LAST_TAG_DIFF").unsafeCast<String>()
+
+    @Suppress("unused")
+    val vcsDirty = js("VCS_DIRTY").unsafeCast<String>().toBoolean()
+
+    @Suppress("unused")
+    val vcsCommitCount = js("VCS_COMMIT_COUNT").unsafeCast<String>().toInt()
 }

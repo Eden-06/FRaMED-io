@@ -14,7 +14,7 @@ class Border(
     enum class BorderStyle {
         SOLID, DASHED, NONE;
 
-        override fun toString(): String = name.toLowerCase()
+        override fun toString(): String = name.lowercase()
     }
 
     //fun toCss(): String = "$style ${width}px ${color.toCss()}"

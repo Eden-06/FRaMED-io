@@ -38,9 +38,9 @@ class RoleType() : ModelElement() {
 
     override fun maxId(): Long = listOf(
             id,
-            attributes.map { it.maxId() }.max() ?: 0,
-            methods.map { it.maxId() }.max() ?: 0
-    ).max() ?: id
+            attributes.map { it.maxId() }.maxOrNull() ?: 0,
+            methods.map { it.maxId() }.maxOrNull() ?: 0
+    ).maxOrNull() ?: id
 
     override fun copy() = RoleType { new ->
         new.name = name

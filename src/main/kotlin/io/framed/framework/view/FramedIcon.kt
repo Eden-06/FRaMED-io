@@ -2,7 +2,7 @@ package io.framed.framework.view
 
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLImageElement
-import kotlin.browser.document
+import kotlinx.browser.document
 
 /**
  * List of material design icons.

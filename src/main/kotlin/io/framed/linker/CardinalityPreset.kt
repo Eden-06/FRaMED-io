@@ -9,7 +9,7 @@ enum class CardinalityPreset(val symbol: String) {
 
     ONCE_TO_MANY("1..*");
 
-    override fun toString(): String = name.toLowerCase().replace("_", " ")
+    override fun toString(): String = name.lowercase().replace("_", " ")
 
     companion object {
         val STRING_VALUES = values().map { it.symbol }

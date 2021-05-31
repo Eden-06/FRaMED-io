@@ -63,8 +63,8 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
         val connectionCount = connectionManager.listConnections(elementLinker.id).size
 
-        val elementName = elementLinker.model::class.simpleName?.toLowerCase() ?: "element"
-        val targetName = targetLinker.model::class.simpleName?.toLowerCase() ?: "container"
+        val elementName = elementLinker.model::class.simpleName?.lowercase() ?: "element"
+        val targetName = targetLinker.model::class.simpleName?.lowercase() ?: "container"
 
         if (connectionCount > 0) {
             dialog {
@@ -286,9 +286,9 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
                     // Find the nearest intersection to the outer element
                     val nearest = if (source.id == id) {
-                        points.minBy { it.distance(t) }
+                        points.minByOrNull { it.distance(t) }
                     } else {
-                        points.minBy { it.distance(s) }
+                        points.minByOrNull { it.distance(s) }
                     }
 
                     // Set the position

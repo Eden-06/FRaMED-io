@@ -28,7 +28,7 @@ class AttributeDelegate<T : Any>(
                 } as T?
             } ?: default
 
-    private fun getParamName(property: KProperty<*>): String = paramName ?: property.name.toLowerCase()
+    private fun getParamName(property: KProperty<*>): String = paramName ?: property.name.lowercase()
 
     operator fun getValue(container: Any, property: KProperty<*>): T = element?.let {
         getAttribute(it, property)

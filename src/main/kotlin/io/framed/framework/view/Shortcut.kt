@@ -11,18 +11,18 @@ data class Shortcut(
     constructor(letter: String, vararg modifiers: Modifier) : this(letter, modifiers.toSet())
 
     fun match(event: KeyboardEvent): Boolean {
-        //println("'${event.key.toUpperCase()}' == '${letter.toUpperCase()}' -> ${event.key.toUpperCase() == letter.toUpperCase()}")
+        //println("'${event.key.uppercase()}' == '${letter.uppercase()}' -> ${event.key.uppercase() == letter.uppercase()}")
         //println("Ctrl: ${event.ctrlKey} == ${Modifier.CTRL in modifiers} -> ${event.ctrlKey == Modifier.CTRL in modifiers}")
         //println("Alt: ${event.altKey} == ${Modifier.ALT in modifiers} -> ${event.altKey == Modifier.ALT in modifiers}")
         //println("Shift: ${event.shiftKey} == ${Modifier.SHIFT in modifiers} -> ${event.shiftKey == Modifier.SHIFT in modifiers}")
-        return event.key.toUpperCase() == letter.toUpperCase() &&
+        return event.key.uppercase() == letter.uppercase() &&
                 event.ctrlKey == Modifier.CTRL in modifiers &&
                 event.altKey == Modifier.ALT in modifiers &&
                 event.shiftKey == Modifier.SHIFT in modifiers
     }
 
     private fun formatLetter(): String {
-        val lower = letter.toLowerCase()
+        val lower = letter.lowercase()
 
         return when (lower) {
             "+" -> "Plus"
@@ -31,14 +31,15 @@ data class Shortcut(
             "arrowright" -> "Right"
             "arrowup" -> "Up"
             "arrowdown" -> "Down"
-            else -> lower.capitalize()
+            else -> lower.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
         }
     }
 
     fun description(description: String) = this.copy(description = description)
 
     override fun toString(): String =
-            (modifiers.sortedBy { it.priority }.map { it.name.toLowerCase().capitalize() } +
+            (modifiers.sortedBy { it.priority }.map { it.name.lowercase()
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } } +
                     listOf(formatLetter()))
                     .joinToString("+")
 
