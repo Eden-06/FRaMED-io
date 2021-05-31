@@ -18,6 +18,7 @@ install:
   - ./gradlew --info kotlinNpmInstall
 script:
   - ./gradlew --info dist
+  - ./gradlew --info test
 deploy:
   provider: pages
   skip_cleanup: true
