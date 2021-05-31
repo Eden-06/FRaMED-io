@@ -6,7 +6,7 @@ import io.framed.framework.util.async
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.inputView
-import kotlin.browser.document
+import kotlinx.browser.document
 import kotlin.math.max
 
 class HtmlTextShape(

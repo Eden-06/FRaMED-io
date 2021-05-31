@@ -1,15 +1,24 @@
 language: java
 jdk:
   - openjdk11
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 before_install:
   - chmod +x gradlew
   - chmod +x gradle/wrapper/gradle-wrapper.jar
+install:
+  - ./gradlew --info kotlinNpmInstall
 script:
-  - ./gradlew build
+  - ./gradlew --info dist
 deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
-  local_dir: web/website
+  local_dir: dist
   on:
     branch: master

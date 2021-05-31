@@ -5,7 +5,7 @@ import de.westermann.kobserve.event.EventHandler
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
-import kotlin.dom.clear
+import kotlinx.dom.clear
 
 /**
  * @author lars

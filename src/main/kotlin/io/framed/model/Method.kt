@@ -33,8 +33,8 @@ class Method() : ModelElement() {
 
     override fun maxId(): Long = listOf(
             id,
-            parameters.map { it.maxId() }.max() ?: 0
-    ).max() ?: id
+            parameters.map { it.maxId() }.maxOrNull() ?: 0
+    ).maxOrNull() ?: id
 
     override fun copy() = Method { new ->
         new.name = name

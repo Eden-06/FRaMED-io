@@ -1,7 +1,6 @@
 package io.framed.model
 
 import io.framed.framework.model.ModelElement
-import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
@@ -30,9 +29,9 @@ class Scene() : ModelElement() {
 
     override fun maxId(): Long = listOf(
             id,
-            attributes.map { it.maxId() }.max() ?: 0,
-            children.map { it.maxId() }.max() ?: 0
-            ).max() ?: id
+            attributes.map { it.maxId() }.maxOrNull() ?: 0,
+            children.map { it.maxId() }.maxOrNull() ?: 0
+            ).maxOrNull() ?: id
 
     override fun copy() = Scene { new ->
         new.name = name

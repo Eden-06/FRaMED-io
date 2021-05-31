@@ -46,7 +46,7 @@ interface ShapeLinker<M : ModelElement, P : Shape> : Linker<M, P> {
     fun getTypeSubset(partial: String): List<String> {
         val parent = parent
         return parent?.getTypeSubset(partial)
-                ?: subTypes.filter { it.toLowerCase().contains(partial.toLowerCase()) && it.isNotEmpty() }.take(8)
+                ?: subTypes.filter { it.lowercase().contains(partial.lowercase()) && it.isNotEmpty() }.take(8)
     }
 
     fun updateSize(allowDownsize: Boolean = false) {

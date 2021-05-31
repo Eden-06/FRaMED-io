@@ -1,15 +1,46 @@
+import java.text.SimpleDateFormat
+import java.util.*
+
 plugins {
-    kotlin("js") version "1.3.71"
-    kotlin("plugin.serialization") version "1.3.71"
-    id("com.github.node-gradle.node") version "2.2.3"
-    id("org.kravemir.gradle.sass") version "1.2.4"
+    kotlin("js") version "1.5.0"
+    kotlin("plugin.serialization") version "1.5.0"
+    id("com.gorylenko.gradle-git-properties") version "2.2.4"
 }
 
-apply(from = "version-file.gradle")
+@Suppress("LeakingThis")
+open class NodeExec : AbstractExecTask<NodeExec>(NodeExec::class.java) {
+
+    private val nodeJs = org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin.apply(project.rootProject)
+
+    private val e by lazy {
+        nodeJs.requireConfigured().nodeExecutable
+    }
+
+    override fun exec() {
+        executable = e
+        super.exec()
+    }
+
+    init {
+        dependsOn(nodeJs.npmInstallTaskProvider, "kotlinNpmInstall", "kotlinNodeJsSetup")
+    }
+}
 
 repositories {
-    jcenter()
     mavenCentral()
+}
+
+kotlin {
+    js(IR) {
+        browser()
+        binaries.executable()
+
+        compilations.all {
+            kotlinOptions {
+                moduleKind = "commonjs"
+            }
+        }
+    }
 }
 
 dependencies {
@@ -17,92 +48,175 @@ dependencies {
     implementation(kotlin("stdlib-js"))
 
     // Serialization library
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
 
-    // Observable library with EventHandler, Properties and ObservableLists
-    implementation("de.westermann:KObserve-js:0.9.3")
+    implementation(npm("jsplumb", "2.15.5"))
+    implementation(npm("dagre", "0.8.5"))
+    implementation(devNpm("sass", "1.33.0"))
 }
 
-// Config sass build
-sass {
-    create("main") {
-        srcDir = file("$projectDir/src/main/resources/public/stylesheets")
-        outDir = file("$buildDir/processedResources/Js/main/public/stylesheets/")
-
-        exclude = "**/*.css"
-    }
+gitProperties {
+    extProperty = "gitProps"
+    dateFormat = "yyyy-MM-dd HH:mm:ss z"
+    dateFormatTimeZone = "UTC"
 }
 
-// Config node js environment
-node {
-    download = true
-    workDir = file("${project.projectDir}/build/node")
-    npmWorkDir = file("${project.projectDir}/web")
-    nodeModulesDir = file("${project.projectDir}/web")
+val generateGitProperties = tasks.named<com.gorylenko.GenerateGitPropertiesTask>("generateGitProperties") {
+    outputs.upToDateWhen { false }
 }
 
-// Sass depends on processResources
-tasks.named("mainSass") {
-    dependsOn("processResources")
-}
-
-// jsJar depends on mainSass and versionFile
-// Remove duplicate entries
-val jsJar = tasks.named<Jar>("JsJar") {
-    dependsOn("mainSass", "versionFile")
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    from(Callable { configurations["runtimeClasspath"].map { if (it.isDirectory) it else zipTree(it) } })
-}
-
-// Copy content from jsJar to website
-tasks.create<Sync>("jsSync") {
-    dependsOn("JsJar")
-
-    from(Callable { zipTree(jsJar.get().archiveFile) })
-    into("${projectDir}/web/website")
-}
-
-// Copy content from jsJar to website
-tasks.create<Delete>("cleanWebsite") {
-    dependsOn("jsSync")
-
-    delete(fileTree("${projectDir}/web/website") {
-        include("**/*.kjsm", "**/*.class", "**/*.kn*", "**/*.kotlin_*", "META-INF/", "linkdata/module")
-    })
+val generateBuildInformation = tasks.create("generateBuildInformation") {
+    dependsOn("generateGitProperties")
+    val webpackFile = File("$projectDir/webpack.config.d/build.js")
 
     doLast {
-        val emptyDirs = mutableListOf<File>()
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+        format.timeZone = TimeZone.getTimeZone("UTC")
 
-        fileTree("${projectDir}/web/website").visit {
-            if (file.isDirectory) {
-                val children = fileTree(file).filter { it.isFile }.files
-                if (children.isEmpty()) {
-                    emptyDirs += file
-                }
-            }
-        }
+        @Suppress("UNCHECKED_CAST") val git = project.ext["gitProps"] as Map<String, String>
 
-        emptyDirs.asReversed().forEach { it.delete() }
+        webpackFile.writeText(
+            """
+            const webpack = require("webpack")
+
+            const definePlugin = new webpack.DefinePlugin(
+               {
+                  VCS_BRANCH: "\"${git["git.branch"]}\"",
+                  VCS_COMMIT_HASH: "\"${git["git.commit.id.abbrev"]}\"",
+                  VCS_COMMIT_MESSAGE: "\"${git["git.commit.message.short"]}\"",
+                  VCS_COMMIT_TIME: "\"${git["git.commit.time"]}\"",
+                  VCS_TAGS: "\"${git["git.tags"]}\"",
+                  VCS_LAST_TAG: "\"${git["git.closest.tag"] ?: ""}\"",
+                  VCS_LAST_TAG_DIFF: "\"${git["git.closest.tag.commit.count"]}\"",
+                  VCS_DIRTY: "\"${git["git.dirty"]}\"",
+                  VCS_COMMIT_COUNT: "\"${git["git.total.commit.count"]}\""
+               }
+            )
+
+            config.plugins.push(definePlugin)
+
+        """.trimIndent()
+        )
     }
+
+    outputs.upToDateWhen { false }
+    outputs.cacheIf { false }
+    outputs.files(webpackFile)
 }
 
-// Add task jsSync to build goal
-tasks.named("build") {
-    dependsOn("cleanWebsite")
+@Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+tasks.create<NodeExec>("compileSass") {
+    dependsOn("processResources")
+
+    args(
+        "$buildDir/js/node_modules/sass/sass.js",
+        "$projectDir/src/main/resources/public/stylesheets/style.scss",
+        "$buildDir/processedResources/js/main/public/stylesheets/style.css"
+    )
+
+    outputs.cacheIf { true }
+    inputs.dir(file("$projectDir/src/main/resources/public/stylesheets"))
+        .withPropertyName("stylesheets")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    outputs.file("$buildDir/processedResources/js/main/public/stylesheets/style.css")
+        .withPropertyName("style")
 }
 
-// Start dev server
-tasks.create<com.moowork.gradle.node.task.NodeTask>("run") {
-    dependsOn("build", "npmInstall")
-    script = file("web/index.js")
+tasks.named("browserDevelopmentExecutableDistributeResources") {
+    dependsOn("compileSass")
 }
 
-// Extend delete task to cleanup website
+tasks.named("browserProductionExecutableDistributeResources") {
+    dependsOn("compileSass")
+}
+
+tasks.named("developmentExecutableCompileSync") {
+    dependsOn("compileSass")
+}
+
+tasks.named("productionExecutableCompileSync") {
+    dependsOn("compileSass")
+}
+
+tasks.named("browserDevelopmentRun") {
+    dependsOn("compileSass")
+}
+
+tasks.named("browserProductionRun") {
+    dependsOn("compileSass")
+}
+
+tasks.named("jsJar") {
+    dependsOn("compileSass")
+}
+
+tasks.named("browserDevelopmentWebpack") {
+    dependsOn(generateBuildInformation)
+}
+
+tasks.named("browserProductionWebpack") {
+    dependsOn(generateBuildInformation)
+}
+
+tasks.create<Sync>("dist") {
+    dependsOn("browserProductionWebpack", "jsJar")
+
+    val file =
+        tasks.named("browserProductionWebpack")
+            .get().outputs.files.files.first { it.name == "${project.name}.js" }
+    val sourceMap = file.resolveSibling("${project.name}.js.map")
+    from(
+        file,
+        sourceMap,
+        Callable { zipTree(tasks.get("jsJar").outputs.files.first()) }
+    )
+
+    exclude(
+        "${project.name}-js/**",
+        "${project.name}-js.js",
+        "${project.name}-js.js.map",
+        "${project.name}-js.meta.js",
+        "package.json",
+        "META-INF/**",
+        "**/*.scss",
+        "default/**"
+    )
+
+    into("${projectDir}/dist/")
+}
+
+tasks.create<Sync>("distDevelopment") {
+    dependsOn("browserDevelopmentWebpack", "jsJar")
+
+    val file =
+        tasks.named("browserDevelopmentWebpack")
+            .get().outputs.files.files.first { it.name == "${project.name}.js" }
+    val sourceMap = file.resolveSibling("${project.name}.js.map")
+    from(
+        file,
+        sourceMap,
+        Callable { zipTree(tasks.get("jsJar").outputs.files.first()) }
+    )
+
+    exclude(
+        "${project.name}-js/**",
+        "${project.name}-js.js",
+        "${project.name}-js.js.map",
+        "${project.name}-js.meta.js",
+        "package.json",
+        "META-INF/**",
+        "**/*.scss",
+        "default/**"
+    )
+
+    into("${projectDir}/dist/")
+}
+
+tasks.create<Delete>("cleanDist") {
+    delete("dist")
+}
+
 tasks.named("clean") {
-    doFirst {
-        delete("web/website")
-        delete("web/node_modules")
-        delete("out")
-    }
+    dependsOn("cleanDist")
 }

@@ -1,8 +1,8 @@
 package io.framed.framework.view
 
 import de.westermann.kobserve.ReadOnlyProperty
+import kotlinx.dom.clear
 import org.w3c.dom.HTMLSpanElement
-import kotlin.dom.clear
 
 /**
  * Represents all kinds of icon views.

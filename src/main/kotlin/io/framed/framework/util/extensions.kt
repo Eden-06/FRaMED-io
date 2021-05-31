@@ -15,8 +15,8 @@ import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 import org.w3c.files.FileReader
 import org.w3c.xhr.XMLHttpRequest
-import kotlin.browser.document
-import kotlin.browser.window
+import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlin.math.roundToInt
 
 /**
@@ -28,7 +28,7 @@ import kotlin.math.roundToInt
  *
  * @return Dash cased string.
  */
-fun String.toDashCase() = this.replace("([a-z])([A-Z])".toRegex(), "$1-$2").toLowerCase()
+fun String.toDashCase() = this.replace("([a-z])([A-Z])".toRegex(), "$1-$2").lowercase()
 
 /**
  * Apply current dom changes and recalculate all sizes. Executes the given block afterwards.
@@ -111,7 +111,7 @@ inline fun <reified V : HTMLElement> createHtmlView(tag: String? = null): V {
     if (tag != null) {
         tagName = tag
     } else {
-        tagName = V::class.js.name.toLowerCase().replace("html([a-z]*)element".toRegex(), "$1")
+        tagName = V::class.js.name.lowercase().replace("html([a-z]*)element".toRegex(), "$1")
         if (tagName.isBlank()) {
             tagName = "div"
         }
@@ -202,4 +202,12 @@ fun Sidebar.advanced(pictogram: Shape) {
 
         collapse()
     }
+}
+
+fun dynamicOf(vararg entries: Pair<String, *>): dynamic {
+    val dyn = js("{}")
+    for ((key, value) in entries) {
+        dyn[key] = value
+    }
+    return dyn
 }

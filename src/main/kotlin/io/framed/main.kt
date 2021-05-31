@@ -12,7 +12,7 @@ import io.framed.linker.*
 import io.framed.model.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.modules.SerializersModule
-import kotlin.browser.window
+import kotlinx.browser.window
 
 /**
  * Entry point of the application.

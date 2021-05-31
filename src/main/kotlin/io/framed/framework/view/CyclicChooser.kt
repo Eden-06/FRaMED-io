@@ -83,8 +83,8 @@ class CyclicChooser<T>(
 
 
         async {
-            val height = (views.asSequence().map { it.clientHeight }.max() ?: 0).toDouble()
-            val width = (views.asSequence().map { it.clientWidth }.max() ?: 0).toDouble()
+            val height = (views.asSequence().map { it.clientHeight }.maxOrNull() ?: 0).toDouble()
+            val width = (views.asSequence().map { it.clientWidth }.maxOrNull() ?: 0).toDouble()
 
             container.left = Root.mousePosition.x
             container.top = Root.mousePosition.y
