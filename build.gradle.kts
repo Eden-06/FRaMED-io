@@ -31,7 +31,7 @@ repositories {
 }
 
 kotlin {
-    js(IR) {
+    js(LEGACY) {
         browser {
             testTask {
                 enabled = true
@@ -134,7 +134,7 @@ tasks.create<NodeExec>("compileSass") {
         .withPropertyName("style")
 }
 
-tasks.named("browserDevelopmentExecutableDistributeResources") {
+/*tasks.named("browserDevelopmentExecutableDistributeResources") {
     dependsOn("compileSass")
 }
 
@@ -148,7 +148,7 @@ tasks.named("developmentExecutableCompileSync") {
 
 tasks.named("productionExecutableCompileSync") {
     dependsOn("compileSass")
-}
+}*/
 
 tasks.named("browserDevelopmentRun") {
     dependsOn("compileSass")
@@ -232,18 +232,4 @@ tasks.named("clean") {
     dependsOn("cleanDist")
 }
 
-/*tasks.named("test") {
-    onlyIf {
-        project.hasProperty("runTests")
-    }
-}*/
 
-kotlin.target.browser {
-    testTask {
-        useKarma {
-            useFirefox()
-            useChrome()
-            useChromeHeadless()
-        }
-    }
-}

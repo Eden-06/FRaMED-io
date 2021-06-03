@@ -1,69 +1,68 @@
-package io.framed.model
+package io.framed.framework.model
 
-import io.framed.framework.model.ModelElement
+import io.framed.model.RoleEquivalence
+import io.framed.model.RoleImplication
+import io.framed.model.RoleProhibition
 import kotlin.test.*
 
-class RoleEquivalenceTest {
-    private var roleEquivalence1: RoleEquivalence? = null
-    private var roleEquivalence2: RoleEquivalence? = null
-    private var roleEquivalence3: RoleEquivalence? = null
+class ModelConnectionTest {
+
+    private var roleEquivalence: ModelConnection? = null
+    private var roleImplication: ModelConnection? = null
+    private var roleProhibition: ModelConnection? = null
 
     @BeforeTest
     fun setUpTest() {
         ModelElement.lastId = 0
 
-        roleEquivalence1 = RoleEquivalence()
-        roleEquivalence2 = RoleEquivalence(68, 44)
-        roleEquivalence3 = RoleEquivalence()
+        roleEquivalence = RoleEquivalence()
+        roleImplication = RoleImplication(68, 44)
+        roleProhibition = RoleProhibition()
     }
 
     @AfterTest
     fun tearDownTest() {
-        roleEquivalence1 = null
-        roleEquivalence2 = null
-        roleEquivalence3 = null
+        roleEquivalence = null
+        roleImplication = null
+        roleProhibition = null
     }
 
     @Test
     fun constructorTest() {
-        roleEquivalence1?.let { eqv: RoleEquivalence ->
-            assertEquals( "", eqv.name,
-                "The initial default name does not match")
+        roleEquivalence?.let { eqv: ModelConnection ->
             assertEquals( 0, eqv.sourceId,
                 "The initial source id does not match")
             assertEquals( 0, eqv.targetId,
                 "The initial target id does not match")
         } ?: run {
-            fail("Equivalence1 object is null. Test setup failed")
+            fail("RoleEquivalence object is null. Test setup failed")
         }
 
-        roleEquivalence2?.let { eqv: RoleEquivalence ->
+        roleImplication?.let { eqv: ModelConnection ->
             assertEquals( 68, eqv.sourceId,
                 "The explicitly set source id does not match")
             assertEquals( 44, eqv.targetId,
                 "The explicitly set source id does not match")
         } ?: run {
-            fail("Equivalence2 object is null. Test setup failed")
+            fail("RoleImplication object is null. Test setup failed")
         }
 
-        roleEquivalence3?.let { eqv: RoleEquivalence ->
+        roleProhibition?.let { eqv: ModelConnection ->
             assertEquals( 2, eqv.sourceId,
                 "The counted up source id does not match")
             assertEquals( 2, eqv.targetId,
                 "The counted up target id does not match")
         } ?: run {
-            fail("Equivalence3 object is null. Test setup failed")
+            fail("RoleProhibition object is null. Test setup failed")
         }
     }
 
     @Test
     fun copyTest() {
 
-        roleEquivalence1?.let { eqv: RoleEquivalence ->
+        roleEquivalence?.let { eqv: ModelConnection ->
             val equivalence4 = eqv.copy()
 
-            assertEquals(eqv.name, equivalence4.name,
-                "The copied named does not match")
             assertNotEquals(eqv.targetId, equivalence4.targetId,
                 "The copied target id does match the original id")
             assertNotEquals(eqv.sourceId, equivalence4.sourceId,
@@ -74,7 +73,8 @@ class RoleEquivalenceTest {
             assertEquals(3, equivalence4.targetId,
                 "The counted up target id does not match")
         } ?: run {
-            fail("Equivalence1 object is null. Test setup failed")
+            fail("RoleEquivalence object is null. Test setup failed")
         }
     }
+
 }
