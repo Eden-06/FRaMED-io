@@ -134,6 +134,10 @@ tasks.create<NodeExec>("compileSass") {
         .withPropertyName("style")
 }
 
+tasks.named("browserDistributeResources") {
+    dependsOn("compileSass")
+}
+
 /*tasks.named("browserDevelopmentExecutableDistributeResources") {
     dependsOn("compileSass")
 }
@@ -182,6 +186,7 @@ tasks.create<Sync>("dist") {
         sourceMap,
         Callable { zipTree(tasks.get("jsJar").outputs.files.first()) }
     )
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
     exclude(
         "${project.name}-js/**",

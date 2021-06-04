@@ -8,6 +8,7 @@ import kotlin.test.*
 
 class RoleProhibitionLinkerTest {
     private var roleProhibitionLinker1: RoleProhibitionLinker? = null
+    private var connectionManagerLinker: ConnectionManagerLinker? = null
 
     @BeforeTest
     fun setUpTest() {
@@ -16,8 +17,8 @@ class RoleProhibitionLinkerTest {
         val roleProhibition = RoleProhibition(1 ,2)
         roleProhibition.name =  "RoleProhibition1"
 
-        val packageLinker = ConnectionManagerLinker(Connections())
-        roleProhibitionLinker1 = RoleProhibitionLinker(roleProhibition, packageLinker)
+        connectionManagerLinker = ConnectionManagerLinker(Connections())
+        roleProhibitionLinker1 = RoleProhibitionLinker(roleProhibition, connectionManagerLinker!!)
     }
 
     @AfterTest
@@ -45,9 +46,9 @@ class RoleProhibitionLinkerTest {
 
     @Test
     fun canConnectTest() {
-        val connectionManager = ConnectionManagerLinker(Connections())
         val packageModel = Package()
-        val packageLinker = PackageLinker(packageModel, connectionManager)
+        val packageLinker = PackageLinker(packageModel, connectionManagerLinker!!)
+
         val role1 = RoleType()
         val roleLinker1 = RoleTypeLinker(role1, packageLinker)
 
@@ -59,6 +60,11 @@ class RoleProhibitionLinkerTest {
 
             assertTrue(RoleProhibitionLinker.canStart(roleLinker1))
             assertTrue(RoleProhibitionLinker.canStart(roleLinker2))
+            assertTrue(RoleProhibitionLinker.canCreate(roleLinker1, roleLinker2))
+
+            assertNotNull(RoleProhibitionLinker.createLinker(
+                RoleProhibitionLinker.createModel(role1.id, role2.id),
+                connectionManagerLinker!!))
 
         } ?: run {
             fail("RoleEquivalenceLinker object is null. Test setup failed")
