@@ -45,8 +45,7 @@ class CyclicChooser<T>(
     private var positionMap: Map<IntRange, View<*>> = emptyMap()
 
     private fun selectDirection(index: Int) {
-        val part = 360 / data.size
-        val angle = (part * index) + 90
+        val angle = ((360 / data.size) * index)
 
         positionMap.filterKeys {
             angle in it
@@ -93,10 +92,10 @@ class CyclicChooser<T>(
 
             val part = 360 / views.size
             positionMap = views.mapIndexed { index, view ->
-                val angle = (part * index) + 90
-                val pos = calc(width * 2.0, height * 6.0, angle)
-                view.top = pos.y
-                view.left = pos.x
+                val angle = (part * index)
+                val pos = calc(3.0 * width, 3.0 * height, angle)
+                view.top = pos.y - height
+                view.left = pos.x + width
 
                 view.marginTop = -(height / 1.8)
                 view.marginLeft = -(width / 1.8)
