@@ -91,11 +91,13 @@ class CyclicChooser<T>(
             container.top = Root.mousePosition.y
 
             val part = 360 / views.size
+            val scaling: Double = (views.size) / 1.5 // 3.0
+
             positionMap = views.mapIndexed { index, view ->
                 val angle = (part * index)
-                val pos = calc(3.0 * width, 3.0 * height, angle)
-                view.top = pos.y - height
-                view.left = pos.x + width
+                val pos = calc(scaling * width, scaling * height, angle)
+                view.top = pos.y
+                view.left = pos.x
 
                 view.marginTop = -(height / 1.8)
                 view.marginLeft = -(width / 1.8)
