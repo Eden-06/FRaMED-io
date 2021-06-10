@@ -91,7 +91,7 @@ class CyclicChooser<T>(
             container.top = Root.mousePosition.y
 
             val part = 360 / views.size
-            val scaling: Double = (views.size) / 1.5 // 3.0
+            val scaling: Double = (views.size) / 1.9 // 3.0
 
             positionMap = views.mapIndexed { index, view ->
                 val angle = (part * index)
