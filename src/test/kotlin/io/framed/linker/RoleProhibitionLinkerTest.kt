@@ -86,7 +86,7 @@ class RoleProhibitionLinkerTest {
             assertNotNull(linker.contextMenu)
 
         } ?: run {
-            fail("RoleEquivalenceLinker object is null. Test setup failed")
+            fail("RoleProhibitionLinker object is null. Test setup failed")
         }
     }
 
@@ -122,7 +122,7 @@ class RoleProhibitionLinkerTest {
                 }
             }
         } ?: run {
-            fail("RoleEquivalenceLinker object is null. Test setup failed")
+            fail("RoleProhibitionLinker object is null. Test setup failed")
         }
     }
 
@@ -183,7 +183,7 @@ class RoleProhibitionLinkerTest {
                 }
             }
         } ?: run {
-            fail("RoleEquivalenceLinker object is null. Test setup failed")
+            fail("RoleProhibitionLinker object is null. Test setup failed")
         }
     }
 
@@ -196,7 +196,7 @@ class RoleProhibitionLinkerTest {
             assertFalse(RoleProhibitionLinker.isLinkerFor(roleTypeLinker1!!))
             assertFalse(RoleProhibitionLinker.isLinkerFor(classTypeLinker!!))
         } ?: run {
-            fail("RoleEquivalenceLinker object is null. Test setup failed")
+            fail("RoleProhibitionLinker object is null. Test setup failed")
         }
     }
 
@@ -230,7 +230,7 @@ class RoleProhibitionLinkerTest {
                 }
             )
         } ?: run {
-            fail("RoleEquivalenceLinker object is null. Test setup failed")
+            fail("RoleProhibitionLinker object is null. Test setup failed")
         }
     }
 
@@ -244,23 +244,20 @@ class RoleProhibitionLinkerTest {
             assertEquals(roleType2!!.id, linker.sourceIdProperty.value, "Unexpected source id after swap!")
             assertEquals(roleType1!!.id, linker.targetIdProperty.value, "Unexpected target id after swap!")
         } ?: run {
-            fail("RoleEquivalenceLinker object is null. Test setup failed")
+            fail("RoleProhibitionLinker object is null. Test setup failed")
         }
     }
 
     @Test
     fun deleteTest() {
         roleProhibitionLinker1?.let { linker ->
-            connectionManagerLinker!!.connections.forEach { it ->
-                println("${it.id} ${it.name}")
-            }
             assertTrue(connectionManagerLinker!!.connections.contains(linker),
             "Linker not found in the connectionManagerLinker")
             linker.delete()
             assertFalse(connectionManagerLinker!!.connections.contains(linker),
                 "Deleted linker found in the connectionManagerLinker")
         } ?: run {
-            fail("RoleEquivalenceLinker object is null. Test setup failed")
+            fail("RoleProhibitionLinker object is null. Test setup failed")
         }
     }
 }

@@ -251,9 +251,6 @@ class RoleImplicationLinkerTest {
     @Test
     fun deleteTest() {
         roleImplicationLinker1?.let { linker ->
-            connectionManagerLinker!!.connections.forEach { it ->
-                println("${it.id} ${it.name}")
-            }
             assertTrue(connectionManagerLinker!!.connections.contains(linker),
             "Linker not found in the connectionManagerLinker")
             linker.delete()
