@@ -24,6 +24,8 @@ class ModelElementTest {
         roleEquivalence = null
         roleImplication = null
         roleProhibition = null
+
+        ModelElement.lastId = 0
     }
 
     @Test
