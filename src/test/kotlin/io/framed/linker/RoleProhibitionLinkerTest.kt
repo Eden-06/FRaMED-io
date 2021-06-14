@@ -216,7 +216,7 @@ class RoleProhibitionLinkerTest {
 
     @Test
     fun createLinkerTest() {
-        roleProhibitionLinker1?.let { linker ->
+        roleProhibitionLinker1?.let { _ ->
             assertNotNull(RoleProhibitionLinker.createLinker(
                 RoleProhibitionLinker.createModel(roleType1!!.id, roleType2!!.id),
                 connectionManagerLinker!!))

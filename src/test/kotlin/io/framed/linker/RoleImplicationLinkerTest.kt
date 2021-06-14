@@ -216,7 +216,7 @@ class RoleImplicationLinkerTest {
 
     @Test
     fun createLinkerTest() {
-        roleImplicationLinker1?.let { linker ->
+        roleImplicationLinker1?.let { _ ->
             assertNotNull(RoleImplicationLinker.createLinker(
                 RoleImplicationLinker.createModel(roleType1!!.id, roleType2!!.id),
                 connectionManagerLinker!!))

@@ -215,7 +215,7 @@ class RoleEquivalenceLinkerTest {
 
     @Test
     fun createLinkerTest() {
-        roleEquivalenceLinker1?.let { linker ->
+        roleEquivalenceLinker1?.let { _ ->
             assertNotNull(RoleEquivalenceLinker.createLinker(
                 RoleEquivalenceLinker.createModel(roleType1!!.id, roleType2!!.id),
                 connectionManagerLinker!!))

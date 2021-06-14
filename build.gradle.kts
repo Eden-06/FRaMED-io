@@ -36,7 +36,7 @@ kotlin {
             testTask {
                 enabled = true
                 useKarma {
-                    useFirefox()
+                    useChromeHeadless()
                     useChrome()
                 }
             }
