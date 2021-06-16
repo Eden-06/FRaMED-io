@@ -268,7 +268,7 @@ class RoleTypeLinker(
         override val info = ElementInfo("Role type", FramedIcon.ROLETYPE)
 
         override fun canCreateIn(container: ModelElement): Boolean {
-            return container is Compartment || container is Scene
+            return container is Compartment || container is Scene || container is RoleGroup
         }
 
         override fun isLinkerFor(element: ModelElement): Boolean = element is RoleType

@@ -44,6 +44,7 @@ fun init() {
     LinkerManager.register(ReturnEventLinker)
     LinkerManager.register(ClassLinker)
     LinkerManager.register(PackageLinker)
+    LinkerManager.register(RoleGroupLinker)
     LinkerManager.register(CompartmentLinker)
     LinkerManager.register(SceneLinker)
 

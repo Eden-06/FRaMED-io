@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" width="24" height="24">
+    <defs>
+        <path d="M1.5 3L3 3L3 4.69L1.5 4.69L1.5 3Z" id="b1Ytg0gchG"></path>
+        <path d="M1.5 7.37L3 7.37L3 10.63L1.5 10.63L1.5 7.37Z" id="bOgNDOwqf"></path>
+        <path d="M1.5 13.3L3 13.3L3 16.3L1.5 16.3L1.5 13.3Z" id="e2ATk6YUJn"></path>
+        <path d="M1.5 21L4.5 21L4.5 22.5L1.5 22.5L1.5 21Z" id="c1gMCRTuvW"></path>
+        <path d="M7.5 21L10.5 21L10.5 22.5L7.5 22.5L7.5 21Z" id="bWf7rX5zm"></path>
+        <path d="M13.5 21L16.5 21L16.5 22.5L13.5 22.5L13.5 21Z" id="a5GCNH8fT"></path>
+        <path d="M19.5 21L22.5 21L22.5 22.5L19.5 22.5L19.5 21Z" id="aaJad3UzmD"></path>
+        <path d="M21 19.5L22.5 19.5L22.5 22.5L21 22.5L21 19.5Z" id="a3VUb6sdTk"></path>
+        <path d="M21 13.73L22.5 13.73L22.5 16.5L21 16.5L21 13.73Z" id="a237X0erO2"></path>
+        <path d="M21 7.5L22.5 7.5L22.5 10.5L21 10.5L21 7.5Z" id="a1q5iQLcXl"></path>
+        <path d="M21 3L22.5 3L22.5 4.5L21 4.5L21 3Z" id="c61dyiF7Su"></path>
+        <path d="M7.5 1.5L10.5 1.5L10.5 3L7.5 3L7.5 1.5Z" id="iK4l2Gk5c"></path>
+        <path d="M13.5 1.5L16.5 1.5L16.5 3L13.5 3L13.5 1.5Z" id="cpvoaurkK"></path>
+        <path d="M19.5 1.5L22.5 1.5L22.5 3L19.5 3L19.5 1.5Z" id="eJecR2eQm"></path>
+        <path d="M2.38 11.39L2.38 11.39L2.38 11.61L2.38 11.61L2.38 11.39Z" id="a38ILrznrY"></path>
+        <path d="M1.5 1.5L4.5 1.5L4.5 3L1.5 3L1.5 1.5Z" id="b23rXFHMAw"></path>
+        <path d="M1.5 19.32L3 19.32L3 21.55L1.5 21.55L1.5 19.32Z" id="b9BSIgdxP"></path>
+        <path d="M16.69 11.36C17.52 11.36 18.19 12.03 18.19 12.86C18.19 14.02 18.19 15.98 18.19 17.14C18.19 17.97 17.52 18.64 16.69 18.64C14.55 18.64 9.64 18.64 7.5 18.64C6.67 18.64 6 17.97 6 17.14C6 15.98 6 14.02 6 12.86C6 12.03 6.67 11.36 7.5 11.36C9.64 11.36 14.55 11.36 16.69 11.36Z" id="d1cGyBN0D6"></path>
+    </defs>
+    <g>
+        <g>
+            <g>
+                <use xlink:href="#b1Ytg0gchG" opacity="1" fill="#091112" fill-opacity="1"></use>
+            </g>
+            <g>
+                <use xlink:href="#bOgNDOwqf" opacity="1" fill="#091112" fill-opacity="1"></use>
+            </g><g><use xlink:href="#e2ATk6YUJn" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#c1gMCRTuvW" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#bWf7rX5zm" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#a5GCNH8fT" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#aaJad3UzmD" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#a3VUb6sdTk" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#a237X0erO2" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#a1q5iQLcXl" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#c61dyiF7Su" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#iK4l2Gk5c" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#cpvoaurkK" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#eJecR2eQm" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#a38ILrznrY" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#b23rXFHMAw" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><use xlink:href="#b9BSIgdxP" opacity="1" fill="#091112" fill-opacity="1"></use></g><g><g><use xlink:href="#d1cGyBN0D6" opacity="1" fill-opacity="0" stroke="#000000" stroke-width="1" stroke-opacity="1"></use></g></g></g></g></svg>
