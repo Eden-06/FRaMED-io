@@ -31,8 +31,16 @@ repositories {
 }
 
 kotlin {
-    js(IR) {
-        browser()
+    js(LEGACY) {
+        browser {
+            testTask {
+                enabled = true
+                useKarma {
+                    useChromeHeadless()
+                    useChrome()
+                }
+            }
+        }
         binaries.executable()
 
         compilations.all {
@@ -53,6 +61,8 @@ dependencies {
     implementation(npm("jsplumb", "2.15.5"))
     implementation(npm("dagre", "0.8.5"))
     implementation(devNpm("sass", "1.33.0"))
+
+    testImplementation(kotlin("test-js"))
 }
 
 gitProperties {
@@ -123,7 +133,11 @@ tasks.create<NodeExec>("compileSass") {
         .withPropertyName("style")
 }
 
-tasks.named("browserDevelopmentExecutableDistributeResources") {
+tasks.named("browserDistributeResources") {
+    dependsOn("compileSass")
+}
+
+/*tasks.named("browserDevelopmentExecutableDistributeResources") {
     dependsOn("compileSass")
 }
 
@@ -137,7 +151,7 @@ tasks.named("developmentExecutableCompileSync") {
 
 tasks.named("productionExecutableCompileSync") {
     dependsOn("compileSass")
-}
+}*/
 
 tasks.named("browserDevelopmentRun") {
     dependsOn("compileSass")
@@ -171,6 +185,7 @@ tasks.create<Sync>("dist") {
         sourceMap,
         Callable { zipTree(tasks.get("jsJar").outputs.files.first()) }
     )
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
     exclude(
         "${project.name}-js/**",
@@ -220,3 +235,5 @@ tasks.create<Delete>("cleanDist") {
 tasks.named("clean") {
     dependsOn("cleanDist")
 }
+
+

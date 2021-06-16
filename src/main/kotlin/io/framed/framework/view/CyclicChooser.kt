@@ -32,22 +32,23 @@ class CyclicChooser<T>(
     }
 
     private fun keyListener(event: KeyboardEvent) {
-        when (event.keyCode) {
-            27 -> {
-                close()
-            }
-            37, 65 -> selectDirection(Direction.LEFT)
-            38, 87 -> selectDirection(Direction.UP)
-            39, 68 -> selectDirection(Direction.RIGHT)
-            40, 83 -> selectDirection(Direction.DOWN)
+
+        val keyCode = event.keyCode
+
+        if (keyCode == 27) {
+            close()
+        } else if (keyCode in 48..57) {
+            selectDirection(keyCode - 48)
         }
     }
 
     private var positionMap: Map<IntRange, View<*>> = emptyMap()
 
-    private fun selectDirection(direction: Direction) {
+    private fun selectDirection(index: Int) {
+        val angle = ((360 / data.size) * index)
+
         positionMap.filterKeys {
-            direction.angle in it
+            angle in it
         }.values.firstOrNull()?.let {
             it.onClick.emit(js("{}"))
             close()
@@ -90,14 +91,16 @@ class CyclicChooser<T>(
             container.top = Root.mousePosition.y
 
             val part = 360 / views.size
+            val scaling: Double = (views.size) / 1.9 // 3.0
+
             positionMap = views.mapIndexed { index, view ->
-                val angle = part * index
-                val pos = calc(width * 1.8, height * 2.4, angle)
+                val angle = (part * index)
+                val pos = calc(scaling * width, scaling * height, angle)
                 view.top = pos.y
                 view.left = pos.x
 
-                view.marginTop = -(height / 2.0)
-                view.marginLeft = -(width / 2.0)
+                view.marginTop = -(height / 1.8)
+                view.marginLeft = -(width / 1.8)
 
                 view.width = width
                 view.height = height
@@ -108,11 +111,4 @@ class CyclicChooser<T>(
     }
 
     private fun Int.rangeBy(distance: Int): IntRange = (this - distance / 2)..(this + distance / 2)
-
-    enum class Direction(val angle: Int) {
-        LEFT(180),
-        UP(90),
-        RIGHT(0),
-        DOWN(270)
-    }
 }

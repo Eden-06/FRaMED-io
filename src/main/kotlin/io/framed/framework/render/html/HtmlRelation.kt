@@ -244,7 +244,8 @@ class HtmlRelation(
                     strokeWidth = style.paintStyle.strokeWidth
                     fill = style.paintStyle.fill.toCss()
                 },
-                "location" to style.length * style.foldback + 1,
+                "location" to style.location,
+                "direction" to style.direction,
             )))
         }
 
@@ -258,7 +259,8 @@ class HtmlRelation(
                     strokeWidth = style.paintStyle.strokeWidth
                     fill = style.paintStyle.fill.toCss()
                 },
-                "location" to 1,
+                "location" to style.location,
+                "direction" to style.direction,
             )))
         }
 

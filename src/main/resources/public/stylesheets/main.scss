@@ -712,7 +712,7 @@ table {
       border: solid 1px $border-color-light;
       border-radius: $border-radius;
       padding: 0.5rem;
-      overflow: hidden;
+      //overflow: hidden;
       text-align: center;
       white-space: nowrap;
 
@@ -853,6 +853,50 @@ table {
     white-space: nowrap;
   }
 }
+
+.tooltiptext {
+  display: none;
+
+  width: fit-content;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 10px 10px;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip {
+  overflow: visible !important;
+
+  & > .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+
+  &:hover > .tooltiptext {
+    visibility: visible;
+    display: block;
+    opacity: 1;
+  }
+}
+
 
 #noscript {
   position: absolute;

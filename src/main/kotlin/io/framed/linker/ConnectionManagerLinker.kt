@@ -8,9 +8,7 @@ import io.framed.framework.linker.ModelLinker
 import io.framed.framework.model.ModelConnection
 import io.framed.framework.pictogram.ElementInfo
 import io.framed.framework.util.LinkerConnectionBox
-import io.framed.framework.view.CyclicChooser
-import io.framed.framework.view.iconView
-import io.framed.framework.view.textView
+import io.framed.framework.view.*
 import io.framed.model.Connections
 
 class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionManager {
@@ -47,8 +45,8 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
             createConnection(source, target, types.first())
         } else {
             CyclicChooser(types) { type ->
-                iconView(type.icon)
-                textView(type.name)
+                tooltipIconView(type.icon, type.name)
+                //textView(type.name)
 
                 onClick {
                     createConnection(source, target, type)

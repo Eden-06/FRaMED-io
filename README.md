@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Eden-06/FRaMED-io.svg?branch=master)](https://travis-ci.org/Eden-06/FRaMED-io)
+[![Build Status](https://travis-ci.com/Eden-06/FRaMED-io.svg?branch=master)](https://travis-ci.com/Eden-06/FRaMED-io)
 
 # FRaMED-io
 This is the repository for the web-based reimplimentation of the FRaMED 2.0 editor for the family of role-based modeling languages.
