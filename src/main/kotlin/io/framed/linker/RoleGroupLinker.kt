@@ -49,6 +49,7 @@ class RoleGroupLinker(
             style {
                 padding = box(8.0)
             }
+
         }
 
         autoLayoutBox = boxShape(BoxShape.Position.VERTICAL) {
@@ -276,7 +277,7 @@ class RoleGroupLinker(
         override val info = ElementInfo("RoleGroup", FramedIcon.ROLEGROUP)
 
         override fun canCreateIn(container: ModelElement): Boolean {
-            return container is Package || container is RoleGroup
+            return container is Compartment || container is Scene || container is RoleGroup
         }
 
         override fun isLinkerFor(element: ModelElement): Boolean = element is RoleGroup
