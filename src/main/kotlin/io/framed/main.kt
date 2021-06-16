@@ -1,11 +1,7 @@
 package io.framed
 
 import io.framed.framework.*
-import io.framed.framework.linker.LinkerInfoConnection
-import io.framed.framework.linker.LinkerInfoItem
 import io.framed.framework.linker.LinkerManager
-import io.framed.framework.model.ModelConnection
-import io.framed.framework.model.ModelElement
 import io.framed.framework.util.loadAjaxFile
 import io.framed.framework.view.Application
 import io.framed.linker.*
@@ -36,6 +32,9 @@ fun init() {
     LinkerManager.register(InheritanceLinker)
     LinkerManager.register(CreateRelationshipLinker)
     LinkerManager.register(DestroyRelationshipLinker)
+    LinkerManager.register(RoleImplicationLinker)
+    LinkerManager.register(RoleEquivalenceLinker)
+    LinkerManager.register(RoleProhibitionLinker)
 
     LinkerManager.register(AttributeLinker)
     LinkerManager.register(MethodLinker)

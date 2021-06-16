@@ -1,6 +1,9 @@
 language: java
 jdk:
   - openjdk11
+dist: xenial
+services:
+  - xvfb
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -15,6 +18,7 @@ install:
   - ./gradlew --info kotlinNpmInstall
 script:
   - ./gradlew --info dist
+  - ./gradlew --info test
 deploy:
   provider: pages
   skip_cleanup: true
