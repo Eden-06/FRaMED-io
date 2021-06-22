@@ -32,6 +32,8 @@ repositories {
 
 kotlin {
     js(LEGACY) {
+        useCommonJs()
+
         browser {
             testTask {
                 enabled = true
@@ -58,9 +60,9 @@ dependencies {
     // Serialization library
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
 
-    implementation(npm("jsplumb", "2.15.5"))
+    implementation(npm("jsplumb", "2.15.6"))
     implementation(npm("dagre", "0.8.5"))
-    implementation(devNpm("sass", "1.33.0"))
+    implementation(devNpm("sass", "1.35.1"))
 
     testImplementation(kotlin("test-js"))
 }
@@ -137,22 +139,6 @@ tasks.named("browserDistributeResources") {
     dependsOn("compileSass")
 }
 
-/*tasks.named("browserDevelopmentExecutableDistributeResources") {
-    dependsOn("compileSass")
-}
-
-tasks.named("browserProductionExecutableDistributeResources") {
-    dependsOn("compileSass")
-}
-
-tasks.named("developmentExecutableCompileSync") {
-    dependsOn("compileSass")
-}
-
-tasks.named("productionExecutableCompileSync") {
-    dependsOn("compileSass")
-}*/
-
 tasks.named("browserDevelopmentRun") {
     dependsOn("compileSass")
 }
@@ -185,7 +171,7 @@ tasks.create<Sync>("dist") {
         sourceMap,
         Callable { zipTree(tasks.get("jsJar").outputs.files.first()) }
     )
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     exclude(
         "${project.name}-js/**",
@@ -213,6 +199,7 @@ tasks.create<Sync>("distDevelopment") {
         sourceMap,
         Callable { zipTree(tasks.get("jsJar").outputs.files.first()) }
     )
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     exclude(
         "${project.name}-js/**",
