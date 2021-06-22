@@ -25,6 +25,9 @@ class RoleGroupLinker(
         .trackHistory()
     override var name by nameProperty
 
+
+    private val cardinalityProperty = property(model::cardinality).trackHistory()
+
     override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
 
     private val children = shapeBox<ModelElement, ShapeLinker<out ModelElement, out Shape>>(model::children, connectionManager) { box ->
@@ -45,7 +48,8 @@ class RoleGroupLinker(
 
     override val pictogram = boxShape {
         boxShape {
-            textShape(nameProperty)
+            textShape(nameProperty, alignment = TextShape.TextAlignment.CENTER)
+            textShape(cardinalityProperty)
             style {
                 padding = box(8.0)
             }
@@ -168,6 +172,7 @@ class RoleGroupLinker(
         title("Role Group")
         group("General") {
             input("Name", nameProperty)
+            input("Cardinality", cardinalityProperty, CardinalityPreset.STRING_VALUES)
         }
         sidebarActionsGroup = group("Actions") {
             button("Auto layout") {
@@ -248,6 +253,21 @@ class RoleGroupLinker(
         contextStepOut.display = event.target != pictogram
     }
 
+    override fun updateLabelBindings() {
+        var label = pictogram.labels.find { it.id == "cardinality" }
+        if (label == null) {
+            label = Label(id = "cardinality")
+            label.autocomplete = CardinalityPreset.STRING_VALUES
+            pictogram.labels += label
+        }
+
+        if (label.textProperty.isBound) {
+            label.textProperty.unbind()
+        }
+        label.textProperty.bindBidirectional(cardinalityProperty)
+
+        super.updateLabelBindings()
+    }
 
     /**
      * The model initializes a new instance of the linker

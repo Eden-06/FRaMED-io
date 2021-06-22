@@ -59,6 +59,10 @@ abstract class HtmlShape(
             }
         }
 
+        if (style.text_center) {
+            view.html.style.textAlign = "center"
+        }
+
 
         style.border?.let { border ->
             view.html.style.borderStyle = border.style.toString()

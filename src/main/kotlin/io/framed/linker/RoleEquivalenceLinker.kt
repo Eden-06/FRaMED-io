@@ -104,12 +104,12 @@ class RoleEquivalenceLinker(
         override val info = ElementInfo("Role Equivalence", FramedIcon.EQUIVALENCE)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is RoleTypeLinker
+            return (source is RoleTypeLinker || source is RoleGroupLinker)
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
             return canStart(source) &&
-                    target is RoleTypeLinker &&
+                    (target is RoleTypeLinker || target is RoleGroupLinker)  &&
                     source != target &&
                     source.parent == target.parent
         }

@@ -1,8 +1,10 @@
 package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumbInstance
+import io.framed.framework.pictogram.Style
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.util.async
+import io.framed.framework.view.InputView
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.inputView
@@ -18,9 +20,18 @@ class HtmlTextShape(
         override val jsPlumbInstance: JsPlumbInstance
 ) : HtmlShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
 
+    fun alignment(view: InputView, alignment: TextShape.TextAlignment) {
+        when (alignment) {
+            TextShape.TextAlignment.LEFT -> view.input.html.style.textAlign = "left"
+            TextShape.TextAlignment.RIGHT ->  view.input.html.style.textAlign = "right"
+            TextShape.TextAlignment.CENTER ->  view.input.html.style.textAlign = "center"
+        }
+    }
     override val view: View<*> = container.inputView(shape.property) {
         style(this, shape.style)
         events(this, shape)
+
+        alignment(this, shape.alignment)
 
         autocomplete(shape.autocomplete)
 
