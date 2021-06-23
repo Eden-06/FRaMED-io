@@ -13,6 +13,7 @@ import io.framed.framework.view.FramedIcon
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
+import io.framed.linker.RoleImplicationLinker.Companion.parent
 import io.framed.model.RoleProhibition
 
 /**
@@ -112,10 +113,20 @@ class RoleProhibitionLinker(
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) &&
-                    (target is RoleTypeLinker || target is RoleGroupLinker)  &&
+            var source_ancestor = source.parent
+            while (source_ancestor != null && source_ancestor is RoleGroupLinker) {
+                source_ancestor = source_ancestor.parent
+            }
+
+            var target_ancestor = target.parent
+            while (target_ancestor != null && target_ancestor is RoleGroupLinker) {
+                target_ancestor = target_ancestor.parent
+            }
+
+            return RoleImplicationLinker.canStart(source) &&
+                    (target is RoleTypeLinker || target is RoleGroupLinker) &&
                     source != target &&
-                    source.parent == target.parent
+                    source_ancestor == target_ancestor
         }
 
         override fun isLinkerFor(element: ModelConnection): Boolean = element is RoleProhibition

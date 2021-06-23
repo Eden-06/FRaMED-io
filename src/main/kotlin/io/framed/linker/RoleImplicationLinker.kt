@@ -98,10 +98,20 @@ class RoleImplicationLinker(
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
+            var source_ancestor = source.parent
+            while (source_ancestor != null && source_ancestor is RoleGroupLinker) {
+                source_ancestor = source_ancestor.parent
+            }
+
+            var target_ancestor = target.parent
+            while (target_ancestor != null && target_ancestor is RoleGroupLinker) {
+                target_ancestor = target_ancestor.parent
+            }
+
             return canStart(source) &&
                     (target is RoleTypeLinker || target is RoleGroupLinker) &&
                     source != target &&
-                    source.parent == target.parent
+                    source_ancestor == target_ancestor
         }
 
         override fun isLinkerFor(element: ModelConnection): Boolean = element is RoleImplication

@@ -48,8 +48,13 @@ class RoleGroupLinker(
 
     override val pictogram = boxShape {
         boxShape {
-            textShape(nameProperty, alignment = TextShape.TextAlignment.CENTER)
-            textShape(cardinalityProperty)
+            textShape(nameProperty,
+                alignment = TextShape.TextAlignment.CENTER
+            )
+//            textShape(cardinalityProperty,
+//                alignment = TextShape.TextAlignment.CENTER,
+//                autocomplete = CardinalityPreset.STRING_VALUES
+//            )
             style {
                 padding = box(8.0)
             }
@@ -256,7 +261,9 @@ class RoleGroupLinker(
     override fun updateLabelBindings() {
         var label = pictogram.labels.find { it.id == "cardinality" }
         if (label == null) {
-            label = Label(id = "cardinality")
+            label = Label(
+                id = "cardinality"
+            )
             label.autocomplete = CardinalityPreset.STRING_VALUES
             pictogram.labels += label
         }
