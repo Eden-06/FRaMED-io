@@ -1,7 +1,6 @@
 package io.framed.framework.render.html
 
 import io.framed.framework.JsPlumbInstance
-import io.framed.framework.pictogram.Style
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.util.async
 import io.framed.framework.view.InputView
@@ -38,6 +37,7 @@ class HtmlTextShape(
         onMouseDown {
             focus()
         }
+
         onFocusEnter {
             if(View.disableDrag){
                 val downEvent = document.createEvent("MouseEvents")
@@ -63,7 +63,7 @@ class HtmlTextShape(
 
     private fun updateSize() {
         //TODO The current formula definitely depends on the dpi settings
-        val width = max(100, shape.property.value.length * 11 + 24)
+        val width = max(60, shape.property.value.length * 11 + 24)
         view.html.style.minWidth = "${width}px"
         async {
             shape.width = width.toDouble()

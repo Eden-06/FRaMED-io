@@ -27,6 +27,7 @@ class HtmlBoxShape(
         if (shape.style.stretchHeight) {
             html.style.height = "100%"
         }
+
         events(this, shape)
         if (shape.resizeable) {
             resizer = resizeable {
@@ -108,6 +109,11 @@ class HtmlBoxShape(
         classes += "content-view"
         style(this, shape.style)
         events(this, shape)
+
+        if (shape.style.flex) {
+            classes += "flex-row"
+            shape.shapes.size
+        }
 
         if (shape.position == BoxShape.Position.ABSOLUTE) {
             html.style.position = "relative"

@@ -51,24 +51,17 @@ class RoleGroupLinker(
             textShape(nameProperty,
                 alignment = TextShape.TextAlignment.CENTER
             )
-//            textShape(cardinalityProperty,
-//                alignment = TextShape.TextAlignment.CENTER,
-//                autocomplete = CardinalityPreset.STRING_VALUES
-//            )
+            textShape(cardinalityProperty,
+                autocomplete = CardinalityPreset.STRING_VALUES
+            )
             style {
                 padding = box(8.0)
+                flex = true
             }
-
         }
 
         autoLayoutBox = boxShape(BoxShape.Position.VERTICAL) {
             style {
-
-                /*border {
-                    style = Border.BorderStyle.DASHED
-                    width = box(Border.DEFAULT_WIDTH, 0.0, 0.0, 0.0)
-                    color = box(color(0, 0, 0, 0.3))
-                }*/
                 border = null
                 padding = box(8.0)
                 stretchHeight = true
@@ -258,23 +251,23 @@ class RoleGroupLinker(
         contextStepOut.display = event.target != pictogram
     }
 
-    override fun updateLabelBindings() {
-        var label = pictogram.labels.find { it.id == "cardinality" }
-        if (label == null) {
-            label = Label(
-                id = "cardinality"
-            )
-            label.autocomplete = CardinalityPreset.STRING_VALUES
-            pictogram.labels += label
-        }
-
-        if (label.textProperty.isBound) {
-            label.textProperty.unbind()
-        }
-        label.textProperty.bindBidirectional(cardinalityProperty)
-
-        super.updateLabelBindings()
-    }
+//    override fun updateLabelBindings() {
+//        var label = pictogram.labels.find { it.id == "cardinality" }
+//        if (label == null) {
+//            label = Label(
+//                id = "cardinality"
+//            )
+//            label.autocomplete = CardinalityPreset.STRING_VALUES
+//            pictogram.labels += label
+//        }
+//
+//        if (label.textProperty.isBound) {
+//            label.textProperty.unbind()
+//        }
+//        label.textProperty.bindBidirectional(cardinalityProperty)
+//
+//        super.updateLabelBindings()
+//    }
 
     /**
      * The model initializes a new instance of the linker

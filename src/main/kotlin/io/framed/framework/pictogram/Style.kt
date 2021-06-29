@@ -9,7 +9,6 @@ class Style {
     var padding: Box<Double>? = null
     var topNotch = false
     var notch = false
-    var text_center = false
-
     var stretchHeight = false
+    var flex = false
 }
