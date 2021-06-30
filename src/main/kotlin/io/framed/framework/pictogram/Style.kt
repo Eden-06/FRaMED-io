@@ -11,4 +11,5 @@ class Style {
     var notch = false
     var stretchHeight = false
     var flex = false
+    var overflow = false
 }

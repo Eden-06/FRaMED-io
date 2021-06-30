@@ -112,7 +112,10 @@ class HtmlBoxShape(
 
         if (shape.style.flex) {
             classes += "flex-row"
-            shape.shapes.size
+        }
+
+        if (shape.style.overflow) {
+            classes += "popup-overflow"
         }
 
         if (shape.position == BoxShape.Position.ABSOLUTE) {

@@ -58,6 +58,7 @@ class RoleGroupLinker(
             style {
                 padding = box(8.0)
                 flex = true
+                overflow = true
             }
         }
 
