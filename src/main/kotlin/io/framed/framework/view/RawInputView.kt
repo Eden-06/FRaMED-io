@@ -18,23 +18,51 @@ import kotlin.math.max
  *
  * @author lars
  */
-class RawInputView() : View<HTMLInputElement>("input") {
+class RawInputView(
+    /**
+     * Surround the value with parentheses.
+     */
+    val surround: Surround
+) : View<HTMLInputElement>("input") {
+
+    var displayValue: String
+        get() {
+            when (surround) {
+                Surround.NONE -> {
+                    return html.value
+                }
+                Surround.PARENTHESIS -> {
+                    return html.value.trim().removePrefix("(").removeSuffix(")").trim()
+                }
+            }
+        }
+        set(value) {
+            when (surround) {
+                Surround.NONE -> {
+                    html.value = value
+                }
+                Surround.PARENTHESIS -> {
+                    html.value = "( $value )"
+                }
+            }
+        }
 
     /**
      * Inputs value.
      */
     var value: String
-        get() = html.value
+        get() = displayValue
         set(value) {
-            val oldValue = html.value
+            val oldValue = displayValue
             val oldSelection = html.selectionStart
             val oldLength = oldValue.length
 
-            html.value = value
+            displayValue = value
             lastValue = value
             if (sizeMatch) {
                 size = max(value.length, 1)
             }
+
 
             if (oldSelection != null) {
                 val pos: Int
@@ -87,7 +115,7 @@ class RawInputView() : View<HTMLInputElement>("input") {
 
         onChange {
             if (property is Property<String> && property.isWritable) {
-                property.set(it)
+                property.set(it.trim())
             }
         }
         onFocusEnter {
@@ -95,7 +123,10 @@ class RawInputView() : View<HTMLInputElement>("input") {
         }
         onFocusLeave {
             if (property is Property<String> && property.isWritable) {
-                property.set(value.trim())
+                property.set(
+                    value
+                        .trim()
+                )
             }
         }
 

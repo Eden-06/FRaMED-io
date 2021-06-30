@@ -52,7 +52,8 @@ class RoleGroupLinker(
                 alignment = TextShape.TextAlignment.CENTER
             )
             textShape(cardinalityProperty,
-                autocomplete = CardinalityPreset.STRING_VALUES
+                autocomplete = CardinalityPreset.STRING_VALUES,
+                surround = Surround.PARENTHESIS
             )
             style {
                 padding = box(8.0)

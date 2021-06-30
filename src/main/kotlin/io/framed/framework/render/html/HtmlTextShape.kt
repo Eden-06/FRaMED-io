@@ -8,6 +8,7 @@ import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.inputView
 import kotlinx.browser.document
+import org.w3c.dom.Text
 import kotlin.math.max
 
 class HtmlTextShape(
@@ -26,7 +27,7 @@ class HtmlTextShape(
             TextShape.TextAlignment.CENTER ->  view.input.html.style.textAlign = "center"
         }
     }
-    override val view: View<*> = container.inputView(shape.property) {
+    override val view: View<*> = container.inputView(shape.property, shape.surround) {
         style(this, shape.style)
         events(this, shape)
 
@@ -52,6 +53,7 @@ class HtmlTextShape(
                 blur()
             }
         }
+
         onFocusLeave {
             value = shape.property.value
         }

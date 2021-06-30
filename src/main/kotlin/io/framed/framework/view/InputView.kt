@@ -10,13 +10,15 @@ import org.w3c.dom.HTMLDivElement
  *
  * @author lars
  */
-class InputView() : View<HTMLDivElement>("div") {
+class InputView(
+    surround: Surround = Surround.NONE
+) : View<HTMLDivElement>("div") {
 
-    constructor(property: ReadOnlyProperty<String>) : this() {
+    constructor(property: ReadOnlyProperty<String>, surround: Surround = Surround.NONE) : this(surround) {
         bind(property)
     }
 
-    val input = RawInputView().also {
+    var input: RawInputView = RawInputView(surround).also {
         html.appendChild(it.html)
     }
 
@@ -143,8 +145,11 @@ class InputView() : View<HTMLDivElement>("div") {
     }
 }
 
-fun ViewCollection<in InputView, *>.inputView(init: InputView.() -> Unit) =
+fun ViewCollection<in InputView, *>.inputView(
+    init: InputView.() -> Unit) =
         InputView().also(this::append).also(init)
 
-fun ViewCollection<in InputView, *>.inputView(property: ReadOnlyProperty<String>, init: InputView.() -> Unit) =
-        InputView(property).also(this::append).also(init)
+fun ViewCollection<in InputView, *>.inputView(property: ReadOnlyProperty<String>,
+                                              surround: Surround = Surround.NONE,
+                                              init: InputView.() -> Unit) =
+        InputView(property, surround).also(this::append).also(init)
