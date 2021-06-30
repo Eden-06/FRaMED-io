@@ -130,7 +130,7 @@ class RoleEquivalenceLinkerTest {
     fun sidebarTest() {
         roleEquivalenceLinker1?.let { linker ->
             // Test HTML Children
-            assertEquals(3, linker.sidebar.html.children.length,
+            assertEquals(2, linker.sidebar.html.children.length,
                 "Unexpected amount of sidebar children!")
 
             // Test Title entry
@@ -143,39 +143,18 @@ class RoleEquivalenceLinkerTest {
 
             // First Group Element
             linker.sidebar.html.children[1]?.let { firstGroupView ->
-                assertEquals(2, firstGroupView.children.length,
-                    "Unexpected amount of children in the first sidebar group!")
-
-                // General Title Header
-                firstGroupView.children[0]?.let { titleListView ->
-                    assertEquals(2, titleListView.children.length)
-                    titleListView.children[0]?.let { titleView ->
-                        assertEquals("General", titleView.textContent)
-                    }
-                }
-                // Name Selection Element
-                firstGroupView.children[1]?.let { nameListView ->
-                    assertEquals(2, nameListView.children.length)
-                    nameListView.children[0]?.let { titleView ->
-                        assertEquals("Name", titleView.textContent)
-                    }
-                }
-            }
-
-            // Second Group Element
-            linker.sidebar.html.children[2]?.let { secondGroupView ->
-                assertEquals(3, secondGroupView.children.length,
+                assertEquals(3, firstGroupView.children.length,
                     "Unexpected amount of children in the second sidebar group!")
 
                 // General Title Header
-                secondGroupView.children[0]?.let { titleListView ->
+                firstGroupView.children[0]?.let { titleListView ->
                     assertEquals(2, titleListView.children.length)
                     titleListView.children[0]?.let { titleView ->
                         assertEquals("Structure", titleView.textContent)
                     }
                 }
                 // Name Selection Element
-                secondGroupView.children[1]?.let { nameListView ->
+                firstGroupView.children[1]?.let { nameListView ->
                     assertEquals(2, nameListView.children.length)
                     nameListView.children[0]?.let { titleView ->
                         assertEquals("Type", titleView.textContent)

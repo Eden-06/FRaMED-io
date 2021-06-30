@@ -65,10 +65,6 @@ class RoleEquivalenceLinker(
 
     override val sidebar = sidebar {
         title("Role Equivalence")
-
-        group("General") {
-            input("Name", nameProperty)
-        }
     }
 
     override val contextMenu = contextMenu {
@@ -80,17 +76,9 @@ class RoleEquivalenceLinker(
 
 
     override fun updateLabelBindings() {
-        val ids = pictogram.labels.mapNotNull { it.id }.distinct().toSet()
-        if ("name" !in ids) {
-            pictogram.labels += Label(id = "name", position = 0.5)
-        }
-
         for (label in pictogram.labels) {
             if (label.textProperty.isBound) {
                 label.textProperty.unbind()
-            }
-            when {
-                label.id == "name" -> label.textProperty.bindBidirectional(nameProperty)
             }
         }
 

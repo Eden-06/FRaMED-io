@@ -94,9 +94,6 @@ class RoleGroupLinker(
             updatePreviewType()
         }
 
-        onAction {
-            ControllerManager.display(this@RoleGroupLinker)
-        }
     }
 
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
@@ -216,17 +213,7 @@ class RoleGroupLinker(
         sidebarPreviewGroup.display = isTargetRoot
     }
 
-    private lateinit var contextStepIn: ListView
-    private lateinit var contextStepOut: ListView
-
-    override val contextMenu = defaultContextMenu {
-        contextStepIn = addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
-            ControllerManager.display(this@RoleGroupLinker)
-        }
-        contextStepOut = addItem(MaterialIcon.ARROW_BACK, "Step out") {
-            ControllerManager.display(parent)
-        }
-    }
+    override val contextMenu = defaultContextMenu {}
 
     override fun remove(linker: ShapeLinker<*, *>) {
         when (linker) {
@@ -248,28 +235,7 @@ class RoleGroupLinker(
         updatePorts()
     }
 
-    override fun ContextMenu.onOpen(event: ContextEvent) {
-        contextStepIn.display = event.target == pictogram
-        contextStepOut.display = event.target != pictogram
-    }
-
-//    override fun updateLabelBindings() {
-//        var label = pictogram.labels.find { it.id == "cardinality" }
-//        if (label == null) {
-//            label = Label(
-//                id = "cardinality"
-//            )
-//            label.autocomplete = CardinalityPreset.STRING_VALUES
-//            pictogram.labels += label
-//        }
-//
-//        if (label.textProperty.isBound) {
-//            label.textProperty.unbind()
-//        }
-//        label.textProperty.bindBidirectional(cardinalityProperty)
-//
-//        super.updateLabelBindings()
-//    }
+    override fun ContextMenu.onOpen(event: ContextEvent) {}
 
     /**
      * The model initializes a new instance of the linker
