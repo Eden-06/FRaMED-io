@@ -416,14 +416,19 @@ class HtmlRenderer(
 
         if (shape != null) {
             val mouse = navigationView.mouseToCanvas(Root.mousePosition)
-            val targets = shapeMap.filter { (s, view) ->
-                mouse in (view.view.dimension + Point(view.view.offsetLeft - workspace.offsetLeft, view.view.offsetTop - workspace.offsetTop)) && shape != s
-            }.filterKeys { target ->
+            val targets_pre = shapeMap.filter { (s, view) ->
+                mouse in (
+                        view.view.dimension + Point(view.view.offsetLeft - workspace.offsetLeft,
+                            view.view.offsetTop - workspace.offsetTop)
+                        ) && shape != s
+            }
+            val targets = targets_pre.filterKeys { target ->
                 viewModel.handler.canDropShape(shape.id ?: return null, target.id ?: return null)
             }
 
-            if (targets.size == 1) {
-                val (target, view) = targets.entries.first()
+            if (targets.isNotEmpty()) {
+                // This should give the most specific element.
+                val (target, view) = targets.entries.last()
                 view.view.classes += "drop-target"
                 return target
             }

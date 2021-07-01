@@ -47,19 +47,34 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
     fun getLinkerById(id: Long): ShapeLinker<*, *>? =
             shapeLinkers.find { it.id == id }
 
+    fun getLinkerByIdRecursive(id: Long ): ShapeLinker<*, *>? {
+        val linkerQueue = ArrayDeque(shapeLinkers);
+        while (linkerQueue.isNotEmpty()) {
+            val linker = linkerQueue.removeFirst()
+            if (linker.id == id) {
+                return linker;
+            } else {
+                if (linker is ModelLinker<*, *, *>) {
+                    linkerQueue.addAll(linker.shapeLinkers)
+                }
+            }
+        }
+        return null
+    }
+
     fun redraw(linker: ShapeLinker<*, *>)
 
     fun canDropShape(element: Long, target: Long): Boolean {
-        val shapeLinker = shapeLinkers.find { it.id == element } ?: return false
-        val targetLinker = shapeLinkers.find { it.id == target } ?: return false
+        val shapeLinker = this.getLinkerByIdRecursive(element) ?: return false
+        val targetLinker = this.getLinkerByIdRecursive(target) ?: return false
 
         return LinkerManager.linkerItemList.find { it.isLinkerFor(shapeLinker.model) }?.canCreateIn(targetLinker.model)
                 ?: false
     }
 
     fun dropShape(element: Long, target: Long) {
-        val elementLinker = getLinkerById(element) ?: throw IllegalArgumentException()
-        val targetLinker = getLinkerById(target) ?: throw IllegalArgumentException()
+        val elementLinker = getLinkerByIdRecursive(element) ?: throw IllegalArgumentException()
+        val targetLinker = getLinkerByIdRecursive(target) ?: throw IllegalArgumentException()
 
         val connectionCount = connectionManager.listConnections(elementLinker.id).size
 
