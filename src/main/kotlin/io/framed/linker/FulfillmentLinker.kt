@@ -84,14 +84,28 @@ class FulfillmentLinker(
         override val info = ElementInfo("Fulfillment", FramedIcon.FULFILLMENT)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is ClassLinker || source is CompartmentLinker || source is RoleTypeLinker
+            return source is ClassLinker ||
+                    source is CompartmentLinker ||
+                    source is RoleTypeLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
             if(source !is RoleTypeLinker){
                 return canStart(source) && target is RoleTypeLinker
+            } else {
+                return canStart(source) &&
+                        target is RoleTypeLinker &&
+                        target.ancestors.filter { linker ->
+                            source.ancestors.contains(linker)
+                        }.isNotEmpty()
+                // TODO: Find out which implementation is correct for the semantics.
+//                target.ancestors.filter { linker ->
+//                    linker !is RoleGroupLinker
+//                } == source.ancestors.filter { linker ->
+//                    linker !is RoleGroupLinker
+//                }
             }
-            return canStart(source) && target is RoleTypeLinker && source.parent == target.parent.parent
+
         }
 
         override fun isLinkerFor(element: ModelConnection): Boolean = element is Fulfillment
