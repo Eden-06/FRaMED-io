@@ -74,26 +74,14 @@ interface LinkerInfoConnection {
     infix fun Linker<*, *>.isAncestorOf(other: Linker<*, *>) = this in other.ancestors
 }
 
-// FIXME: Function is not working as expected. Only the most direct member is detected.
-//private tailrec fun Linker<*, *>.getAncestors(accumulator: List<ShapeLinker<*, *>> = emptyList()): List<ShapeLinker<*, *>> {
-//    if (this !is ShapeLinker<*, *>) return emptyList()
-//    val parent = parent
-//    @Suppress("IfThenToElvis")
-//    return if (parent == null) {
-//        listOf(this)
-//    } else {
-//        parent.getAncestors(accumulator + this)
-//    }
-//}
-
-private fun Linker<*, *>.getAncestors(): List<ShapeLinker<*, *>> {
+private tailrec fun Linker<*, *>.getAncestors(accumulator: List<ShapeLinker<*, *>> = emptyList()): List<ShapeLinker<*, *>> {
     if (this !is ShapeLinker<*, *>) return emptyList()
+    val parent = this.parent
 
-    val ancestors = mutableListOf<ShapeLinker<*,*>>()
-    var parent = this.parent
-    while (parent != null) {
-        ancestors += parent
-        parent = parent .parent
+    @Suppress("IfThenToElvis")
+    return if (parent == null) {
+        accumulator
+    } else {
+        parent.getAncestors(accumulator + parent)
     }
-    return ancestors
 }
