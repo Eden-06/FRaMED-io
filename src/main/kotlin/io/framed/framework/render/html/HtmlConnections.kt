@@ -221,23 +221,57 @@ class HtmlConnections(
         val position = Root.mousePosition
         val elements = document.elementsFromPoint(position.x, position.y)
 
-        for (element in elements) {
-            val shape = endpointReverseMap[element] ?: continue
-            val entry = endpointMap[shape] ?: continue
+        createTargetShape?.let {
+            endpointMap[it]?.let {
+                it.view.classes -= "drop-target"
+            }
+        }
 
-            createTargetShape?.let { endpointMap[it]?.let { it.view.classes -= "drop-target" } }
+        val selectedDropTarget = elements
+            .filter { element ->
+            val shape = this.endpointReverseMap[element] ?: return@filter false
+            val entry = this.endpointMap[shape] ?: return@filter false
 
             // Change break to continue to allow connections to visible hidden elements
-            if (isConnecting == shape || "target-disabled" in entry.view.classes) break
+            return@filter !(isConnecting == shape || "target-disabled" in entry.view.classes)
+        }.map { element ->
+            val shape = this.endpointReverseMap[element]!!
+            val entry = this.endpointMap[shape]!!
+
+            return@map Pair(entry, shape)
+        }.toList()
+            .distinctBy { (_, s) ->
+                s.id
+            }.sortedWith(Comparator{ (_,s1), (_, s2) ->
+                var p1= s1.parent
+                var p2= s2.parent
+
+                var depth1 = 0
+                var depth2 = 0
+
+                while (p1 != null) {
+                    p1 = p1.parent
+                    depth1++
+                }
+
+                while (p2 != null) {
+                    p2 = p2.parent
+                    depth2++
+                }
+
+                return@Comparator compareValues(depth1, depth2)
+            })
+            .lastOrNull()
+
+        if (selectedDropTarget != null) {
+            val entry = selectedDropTarget.first
+            val shape = selectedDropTarget.second
 
             entry.view.classes += "drop-target"
             createTargetShape = shape
-
-            return
+        } else {
+            createTargetShape = null
         }
-
-        createTargetShape?.let { endpointMap[it]?.let { it.view.classes -= "drop-target" } }
-        createTargetShape = null
     }
 
     private fun createEndpointInternal(shape: Shape, canStart: Boolean) {

@@ -409,6 +409,20 @@ class HtmlRenderer(
 
     val shapeMap = mutableMapOf<Shape, HtmlShape>()
 
+    /**
+     * Calculates the depth of the Shape in the view tree.
+     * The depth is the amount of elements between the first null parent.
+     */
+    private fun calculateDepthOfView(shape: Shape): Int {
+        val shapeAncestors = mutableListOf(shape)
+        var ancestor = shape.parent
+        while(ancestor != null) {
+            shapeAncestors += ancestor
+            ancestor = ancestor.parent
+        }
+        return shapeAncestors.size
+    }
+
     fun checkDrop(shape: Shape? = null): Shape? {
         shapeMap.values.filter { "drop-target" in it.view.classes }.forEach {
             it.view.classes -= "drop-target"
@@ -416,19 +430,20 @@ class HtmlRenderer(
 
         if (shape != null) {
             val mouse = navigationView.mouseToCanvas(Root.mousePosition)
-            val targets_pre = shapeMap.filter { (s, view) ->
+            val targets = shapeMap.filter { (s, view) ->
                 mouse in (
                         view.view.dimension + Point(view.view.offsetLeft - workspace.offsetLeft,
                             view.view.offsetTop - workspace.offsetTop)
                         ) && shape != s
-            }
-            val targets = targets_pre.filterKeys { target ->
+            }.filterKeys { target ->
                 viewModel.handler.canDropShape(shape.id ?: return null, target.id ?: return null)
             }
 
             if (targets.isNotEmpty()) {
-                // This should give the most specific element.
-                val (target, view) = targets.entries.last()
+                val (target, view) = targets.entries.sortedWith { a, b ->
+                    compareValues(calculateDepthOfView(a.key), calculateDepthOfView(b.key))
+                }.last()
+
                 view.view.classes += "drop-target"
                 return target
             }

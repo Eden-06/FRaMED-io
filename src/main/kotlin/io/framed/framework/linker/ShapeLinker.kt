@@ -31,8 +31,8 @@ interface ShapeLinker<M : ModelElement, P : Shape> : Linker<M, P> {
         }.open()
     }
 
-    fun remove(linker: ShapeLinker<*, *>): Unit = throw UnsupportedOperationException()
-    fun add(model: ModelElement): ShapeLinker<*, *> = throw  UnsupportedOperationException()
+    fun remove(linker: ShapeLinker<*, *>): Unit = throw UnsupportedOperationException("Remove operation for ${this::class} not implemented.")
+    fun add(model: ModelElement): ShapeLinker<*, *> = throw  UnsupportedOperationException("Add operation for ${this::class} not implemented.")
 
     /**
      * Set of all known type names of this linker and all children.

@@ -53,18 +53,13 @@ interface LinkerInfoConnection {
     infix fun Linker<*, *>.isSibling(other: Linker<*, *>) =
             this is ShapeLinker<*, *> && other is ShapeLinker<*, *> && parent == other.parent
 
-    infix fun Linker<*, *>.isConnectable(other: Linker<*, *>) =
-            this is ShapeLinker<*, *> && other is ShapeLinker<*, *> && (parent == other.parent || parent?.getAncestors()?.contains(other.parent) ?: false || other.parent?.getAncestors()?.contains(parent) ?: false)
-
-    private tailrec fun Linker<*, *>.getAncestors(accumulator: List<ShapeLinker<*, *>> = emptyList()): List<ShapeLinker<*, *>> {
-        if (this !is ShapeLinker<*, *>) return emptyList()
-        val parent = parent
-        @Suppress("IfThenToElvis")
-        return if (parent == null) {
-            listOf(this)
-        } else {
-            parent.getAncestors(accumulator + this)
-        }
+    // FIXME: This function does not work with nested elements and RoleGroups.
+    infix fun Linker<*, *>.isConnectable(other: Linker<*, *>) : Boolean {
+        return this is ShapeLinker<*, *> &&
+                other is ShapeLinker<*, *> &&
+                (parent == other.parent ||
+                        this.ancestors.contains(other.parent) ||
+                        other.ancestors.contains(parent))
     }
 
     val Linker<*, *>.ancestors
@@ -77,4 +72,28 @@ interface LinkerInfoConnection {
         get() = (this as? ShapeLinker<*, *>)?.parent
 
     infix fun Linker<*, *>.isAncestorOf(other: Linker<*, *>) = this in other.ancestors
+}
+
+// FIXME: Function is not working as expected. Only the most direct member is detected.
+//private tailrec fun Linker<*, *>.getAncestors(accumulator: List<ShapeLinker<*, *>> = emptyList()): List<ShapeLinker<*, *>> {
+//    if (this !is ShapeLinker<*, *>) return emptyList()
+//    val parent = parent
+//    @Suppress("IfThenToElvis")
+//    return if (parent == null) {
+//        listOf(this)
+//    } else {
+//        parent.getAncestors(accumulator + this)
+//    }
+//}
+
+private fun Linker<*, *>.getAncestors(): List<ShapeLinker<*, *>> {
+    if (this !is ShapeLinker<*, *>) return emptyList()
+
+    val ancestors = mutableListOf<ShapeLinker<*,*>>()
+    var parent = this.parent
+    while (parent != null) {
+        ancestors += parent
+        parent = parent .parent
+    }
+    return ancestors
 }

@@ -47,7 +47,11 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
     fun getLinkerById(id: Long): ShapeLinker<*, *>? =
             shapeLinkers.find { it.id == id }
 
-    fun getLinkerByIdRecursive(id: Long ): ShapeLinker<*, *>? {
+    /**
+     * Function to query all linkers with the specified id from all child elements of this linker.
+     * This includes all linkers where this instance is a ancestor.
+     */
+    fun getChildLinkerById(id: Long ): ShapeLinker<*, *>? {
         val linkerQueue = ArrayDeque(shapeLinkers);
         while (linkerQueue.isNotEmpty()) {
             val linker = linkerQueue.removeFirst()
@@ -65,21 +69,25 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
     fun redraw(linker: ShapeLinker<*, *>)
 
     fun canDropShape(element: Long, target: Long): Boolean {
-        val shapeLinker = this.getLinkerByIdRecursive(element) ?: return false
-        val targetLinker = this.getLinkerByIdRecursive(target) ?: return false
+        val shapeLinker = this.getChildLinkerById(element) ?: return false
+        val targetLinker = this.getChildLinkerById(target) ?: return false
 
         return LinkerManager.linkerItemList.find { it.isLinkerFor(shapeLinker.model) }?.canCreateIn(targetLinker.model)
                 ?: false
     }
 
     fun dropShape(element: Long, target: Long) {
-        val elementLinker = getLinkerByIdRecursive(element) ?: throw IllegalArgumentException()
-        val targetLinker = getLinkerByIdRecursive(target) ?: throw IllegalArgumentException()
+        val elementLinker = getChildLinkerById(element) ?: throw IllegalArgumentException()
+        val targetLinker = getChildLinkerById(target) ?: throw IllegalArgumentException()
 
         val connectionCount = connectionManager.listConnections(elementLinker.id).size
 
         val elementName = elementLinker.model::class.simpleName?.lowercase() ?: "element"
         val targetName = targetLinker.model::class.simpleName?.lowercase() ?: "container"
+
+        if (elementLinker.parent == targetLinker) {
+            return
+        }
 
         if (connectionCount > 0) {
             dialog {
@@ -88,7 +96,7 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                 closable = true
                 addButton("Move and delete", true) {
                     History.group("Move $elementName to $targetName") {
-                        remove(elementLinker)
+                        elementLinker.parent?.remove(elementLinker)
                         targetLinker.add(elementLinker.model.copy())
                     }
                 }
@@ -97,7 +105,8 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                         val connectionList = connectionManager.listConnections(elementLinker.id).map { it.model }
 
                         val oldId = elementLinker.id
-                        remove(elementLinker)
+                        elementLinker.parent?.remove(elementLinker)
+
                         val model = elementLinker.model.copy()
                         targetLinker.add(model)
                         val newId = model.id
@@ -117,7 +126,7 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
             }.open()
         } else {
             History.group("Move $elementName to $targetName") {
-                remove(elementLinker)
+                elementLinker.parent?.remove(elementLinker)
                 targetLinker.add(elementLinker.model.copy())
             }
         }
