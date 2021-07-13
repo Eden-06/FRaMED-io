@@ -49,7 +49,7 @@ class RoleGroupLinker(
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty,
-                alignment = TextShape.TextAlignment.CENTER
+                alignment = TextShape.TextAlignment.RIGHT
             )
             textShape(cardinalityProperty,
                 autocomplete = CardinalityPreset.STRING_VALUES,
@@ -62,7 +62,7 @@ class RoleGroupLinker(
             }
         }
 
-        autoLayoutBox = boxShape(BoxShape.Position.VERTICAL) {
+        autoLayoutBox = boxShape(BoxShape.Position.ABSOLUTE) {
             style {
                 border = null
                 padding = box(8.0)
@@ -96,6 +96,9 @@ class RoleGroupLinker(
 
     }
 
+    /**
+     * Preview that is shown for the flatPreview of the parent.
+     */
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
         iconShape(constProperty(info.icon))
         textShape(nameProperty)
@@ -140,7 +143,7 @@ class RoleGroupLinker(
             return true
         }
 
-        override fun get(): Boolean = isFlatPreviewStringProperty.value?.toBoolean() ?: true
+        override fun get(): Boolean = isFlatPreviewStringProperty.value?.toBoolean() ?: false
     }, isFlatPreviewStringProperty)
     private var isFlatPreview by isFlatPreviewProperty
 
@@ -150,13 +153,13 @@ class RoleGroupLinker(
 
 
     private fun updatePreviewType() {
-        val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.ABSOLUTE
+        val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.VERTICAL
         if (shapeIsFlat == isFlatPreview) return
 
         autoLayoutBox.position = if (isFlatPreview) {
-            BoxShape.Position.ABSOLUTE
-        } else {
             BoxShape.Position.VERTICAL
+        } else {
+            BoxShape.Position.ABSOLUTE
         }
 
         autoLayoutBox.clear()
@@ -216,23 +219,25 @@ class RoleGroupLinker(
     override val contextMenu = defaultContextMenu {}
 
     override fun remove(linker: ShapeLinker<*, *>) {
-        when (linker) {
-            in children -> children -= linker
-            else -> super.remove(linker)
+        if (linker in children) {
+            children -= linker
+        } else {
+            println("${linker.id} removal from parent.")
+            super.remove(linker)
         }
-        updatePorts()
+        //updatePorts()
     }
 
     override fun add(model: ModelElement): ShapeLinker<*, *> {
         val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this, connectionManager)
         children += linker
-        updatePorts()
+        //updatePorts()
         return linker
     }
 
     override fun redraw(linker: ShapeLinker<*, *>) {
         children.redraw(linker)
-        updatePorts()
+        //updatePorts()
     }
 
     override fun ContextMenu.onOpen(event: ContextEvent) {}
@@ -255,9 +260,9 @@ class RoleGroupLinker(
         LinkerManager.setup(this)
         connectionManager.addModel(this)
 
-        connectionManager.onConnectionAdd { updatePorts() }
-        connectionManager.onConnectionRemove { updatePorts() }
-        updatePorts()
+        //connectionManager.onConnectionAdd { updatePorts() }
+        //connectionManager.onConnectionRemove { updatePorts() }
+        //updatePorts()
     }
 
     companion object : LinkerInfoItem {
