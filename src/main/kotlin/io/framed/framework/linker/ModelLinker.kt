@@ -13,6 +13,10 @@ import io.framed.framework.util.Point
 import io.framed.framework.view.Icon
 import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
+import io.framed.model.Aggregation
+import io.framed.model.Composition
+import io.framed.model.Fulfillment
+import io.framed.model.Relationship
 import kotlin.math.absoluteValue
 
 /**
@@ -45,13 +49,13 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
     val borderShapes: MutableList<Shape>
 
     fun getLinkerById(id: Long): ShapeLinker<*, *>? =
-            shapeLinkers.find { it.id == id }
+        shapeLinkers.find { it.id == id }
 
     /**
      * Function to query all linkers with the specified id from all child elements of this linker.
      * This includes all linkers where this instance is a ancestor.
      */
-    fun getChildLinkerById(id: Long ): ShapeLinker<*, *>? {
+    fun getChildLinkerById(id: Long): ShapeLinker<*, *>? {
         val linkerQueue = ArrayDeque(shapeLinkers);
         while (linkerQueue.isNotEmpty()) {
             val linker = linkerQueue.removeFirst()
@@ -73,7 +77,7 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
         val targetLinker = this.getChildLinkerById(target) ?: return false
 
         return LinkerManager.linkerItemList.find { it.isLinkerFor(shapeLinker.model) }?.canCreateIn(targetLinker.model)
-                ?: false
+            ?: false
     }
 
     fun dropShape(element: Long, target: Long) {
@@ -213,21 +217,26 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
     fun updatePorts(autoPosition: Boolean = false) {
         val directIdList = generateChildrenIdList()
 
+        // Find Fulfillment connections that run over a border.
         var neededBorderViews = connectionManager.connections
-                .mapNotNull {
-                    val s = it.sourceIdProperty.value
-                    val t = it.targetIdProperty.value
+            .filter {
+                it.model is Fulfillment
+            }
+            .mapNotNull {
+                val s = it.sourceIdProperty.value
+                val t = it.targetIdProperty.value
 
-                    if (s in directIdList && t !in directIdList) {
-                        s
-                    } else if (s !in directIdList && t in directIdList) {
-                        t
-                    } else {
-                        null
-                    }
+                if (s in directIdList && t !in directIdList) {
+                    s
+                } else if (s !in directIdList && t in directIdList) {
+                    t
+                } else {
+                    null
                 }
-                .distinct()
+            }
+            .distinct()
 
+        // Remove a shapes that already own a port.
         for (shape in borderShapes) {
             val id = shape.id?.absoluteValue ?: continue
             if (id !in neededBorderViews) {
@@ -237,7 +246,6 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                 neededBorderViews -= id
             }
         }
-
         for (shape in borderBox.shapes) {
             val id = shape.id?.absoluteValue ?: continue
             if (id >= 0 && id in neededBorderViews) {
@@ -252,6 +260,8 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
         }
 
         for (id in neededBorderViews) {
+
+            // Create a port for the id
             val shape = iconShape(property<Icon?>(null), id = -id) {
                 style {
                     background = color(255, 255, 255)
@@ -277,14 +287,14 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
             val id = -(shape.id ?: continue)
             // Find connection
             val connection = connectionManager.connections
-                    .find {
-                        val s = it.sourceIdProperty.value
-                        val t = it.targetIdProperty.value
+                .find {
+                    val s = it.sourceIdProperty.value
+                    val t = it.targetIdProperty.value
 
-                        (s == id || t == id) && (
-                                (s in directIdList && t !in directIdList) ||
-                                        (s !in directIdList && t in directIdList))
-                    }
+                    (s == id || t == id) &&
+                            ((s in directIdList && t !in directIdList) ||
+                                    (s !in directIdList && t in directIdList))
+                }
 
             if (connection != null) {
                 // Get source and target shape
@@ -298,10 +308,10 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
                     // Calculate intersection points with the four dimension lines
                     val points = listOf(
-                            d.left to calcIntersection(s.x, s.y, t.x, t.y, d.left),
-                            d.left + d.width to calcIntersection(s.x, s.y, t.x, t.y, d.left + d.width),
-                            calcIntersection(s.y, s.x, t.y, t.x, d.top) to d.top,
-                            calcIntersection(s.y, s.x, t.y, t.x, d.top + d.height) to d.top + d.height
+                        d.left to calcIntersection(s.x, s.y, t.x, t.y, d.left),
+                        d.left + d.width to calcIntersection(s.x, s.y, t.x, t.y, d.left + d.width),
+                        calcIntersection(s.y, s.x, t.y, t.x, d.top) to d.top,
+                        calcIntersection(s.y, s.x, t.y, t.x, d.top + d.height) to d.top + d.height
                     ).mapNotNull { (x, y) ->
                         if (x == null || y == null) null else Point(x, y)
                     }.filter {

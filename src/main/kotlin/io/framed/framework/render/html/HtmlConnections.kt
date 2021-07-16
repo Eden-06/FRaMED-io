@@ -189,32 +189,28 @@ class HtmlConnections(
         }
     }
 
+    /**
+     * Function ot give a shape the source-disabled css class.
+     */
     private fun setSourceEnabled(shape: Shape, enabled: Boolean) {
         val endpointItem = endpointMap[shape] ?: return
-        val jsPlumbInstance = endpointItem.jsPlumbInstance
         val view = endpointItem.view
-        val html = view.html
-
-        if (jsPlumbInstance.isSourceEnabled(html) != enabled) {
-            //jsPlumbInstance.setSourceEnabled(html)
-        }
 
         view.classes["source-disabled"] = !enabled
     }
 
+    /**
+     * Function to give a shape the target-disabled css class.
+     */
     private fun setTargetEnabled(shape: Shape, enabled: Boolean) {
         val endpointItem = endpointMap[shape] ?: return
-        val jsPlumbInstance = endpointItem.jsPlumbInstance
         val view = endpointItem.view
-        val html = view.html
-
-        if (jsPlumbInstance.isTargetEnabled(html) != enabled) {
-            //jsPlumbInstance.setTargetEnabled(html)
-        }
-
         view.classes["target-disabled"] = !enabled
     }
 
+    /**
+     * Function for checking if the elements at the current mouse position is a valid target for the new connection.
+     */
     private fun checkMousePosition() {
         if (jsTypeOf(document::elementsFromPoint) != "function") return
 
@@ -274,6 +270,9 @@ class HtmlConnections(
         }
     }
 
+    /**
+     * Function adding the Add Symbol next to shape for creating a new connection.
+     */
     private fun createEndpointInternal(shape: Shape, canStart: Boolean) {
         if (shape in endpointMap) return
 
