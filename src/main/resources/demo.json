@@ -310,7 +310,7 @@
                     "height": 480,
                     "autosize": false,
                     "data": {
-                        "flat-preview": "true"
+                        "flat-preview": "false"
                     },
                     "labels": [
                     ]
@@ -333,7 +333,7 @@
                     "height": 320,
                     "autosize": false,
                     "data": {
-                        "flat-preview": "true"
+                        "flat-preview": "false"
                     },
                     "labels": [
                     ]
@@ -543,7 +543,7 @@
                     "height": 403.1717343412528,
                     "autosize": false,
                     "data": {
-                        "flat-preview": "true"
+                        "flat-preview": "false"
                     },
                     "labels": [
                     ]

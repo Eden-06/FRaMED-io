@@ -79,7 +79,7 @@ class CompartmentLinker(
             }
         }
 
-        autoLayoutBox = boxShape(BoxShape.Position.VERTICAL) {
+        autoLayoutBox = boxShape(BoxShape.Position.ABSOLUTE) {
             style {
                 border {
                     style = Border.BorderStyle.SOLID
@@ -165,7 +165,9 @@ class CompartmentLinker(
             return true
         }
 
-        override fun get(): Boolean = isFlatPreviewStringProperty.value?.toBoolean() ?: true
+        override fun get(): Boolean {
+            return isFlatPreviewStringProperty.value?.toBoolean()?: false
+        }
     }, isFlatPreviewStringProperty)
     private var isFlatPreview by isFlatPreviewProperty
 
@@ -181,13 +183,13 @@ class CompartmentLinker(
     private val sidebarMethodsList: MutableList<SidebarEntry<Method>> = mutableListOf()
 
     private fun updatePreviewType() {
-        val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.ABSOLUTE
+        val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.VERTICAL
         if (shapeIsFlat == isFlatPreview) return
 
         autoLayoutBox.position = if (isFlatPreview) {
-            BoxShape.Position.ABSOLUTE
-        } else {
             BoxShape.Position.VERTICAL
+        } else {
+            BoxShape.Position.ABSOLUTE
         }
 
         autoLayoutBox.clear()

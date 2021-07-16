@@ -140,7 +140,7 @@ class PackageLinker(
             return true
         }
 
-        override fun get(): Boolean = isFlatPreviewStringProperty.value?.toBoolean() ?: true
+        override fun get(): Boolean = isFlatPreviewStringProperty.value?.toBoolean() ?: false
     }, isFlatPreviewStringProperty)
     private var isFlatPreview by isFlatPreviewProperty
 
@@ -157,13 +157,13 @@ class PackageLinker(
     private val authorProperty = property(model.metadata::author)
 
     private fun updatePreviewType() {
-        val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.ABSOLUTE
+        val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.VERTICAL
         if (shapeIsFlat == isFlatPreview) return
 
         autoLayoutBox.position = if (isFlatPreview) {
-            BoxShape.Position.ABSOLUTE
-        } else {
             BoxShape.Position.VERTICAL
+        } else {
+            BoxShape.Position.ABSOLUTE
         }
 
         autoLayoutBox.clear()

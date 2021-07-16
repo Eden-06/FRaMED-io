@@ -225,19 +225,19 @@ class RoleGroupLinker(
             println("${linker.id} removal from parent.")
             super.remove(linker)
         }
-        //updatePorts()
+        updatePorts()
     }
 
     override fun add(model: ModelElement): ShapeLinker<*, *> {
         val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this, connectionManager)
         children += linker
-        //updatePorts()
+        updatePorts()
         return linker
     }
 
     override fun redraw(linker: ShapeLinker<*, *>) {
         children.redraw(linker)
-        //updatePorts()
+        updatePorts()
     }
 
     override fun ContextMenu.onOpen(event: ContextEvent) {}
@@ -260,9 +260,9 @@ class RoleGroupLinker(
         LinkerManager.setup(this)
         connectionManager.addModel(this)
 
-        //connectionManager.onConnectionAdd { updatePorts() }
-        //connectionManager.onConnectionRemove { updatePorts() }
-        //updatePorts()
+        connectionManager.onConnectionAdd { updatePorts() }
+        connectionManager.onConnectionRemove { updatePorts() }
+        updatePorts()
     }
 
     companion object : LinkerInfoItem {
