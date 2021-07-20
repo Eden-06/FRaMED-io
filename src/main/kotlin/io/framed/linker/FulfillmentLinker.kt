@@ -92,18 +92,14 @@ class FulfillmentLinker(
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
             if(source !is RoleTypeLinker){
                 return canStart(source) && target is RoleTypeLinker
+                        && !(target.parent is SceneLinker && target.parent.parent is CompartmentLinker)
             } else {
                 return canStart(source) &&
                         target is RoleTypeLinker &&
-                        target.ancestors.filter { linker ->
-                            source.ancestors.contains(linker)
-                        }.isNotEmpty()
-                // TODO: Find out which implementation is correct for the semantics.
-//                target.ancestors.filter { linker ->
-//                    linker !is RoleGroupLinker
-//                } == source.ancestors.filter { linker ->
-//                    linker !is RoleGroupLinker
-//                }
+                        source.parent != target.parent &&
+                        target.ancestors
+                            .filter { linker -> (linker !is RoleGroupLinker) && (linker !is PackageLinker) }
+                            .any { linker -> source.ancestors.contains(linker) }
             }
 
         }
