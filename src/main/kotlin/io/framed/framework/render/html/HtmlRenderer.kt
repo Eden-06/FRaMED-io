@@ -4,6 +4,7 @@ import de.westermann.kobserve.event.EventHandler
 import de.westermann.kobserve.event.EventListener
 import de.westermann.kobserve.property.property
 import io.framed.framework.JsPlumbInstance
+import io.framed.framework.linker.LinkerManager
 import io.framed.framework.pictogram.ContextEvent
 import io.framed.framework.pictogram.Shape
 import io.framed.framework.pictogram.SidebarEvent
@@ -354,6 +355,7 @@ class HtmlRenderer(
         }
     }
 
+
     private fun loadViewBox() {
         val dimension = Dimension(viewModel.container.left, viewModel.container.top, viewModel.container.width, viewModel.container.height)
         navigationView.viewBox = dimension
@@ -413,7 +415,7 @@ class HtmlRenderer(
      * Calculates the depth of the Shape in the view tree.
      * The depth is the amount of elements between the first null parent.
      */
-    private fun calculateDepthOfView(shape: Shape): Int {
+     fun calculateDepthOfView(shape: Shape): Int {
         val shapeAncestors = mutableListOf(shape)
         var ancestor = shape.parent
         while(ancestor != null) {
@@ -435,6 +437,9 @@ class HtmlRenderer(
                         view.view.dimension + Point(view.view.offsetLeft - workspace.offsetLeft,
                             view.view.offsetTop - workspace.offsetTop)
                         ) && shape != s
+            }.filterKeys { target ->
+                //FIXME: Shape parent is always null. Thus this statement will not work.
+                shape.parent?.id != target.id ?: return@filterKeys true
             }.filterKeys { target ->
                 viewModel.handler.canDropShape(shape.id ?: return null, target.id ?: return null)
             }
