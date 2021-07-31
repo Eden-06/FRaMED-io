@@ -28,7 +28,7 @@ class HtmlConnections(
 
     var relations: Map<Connection, HtmlRelation> = emptyMap()
     val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
-    var jsPlumbList: List<Pair<JsPlumbInstance, ViewCollection<View<*>, *>>> = emptyList()
+    var jsPlumbList: List<Pair<JsPlumbInstance, Pair<Shape, ViewCollection<View<*>, *>>>> = emptyList()
 
     private var isConnecting: Shape? = null
 
@@ -55,7 +55,7 @@ class HtmlConnections(
     private var createSourceShape: Shape? = null
     private var createTargetShape: Shape? = null
 
-    fun createJsPlumb(container: ViewCollection<View<*>, *>): JsPlumbInstance {
+    fun createJsPlumb(shape: Shape, container: ViewCollection<View<*>, *>): JsPlumbInstance {
         val instance = JsPlumb.JsPlumb.getInstance().apply {
             setContainer(container.html)
 
@@ -116,21 +116,66 @@ class HtmlConnections(
             }
         }
 
-        jsPlumbList += instance to container
+        var idParent: Shape = shape
+        var parent = shape.parent
+        while (parent != null) {
+            if (parent.id != null) {
+                idParent = parent
+                break;
+            }
+            parent = parent.parent
+        }
+
+        jsPlumbList += instance to (idParent to container)
 
         return instance
     }
 
-    fun findInstance(idList: List<Long>): JsPlumbInstance {
-        val list = htmlRenderer.shapeMap.filterKeys { it.id in idList }.values.mapNotNull {
-            it.jsPlumbInstance
-        }.distinct()
+    /**
+     * Function to find all ancestors of a element with a id that are non anonymous (also have a id).
+     *
+     * This function has a complexity of O(|htmlRenderer.shapeMap|*|idList|)
+     */
+    private fun findNonAnonymousAncestors(idList: List<Long>): List<List<Shape>> {
+        return htmlRenderer.shapeMap.filterKeys { it.id in idList }.map { (shape, _) ->
+                val ancestors = mutableListOf<Shape>()
+                ancestors += shape
 
-        return if (list.size == 1) {
-            list.first()
-        } else {
-            jsPlumbList.firstOrNull { it.first in list }?.first ?: jsPlumbList.first().first
+                var parent = shape.parent
+                while (parent != null) {
+                    if (parent.id != null) {
+                        ancestors += parent
+                    }
+                    parent = parent.parent
+                }
+            ancestors.reversed()
         }
+    }
+
+    fun findInstance(idList: List<Long>): JsPlumbInstance {
+
+        val ancestorLists =  findNonAnonymousAncestors(idList)
+
+        val validAncestors = ancestorLists
+            .map { ancestors -> ancestors.map { ancestor -> ancestor.id }.toList() }
+            .reduceRightOrNull { a, b ->
+            a.intersect(b).toMutableList()
+        } ?: return jsPlumbList.first().first
+
+        val parent = ancestorLists
+            .asSequence()
+            .flatten()
+            .distinct()
+            .filter { it.id in validAncestors }
+            .sortedWith(compareByDescending {htmlRenderer.calculateDepthOfView(it)})
+            .firstOrNull()
+
+        return if (parent == null) {
+            jsPlumbList.first().first
+        } else {
+            jsPlumbList.firstOrNull { it.second.first.id == parent.id }?.first ?: jsPlumbList.first().first
+        }
+
     }
 
     fun addShape(shape: Shape) {
@@ -238,25 +283,12 @@ class HtmlConnections(
         }.toList()
             .distinctBy { (_, s) ->
                 s.id
-            }.sortedWith(Comparator{ (_,s1), (_, s2) ->
-                var p1= s1.parent
-                var p2= s2.parent
-
-                var depth1 = 0
-                var depth2 = 0
-
-                while (p1 != null) {
-                    p1 = p1.parent
-                    depth1++
-                }
-
-                while (p2 != null) {
-                    p2 = p2.parent
-                    depth2++
-                }
-
-                return@Comparator compareValues(depth1, depth2)
-            })
+            }.sortedWith { (_, s1), (_, s2) ->
+                compareValues(
+                    htmlRenderer.calculateDepthOfView(s1),
+                    htmlRenderer.calculateDepthOfView(s2)
+                )
+            }
             .lastOrNull()
 
         if (selectedDropTarget != null) {

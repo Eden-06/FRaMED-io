@@ -19,7 +19,7 @@ class HtmlShapeContainer(
 ) {
 
     val jsPlumbInstance = if (containerShape.position == BoxShape.Position.ABSOLUTE || jsPlumbInstanceParent == null) {
-        htmlRenderer.htmlConnections.createJsPlumb(container)
+        htmlRenderer.htmlConnections.createJsPlumb(containerShape, container)
     } else jsPlumbInstanceParent
 
     private val shapeMap: MutableMap<Shape, HtmlShape> = mutableMapOf()

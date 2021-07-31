@@ -107,7 +107,7 @@ class HtmlRelation(
         val targetId = connection.target.value
 
         val instance = renderer.htmlConnections.findInstance(listOf(sourceId, targetId))
-        val box = renderer.htmlConnections.jsPlumbList.first { it.first == instance }.second
+        val box = renderer.htmlConnections.jsPlumbList.first { it.first == instance }.second.second
 
         remove()
 
