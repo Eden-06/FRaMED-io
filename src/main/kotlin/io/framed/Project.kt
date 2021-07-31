@@ -59,6 +59,9 @@ class Project(
                 subclass(Inheritance::class)
                 subclass(CreateRelationship::class)
                 subclass(DestroyRelationship::class)
+                subclass(RoleProhibition::class)
+                subclass(RoleImplication::class)
+                subclass(RoleEquivalence::class)
             }
 
             // Register model elements
@@ -73,6 +76,7 @@ class Project(
                 subclass(Package::class)
                 subclass(Compartment::class)
                 subclass(Scene::class)
+                subclass(RoleGroup::class)
             }
 
             polymorphic(Attribute::class) {

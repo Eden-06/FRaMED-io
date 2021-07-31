@@ -1,9 +1,9 @@
 package io.framed.model
 
 import io.framed.framework.model.ModelElement
-import io.framed.init
-import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.Serializable
 
+@Serializable
 class RoleGroup() : ModelElement() {
 
     constructor(init: (RoleGroup) -> Unit) : this() {
