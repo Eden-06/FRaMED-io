@@ -49,6 +49,9 @@ class SceneLinker(
     override lateinit var borderBox: BoxShape
     override val borderShapes = mutableListOf<Shape>()
 
+    override val portMapping: MutableMap<Long, Long> = mutableMapOf()
+    override val inversePortMapping: MutableMap<Long, Long> = mutableMapOf()
+
     override val pictogram = boxShape {
         boxShape {
             textShape(nameProperty)

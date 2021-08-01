@@ -48,6 +48,9 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
     val borderShapes: MutableList<Shape>
 
+    val portMapping: MutableMap<Long, Long>
+    val inversePortMapping: MutableMap<Long, Long>
+
     fun getLinkerById(id: Long): ShapeLinker<*, *>? =
         shapeLinkers.find { it.id == id }
 
@@ -238,17 +241,25 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
         // Remove a shapes that already own a port.
         for (shape in borderShapes) {
-            val id = shape.id?.absoluteValue ?: continue
+            val portId = shape.id?: continue
+            val id = inversePortMapping[portId] ?: continue
+
             if (id !in neededBorderViews) {
                 borderBox -= shape
                 borderShapes -= shape
+
+                portMapping.remove(id)
+                inversePortMapping.remove(portId)
             } else {
                 neededBorderViews -= id
             }
         }
+
         for (shape in borderBox.shapes) {
-            val id = shape.id?.absoluteValue ?: continue
-            if (id >= 0 && id in neededBorderViews) {
+            val portId = shape.id?: continue
+            val id = inversePortMapping[portId] ?: continue
+
+            if (id in neededBorderViews) {
                 neededBorderViews -= id
             }
         }
@@ -261,8 +272,13 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
         for (id in neededBorderViews) {
 
+            val portId = Long.MAX_VALUE - id
+
+            portMapping += id to portId
+            inversePortMapping += portId to id
+
             // Create a port for the id
-            val shape = iconShape(property<Icon?>(null), id = -id) {
+            val shape = iconShape(property<Icon?>(null), id = portId) {
                 style {
                     background = color(255, 255, 255)
                     border {
@@ -275,7 +291,7 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
             }
 
             // Check if it is a new border view
-            if (-id !in borderBox.layer) {
+            if (portId !in borderBox.layer) {
                 autoLayout += shape
             }
 
@@ -284,7 +300,9 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
         }
 
         for (shape in autoLayout) {
-            val id = -(shape.id ?: continue)
+            val portId = shape.id ?: continue
+            val id = inversePortMapping[portId] ?: continue
+
             // Find connection
             val connection = connectionManager.connections
                 .find {
@@ -302,6 +320,7 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                 val target = connectionManager.getLinkerById(connection.targetIdProperty.value)
 
                 if (source != null && target != null) {
+
                     val d = pictogram.dimension
                     val s = source.pictogram.center
                     val t = target.pictogram.center
@@ -338,6 +357,7 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
     }
 
     override fun updateLabelBindings() {
+
         for (shape in borderShapes) {
             var label = shape.labels.find { it.id == "name" }
             if (label == null) {
@@ -345,7 +365,10 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                 shape.labels += label
             }
 
-            val id = -(shape.id ?: continue)
+
+            val portId = shape.id ?: continue
+            val id = inversePortMapping[portId] ?: continue
+
             val linker = shapeLinkers.find { it.id == id } as? PreviewLinker<*, *, *> ?: continue
 
             val typeName = linker.typeName
