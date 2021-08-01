@@ -114,8 +114,8 @@ class HtmlRelation(
         jsPlumbInstance = instance
         container = box
 
-        val sourceViewNew = renderer[sourceId, jsPlumbInstance] ?: return
-        val targetViewNew = renderer[targetId, jsPlumbInstance] ?: return
+        val sourceViewNew = renderer[sourceId] ?: return
+        val targetViewNew = renderer[targetId] ?: return
 
         if (!this::sourceView.isInitialized || sourceView != sourceViewNew) {
             sourceView = sourceViewNew
