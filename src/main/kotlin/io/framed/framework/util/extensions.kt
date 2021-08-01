@@ -187,7 +187,7 @@ fun Sidebar.advanced(pictogram: Shape) {
                     "[${paramList.joinToString(", ")}]"
                 }
                 return buildString {
-                    append("$type$params(${shape.id?.toInt()}: ${shape.width} x ${shape.height})")
+                    append("$type$params(${shape.id?.toLong()}: ${shape.width} x ${shape.height})")
                     if (shape is BoxShape) {
                         for (child in shape.shapes) {
                             append("\n")
