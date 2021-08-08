@@ -13,6 +13,10 @@ class Connection(
         id: Long
 ) : Pictogram(id) {
 
+    // FIXME: Implement proper solution to switch between port targeting and regular targeting.
+    var useSourcePortEndpoint: Boolean = false;
+    var useTargetPortEndpoint: Boolean = false;
+
     var lines: List<ConnectionLine> = emptyList()
         set(value) {
             field = value

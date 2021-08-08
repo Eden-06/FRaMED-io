@@ -401,8 +401,13 @@ class HtmlRenderer(
         viewModel.container.onSidebar.emit(SidebarEvent(viewModel.container))
     }
 
-    operator fun get(id: Long): View<*>? = shapeMap
-            .filter { it.key.id == id}
+    operator fun get(id: Long, usePort: Boolean = false): View<*>? = shapeMap
+            .filter {
+                if (usePort) {
+                    it.key.id?.let(::abs)==id
+                } else {
+                    it.key.id == id
+                }}
             .values.sortedBy { it.shape.id }.firstOrNull()?.view
 
     fun getShapeById(id: String): Shape? = shapeMap.entries.find { (_, item) ->

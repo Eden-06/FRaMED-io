@@ -13,10 +13,7 @@ import io.framed.framework.util.Point
 import io.framed.framework.view.Icon
 import io.framed.framework.view.dialog
 import io.framed.framework.view.textView
-import io.framed.model.Aggregation
-import io.framed.model.Composition
 import io.framed.model.Fulfillment
-import io.framed.model.Relationship
 import kotlin.math.absoluteValue
 
 /**
@@ -227,11 +224,19 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                 val t = it.targetIdProperty.value
 
                 if (s in directIdList && t !in directIdList) {
+                    it.enablePortConnection(
+                        true,
+                        false)
+
                     s
                 } else if (s !in directIdList && t in directIdList) {
+                    it.enablePortConnection(
+                        false,
+                        true)
+
                     t
                 } else {
-                    null
+                   null
                 }
             }
             .distinct()
@@ -296,12 +301,14 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                                     (s !in directIdList && t in directIdList))
                 }
 
+
             if (connection != null) {
                 // Get source and target shape
                 val source = connectionManager.getLinkerById(connection.sourceIdProperty.value)
                 val target = connectionManager.getLinkerById(connection.targetIdProperty.value)
 
                 if (source != null && target != null) {
+
                     val d = pictogram.dimension
                     val s = source.pictogram.center
                     val t = target.pictogram.center

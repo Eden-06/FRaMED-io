@@ -156,6 +156,8 @@ class HtmlConnections(
 
         val ancestorLists =  findNonAnonymousAncestors(idList)
 
+        //TODO Avoid ancestors that are target elements.
+
         val validAncestors = ancestorLists
             .map { ancestors -> ancestors.map { ancestor -> ancestor.id }.toList() }
             .reduceRightOrNull { a, b ->

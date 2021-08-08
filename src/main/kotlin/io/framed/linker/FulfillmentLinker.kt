@@ -57,6 +57,11 @@ class FulfillmentLinker(
 
     override val contextMenu = defaultContextMenu()
 
+    override fun enablePortConnection(forSource: Boolean, forTarget: Boolean) {
+        pictogram.useSourcePortEndpoint = forSource
+        pictogram.useTargetPortEndpoint = forTarget
+    }
+
 
     override fun updateLabelBindings() {
         val ids = pictogram.labels.mapNotNull { it.id }.distinct().toSet()
