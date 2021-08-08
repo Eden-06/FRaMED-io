@@ -154,7 +154,11 @@ class HtmlConnections(
 
     fun findInstance(idList: List<Long>): JsPlumbInstance {
 
-        val ancestorLists =  findNonAnonymousAncestors(idList)
+        val ancestorLists =  findNonAnonymousAncestors(idList).map {
+            it.filter { shape ->
+                !idList.contains(shape.id)
+            }
+        }
 
         //TODO Avoid ancestors that are target elements.
 
