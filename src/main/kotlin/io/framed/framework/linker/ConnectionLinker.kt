@@ -61,6 +61,12 @@ interface ConnectionLinker<M : ModelConnection> : Linker<M, Connection> {
      * Check if the given [id] is the source or target.
      */
     operator fun contains(id: Long): Boolean = sourceIdProperty.get() == id || targetIdProperty.get() == id
+
+    /**
+     * Enable targeting the port representations for the source and target of the connection.
+     *
+     * FIXME: Implement proper solution to switch between port targeting and regular targeting.
+     */
     fun enablePortConnection(forSource: Boolean, forTarget: Boolean) {
         throw RuntimeException("Not implemented for this connection!")
     }

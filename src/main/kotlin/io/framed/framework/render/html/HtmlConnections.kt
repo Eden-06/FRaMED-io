@@ -55,6 +55,9 @@ class HtmlConnections(
     private var createSourceShape: Shape? = null
     private var createTargetShape: Shape? = null
 
+    /**
+     * Creates a new jsPlumb instance managing a given container inside the specified shape.
+     */
     fun createJsPlumb(shape: Shape, container: ViewCollection<View<*>, *>): JsPlumbInstance {
         val instance = JsPlumb.JsPlumb.getInstance().apply {
             setContainer(container.html)
@@ -132,7 +135,7 @@ class HtmlConnections(
     }
 
     /**
-     * Function to find all ancestors of a element with a id that are non anonymous (also have a id).
+     * Finds all ancestors of a element with an id that are non anonymous (also have a id).
      *
      * This function has a complexity of O(|htmlRenderer.shapeMap|*|idList|)
      */
@@ -152,6 +155,14 @@ class HtmlConnections(
         }
     }
 
+    /**
+     * Finds the lowest jsPlumbInstance that encompasses all shapes in the idList.
+     *
+     * A suitable instance has to contain all shapes in the list.
+     * Thus if a parent and child shape are give, the parent of the parent should be returned.
+     *
+     * @author David Oberacker <david.oberacker@student.kit.edu>
+     */
     fun findInstance(idList: List<Long>): JsPlumbInstance {
 
         val ancestorLists =  findNonAnonymousAncestors(idList).map {
