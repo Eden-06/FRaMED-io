@@ -5,15 +5,36 @@ import io.framed.framework.linker.Linker
 import io.framed.framework.view.Surround
 
 /**
- * @author lars
+ * ViewModel class that represents a text field.
+ *
+ * @author Lars Westermann, David Oberacker
  */
 class TextShape(
+        /**
+         * Property containing the text that is displayed inside the text shape.
+         */
         val property: ReadOnlyProperty<String>,
+        /**
+         * Strings to use for autocompletion when writing inside the text field.
+         */
         val autocomplete: List<String>,
+        /**
+         * Optional id of the text shape.
+         */
         id: Long?,
+        /**
+         * Text alignment direction.
+         */
         val alignment: TextAlignment,
+        /**
+         * Limiters that should surround the text at all times.
+         */
         val surround: Surround
 ) : Shape(id) {
+
+        /**
+         * Text alignment direction.
+         */
         enum class TextAlignment {
                 LEFT,
                 RIGHT,
