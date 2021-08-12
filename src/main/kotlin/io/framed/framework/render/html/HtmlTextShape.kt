@@ -8,9 +8,13 @@ import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.inputView
 import kotlinx.browser.document
-import org.w3c.dom.Text
 import kotlin.math.max
 
+/**
+ * HTML render of a [TextShape].
+ *
+ * @author Lars Westermann, David Oberacker
+ */
 class HtmlTextShape(
         htmlRenderer: HtmlRenderer,
         override val shape: TextShape,
@@ -20,13 +24,17 @@ class HtmlTextShape(
         override val jsPlumbInstance: JsPlumbInstance
 ) : HtmlShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
 
-    fun alignment(view: InputView, alignment: TextShape.TextAlignment) {
+    /**
+     * Sets text alignment on the input view to match the value specified in the view model.
+     */
+    private fun alignment(view: InputView, alignment: TextShape.TextAlignment) {
         when (alignment) {
             TextShape.TextAlignment.LEFT -> view.input.html.style.textAlign = "left"
             TextShape.TextAlignment.RIGHT ->  view.input.html.style.textAlign = "right"
             TextShape.TextAlignment.CENTER ->  view.input.html.style.textAlign = "center"
         }
     }
+
     override val view: View<*> = container.inputView(shape.property, shape.surround) {
         style(this, shape.style)
         events(this, shape)
@@ -42,10 +50,10 @@ class HtmlTextShape(
         onFocusEnter {
             if(View.disableDrag){
                 val downEvent = document.createEvent("MouseEvents")
-                downEvent.initEvent("mousedown", bubbles = true, cancelable = true);
+                downEvent.initEvent("mousedown", bubbles = true, cancelable = true)
                 html.dispatchEvent(downEvent)
                 val upEvent = document.createEvent("MouseEvents")
-                upEvent.initEvent("mouseup", bubbles = true, cancelable = true);
+                upEvent.initEvent("mouseup", bubbles = true, cancelable = true)
                 html.dispatchEvent(upEvent)
             } else {
                 it.preventDefault()

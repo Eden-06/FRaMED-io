@@ -22,10 +22,12 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * @author lars
+ * Render component used for rendering the view model to HTML elements.
+ *
+ * @author Lars Westermann, David Oberacker
  */
 class HtmlRenderer(
-        private val workspace: ListView
+    private val workspace: ListView
 ) : Renderer {
     lateinit var viewModel: ViewModel
 
@@ -188,31 +190,31 @@ class HtmlRenderer(
 
         val ignore = selected
         val otherViews = unselected
-                .asSequence()
-                .filter { it.isChildOf(parent) }
-                .map {
-                    it to Dimension(
-                            it.positionView?.left ?: 0.0,
-                            it.positionView?.top ?: 0.0,
-                            it.positionView?.width ?: 0.0,
-                            it.positionView?.height ?: 0.0
-                    )
-                }
-                .filter {
-                    it.second in visible
-                }
-                .flatMap { (it, dim) ->
-                    sequenceOf(
-                            it to Point(dim.left, dim.top),
-                            it to Point(dim.left + dim.width / 2, dim.top + dim.height / 2),
-                            it to Point(dim.left + dim.width, dim.top + dim.height)
-                    )
-                }.toList()
+            .asSequence()
+            .filter { it.isChildOf(parent) }
+            .map {
+                it to Dimension(
+                    it.positionView?.left ?: 0.0,
+                    it.positionView?.top ?: 0.0,
+                    it.positionView?.width ?: 0.0,
+                    it.positionView?.height ?: 0.0
+                )
+            }
+            .filter {
+                it.second in visible
+            }
+            .flatMap { (it, dim) ->
+                sequenceOf(
+                    it to Point(dim.left, dim.top),
+                    it to Point(dim.left + dim.width / 2, dim.top + dim.height / 2),
+                    it to Point(dim.left + dim.width, dim.top + dim.height)
+                )
+            }.toList()
 
         val points = listOf(
-                topLeft,
-                Point(topLeft.x + view.width / 2, topLeft.y + view.height / 2),
-                Point(topLeft.x + view.width, topLeft.y + view.height)
+            topLeft,
+            Point(topLeft.x + view.width / 2, topLeft.y + view.height / 2),
+            Point(topLeft.x + view.width, topLeft.y + view.height)
         ).map { it to snapPoint(it, SnapDirection.BOTH, parent, ignore, otherViews) }
 
         val (sourceX, snapX) = points.minByOrNull { (point, result) ->
@@ -240,9 +242,9 @@ class HtmlRenderer(
             var hLines = emptySet<Double>()
 
             val newPoints = listOf(
-                    snap,
-                    Point(snap.x + view.width / 2, snap.y + view.height / 2),
-                    Point(snap.x + view.width, snap.y + view.height)
+                snap,
+                Point(snap.x + view.width / 2, snap.y + view.height / 2),
+                Point(snap.x + view.width, snap.y + view.height)
             )
             for (it in newPoints) {
                 otherViews.forEach { (v, p) ->
@@ -268,11 +270,11 @@ class HtmlRenderer(
     }
 
     fun snapPoint(
-            point: Point,
-            direction: SnapDirection = SnapDirection.BOTH,
-            parent: ViewCollection<View<*>, *>? = null,
-            ignore: List<Selectable> = emptyList(),
-            snapableViews: List<Pair<Selectable, Point>>? = null
+        point: Point,
+        direction: SnapDirection = SnapDirection.BOTH,
+        parent: ViewCollection<View<*>, *>? = null,
+        ignore: List<Selectable> = emptyList(),
+        snapableViews: List<Pair<Selectable, Point>>? = null
     ): SnapResult {
         var p = point
         var snapToViewX = false
@@ -282,8 +284,8 @@ class HtmlRenderer(
 
         if (snapToGrid) {
             p = Point(
-                    if (direction != SnapDirection.VERTICAL) (p.x / gridSize).roundToInt() * gridSize else p.x,
-                    if (direction != SnapDirection.HORIZONTAL) (p.y / gridSize).roundToInt() * gridSize else p.y
+                if (direction != SnapDirection.VERTICAL) (p.x / gridSize).roundToInt() * gridSize else p.x,
+                if (direction != SnapDirection.HORIZONTAL) (p.y / gridSize).roundToInt() * gridSize else p.y
             )
         }
 
@@ -291,14 +293,14 @@ class HtmlRenderer(
             val threshold = gridSize / 2
 
             val otherViews = snapableViews ?: (selectable - ignore)
-                    .filter { (it.isChildOf(parent)) }
-                    .flatMap {
-                        listOf(
-                                it to Point(it.left, it.top),
-                                it to Point(it.left + it.width / 2, it.top + it.height / 2),
-                                it to Point(it.left + it.width, it.top + it.height)
-                        )
-                    }
+                .filter { (it.isChildOf(parent)) }
+                .flatMap {
+                    listOf(
+                        it to Point(it.left, it.top),
+                        it to Point(it.left + it.width / 2, it.top + it.height / 2),
+                        it to Point(it.left + it.width, it.top + it.height)
+                    )
+                }
 
             var newPx = p.x
             var newPy = p.y
@@ -306,10 +308,10 @@ class HtmlRenderer(
             if (direction != SnapDirection.VERTICAL) {
                 // Test x center
                 val foundX = otherViews
-                        .map { (view, px) ->
-                            SnapHelper(view, px, abs(px.x - p.x))
-                        }
-                        .filter { it.delta < threshold }
+                    .map { (view, px) ->
+                        SnapHelper(view, px, abs(px.x - p.x))
+                    }
+                    .filter { it.delta < threshold }
                 if (foundX.isNotEmpty()) {
                     val (_, min, _) = foundX.minByOrNull { it.delta } ?: foundX.first()
                     newPx = min.x
@@ -321,10 +323,10 @@ class HtmlRenderer(
             if (direction != SnapDirection.HORIZONTAL) {
                 // Test y center
                 val foundY = otherViews
-                        .map { (view, py) ->
-                            SnapHelper(view, py, abs(py.y - p.y))
-                        }
-                        .filter { it.delta < threshold }
+                    .map { (view, py) ->
+                        SnapHelper(view, py, abs(py.y - p.y))
+                    }
+                    .filter { it.delta < threshold }
                 if (foundY.isNotEmpty()) {
                     val (_, min, _) = foundY.minByOrNull { it.delta } ?: foundY.first()
                     newPy = min.y
@@ -357,7 +359,12 @@ class HtmlRenderer(
 
 
     private fun loadViewBox() {
-        val dimension = Dimension(viewModel.container.left, viewModel.container.top, viewModel.container.width, viewModel.container.height)
+        val dimension = Dimension(
+            viewModel.container.left,
+            viewModel.container.top,
+            viewModel.container.width,
+            viewModel.container.height
+        )
         navigationView.viewBox = dimension
     }
 
@@ -391,9 +398,9 @@ class HtmlRenderer(
         htmlConnections = HtmlConnections(this, viewModel)
 
         htmlShape = HtmlShapeContainer(
-                this,
-                viewModel.container,
-                navigationView.container
+            this,
+            viewModel.container,
+            navigationView.container
         )
 
         htmlConnections.init()
@@ -401,14 +408,19 @@ class HtmlRenderer(
         viewModel.container.onSidebar.emit(SidebarEvent(viewModel.container))
     }
 
+    /**
+     * Retrieves the shape with the given id. If the [usePort] parameter is enabled, the port of the shape with this
+     * id will be targeted.
+     */
     operator fun get(id: Long, usePort: Boolean = false): View<*>? = shapeMap
-            .filter {
-                if (usePort) {
-                    it.key.id?.let(::abs)==id
-                } else {
-                    it.key.id == id
-                }}
-            .values.sortedBy { it.shape.id }.firstOrNull()?.view
+        .filter {
+            if (usePort) {
+                it.key.id?.let(::abs) == id
+            } else {
+                it.key.id == id
+            }
+        }
+        .values.sortedBy { it.shape.id }.firstOrNull()?.view
 
     fun getShapeById(id: String): Shape? = shapeMap.entries.find { (_, item) ->
         item.view.id == id
@@ -420,16 +432,20 @@ class HtmlRenderer(
      * Calculates the depth of the Shape in the view tree.
      * The depth is the amount of elements between the first null parent.
      */
-     fun calculateDepthOfView(shape: Shape): Int {
+    fun calculateDepthOfView(shape: Shape): Int {
         val shapeAncestors = mutableListOf(shape)
         var ancestor = shape.parent
-        while(ancestor != null) {
+        while (ancestor != null) {
             shapeAncestors += ancestor
             ancestor = ancestor.parent
         }
         return shapeAncestors.size
     }
 
+    /**
+     * Checks if a shape can be dropped inside another shape.
+     * The target is selected from the 'drop-target' annotation on the element.
+     */
     fun checkDrop(shape: Shape? = null): Shape? {
         shapeMap.values.filter { "drop-target" in it.view.classes }.forEach {
             it.view.classes -= "drop-target"
@@ -439,8 +455,10 @@ class HtmlRenderer(
             val mouse = navigationView.mouseToCanvas(Root.mousePosition)
             val targets = shapeMap.filter { (s, view) ->
                 mouse in (
-                        view.view.dimension + Point(view.view.offsetLeft - workspace.offsetLeft,
-                            view.view.offsetTop - workspace.offsetTop)
+                        view.view.dimension + Point(
+                            view.view.offsetLeft - workspace.offsetLeft,
+                            view.view.offsetTop - workspace.offsetTop
+                        )
                         ) && shape != s
             }.filterKeys { target ->
                 //FIXME: Shape parent is always null. Thus this statement will not work.
@@ -450,6 +468,7 @@ class HtmlRenderer(
             }
 
             if (targets.isNotEmpty()) {
+                // Select the deepest element that the shape can be dropped to allow for nesting.
                 val (target, view) = targets.entries.sortedWith { a, b ->
                     compareValues(calculateDepthOfView(a.key), calculateDepthOfView(b.key))
                 }.last()
@@ -479,9 +498,9 @@ class HtmlRenderer(
 }
 
 data class SnapHelper(
-        val view: Selectable,
-        val targetPoint: Point,
-        val delta: Double
+    val view: Selectable,
+    val targetPoint: Point,
+    val delta: Double
 )
 
 enum class SnapDirection {
@@ -489,7 +508,7 @@ enum class SnapDirection {
 }
 
 data class SnapResult(
-        val point: Point,
-        val snapToViewX: Boolean,
-        val snapToViewY: Boolean
+    val point: Point,
+    val snapToViewX: Boolean,
+    val snapToViewY: Boolean
 )

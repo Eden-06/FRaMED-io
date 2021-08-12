@@ -13,12 +13,15 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.MouseEvent
 
 /**
- * @author lars
+ * HTML representation of a line between to shape elements. This is a abstraction from the connection that has
+ * attributes and labels.
+ *
+ * @author Lars Westermann, David Oberacker
  */
 @Suppress("UNUSED")
 class HtmlRelation(
-        val connection: Connection,
-        val renderer: HtmlRenderer
+    val connection: Connection,
+    private val renderer: HtmlRenderer
 ) : Selectable {
 
     override val id: Long = connection.id!!
@@ -102,10 +105,14 @@ class HtmlRelation(
         }
     }
 
+    /**
+     * Draws a connection between the source and target of [connection] using the JsPlumb framework.
+     */
     fun draw() {
         val sourceId = connection.source.value
         val targetId = connection.target.value
 
+        // Find JsPlumb instance to use and the container it is responsible for.
         val instance = renderer.htmlConnections.findInstance(listOf(sourceId, targetId))
         val box = renderer.htmlConnections.jsPlumbList.first { it.first == instance }.second.second
 
