@@ -14,9 +14,10 @@ import io.framed.framework.view.sidebar
 import io.framed.model.Fulfillment
 
 /**
+ * Linker component for the [Fulfillment] model.
+ *
  * @author lars
  */
-
 class FulfillmentLinker(
         override val model: Fulfillment,
         override val manager: ConnectionManager
@@ -57,11 +58,13 @@ class FulfillmentLinker(
 
     override val contextMenu = defaultContextMenu()
 
-    override fun enablePortConnection(forSource: Boolean, forTarget: Boolean) {
-        pictogram.useSourcePortEndpoint = forSource
-        pictogram.useTargetPortEndpoint = forTarget
+    override fun enablePortTargetingSource(enable: Boolean) {
+        pictogram.useSourcePortEndpoint = enable
     }
 
+    override fun enablePortTargetingTarget(enable: Boolean) {
+        pictogram.useTargetPortEndpoint = enable
+    }
 
     override fun updateLabelBindings() {
         val ids = pictogram.labels.mapNotNull { it.id }.distinct().toSet()
@@ -95,11 +98,11 @@ class FulfillmentLinker(
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            if(source !is RoleTypeLinker){
-                return canStart(source) && target is RoleTypeLinker
-                        && !(target.parent is SceneLinker && target.parent.parent is CompartmentLinker)
+            return if(source !is RoleTypeLinker){
+                (canStart(source) && target is RoleTypeLinker
+                        && !(target.parent is SceneLinker && target.parent.parent is CompartmentLinker))
             } else {
-                return canStart(source) &&
+                canStart(source) &&
                         target is RoleTypeLinker &&
                         source.parent != target.parent &&
                         target.ancestors

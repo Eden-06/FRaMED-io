@@ -13,15 +13,13 @@ import io.framed.framework.view.FramedIcon
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
-import io.framed.linker.RoleImplicationLinker.Companion.parent
 import io.framed.model.RoleProhibition
 
 /**
- * ProhibitionLinker for the Prohibition role connection.
+ * Linker component for the [RoleProhibition] connection.
  *
  * @author David Oberacker
  */
-
 class RoleProhibitionLinker(
     override val model: RoleProhibition,
     override val manager: ConnectionManager
@@ -33,7 +31,6 @@ class RoleProhibitionLinker(
     override val sourceIdProperty = property(model::sourceId).trackHistory()
     override val targetIdProperty = property(model::targetId).trackHistory()
 
-    //TODO: Optimize the display of the prohibition arrow.
     override val pictogram = connection(sourceIdProperty, targetIdProperty) {
         line(ConnectionLine.Type.RECTANGLE) {
             stroke = Color(0, 0, 0)
@@ -78,7 +75,6 @@ class RoleProhibitionLinker(
         }
     }
 
-
     override fun updateLabelBindings() {
         for (label in pictogram.labels) {
             if (label.textProperty.isBound) {
@@ -101,20 +97,10 @@ class RoleProhibitionLinker(
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            var source_ancestor = source.parent
-            while (source_ancestor != null && source_ancestor is RoleGroupLinker) {
-                source_ancestor = source_ancestor.parent
-            }
-
-            var target_ancestor = target.parent
-            while (target_ancestor != null && target_ancestor is RoleGroupLinker) {
-                target_ancestor = target_ancestor.parent
-            }
-
             return RoleImplicationLinker.canStart(source) &&
                     (target is RoleTypeLinker || target is RoleGroupLinker) &&
                     source != target &&
-                    source_ancestor == target_ancestor
+                    source isConnectable target
         }
 
         override fun isLinkerFor(element: ModelConnection): Boolean = element is RoleProhibition

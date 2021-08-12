@@ -16,7 +16,7 @@ import io.framed.framework.view.sidebar
 import io.framed.model.RoleImplication
 
 /**
- * ImplicationLinker for the Implication role connection.
+ * Linker component for the [RoleImplication] connection.
  *
  * @author David Oberacker
  */
@@ -86,20 +86,10 @@ class RoleImplicationLinker(
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            var source_ancestor = source.parent
-            while (source_ancestor != null && source_ancestor is RoleGroupLinker) {
-                source_ancestor = source_ancestor.parent
-            }
-
-            var target_ancestor = target.parent
-            while (target_ancestor != null && target_ancestor is RoleGroupLinker) {
-                target_ancestor = target_ancestor.parent
-            }
-
             return canStart(source) &&
                     (target is RoleTypeLinker || target is RoleGroupLinker) &&
                     source != target &&
-                    source_ancestor == target_ancestor
+                    source isConnectable target
         }
 
         override fun isLinkerFor(element: ModelConnection): Boolean = element is RoleImplication

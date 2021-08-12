@@ -46,8 +46,6 @@ class ConnectionManagerLinker(val modelConnections: Connections) : ConnectionMan
         } else {
             CyclicChooser(types) { type ->
                 tooltipIconView(type.icon, type.name)
-                //textView(type.name)
-
                 onClick {
                     createConnection(source, target, type)
                 }

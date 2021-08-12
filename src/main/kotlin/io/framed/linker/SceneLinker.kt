@@ -16,6 +16,8 @@ import io.framed.model.Package
 import io.framed.model.Scene
 
 /**
+ * Linker component for the [Scene] model element.
+ *
  * @author lars
  */
 class SceneLinker(

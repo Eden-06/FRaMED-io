@@ -10,6 +10,8 @@ import io.framed.framework.view.*
 import io.framed.model.Package
 
 /**
+ * Linker component for the [Package] model element.
+ *
  * @author lars
  */
 class PackageLinker(

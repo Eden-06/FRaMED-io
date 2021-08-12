@@ -5,7 +5,6 @@ import de.westermann.kobserve.property.constProperty
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
 import io.framed.framework.ConnectionManager
-import io.framed.framework.ControllerManager
 import io.framed.framework.Layouting
 import io.framed.framework.linker.*
 import io.framed.framework.model.ModelElement
@@ -24,7 +23,6 @@ class RoleGroupLinker(
         .validate(RegexValidator.IDENTIFIER::validate)
         .trackHistory()
     override var name by nameProperty
-
 
     private val cardinalityProperty = property(model::cardinality).trackHistory()
 
@@ -222,7 +220,6 @@ class RoleGroupLinker(
         if (linker in children) {
             children -= linker
         } else {
-            println("${linker.id} removal from parent.")
             super.remove(linker)
         }
         updatePorts()

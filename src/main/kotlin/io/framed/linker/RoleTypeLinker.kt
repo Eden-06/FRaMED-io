@@ -13,6 +13,8 @@ import io.framed.framework.view.*
 import io.framed.model.*
 
 /**
+ * Linker component for the [RoleType] model element.
+ *
  * @author lars
  */
 class RoleTypeLinker(

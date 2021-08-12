@@ -28,6 +28,9 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
     override val nameProperty: Property<String>
 
+    /**
+     * Set of direct child linkers to this linker.
+     */
     val shapeLinkers: Set<ShapeLinker<*, *>>
 
     fun generateChildrenIdList(): List<Long> = shapeLinkers.flatMap {
@@ -50,46 +53,64 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
 
     /**
      * Function to query all linkers with the specified id from all child elements of this linker.
-     * This includes all linkers where this instance is a ancestor.
+     * This includes all linkers where this instance is an ancestor.
      */
     fun getChildLinkerById(id: Long): ShapeLinker<*, *>? {
-        val linkerQueue = ArrayDeque(shapeLinkers);
-        while (linkerQueue.isNotEmpty()) {
-            val linker = linkerQueue.removeFirst()
+
+        // Create a queue for all linkers that need to be checked.
+        val todoLinkerQueue = ArrayDeque(shapeLinkers)
+        while (todoLinkerQueue.isNotEmpty()) {
+            val linker = todoLinkerQueue.removeFirst()
+
             if (linker.id == id) {
-                return linker;
+                return linker
             } else {
+                // If the linker has children at them to the todoList.
                 if (linker is ModelLinker<*, *, *>) {
-                    linkerQueue.addAll(linker.shapeLinkers)
+                    todoLinkerQueue.addAll(linker.shapeLinkers)
                 }
+                continue
             }
         }
+        // The linker was not found.
         return null
     }
 
     fun redraw(linker: ShapeLinker<*, *>)
 
+    /**
+     * Checks if a shape can be dropped in another element.
+     */
     fun canDropShape(element: Long, target: Long): Boolean {
         val shapeLinker = this.getChildLinkerById(element) ?: return false
         val targetLinker = this.getChildLinkerById(target) ?: return false
 
-        return LinkerManager.linkerItemList.find { it.isLinkerFor(shapeLinker.model) }?.canCreateIn(targetLinker.model)
-            ?: false
+        return LinkerManager.linkerItemList
+            .find {
+                it.isLinkerFor(shapeLinker.model)
+            }?.canCreateIn(targetLinker.model) ?: false
     }
 
+    /**
+     * Moves a dragged and dropped shape from the original parent linker to the new parent linker.
+     */
     fun dropShape(element: Long, target: Long) {
-        val elementLinker = getChildLinkerById(element) ?: throw IllegalArgumentException()
-        val targetLinker = getChildLinkerById(target) ?: throw IllegalArgumentException()
+        val elementLinker = getChildLinkerById(element)
+            ?: throw IllegalArgumentException("Cannot find the moved element for the d&d with id $element")
+        val targetLinker = getChildLinkerById(target)
+            ?: throw IllegalArgumentException("Cannot find the target element for the d&d with id $target")
 
         val connectionCount = connectionManager.listConnections(elementLinker.id).size
 
         val elementName = elementLinker.model::class.simpleName?.lowercase() ?: "element"
         val targetName = targetLinker.model::class.simpleName?.lowercase() ?: "container"
 
+        // Avoid moving if the target is equal to the current parent.
         if (elementLinker.parent == targetLinker) {
             return
         }
 
+        // Check if connections are present that need to be rerouted.
         if (connectionCount > 0) {
             dialog {
                 title = "Move $elementName to $targetName"
@@ -97,6 +118,7 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                 closable = true
                 addButton("Move and delete", true) {
                     History.group("Move $elementName to $targetName") {
+                        // Remove it from the previous parent and add to the new parent.
                         elementLinker.parent?.remove(elementLinker)
                         targetLinker.add(elementLinker.model.copy())
                     }
@@ -105,6 +127,7 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                     History.group("Move $elementName to $targetName") {
                         val connectionList = connectionManager.listConnections(elementLinker.id).map { it.model }
 
+                        // Save information of the old linker and remove it from the previous parent.
                         val oldId = elementLinker.id
                         elementLinker.parent?.remove(elementLinker)
 
@@ -127,12 +150,12 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
             }.open()
         } else {
             History.group("Move $elementName to $targetName") {
+                // Remove it from the previous parent and add to the new parent.
                 elementLinker.parent?.remove(elementLinker)
                 targetLinker.add(elementLinker.model.copy())
             }
         }
     }
-
 
     fun delete(idList: List<Long>) {
         connectionManager.delete(idList)
@@ -209,7 +232,11 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
     }
 
     /**
-     * Check all children and connections to create or delete ports.
+     * Create and updated ports for linker that have fulfillment relations that span over a container.
+     *
+     * This functions creates port if they are necessary and removes them if they are no longer needed.
+     *
+     * FIXME: Ports use a problematic addressing schema that causes problems for nested elements.
      */
     fun updatePorts(autoPosition: Boolean = false) {
         val directIdList = generateChildrenIdList()
@@ -224,16 +251,12 @@ interface ModelLinker<M : ModelElement, P : Shape, R : Shape> : PreviewLinker<M,
                 val t = it.targetIdProperty.value
 
                 if (s in directIdList && t !in directIdList) {
-                    it.enablePortConnection(
-                        true,
-                        false)
-
+                    // Source port will be created, enable targeting the source port.
+                    it.enablePortTargetingSource(true)
                     s
                 } else if (s !in directIdList && t in directIdList) {
-                    it.enablePortConnection(
-                        false,
-                        true)
-
+                    // Target port will be created, enable targeting the target port.
+                    it.enablePortTargetingTarget(true)
                     t
                 } else {
                    null

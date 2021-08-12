@@ -17,11 +17,10 @@ import io.framed.linker.RoleImplicationLinker.Companion.parent
 import io.framed.model.RoleEquivalence
 
 /**
- * EquivalenceLinker for the Equivalence role connection.
+ * Linker component for the [RoleEquivalence] role connection.
  *
  * @author David Oberacker
  */
-
 class RoleEquivalenceLinker(
     override val model: RoleEquivalence,
     override val manager: ConnectionManager
@@ -73,7 +72,6 @@ class RoleEquivalenceLinker(
             delete()
         }
     }
-
 
     override fun updateLabelBindings() {
         for (label in pictogram.labels) {

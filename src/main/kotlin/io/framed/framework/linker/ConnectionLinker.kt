@@ -10,7 +10,7 @@ import io.framed.framework.util.History
 
 /**
  * Base interface for all connection linker. All connection linker have to implement this interface.
- * @author lars
+ * @author Lars Westermann, David Oberacker
  */
 interface ConnectionLinker<M : ModelConnection> : Linker<M, Connection> {
 
@@ -63,11 +63,24 @@ interface ConnectionLinker<M : ModelConnection> : Linker<M, Connection> {
     operator fun contains(id: Long): Boolean = sourceIdProperty.get() == id || targetIdProperty.get() == id
 
     /**
-     * Enable targeting the port representations for the source and target of the connection.
+     * Enable targeting the port representations for the source end of the connection.
      *
      * FIXME: Implement proper solution to switch between port targeting and regular targeting.
+     *
+     * @param enable Enables port targeting instead of the shape of the source.
      */
-    fun enablePortConnection(forSource: Boolean, forTarget: Boolean) {
-        throw RuntimeException("Not implemented for this connection!")
+    fun enablePortTargetingSource(enable: Boolean) {
+        throw RuntimeException("Not implemented for this connection type!")
+    }
+
+    /**
+     * Enable targeting the port representations for the target end of the connection.
+     *
+     * FIXME: Implement proper solution to switch between port targeting and regular targeting.
+     *
+     * @param enable Enables port targeting instead of the shape of the tearget.
+     */
+    fun enablePortTargetingTarget(enable: Boolean) {
+        throw RuntimeException("Not implemented for this connection type!")
     }
 }

@@ -16,7 +16,9 @@ import io.framed.model.Method
 import io.framed.model.Package
 
 /**
- * @author lars
+ * Linker component for the [Compartment] model class.
+ *
+ * @author Lars Westermann, Sebastian Leich, David Oberacker
  */
 class CompartmentLinker(
         override val model: Compartment,
