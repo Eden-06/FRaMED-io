@@ -1,6 +1,5 @@
 package io.framed.linker
 
-import io.framed.framework.linker.ModelLinker
 import io.framed.framework.linker.ShapeLinker
 import io.framed.model.*
 import org.w3c.dom.get
