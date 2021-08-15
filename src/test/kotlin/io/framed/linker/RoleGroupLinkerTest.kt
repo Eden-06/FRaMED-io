@@ -1,31 +1,33 @@
 package io.framed.linker
 
-import io.framed.framework.linker.ShapeLinker
 import io.framed.model.*
 import org.w3c.dom.get
 import kotlin.test.*
 
 class RoleGroupLinkerTest {
-    private var roleGroup1: RoleGroup? = null
-    private var roleGroupLinker1: RoleGroupLinker? = null
-
     private var connectionManagerLinker: ConnectionManagerLinker? = null
+
+    //ModelLinkers
+    private var packageElement: Package? = null
+    private var packageLinker: PackageLinker? = null
 
     private var compartmentElement: Compartment? = null
     private var compartmentLinker: CompartmentLinker? = null
 
-    private var packageElement: Package? = null
-    private var packageLinker: PackageLinker? = null
+    private var roleGroup1: RoleGroup? = null
+    private var roleGroupLinker1: RoleGroupLinker? = null
 
+    // RoleTypes
     private var roleType1: RoleType? = null
-    private var roleTypeLinker1: ShapeLinker<*, *>? = null
+    private var roleTypeLinker1: RoleTypeLinker? = null
 
     private var roleType2: RoleType? = null
-    private var roleTypeLinker2: ShapeLinker<*, *>? = null
+    private var roleTypeLinker2: RoleTypeLinker? = null
 
     private var roleType3: RoleType? = null
-    private var roleTypeLinker3: ShapeLinker<*, *>? = null
+    private var roleTypeLinker3: RoleTypeLinker? = null
 
+    // ClassType
     private var classType: Class? = null
     private var classTypeLinker: ClassLinker? = null
 
@@ -34,27 +36,29 @@ class RoleGroupLinkerTest {
         connectionManagerLinker = ConnectionManagerLinker(Connections())
 
         packageElement = Package()
-        packageLinker = PackageLinker(packageElement!!, connectionManagerLinker!!)
+        packageLinker = PackageLinker(
+            packageElement!!,
+            connectionManagerLinker!!)
 
         compartmentElement = Compartment()
-        compartmentLinker = CompartmentLinker(compartmentElement!!, connectionManagerLinker!!, packageLinker!!)
+        compartmentLinker = packageLinker!!.add(compartmentElement!!) as CompartmentLinker
 
         roleType1 = RoleType()
         roleType1!!.name = "Role1"
-        roleTypeLinker1 = compartmentLinker!!.add(roleType1!!)
+        roleTypeLinker1 = compartmentLinker!!.add(roleType1!!) as RoleTypeLinker
 
         roleType2 = RoleType()
         roleType2!!.name = "Role2"
 
+        roleGroup1 = RoleGroup()
+        roleGroup1!!.name = "RoleGroup1"
+        roleGroupLinker1 = compartmentLinker!!.add(roleGroup1!!) as RoleGroupLinker
+
         roleType3 = RoleType()
         roleType3!!.name = "Role3"
 
-        roleGroup1 = RoleGroup()
-        roleGroup1!!.name = "RoleGroup1"
-        roleGroupLinker1 = RoleGroupLinker(roleGroup1!!, connectionManagerLinker!!, compartmentLinker!!)
-
         classType = Class()
-        classTypeLinker = ClassLinker(classType!!, compartmentLinker!!)
+        classTypeLinker = packageLinker!!.add(classType!!) as ClassLinker
     }
 
     @AfterTest
@@ -125,7 +129,7 @@ class RoleGroupLinkerTest {
     @Test
     fun addTest() {
         roleGroupLinker1?.let { linker ->
-            roleTypeLinker2 = linker.add(roleType2!!)
+            roleTypeLinker2 = linker.add(roleType2!!) as RoleTypeLinker?
             assertNotNull(roleTypeLinker2,
                 "RoleType $roleType2 could not be added to the RoleGroup $roleGroup1")
             assertEquals(1, linker.shapeLinkers.size,
@@ -134,7 +138,7 @@ class RoleGroupLinkerTest {
             //assertContains(linker.shapeLinkers, roleTypeLinker2!!)
             assertTrue(linker.shapeLinkers.any { it.id ==  roleTypeLinker2!!.id })
 
-            roleTypeLinker3 = linker.add(roleType3!!)
+            roleTypeLinker3 = linker.add(roleType3!!) as RoleTypeLinker?
             assertNotNull(roleTypeLinker3,
                 "RoleType $roleType3 could not be added to the RoleGroup $roleGroup1")
             assertEquals(2, linker.shapeLinkers.size,
@@ -151,8 +155,8 @@ class RoleGroupLinkerTest {
     @Test
     fun removeTest() {
         roleGroupLinker1?.let { linker ->
-            roleTypeLinker2 = linker.add(roleType2!!)
-            roleTypeLinker3 = linker.add(roleType3!!)
+            roleTypeLinker2 = linker.add(roleType2!!) as RoleTypeLinker?
+            roleTypeLinker3 = linker.add(roleType3!!) as RoleTypeLinker?
 
             assertEquals(2, linker.shapeLinkers.size,
                 "$roleGroup1 children count is not the expected value!")

@@ -12,21 +12,24 @@ class ModelLinkerTest {
     private var packageElement: Package? = null
     private var packageLinker: PackageLinker? = null
 
+    private var packageElement2: Package? = null
+    private var packageLinker2: PackageLinker? = null
+
     private var compartmentElement: Compartment? = null
     private var compartmentLinker: CompartmentLinker? = null
 
     private var roleGroup1: RoleGroup? = null
-    private var roleGroupLinker1: ShapeLinker<*, *>? = null
+    private var roleGroupLinker1: RoleGroupLinker? = null
 
     // RoleTypes
     private var roleType1: RoleType? = null
-    private var roleTypeLinker1: ShapeLinker<*, *>? = null
+    private var roleTypeLinker1: RoleTypeLinker? = null
 
     private var roleType2: RoleType? = null
-    private var roleTypeLinker2: ShapeLinker<*, *>? = null
+    private var roleTypeLinker2: RoleTypeLinker? = null
 
     private var roleType3: RoleType? = null
-    private var roleTypeLinker3: ShapeLinker<*, *>? = null
+    private var roleTypeLinker3: RoleTypeLinker? = null
 
     // ClassType
     private var classType: Class? = null
@@ -41,30 +44,31 @@ class ModelLinkerTest {
             packageElement!!,
             connectionManagerLinker!!)
 
+        packageElement2 = Package()
+        packageLinker2 = PackageLinker(
+            packageElement2!!,
+            connectionManagerLinker!!)
+
         compartmentElement = Compartment()
-        compartmentLinker = CompartmentLinker(
-            compartmentElement!!,
-            connectionManagerLinker!!,
-            packageLinker!!)
+        compartmentLinker = packageLinker!!.add(compartmentElement!!) as CompartmentLinker
 
         roleType1 = RoleType()
         roleType1!!.name = "Role1"
-        roleTypeLinker1 = compartmentLinker!!.add(roleType1!!)
+        roleTypeLinker1 = compartmentLinker!!.add(roleType1!!) as RoleTypeLinker
 
         roleType2 = RoleType()
         roleType2!!.name = "Role2"
-        roleTypeLinker2 = compartmentLinker!!.add(roleType2!!)
+        roleTypeLinker2 = compartmentLinker!!.add(roleType2!!) as RoleTypeLinker
+
+        roleGroup1 = RoleGroup()
+        roleGroup1!!.name = "RoleGroup1"
+        roleGroupLinker1 = compartmentLinker!!.add(roleGroup1!!) as RoleGroupLinker
 
         roleType3 = RoleType()
         roleType3!!.name = "Role3"
 
-        roleGroup1 = RoleGroup()
-        roleGroup1!!.name = "RoleGroup1"
-
-        roleGroupLinker1 = compartmentLinker!!.add(roleGroup1!!)
-
         classType = Class()
-        classTypeLinker = ClassLinker(classType!!, compartmentLinker!!)
+        classTypeLinker = packageLinker!!.add(classType!!) as ClassLinker
     }
 
     @AfterTest
@@ -99,7 +103,8 @@ class ModelLinkerTest {
             assertNotNull(roleTypeLinker2)
             assertTrue(compartmentLinker!!.canDropShape(roleTypeLinker2!!.id, linker.id),
                 "RoleTypes can be dropped in RoleGroups!")
-            assertFalse(packageLinker!!.canDropShape(roleTypeLinker2!!.id, linker.id),
+
+            assertFalse(packageLinker2!!.canDropShape(roleTypeLinker2!!.id, linker.id),
                 "Drag and drop between non-related elements is not possible.")
 
         } ?: run {
@@ -120,7 +125,7 @@ class ModelLinkerTest {
 
             assertNull(linker.getChildLinkerById(roleType3!!.id))
 
-            roleTypeLinker3 = roleGroupLinker1!!.add(roleType3!!)
+            roleTypeLinker3 = roleGroupLinker1!!.add(roleType3!!) as RoleTypeLinker
 
             assertNotNull(linker.getChildLinkerById(roleType3!!.id))
             assertEquals(roleTypeLinker3!!, linker.getChildLinkerById(roleType3!!.id)!!)
@@ -130,7 +135,7 @@ class ModelLinkerTest {
             assertNull(linker.getChildLinkerById(255))
 
         } ?: run {
-            fail("CompartmentLinkr object is null. Test setup failed")
+            fail("CompartmentLinker object is null. Test setup failed")
         }
     }
 }
