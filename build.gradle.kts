@@ -41,6 +41,8 @@ kotlin {
                 useKarma {
                     useChromeHeadless()
                     useChrome()
+                    useFirefox()
+                    useFirefoxHeadless()
                 }
             }
         }
