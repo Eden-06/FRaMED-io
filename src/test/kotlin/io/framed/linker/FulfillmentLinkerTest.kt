@@ -1,6 +1,7 @@
 package io.framed.linker
 
 import io.framed.model.*
+import io.framed.util.TestMatchers
 import org.w3c.dom.get
 import kotlin.test.*
 
@@ -37,7 +38,7 @@ class FulfillmentLinkerTest {
     // ClassType
     private var classType: Class? = null
     private var classTypeLinker: ClassLinker? = null
-    
+
     // Fulfillments
     private var fulfillment: Fulfillment? = null
     private var fulfillmentLinker: FulfillmentLinker? = null
@@ -80,12 +81,12 @@ class FulfillmentLinkerTest {
 
         classType = Class()
         classTypeLinker = packageLinker!!.add(classType!!) as ClassLinker
-        
+
         fulfillment = FulfillmentLinker.createModel(classTypeLinker!!.id, roleTypeLinker2!!.id) as Fulfillment
 
         fulfillmentLinker = connectionManagerLinker!!
             .createConnection(classTypeLinker!!.id, roleTypeLinker2!!.id, FulfillmentLinker.info) as FulfillmentLinker
-        
+
     }
 
     @AfterTest
@@ -115,7 +116,7 @@ class FulfillmentLinkerTest {
 
         sceneElement = null
         sceneLinker = null
-        
+
         fulfillment = null
         fulfillmentLinker = null
     }
@@ -143,30 +144,10 @@ class FulfillmentLinkerTest {
             assertEquals(1, linker.contextMenu.html.children.length, "Context menu is missing child elements.")
 
             linker.contextMenu.html.children[0]?.let { contextMenuListView ->
-                assertEquals(2, contextMenuListView.children.length, "Context menu list view is missing child elements.")
-
-                // Title entry
-                contextMenuListView.children[0]?.let { titleView ->
-                    assertEquals("Fulfillment: ", titleView.textContent!!)
-                }
-
-                // Buttons
-                contextMenuListView.children[1]?.let { buttonsListView ->
-                    assertEquals(
-                        2,
-                        buttonsListView.children.length,
-                        "Context menu delete button view is missing child elements."
-                    )
-                    // Delete Button Icon
-                    buttonsListView.children[0]?.let { deleteButtonIconView ->
-                        assertNotNull(deleteButtonIconView)
-                    }
-
-                    // Delete Button Text
-                    buttonsListView.children[1]?.let { deleteButtonTextView ->
-                        assertEquals("Delete", deleteButtonTextView.textContent!!)
-                    }
-                }
+                TestMatchers.contextMenuMatcher(
+                    "Fulfillment: ",
+                    "Delete"
+                )(contextMenuListView)
             }
         } ?: run {
             fail("FulfillmentLinker object is null. Test setup failed")
@@ -176,38 +157,13 @@ class FulfillmentLinkerTest {
     @Test
     fun sidebarTest() {
         fulfillmentLinker?.let { linker ->
-            // Test HTML Children
-            assertEquals(2, linker.sidebar.html.children.length,
-                "Unexpected amount of sidebar children!")
-
-            // Test Title entry
-            linker.sidebar.html.children[0]?.let { titleListView ->
-                assertEquals(1, titleListView.children.length)
-                titleListView.children[0]?.let { title ->
-                    assertEquals("Fulfillment", title.textContent!!)
-                }
-            }
-
-            // First Group Element
-            linker.sidebar.html.children[1]?.let { firstGroupView ->
-                assertEquals(2, firstGroupView.children.length,
-                    "Unexpected amount of children in the second sidebar group!")
-
-                // General Title Header
-                firstGroupView.children[0]?.let { titleListView ->
-                    assertEquals(2, titleListView.children.length)
-                    titleListView.children[0]?.let { titleView ->
-                        assertEquals("General", titleView.textContent)
-                    }
-                }
-                // Name Selection Element
-                firstGroupView.children[1]?.let { nameListView ->
-                    assertEquals(2, nameListView.children.length)
-                    nameListView.children[0]?.let { titleView ->
-                        assertEquals("Name", titleView.textContent)
-                    }
-                }
-            }
+            TestMatchers.sidebarMatcher(
+                "Fulfillment",
+                TestMatchers.sidebarSectionMatcher(
+                    "General",
+                    TestMatchers.inputFieldMatcher("Name")
+                )
+            )(linker.sidebar.html)
         } ?: run {
             fail("FulfillmentLinker object is null. Test setup failed")
         }

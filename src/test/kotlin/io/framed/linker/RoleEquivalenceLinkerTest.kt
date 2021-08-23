@@ -3,6 +3,8 @@ package io.framed.linker
 import io.framed.framework.linker.ConnectionLinker
 import io.framed.framework.linker.ShapeLinker
 import io.framed.model.*
+import io.framed.util.TestMatchers
+import io.framed.util.TestMatchers.Companion.contextMenuMatcher
 import org.w3c.dom.get
 import kotlin.test.*
 
@@ -96,30 +98,8 @@ class RoleEquivalenceLinkerTest {
             assertEquals(1, linker.contextMenu.html.children.length, "Context menu is missing child elements.")
 
             linker.contextMenu.html.children[0]?.let { contextMenuListView ->
-                assertEquals(2, contextMenuListView.children.length, "Context menu list view is missing child elements.")
-
-                // Title entry
-                contextMenuListView.children[0]?.let { titleView ->
-                    assertEquals("Role Equivalence", titleView.textContent!!)
-                }
-
-                // Buttons
-                contextMenuListView.children[1]?.let { buttonsListView ->
-                    assertEquals(
-                        2,
-                        buttonsListView.children.length,
-                        "Context menu delete button view is missing child elements."
-                    )
-                    // Delete Button Icon
-                    buttonsListView.children[0]?.let { deleteButtonIconView ->
-                        assertNotNull(deleteButtonIconView)
-                    }
-
-                    // Delete Button Text
-                    buttonsListView.children[1]?.let { deleteButtonTextView ->
-                        assertEquals("Delete", deleteButtonTextView.textContent!!)
-                    }
-                }
+                contextMenuMatcher("Role Equivalence",
+                    "Delete") (contextMenuListView)
             }
         } ?: run {
             fail("RoleEquivalenceLinker object is null. Test setup failed")
@@ -129,38 +109,13 @@ class RoleEquivalenceLinkerTest {
     @Test
     fun sidebarTest() {
         roleEquivalenceLinker1?.let { linker ->
-            // Test HTML Children
-            assertEquals(2, linker.sidebar.html.children.length,
-                "Unexpected amount of sidebar children!")
-
-            // Test Title entry
-            linker.sidebar.html.children[0]?.let { titleListView ->
-                assertEquals(1, titleListView.children.length)
-                titleListView.children[0]?.let { title ->
-                    assertEquals("Role Equivalence", title.textContent!!)
-                }
-            }
-
-            // First Group Element
-            linker.sidebar.html.children[1]?.let { firstGroupView ->
-                assertEquals(3, firstGroupView.children.length,
-                    "Unexpected amount of children in the second sidebar group!")
-
-                // General Title Header
-                firstGroupView.children[0]?.let { titleListView ->
-                    assertEquals(2, titleListView.children.length)
-                    titleListView.children[0]?.let { titleView ->
-                        assertEquals("Structure", titleView.textContent)
-                    }
-                }
-                // Name Selection Element
-                firstGroupView.children[1]?.let { nameListView ->
-                    assertEquals(2, nameListView.children.length)
-                    nameListView.children[0]?.let { titleView ->
-                        assertEquals("Type", titleView.textContent)
-                    }
-                }
-            }
+            TestMatchers.sidebarMatcher(
+                "Role Equivalence",
+                TestMatchers.sidebarSectionMatcher(
+                    "Structure",
+                    TestMatchers.inputFieldMatcher("Type")
+                )
+            )(linker.sidebar.html)
         } ?: run {
             fail("RoleEquivalenceLinker object is null. Test setup failed")
         }

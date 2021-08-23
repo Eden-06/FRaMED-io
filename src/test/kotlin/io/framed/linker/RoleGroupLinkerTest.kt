@@ -1,6 +1,8 @@
 package io.framed.linker
 
 import io.framed.model.*
+import io.framed.util.TestMatchers
+import io.framed.util.TestMatchers.Companion.contextMenuMatcher
 import org.w3c.dom.get
 import kotlin.test.*
 
@@ -194,66 +196,8 @@ class RoleGroupLinkerTest {
                 "Context menu is missing child elements.")
 
             linker.contextMenu.html.children[0]?.let { contextMenuListView ->
-                assertEquals(4, contextMenuListView.children.length,
-                    "Context menu list view is missing child elements")
-
-                // Title entry
-                contextMenuListView.children[0]?.let { titleView ->
-                    assertEquals("RoleGroup: RoleGroup1", titleView.textContent!!)
-                }
-
-                // Add RoleType Buttons
-                contextMenuListView.children[1]?.let { addRoleTypeButtonsListView ->
-                    assertEquals(
-                        2,
-                        addRoleTypeButtonsListView.children.length,
-                        "Context menu 'Add Role Type' button view is missing child elements."
-                    )
-                    // Add RoleType Button Icon
-                    addRoleTypeButtonsListView.children[0]?.let { addRoleTypeButtonIconView ->
-                        assertNotNull(addRoleTypeButtonIconView)
-                    }
-
-                    // Add RoleType Button Text
-                    addRoleTypeButtonsListView.children[1]?.let { addRoleTypeButtonTextView ->
-                        assertEquals("Create Role type", addRoleTypeButtonTextView.textContent!!)
-                    }
-                }
-
-                // Add RoleGroup Buttons
-                contextMenuListView.children[2]?.let { addRoleGroupButtonsListView ->
-                    assertEquals(
-                        2,
-                        addRoleGroupButtonsListView.children.length,
-                        "Context menu 'Add Role Group' button view is missing child elements."
-                    )
-                    // Add RoleGroup Button Icon
-                    addRoleGroupButtonsListView.children[0]?.let { addRoleGroupButtonIconView ->
-                        assertNotNull(addRoleGroupButtonIconView)
-                    }
-
-                    // Add RoleGroup Button Text
-                    addRoleGroupButtonsListView.children[1]?.let { addRoleGroupButtonTextView ->
-                        assertEquals("Create RoleGroup", addRoleGroupButtonTextView.textContent!!)
-                    }
-                }
-
-                contextMenuListView.children[3]?.let { buttonsListView ->
-                    assertEquals(
-                        2,
-                        buttonsListView.children.length,
-                        "Context menu delete button view is missing child elements."
-                    )
-                    // Delete Button Icon
-                    buttonsListView.children[0]?.let { deleteButtonIconView ->
-                        assertNotNull(deleteButtonIconView)
-                    }
-
-                    // Delete Button Text
-                    buttonsListView.children[1]?.let { deleteButtonTextView ->
-                        assertEquals("Delete", deleteButtonTextView.textContent!!)
-                    }
-                }
+                contextMenuMatcher("RoleGroup: RoleGroup1",
+                    "Create Role type", "Create RoleGroup", "Delete")(contextMenuListView)
             }
         } ?: run {
             fail("RoleGroupLinker object is null. Test setup failed")
@@ -263,58 +207,38 @@ class RoleGroupLinkerTest {
     @Test
     fun sidebarTest() {
         roleGroupLinker1?.let { linker ->
-            // Test HTML Children
-            assertEquals(6, linker.sidebar.html.children.length,
-                "Unexpected amount of sidebar children!")
-
-            // Test Title entry
-            linker.sidebar.html.children[0]?.let { titleListView ->
-                assertEquals(1, titleListView.children.length)
-                titleListView.children[0]?.let { title ->
-                    assertEquals("Role Group", title.textContent!!)
-                }
-            }
-
-            // First Group Element
-            linker.sidebar.html.children[1]?.let { firstGroupView ->
-                assertEquals(3, firstGroupView.children.length,
-                    "Unexpected amount of children in the first sidebar group!")
-
-                // General Title Header
-                firstGroupView.children[0]?.let { titleListView ->
-                    assertEquals(2, titleListView.children.length)
-                    titleListView.children[0]?.let { titleView ->
-                        assertEquals("General", titleView.textContent)
-                    }
-                }
-                // Name Selection Element
-                firstGroupView.children[1]?.let { nameListView ->
-                    assertEquals(2, nameListView.children.length)
-                    nameListView.children[0]?.let { titleView ->
-                        assertEquals("Name", titleView.textContent)
-                    }
-                }
-                // Cardinality Selection Element
-                firstGroupView.children[2]?.let { cardinalityListView ->
-                    assertEquals(2, cardinalityListView.children.length)
-                    cardinalityListView.children[0]?.let { titleView ->
-                        assertEquals("Cardinality", titleView.textContent)
-                    }
-                }
-            }
-
-            // Second Group Element
-            linker.sidebar.html.children[2]?.let { secondGroupView ->
-                assertEquals(4, secondGroupView.children.length,
-                    "Unexpected amount of children in the second sidebar group!")
-            }
-
-            // Third Group Element
-            linker.sidebar.html.children[3]?.let { thirdGroupView ->
-                assertEquals(3, thirdGroupView.children.length,
-                    "Unexpected amount of children in the third sidebar group!")
-            }
-
+            TestMatchers.sidebarMatcher(
+                "Role Group",
+                TestMatchers.sidebarSectionMatcher(
+                    "General",
+                    TestMatchers.inputFieldMatcher("Name"),
+                    TestMatchers.inputFieldMatcher("Cardinality")
+                ),
+                TestMatchers.sidebarSectionMatcher(
+                    "Actions",
+                    TestMatchers.listLabelMatcher("Auto layout"),
+                    TestMatchers.listLabelMatcher("Reset zoom"),
+                    TestMatchers.listLabelMatcher("Reset pan")
+                ),
+                TestMatchers.sidebarSectionMatcher(
+                    "Preview",
+                    TestMatchers.checkBoxMatcher("Flat preview"),
+                    TestMatchers.listLabelMatcher("Auto layout")
+                ),
+                TestMatchers.sidebarSectionMatcher(
+                    "Layout",
+                    TestMatchers.listLabelMatcher("Auto size"),
+                    TestMatchers.checkBoxMatcher("Complete view"),
+                ),
+                TestMatchers.sidebarSectionMatcher(
+                    "Advanced",
+                    TestMatchers.inputFieldMatcher("Identifier"),
+                    TestMatchers.inputFieldMatcher("Position"),
+                    TestMatchers.inputFieldMatcher("Size"),
+                    TestMatchers.checkBoxMatcher("Autosize"),
+                    TestMatchers.listLabelMatcher("Log pictogram"),
+                )
+            )(linker.sidebar.html)
         } ?: run {
             fail("RoleGroupLinker object is null. Test setup failed")
         }

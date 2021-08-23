@@ -3,6 +3,7 @@ package io.framed.linker
 import io.framed.framework.linker.ConnectionLinker
 import io.framed.framework.linker.ShapeLinker
 import io.framed.model.*
+import io.framed.util.TestMatchers
 import org.w3c.dom.get
 import kotlin.test.*
 
@@ -96,30 +97,10 @@ class RoleImplicationLinkerTest {
             assertEquals(1, linker.contextMenu.html.children.length, "Context menu is missing child elements.")
 
             linker.contextMenu.html.children[0]?.let { contextMenuListView ->
-                assertEquals(2, contextMenuListView.children.length, "Context menu list view is missing child elements.")
-
-                // Title entry
-                contextMenuListView.children[0]?.let { titleView ->
-                    assertEquals("Role Implication", titleView.textContent!!)
-                }
-
-                // Buttons
-                contextMenuListView.children[1]?.let { buttonsListView ->
-                    assertEquals(
-                        2,
-                        buttonsListView.children.length,
-                        "Context menu delete button view is missing child elements."
-                    )
-                    // Delete Button Icon
-                    buttonsListView.children[0]?.let { deleteButtonIconView ->
-                        assertNotNull(deleteButtonIconView)
-                    }
-
-                    // Delete Button Text
-                    buttonsListView.children[1]?.let { deleteButtonTextView ->
-                        assertEquals("Delete", deleteButtonTextView.textContent!!)
-                    }
-                }
+                TestMatchers.contextMenuMatcher(
+                    "Role Implication",
+                    "Delete"
+                )(contextMenuListView)
             }
         } ?: run {
             fail("RoleImplicationLinker object is null. Test setup failed")
