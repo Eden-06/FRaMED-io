@@ -4,51 +4,93 @@ import org.w3c.dom.Element
 import org.w3c.dom.get
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.fail
 
 class TestMatchers {
     companion object {
 
-        fun labelMatcher(value: String) : (Element) -> Unit {
+
+        /**
+         * Matcher checking for the textContent of an element.
+         * @param value The expected value the textContent
+         * @param elementName The name of the element who's textContent is checked against.
+         * @author David Oberacker
+         */
+        fun elementTextContentMatcher(value: String, elementName: String = "TextContentElement") : (Element) -> Unit {
             return fun (element: Element) {
+                assertNotNull(element.textContent,
+                    "TextContent of $elementName is null")
                 assertEquals(value, element.textContent!!,
-                    "Label title not matching.")
+                    "TextContent of $elementName not matching")
             }
         }
 
-        fun listLabelMatcher(value: String) : (Element) -> Unit {
+        /**
+         * Matcher checking for the textContent of an element nested in a list view.
+         * The list view can only have the text element as a child.
+         * @see io.framed.framework.view.SidebarGroup
+         * @param value The expected value the textContent
+         * @param elementName The name of the element who's textContent is checked against.
+         * @author David Oberacker
+         */
+        fun listWrappedTextContentMatcher(value: String, elementName: String = "ListWrappedTextLabel") : (Element) -> Unit {
             return fun (element: Element) {
                 assertEquals(1, element.children.length,
-                    "Label element $value has invalid child element count")
-                element.children[0]?.let { title ->
-                    assertEquals(value, title.textContent!!,
-                        "List label title not matching.")
+                    "ListWrappedTextLabel element $elementName has invalid child element count")
+                element.children[0]?.let { child ->
+                    elementTextContentMatcher(value, elementName)(child)
+                } ?: run {
+                    fail("$elementName child is null.")
                 }
             }
         }
 
-        fun checkBoxMatcher(value: String) : (Element) -> Unit {
+        /**
+         * Matcher checking for the textContent of the title of a [io.framed.framework.view.CheckBox] element.
+         * The list view can only have the text element as a child.
+         * @param value The expected value the textContent
+         * @param elementName The name of the element who's textContent is checked against.
+         * @author David Oberacker
+         */
+        fun checkBoxMatcher(value: String, elementName: String = "CheckboxElement") : (Element) -> Unit {
             return fun (element: Element) {
                 assertEquals(2, element.children.length,
-                    "Check box element $value has invalid child element count")
+                    "$elementName has invalid child element count")
                 element.children[1]?.let { title ->
-                    assertEquals(value, title.textContent!!,
-                        "Check box label title not matching.")
+                    elementTextContentMatcher(value, "$elementName title")(title)
+                }?: run {
+                    fail("$elementName second child is null.")
                 }
             }
         }
 
-        fun inputFieldMatcher(label: String) : (Element) -> Unit {
+        /**
+         * Matcher checking a [io.framed.framework.view.InputView] element.
+         * @param label The expected value the textContent
+         * @param elementName The name of the element who's textContent is checked against.
+         * @author David Oberacker
+         */
+        fun inputFieldMatcher(label: String, elementName: String = "InputElement") : (Element) -> Unit {
             return fun (element: Element) {
-                assertEquals(2, element.children.length)
+                assertEquals(2, element.children.length,
+                    "$elementName has an invalid child count")
                 element.children[0]?.let { titleView ->
-                    assertEquals(label, titleView.textContent, "Input field label is not matching!")
+                    elementTextContentMatcher(label,
+                        "$elementName title is not matching")(titleView)
+                } ?: run {
+                    fail("$elementName first child is null")
                 }
-                element.children[1]?.let { inputView ->
-                    assertNotNull(inputView, "Input view is null!")
-                }
+                assertNotNull( element.children[1],
+                    "$elementName second child is null")
             }
         }
 
+        /**
+         * Matcher checking the correctness of a [io.framed.framework.view.Sidebar].
+         * @param sidebarTitle The title of the sidebar.
+         * @param subMatchers Matchers for the items in the sidebar.
+         * @author David Oberacker
+         */
         fun sidebarMatcher(sidebarTitle: String, vararg subMatchers: (Element) -> Unit) : (Element) -> Unit {
             return fun (sidebarElement: Element) {
                 // Test HTML Children
@@ -59,7 +101,7 @@ class TestMatchers {
 
                 // Test Title entry
                 sidebarElement.children[0]?.let { titleListView ->
-                    listLabelMatcher(sidebarTitle)(titleListView)
+                    listWrappedTextContentMatcher(sidebarTitle)(titleListView)
                 }
 
                 for (index in 1 until subMatchers.size) {
@@ -67,6 +109,13 @@ class TestMatchers {
                 }
             }
         }
+
+        /**
+         * Matcher checking the correctness of a [io.framed.framework.view.SidebarGroup].
+         * @param title The title of the sidebar group.
+         * @param subMatchers Matchers for the items in the sidebar group.
+         * @author David Oberacker
+         */
         fun sidebarSectionMatcher(title: String, vararg subMatchers: (Element) -> Unit) : (Element) -> Unit {
             return fun (element: Element) {
                 assertEquals(
@@ -88,6 +137,12 @@ class TestMatchers {
             }
         }
 
+        /**
+         * Matcher checking the correctness of a [io.framed.framework.view.ContextMenu].
+         * @param contextMenuTitle The title of the context menu.
+         * @param elementNames Matchers for the item titles in the context menu.
+         * @author David Oberacker
+         */
         fun contextMenuMatcher(contextMenuTitle: String, vararg elementNames: String) : (Element) -> Unit {
             return fun (contextMenu: Element) {
                 assertEquals(
@@ -97,7 +152,7 @@ class TestMatchers {
 
                 // Title entry
                 contextMenu.children[0]?.let { titleView ->
-                    labelMatcher(contextMenuTitle)(titleView)
+                    elementTextContentMatcher(contextMenuTitle)(titleView)
                 }
 
                 for (index in 1 until contextMenu.children.length) {
@@ -106,6 +161,12 @@ class TestMatchers {
             }
         }
 
+        /**
+         * Matcher checking the correctness of a [io.framed.framework.view.Button] with a [io.framed.framework.view.Icon]  in
+         * a [io.framed.framework.view.ContextMenu].
+         * @param buttonName The name of the button.
+         * @author David Oberacker
+         */
         private fun contextMenuButtonMatcher(buttonName: String) : (Element) -> Unit {
             return fun (buttonElement: Element) {
                 assertEquals(

@@ -3,76 +3,29 @@ package io.framed.linker
 import io.framed.framework.linker.ConnectionLinker
 import io.framed.framework.linker.ShapeLinker
 import io.framed.model.*
+import io.framed.util.TestBase
 import io.framed.util.TestMatchers
 import io.framed.util.TestMatchers.Companion.contextMenuMatcher
 import org.w3c.dom.get
 import kotlin.test.*
 
-class RoleEquivalenceLinkerTest {
+class RoleEquivalenceLinkerTest : TestBase() {
     private var roleEquivalenceLinker1: ConnectionLinker<*>? = null
-    private var connectionManagerLinker: ConnectionManagerLinker? = null
-
-    private var packageElement: Package? = null
-    private var packageLinker: PackageLinker? = null
-
-    private var sceneElement: Scene? = null
-    private var sceneLinker: SceneLinker? = null
-
-    private var roleType1: RoleType? = null
-    private var roleTypeLinker1: ShapeLinker<*,*>? = null
-
-    private var roleType2: RoleType? = null
-    private var roleTypeLinker2: ShapeLinker<*,*>? = null
-
-    private var classType: Class? = null
-    private var classTypeLinker: ClassLinker? = null
 
     @BeforeTest
-    fun setUpTest() {
-        connectionManagerLinker = ConnectionManagerLinker(Connections())
-
-        packageElement = Package()
-        packageLinker = PackageLinker(packageElement!!, connectionManagerLinker!!)
-
-        sceneElement = Scene()
-        sceneLinker = SceneLinker(sceneElement!!, connectionManagerLinker!!, packageLinker!!)
-
-        roleType1 = RoleType()
-        roleType1!!.name = "Role1"
-        roleTypeLinker1 = sceneLinker!!.add(roleType1!!)
-
-        roleType2 = RoleType()
-        roleType2!!.name = "Role2"
-        roleTypeLinker2 = sceneLinker!!.add(roleType2!!)
+    override fun setUpTest() {
+        super.setUpTest()
 
         roleEquivalenceLinker1 = connectionManagerLinker!!
             .createConnection(roleType1!!.id,
                 roleType2!!.id,
                 RoleEquivalenceLinker.info)
-
-        classType = Class()
-        classTypeLinker = ClassLinker(classType!!, sceneLinker!!)
     }
 
     @AfterTest
-    fun tearDownTest() {
+    override fun tearDownTest() {
+        super.tearDownTest()
         roleEquivalenceLinker1 = null
-        connectionManagerLinker = null
-
-        packageElement = null
-        packageLinker = null
-
-        sceneElement = null
-        sceneLinker = null
-
-        roleType1 = null
-        roleTypeLinker1 = null
-
-        roleType2 = null
-        roleTypeLinker2 = null
-
-        classType = null
-        classTypeLinker = null
     }
 
     @Test
