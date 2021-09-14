@@ -40,7 +40,7 @@ kotlin {
                 enabled = true
                 useKarma {
                     useChromeHeadless()
-                    useChrome()
+                    useFirefoxHeadless()
                 }
             }
         }
