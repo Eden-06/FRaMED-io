@@ -2,8 +2,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 plugins {
-    kotlin("js") version "1.5.21"
-    kotlin("plugin.serialization") version "1.5.21"
+    kotlin("js") version "1.5.0"
+    kotlin("plugin.serialization") version "1.5.0"
     id("com.gorylenko.gradle-git-properties") version "2.2.4"
 }
 
@@ -39,7 +39,7 @@ kotlin {
             testTask {
                 enabled = true
                 useKarma {
-                    //useChrome()
+                    useChrome()
                     useFirefox()
                 }
             }
@@ -56,16 +56,16 @@ kotlin {
 
 dependencies {
     // Kotlin std
-    implementation(kotlin("stdlib-js", "1.5.21"))
+    implementation(kotlin("stdlib-js"))
 
     // Serialization library
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
 
     implementation(npm("jsplumb", "2.15.6"))
     implementation(npm("dagre", "0.8.5"))
     implementation(devNpm("sass", "1.35.1"))
 
-    testImplementation(kotlin("test-js", "1.5.21"))
+    testImplementation(kotlin("test-js"))
 }
 
 gitProperties {
