@@ -1,5 +1,6 @@
 package io.framed.util
 
+import io.framed.framework.linker.LinkerManager
 import io.framed.linker.*
 import io.framed.model.*
 import kotlin.test.AfterTest
@@ -63,6 +64,28 @@ open class TestBase {
 
     @BeforeTest
     open fun setUpTest() {
+        LinkerManager.register(RelationshipLinker)
+        LinkerManager.register(FulfillmentLinker)
+        LinkerManager.register(CompositionLinker)
+        LinkerManager.register(AggregationLinker)
+        LinkerManager.register(InheritanceLinker)
+        LinkerManager.register(CreateRelationshipLinker)
+        LinkerManager.register(DestroyRelationshipLinker)
+        LinkerManager.register(RoleImplicationLinker)
+        LinkerManager.register(RoleEquivalenceLinker)
+        LinkerManager.register(RoleProhibitionLinker)
+
+        LinkerManager.register(AttributeLinker)
+        LinkerManager.register(MethodLinker)
+        LinkerManager.register(RoleTypeLinker)
+        LinkerManager.register(EventLinker)
+        LinkerManager.register(ReturnEventLinker)
+        LinkerManager.register(ClassLinker)
+        LinkerManager.register(PackageLinker)
+        LinkerManager.register(RoleGroupLinker)
+        LinkerManager.register(CompartmentLinker)
+        LinkerManager.register(SceneLinker)
+
         connectionManagerLinker = ConnectionManagerLinker(Connections())
 
         packageElement = Package()
@@ -130,6 +153,8 @@ open class TestBase {
 
         sceneElement = null
         sceneLinker = null
+
+        LinkerManager.linkerConnectionList = emptyList()
 
     }
 
