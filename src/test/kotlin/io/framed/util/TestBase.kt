@@ -155,7 +155,7 @@ open class TestBase {
         sceneLinker = null
 
         LinkerManager.linkerConnectionList = emptyList()
-
+        LinkerManager.linkerItemList = emptyList()
     }
 
 }

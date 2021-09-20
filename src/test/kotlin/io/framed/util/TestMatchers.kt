@@ -147,7 +147,7 @@ class TestMatchers {
             return fun (contextMenu: Element) {
                 assertEquals(
                     1 + elementNames.size, contextMenu.children.length,
-                    "Context menu has invalid number of child elements"
+                    "Context menu has invalid number of child elements."
                 )
 
                 // Title entry
