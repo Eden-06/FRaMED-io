@@ -13,14 +13,14 @@ import io.framed.framework.view.FramedIcon
 import io.framed.framework.view.MaterialIcon
 import io.framed.framework.view.contextMenu
 import io.framed.framework.view.sidebar
+import io.framed.linker.RoleImplicationLinker.Companion.parent
 import io.framed.model.RoleEquivalence
 
 /**
- * EquivalenceLinker for the Equivalence role connection.
+ * Linker component for the [RoleEquivalence] role connection.
  *
  * @author David Oberacker
  */
-
 class RoleEquivalenceLinker(
     override val model: RoleEquivalence,
     override val manager: ConnectionManager
@@ -64,10 +64,6 @@ class RoleEquivalenceLinker(
 
     override val sidebar = sidebar {
         title("Role Equivalence")
-
-        group("General") {
-            input("Name", nameProperty)
-        }
     }
 
     override val contextMenu = contextMenu {
@@ -77,19 +73,10 @@ class RoleEquivalenceLinker(
         }
     }
 
-
     override fun updateLabelBindings() {
-        val ids = pictogram.labels.mapNotNull { it.id }.distinct().toSet()
-        if ("name" !in ids) {
-            pictogram.labels += Label(id = "name", position = 0.5)
-        }
-
         for (label in pictogram.labels) {
             if (label.textProperty.isBound) {
                 label.textProperty.unbind()
-            }
-            when {
-                label.id == "name" -> label.textProperty.bindBidirectional(nameProperty)
             }
         }
 
@@ -104,14 +91,24 @@ class RoleEquivalenceLinker(
         override val info = ElementInfo("Role Equivalence", FramedIcon.EQUIVALENCE)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is RoleTypeLinker
+            return (source is RoleTypeLinker || source is RoleGroupLinker)
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) &&
-                    target is RoleTypeLinker &&
+            var source_ancestor = source.parent
+            while (source_ancestor != null && source_ancestor is RoleGroupLinker) {
+                source_ancestor = source_ancestor.parent
+            }
+
+            var target_ancestor = target.parent
+            while (target_ancestor != null && target_ancestor is RoleGroupLinker) {
+                target_ancestor = target_ancestor.parent
+            }
+
+            return RoleImplicationLinker.canStart(source) &&
+                    (target is RoleTypeLinker || target is RoleGroupLinker) &&
                     source != target &&
-                    source.parent == target.parent
+                    source_ancestor == target_ancestor
         }
 
         override fun isLinkerFor(element: ModelConnection): Boolean = element is RoleEquivalence

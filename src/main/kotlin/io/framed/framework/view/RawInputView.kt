@@ -16,21 +16,42 @@ import kotlin.math.max
 /**
  * Represents html input element.
  *
- * @author lars
+ * @author Lars Westermann, David Oberacker
  */
-class RawInputView() : View<HTMLInputElement>("input") {
+class RawInputView(
+    /**
+     * Surround the value with parentheses.
+     */
+    val surround: Surround
+) : View<HTMLInputElement>("input") {
+
+    private var displayValue: String
+        get() {
+            return when (surround) {
+                Surround.NONE -> html.value
+                Surround.PARENTHESIS -> {
+                    html.value.trim().removePrefix("(").removeSuffix(")").trim()
+                }
+            }
+        }
+        set(value) {
+            when (surround) {
+                Surround.NONE -> html.value = value
+                Surround.PARENTHESIS -> html.value = "( $value )"
+            }
+        }
 
     /**
      * Inputs value.
      */
     var value: String
-        get() = html.value
+        get() = displayValue
         set(value) {
-            val oldValue = html.value
+            val oldValue = displayValue
             val oldSelection = html.selectionStart
             val oldLength = oldValue.length
 
-            html.value = value
+            displayValue = value
             lastValue = value
             if (sizeMatch) {
                 size = max(value.length, 1)
@@ -87,7 +108,7 @@ class RawInputView() : View<HTMLInputElement>("input") {
 
         onChange {
             if (property is Property<String> && property.isWritable) {
-                property.set(it)
+                property.set(it.trim())
             }
         }
         onFocusEnter {

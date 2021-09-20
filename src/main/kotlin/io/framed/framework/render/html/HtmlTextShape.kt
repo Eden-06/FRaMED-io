@@ -3,12 +3,18 @@ package io.framed.framework.render.html
 import io.framed.framework.JsPlumbInstance
 import io.framed.framework.pictogram.TextShape
 import io.framed.framework.util.async
+import io.framed.framework.view.InputView
 import io.framed.framework.view.View
 import io.framed.framework.view.ViewCollection
 import io.framed.framework.view.inputView
 import kotlinx.browser.document
 import kotlin.math.max
 
+/**
+ * HTML render of a [TextShape].
+ *
+ * @author Lars Westermann, David Oberacker
+ */
 class HtmlTextShape(
         htmlRenderer: HtmlRenderer,
         override val shape: TextShape,
@@ -18,22 +24,36 @@ class HtmlTextShape(
         override val jsPlumbInstance: JsPlumbInstance
 ) : HtmlShape(htmlRenderer, shape, parent, parentContainer, container, jsPlumbInstance) {
 
-    override val view: View<*> = container.inputView(shape.property) {
+    /**
+     * Sets text alignment on the input view to match the value specified in the view model.
+     */
+    private fun alignment(view: InputView, alignment: TextShape.TextAlignment) {
+        when (alignment) {
+            TextShape.TextAlignment.LEFT -> view.input.html.style.textAlign = "left"
+            TextShape.TextAlignment.RIGHT ->  view.input.html.style.textAlign = "right"
+            TextShape.TextAlignment.CENTER ->  view.input.html.style.textAlign = "center"
+        }
+    }
+
+    override val view: View<*> = container.inputView(shape.property, shape.surround) {
         style(this, shape.style)
         events(this, shape)
+
+        alignment(this, shape.alignment)
 
         autocomplete(shape.autocomplete)
 
         onMouseDown {
             focus()
         }
+
         onFocusEnter {
             if(View.disableDrag){
                 val downEvent = document.createEvent("MouseEvents")
-                downEvent.initEvent("mousedown", bubbles = true, cancelable = true);
+                downEvent.initEvent("mousedown", bubbles = true, cancelable = true)
                 html.dispatchEvent(downEvent)
                 val upEvent = document.createEvent("MouseEvents")
-                upEvent.initEvent("mouseup", bubbles = true, cancelable = true);
+                upEvent.initEvent("mouseup", bubbles = true, cancelable = true)
                 html.dispatchEvent(upEvent)
             } else {
                 it.preventDefault()
@@ -41,6 +61,7 @@ class HtmlTextShape(
                 blur()
             }
         }
+
         onFocusLeave {
             value = shape.property.value
         }
@@ -52,7 +73,7 @@ class HtmlTextShape(
 
     private fun updateSize() {
         //TODO The current formula definitely depends on the dpi settings
-        val width = max(100, shape.property.value.length * 11 + 24)
+        val width = max(60, shape.property.value.length * 11 + 24)
         view.html.style.minWidth = "${width}px"
         async {
             shape.width = width.toDouble()

@@ -26,7 +26,10 @@ class ResizeHandler(
         allowDrag = true
         onDrag { event ->
             size += event.delta / target.dragZoom
-            size = Point(max(size.x, 0.0), max(size.y, 0.0))
+            size = Point(
+                max(size.x, 0.0),
+                max(size.y, 0.0)
+            )
             onResize.emit(ResizeEvent(position, size, ResizeOrientation.BOTTOM_RIGHT))
         }
 

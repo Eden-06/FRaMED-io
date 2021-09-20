@@ -3,74 +3,32 @@ package io.framed.linker
 import io.framed.framework.linker.ConnectionLinker
 import io.framed.framework.linker.ShapeLinker
 import io.framed.model.*
+import io.framed.util.TestBase
+import io.framed.util.TestMatchers
+import io.framed.util.TestMatchers.Companion.inputFieldMatcher
+import io.framed.util.TestMatchers.Companion.sidebarMatcher
+import io.framed.util.TestMatchers.Companion.sidebarSectionMatcher
 import org.w3c.dom.get
 import kotlin.test.*
 
-class RoleProhibitionLinkerTest {
+class RoleProhibitionLinkerTest : TestBase() {
     private var roleProhibitionLinker1: ConnectionLinker<*>? = null
-    private var connectionManagerLinker: ConnectionManagerLinker? = null
-
-    private var packageElement: Package? = null
-    private var packageLinker: PackageLinker? = null
-
-    private var sceneElement: Scene? = null
-    private var sceneLinker: SceneLinker? = null
-
-    private var roleType1: RoleType? = null
-    private var roleTypeLinker1: ShapeLinker<*,*>? = null
-
-    private var roleType2: RoleType? = null
-    private var roleTypeLinker2: ShapeLinker<*,*>? = null
-
-    private var classType: Class? = null
-    private var classTypeLinker: ClassLinker? = null
 
     @BeforeTest
-    fun setUpTest() {
-        connectionManagerLinker = ConnectionManagerLinker(Connections())
-
-        packageElement = Package()
-        packageLinker = PackageLinker(packageElement!!, connectionManagerLinker!!)
-
-        sceneElement = Scene()
-        sceneLinker = SceneLinker(sceneElement!!, connectionManagerLinker!!, packageLinker!!)
-
-        roleType1 = RoleType()
-        roleType1!!.name = "Role1"
-        roleTypeLinker1 = sceneLinker!!.add(roleType1!!)
-
-        roleType2 = RoleType()
-        roleType2!!.name = "Role2"
-        roleTypeLinker2 = sceneLinker!!.add(roleType2!!)
+    override fun setUpTest() {
+        super.setUpTest()
 
         roleProhibitionLinker1 = connectionManagerLinker!!
             .createConnection(roleType1!!.id,
                 roleType2!!.id,
                 RoleProhibitionLinker.info)
-
-        classType = Class()
-        classTypeLinker = ClassLinker(classType!!, sceneLinker!!)
     }
 
     @AfterTest
-    fun tearDownTest() {
+    override fun tearDownTest() {
+        super.tearDownTest()
+
         roleProhibitionLinker1 = null
-        connectionManagerLinker = null
-
-        packageElement = null
-        packageLinker = null
-
-        sceneElement = null
-        sceneLinker = null
-
-        roleType1 = null
-        roleTypeLinker1 = null
-
-        roleType2 = null
-        roleTypeLinker2 = null
-
-        classType = null
-        classTypeLinker = null
     }
 
     @Test
@@ -96,30 +54,10 @@ class RoleProhibitionLinkerTest {
             assertEquals(1, linker.contextMenu.html.children.length, "Context menu is missing child elements.")
 
             linker.contextMenu.html.children[0]?.let { contextMenuListView ->
-                assertEquals(2, contextMenuListView.children.length, "Context menu list view is missing child elements.")
-
-                // Title entry
-                contextMenuListView.children[0]?.let { titleView ->
-                    assertEquals("Role Prohibition", titleView.textContent!!)
-                }
-
-                // Buttons
-                contextMenuListView.children[1]?.let { buttonsListView ->
-                    assertEquals(
-                        2,
-                        buttonsListView.children.length,
-                        "Context menu delete button view is missing child elements."
-                    )
-                    // Delete Button Icon
-                    buttonsListView.children[0]?.let { deleteButtonIconView ->
-                        assertNotNull(deleteButtonIconView)
-                    }
-
-                    // Delete Button Text
-                    buttonsListView.children[1]?.let { deleteButtonTextView ->
-                        assertEquals("Delete", deleteButtonTextView.textContent!!)
-                    }
-                }
+                TestMatchers.contextMenuMatcher(
+                    "Role Prohibition",
+                    "Delete"
+                )(contextMenuListView)
             }
         } ?: run {
             fail("RoleProhibitionLinker object is null. Test setup failed")
@@ -129,59 +67,11 @@ class RoleProhibitionLinkerTest {
     @Test
     fun sidebarTest() {
         roleProhibitionLinker1?.let { linker ->
-            // Test HTML Children
-            assertEquals(3, linker.sidebar.html.children.length,
-                "Unexpected amount of sidebar children!")
-
-            // Test Title entry
-            linker.sidebar.html.children[0]?.let { titleListView ->
-                assertEquals(1, titleListView.children.length)
-                titleListView.children[0]?.let { title ->
-                    assertEquals("Role Prohibition", title.textContent!!)
-                }
-            }
-
-            // First Group Element
-            linker.sidebar.html.children[1]?.let { firstGroupView ->
-                assertEquals(2, firstGroupView.children.length,
-                    "Unexpected amount of children in the first sidebar group!")
-
-                // General Title Header
-                firstGroupView.children[0]?.let { titleListView ->
-                    assertEquals(2, titleListView.children.length)
-                    titleListView.children[0]?.let { titleView ->
-                        assertEquals("General", titleView.textContent)
-                    }
-                }
-                // Name Selection Element
-                firstGroupView.children[1]?.let { nameListView ->
-                    assertEquals(2, nameListView.children.length)
-                    nameListView.children[0]?.let { titleView ->
-                        assertEquals("Name", titleView.textContent)
-                    }
-                }
-            }
-
-            // Second Group Element
-            linker.sidebar.html.children[2]?.let { secondGroupView ->
-                assertEquals(3, secondGroupView.children.length,
-                    "Unexpected amount of children in the second sidebar group!")
-
-                // General Title Header
-                secondGroupView.children[0]?.let { titleListView ->
-                    assertEquals(2, titleListView.children.length)
-                    titleListView.children[0]?.let { titleView ->
-                        assertEquals("Structure", titleView.textContent)
-                    }
-                }
-                // Name Selection Element
-                secondGroupView.children[1]?.let { nameListView ->
-                    assertEquals(2, nameListView.children.length)
-                    nameListView.children[0]?.let { titleView ->
-                        assertEquals("Type", titleView.textContent)
-                    }
-                }
-            }
+            sidebarMatcher("Role Prohibition",
+                sidebarSectionMatcher(
+                    "Structure",
+                    inputFieldMatcher("Type")
+                ))(linker.sidebar.html)
         } ?: run {
             fail("RoleProhibitionLinker object is null. Test setup failed")
         }

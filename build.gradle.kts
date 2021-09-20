@@ -35,11 +35,12 @@ kotlin {
         useCommonJs()
 
         browser {
+            useCommonJs()
             testTask {
                 enabled = true
                 useKarma {
-                    useChromeHeadless()
                     useChrome()
+                    useFirefoxHeadless()
                 }
             }
         }

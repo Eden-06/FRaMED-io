@@ -9,11 +9,23 @@ import kotlin.math.PI
 import kotlin.math.sqrt
 import kotlin.math.tan
 
+/**
+ * Cyclic choosing wheel to select from a specified amount of options.
+ *
+ * @author Lars Westermann, David Oberacker
+ */
 class CyclicChooser<T>(
-        val data: Collection<T>,
-        val init: ListView.(T) -> Unit
+    val data: Collection<T>,
+    val init: ListView.(T) -> Unit
 ) : ViewCollection<View<*>, HTMLDivElement>("div") {
 
+    /**
+     * Calculate the position of a element in the ellipse.
+     *
+     * @param width The width of the element to be placed.
+     * @param height The height of the element to be placed.
+     * @param angle The angle the element should be placed at.
+     */
     private fun calc(width: Double, height: Double, angle: Int): Point {
         val shortAngle = (angle % 360)
         val pi = (angle % 360) / 180.0 * PI
@@ -31,6 +43,10 @@ class CyclicChooser<T>(
         return Point(x, y)
     }
 
+    /**
+     * Handler for keyboard events that interact with the chooser.
+     * This uses the 1..0 keys (selection of elements) and the ESC key (close the chooser).
+     */
     private fun keyListener(event: KeyboardEvent) {
 
         val keyCode = event.keyCode
@@ -91,7 +107,7 @@ class CyclicChooser<T>(
             container.top = Root.mousePosition.y
 
             val part = 360 / views.size
-            val scaling: Double = (views.size) / 1.9 // 3.0
+            val scaling: Double = (views.size) / 1.9
 
             positionMap = views.mapIndexed { index, view ->
                 val angle = (part * index)

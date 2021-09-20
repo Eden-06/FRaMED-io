@@ -8,15 +8,24 @@ import org.w3c.dom.HTMLDivElement
 /**
  * Represents html input element.
  *
- * @author lars
+ * @author Lars Westermann, David Oberacker
  */
-class InputView() : View<HTMLDivElement>("div") {
+class InputView(
+    /**
+     * Specifies if the input should be surrounded by a delimiter on both sides.
+     * The delimiter will be added when not present and will not count towards the input.
+     */
+    surround: Surround = Surround.NONE
+) : View<HTMLDivElement>("div") {
 
-    constructor(property: ReadOnlyProperty<String>) : this() {
+    constructor(property: ReadOnlyProperty<String>, surround: Surround = Surround.NONE) : this(surround) {
         bind(property)
     }
 
-    val input = RawInputView().also {
+    /**
+     * The raw input element that serves as the interaction with the user.
+     */
+    var input: RawInputView = RawInputView(surround).also {
         html.appendChild(it.html)
     }
 
@@ -96,7 +105,7 @@ class InputView() : View<HTMLDivElement>("div") {
             }
             focusClass = true
         }
-        onFocusLeave { _ ->
+        onFocusLeave {
             autocompleteListView.display = false
             focusClass = false
         }
@@ -143,8 +152,14 @@ class InputView() : View<HTMLDivElement>("div") {
     }
 }
 
-fun ViewCollection<in InputView, *>.inputView(init: InputView.() -> Unit) =
-        InputView().also(this::append).also(init)
+fun ViewCollection<in InputView, *>.inputView(
+    init: InputView.() -> Unit
+) =
+    InputView().also(this::append).also(init)
 
-fun ViewCollection<in InputView, *>.inputView(property: ReadOnlyProperty<String>, init: InputView.() -> Unit) =
-        InputView(property).also(this::append).also(init)
+fun ViewCollection<in InputView, *>.inputView(
+    property: ReadOnlyProperty<String>,
+    surround: Surround = Surround.NONE,
+    init: InputView.() -> Unit
+) =
+    InputView(property, surround).also(this::append).also(init)

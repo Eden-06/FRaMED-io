@@ -14,9 +14,10 @@ import io.framed.framework.view.sidebar
 import io.framed.model.Fulfillment
 
 /**
+ * Linker component for the [Fulfillment] model.
+ *
  * @author lars
  */
-
 class FulfillmentLinker(
         override val model: Fulfillment,
         override val manager: ConnectionManager
@@ -57,6 +58,13 @@ class FulfillmentLinker(
 
     override val contextMenu = defaultContextMenu()
 
+    override fun enablePortTargetingSource(enable: Boolean) {
+        pictogram.useSourcePortEndpoint = enable
+    }
+
+    override fun enablePortTargetingTarget(enable: Boolean) {
+        pictogram.useTargetPortEndpoint = enable
+    }
 
     override fun updateLabelBindings() {
         val ids = pictogram.labels.mapNotNull { it.id }.distinct().toSet()
@@ -84,14 +92,24 @@ class FulfillmentLinker(
         override val info = ElementInfo("Fulfillment", FramedIcon.FULFILLMENT)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is ClassLinker || source is CompartmentLinker || source is RoleTypeLinker
+            return source is ClassLinker ||
+                    source is CompartmentLinker ||
+                    source is RoleTypeLinker
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            if(source !is RoleTypeLinker){
-                return canStart(source) && target is RoleTypeLinker
+            return if(source !is RoleTypeLinker){
+                (canStart(source) && target is RoleTypeLinker
+                        && !(target.parent is SceneLinker && target.parent.parent is CompartmentLinker))
+            } else {
+                canStart(source) &&
+                        target is RoleTypeLinker &&
+                        source.parent != target.parent &&
+                        target.ancestors
+                            .filter { linker -> (linker !is RoleGroupLinker) && (linker !is PackageLinker) }
+                            .any { linker -> source.ancestors.contains(linker) }
             }
-            return canStart(source) && target is RoleTypeLinker && source.parent == target.parent.parent
+
         }
 
         override fun isLinkerFor(element: ModelConnection): Boolean = element is Fulfillment

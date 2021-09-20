@@ -27,6 +27,7 @@ enum class FramedIcon(private val src: String) : Icon {
     PACKAGE("package"),
     COMPARTMENT("compartment"),
     SCENE("scene"),
+    ROLEGROUP("rolegroup"),
 
     EVENT_STANDARD("event_standard"),
     EVENT_TIMER("event_timer"),

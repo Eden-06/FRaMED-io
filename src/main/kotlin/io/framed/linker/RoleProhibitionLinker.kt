@@ -16,11 +16,10 @@ import io.framed.framework.view.sidebar
 import io.framed.model.RoleProhibition
 
 /**
- * ProhibitionLinker for the Prohibition role connection.
+ * Linker component for the [RoleProhibition] connection.
  *
  * @author David Oberacker
  */
-
 class RoleProhibitionLinker(
     override val model: RoleProhibition,
     override val manager: ConnectionManager
@@ -32,7 +31,6 @@ class RoleProhibitionLinker(
     override val sourceIdProperty = property(model::sourceId).trackHistory()
     override val targetIdProperty = property(model::targetId).trackHistory()
 
-    //TODO: Optimize the display of the prohibition arrow.
     override val pictogram = connection(sourceIdProperty, targetIdProperty) {
         line(ConnectionLine.Type.RECTANGLE) {
             stroke = Color(0, 0, 0)
@@ -68,10 +66,6 @@ class RoleProhibitionLinker(
 
     override val sidebar = sidebar {
         title("Role Prohibition")
-
-        group("General") {
-            input("Name", nameProperty)
-        }
     }
 
     override val contextMenu = contextMenu {
@@ -81,19 +75,10 @@ class RoleProhibitionLinker(
         }
     }
 
-
     override fun updateLabelBindings() {
-        val ids = pictogram.labels.mapNotNull { it.id }.distinct().toSet()
-        if ("name" !in ids) {
-            pictogram.labels += Label(id = "name", position = 0.5)
-        }
-
         for (label in pictogram.labels) {
             if (label.textProperty.isBound) {
                 label.textProperty.unbind()
-            }
-            when {
-                label.id == "name" -> label.textProperty.bindBidirectional(nameProperty)
             }
         }
 
@@ -108,14 +93,14 @@ class RoleProhibitionLinker(
         override val info = ElementInfo("Role Prohibition", FramedIcon.PROHIBITION)
 
         override fun canStart(source: Linker<*, *>): Boolean {
-            return source is RoleTypeLinker
+            return (source is RoleTypeLinker || source is RoleGroupLinker)
         }
 
         override fun canCreate(source: Linker<*, *>, target: Linker<*, *>): Boolean {
-            return canStart(source) &&
-                    target is RoleTypeLinker &&
+            return RoleImplicationLinker.canStart(source) &&
+                    (target is RoleTypeLinker || target is RoleGroupLinker) &&
                     source != target &&
-                    source.parent == target.parent
+                    source isConnectable target
         }
 
         override fun isLinkerFor(element: ModelConnection): Boolean = element is RoleProhibition

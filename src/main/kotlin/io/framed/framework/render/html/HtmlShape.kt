@@ -60,6 +60,9 @@ abstract class HtmlShape(
             }
         }
 
+        if (parent != null && parent.shape.style.flex) {
+            view.classes += "flex-element"
+        }
 
         style.border?.let { border ->
             view.html.style.borderStyle = border.style.toString()

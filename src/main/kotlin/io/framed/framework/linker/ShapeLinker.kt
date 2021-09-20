@@ -12,7 +12,7 @@ import io.framed.framework.view.textView
  *
  * This interface adds a tree structure to the linker to allow parent children relationships.
  *
- * @author lars
+ * @author Lars Westermann, David Oberacker
  */
 interface ShapeLinker<M : ModelElement, P : Shape> : Linker<M, P> {
     val parent: ShapeLinker<*, *>?
@@ -31,8 +31,17 @@ interface ShapeLinker<M : ModelElement, P : Shape> : Linker<M, P> {
         }.open()
     }
 
-    fun remove(linker: ShapeLinker<*, *>): Unit = throw UnsupportedOperationException()
-    fun add(model: ModelElement): ShapeLinker<*, *> = throw  UnsupportedOperationException()
+    /**
+     * Removes a linker from this linkers responsibility.
+     */
+    fun remove(linker: ShapeLinker<*, *>): Unit =
+        throw UnsupportedOperationException("Remove operation for ${this::class} not implemented.")
+
+    /**
+     * Adds a linker to this linkers responsibility.
+     */
+    fun add(model: ModelElement): ShapeLinker<*, *> =
+        throw  UnsupportedOperationException("Add operation for ${this::class} not implemented.")
 
     /**
      * Set of all known type names of this linker and all children.
@@ -46,7 +55,7 @@ interface ShapeLinker<M : ModelElement, P : Shape> : Linker<M, P> {
     fun getTypeSubset(partial: String): List<String> {
         val parent = parent
         return parent?.getTypeSubset(partial)
-                ?: subTypes.filter { it.lowercase().contains(partial.lowercase()) && it.isNotEmpty() }.take(8)
+            ?: subTypes.filter { it.lowercase().contains(partial.lowercase()) && it.isNotEmpty() }.take(8)
     }
 
     fun updateSize(allowDownsize: Boolean = false) {

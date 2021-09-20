@@ -897,6 +897,22 @@ table {
   }
 }
 
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.flex-element {
+  flex: 1 1;
+}
+
+.popup-overflow {
+  overflow: visible !important;
+}
+
 
 #noscript {
   position: absolute;

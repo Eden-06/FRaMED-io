@@ -5,13 +5,28 @@ import de.westermann.kobserve.event.EventHandler
 import io.framed.framework.linker.ConnectionLinker
 
 /**
- * @author lars
+ * ViewModel class representing a connection between two model elements.
+ * @author Lars Westermann, David Oberacker
  */
 class Connection(
-        val source: Property<Long>,
-        val target: Property<Long>,
-        id: Long
+    val source: Property<Long>,
+    val target: Property<Long>,
+    id: Long
 ) : Pictogram(id) {
+
+    /**
+     * Toggle if the connection source end should target the port representation.
+     *
+     * FIXME: Implement proper solution to switch between port targeting and regular targeting.
+     */
+    var useSourcePortEndpoint: Boolean = false
+
+    /**
+     * Toggle if the connection target end should target the port representation.
+     *
+     * FIXME: Implement proper solution to switch between port targeting and regular targeting.
+     */
+    var useTargetPortEndpoint: Boolean = false
 
     var lines: List<ConnectionLine> = emptyList()
         set(value) {
@@ -35,4 +50,4 @@ class Connection(
 }
 
 fun ConnectionLinker<*>.connection(source: Property<Long>, target: Property<Long>, init: Connection.() -> Unit) =
-        Connection(source, target, id).also(init)
+    Connection(source, target, id).also(init)

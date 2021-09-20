@@ -17,9 +17,14 @@ import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.math.abs
 
+/**
+ * HTML representation of a [Connection].
+ *
+ * @author Lars Westermann, David Oberacker
+ */
 class HtmlConnections(
-        private val htmlRenderer: HtmlRenderer,
-        private val viewModel: ViewModel
+    private val htmlRenderer: HtmlRenderer,
+    private val viewModel: ViewModel
 ) {
 
     val listeners = mutableListOf<EventListener<*>>()
@@ -28,7 +33,7 @@ class HtmlConnections(
 
     var relations: Map<Connection, HtmlRelation> = emptyMap()
     val anchors: MutableMap<View<*>, Set<RelationSide>> = mutableMapOf()
-    var jsPlumbList: List<Pair<JsPlumbInstance, ViewCollection<View<*>, *>>> = emptyList()
+    var jsPlumbList: List<Pair<JsPlumbInstance, Pair<Shape, ViewCollection<View<*>, *>>>> = emptyList()
 
     private var isConnecting: Shape? = null
 
@@ -55,7 +60,10 @@ class HtmlConnections(
     private var createSourceShape: Shape? = null
     private var createTargetShape: Shape? = null
 
-    fun createJsPlumb(container: ViewCollection<View<*>, *>): JsPlumbInstance {
+    /**
+     * Creates a new jsPlumb instance managing the given [container] inside the specified [shape].
+     */
+    fun createJsPlumb(shape: Shape, container: ViewCollection<View<*>, *>): JsPlumbInstance {
         val instance = JsPlumb.JsPlumb.getInstance().apply {
             setContainer(container.html)
 
@@ -64,11 +72,11 @@ class HtmlConnections(
             setZoom(htmlRenderer.zoom)
             bind("beforeDrop") { info: dynamic ->
                 val source = createSourceShape?.id
-                        ?: htmlRenderer.getShapeById(info.sourceId as String)?.id
-                        ?: return@bind false
+                    ?: htmlRenderer.getShapeById(info.sourceId as String)?.id
+                    ?: return@bind false
                 val target = createTargetShape?.id
-                        ?: htmlRenderer.getShapeById(info.targetId as String)?.id
-                        ?: return@bind false
+                    ?: htmlRenderer.getShapeById(info.targetId as String)?.id
+                    ?: return@bind false
 
                 htmlRenderer.viewModel.handler.createConnection(source, target)
 
@@ -116,21 +124,84 @@ class HtmlConnections(
             }
         }
 
-        jsPlumbList += instance to container
+        // Some shapes do not have id's.
+        // Find the closest shape that is a parent, that has a id.
+        var idParent: Shape = shape
+        var parent = shape.parent
+        while (parent != null) {
+            if (parent.id != null) {
+                idParent = parent
+                break;
+            }
+            parent = parent.parent
+        }
+
+        // Add the new instance with the parent shape and the container to the map.
+        jsPlumbList += instance to (idParent to container)
 
         return instance
     }
 
-    fun findInstance(idList: List<Long>): JsPlumbInstance {
-        val list = htmlRenderer.shapeMap.filterKeys { it.id in idList }.values.mapNotNull {
-            it.jsPlumbInstance
-        }.distinct()
+    /**
+     * Finds all ancestors of a element with an id that are non anonymous (also have a id).
+     *
+     * The ancestors are sorted from the oldest ancestor to the element with the id given in [idList].
+     * The shape itself is included in the list.
+     *
+     * This function has a complexity of O(|htmlRenderer.shapeMap|*|idList|)
+     */
+    private fun findNonAnonymousAncestors(idList: List<Long>): List<List<Shape>> {
+        return htmlRenderer.shapeMap.filterKeys { it.id in idList }.map { (shape, _) ->
+            val ancestors = mutableListOf<Shape>()
+            ancestors += shape
 
-        return if (list.size == 1) {
-            list.first()
-        } else {
-            jsPlumbList.firstOrNull { it.first in list }?.first ?: jsPlumbList.first().first
+            var parent = shape.parent
+            while (parent != null) {
+                if (parent.id != null) {
+                    ancestors += parent
+                }
+                parent = parent.parent
+            }
+            ancestors.reversed()
         }
+    }
+
+    /**
+     * Finds the lowest jsPlumbInstance that encompasses all shapes in the idList.
+     *
+     * A suitable instance has to contain all shapes in the list.
+     * Thus if a parent and child shape are give, the parent of the parent should be returned.
+     *
+     * @author David Oberacker (david.oberacker@student.kit.edu)
+     */
+    fun findInstance(idList: List<Long>): JsPlumbInstance {
+
+        // Finds all ancestors that are not in the idList.
+        val ancestorLists = findNonAnonymousAncestors(idList).map {
+            it.filter { shape -> !idList.contains(shape.id) }
+        }
+
+        // Calculate the intersection of the different ancestor lists.
+        val validAncestorIds = ancestorLists
+            .map { ancestors -> ancestors.map { ancestor -> ancestor.id } }
+            .reduceRightOrNull { a, b ->
+                a.intersect(b).toMutableList()
+            } ?: return jsPlumbList.first().first
+
+        val selectedParentShape = ancestorLists
+            .asSequence()
+            .flatten()
+            .distinct()
+            .filter { it.id in validAncestorIds }
+            .sortedWith(compareByDescending { htmlRenderer.calculateDepthOfView(it) })
+            .firstOrNull()
+
+        return if (selectedParentShape == null) {
+            jsPlumbList.first().first
+        } else {
+            jsPlumbList.firstOrNull { it.second.first.id == selectedParentShape.id }?.first ?: jsPlumbList.first().first
+        }
+
     }
 
     fun addShape(shape: Shape) {
@@ -174,72 +245,92 @@ class HtmlConnections(
         if (source == null) {
             htmlRenderer.shapeMap.keys.forEach {
                 setSourceEnabled(
-                        it,
-                        viewModel.handler.canConnectionStart(it.id ?: return)
+                    it,
+                    viewModel.handler.canConnectionStart(it.id ?: return)
                 )
                 setTargetEnabled(it, true)
             }
         } else {
             (htmlRenderer.shapeMap.keys - source).forEach {
                 setTargetEnabled(
-                        it,
-                        viewModel.handler.canConnectionCreate(source.id ?: return, it.id ?: return)
+                    it,
+                    viewModel.handler.canConnectionCreate(source.id ?: return, it.id ?: return)
                 )
             }
         }
     }
 
+    /**
+     * Function ot give a shape the source-disabled css class.
+     */
     private fun setSourceEnabled(shape: Shape, enabled: Boolean) {
         val endpointItem = endpointMap[shape] ?: return
-        val jsPlumbInstance = endpointItem.jsPlumbInstance
         val view = endpointItem.view
-        val html = view.html
-
-        if (jsPlumbInstance.isSourceEnabled(html) != enabled) {
-            //jsPlumbInstance.setSourceEnabled(html)
-        }
 
         view.classes["source-disabled"] = !enabled
     }
 
+    /**
+     * Function to give a shape the target-disabled css class.
+     */
     private fun setTargetEnabled(shape: Shape, enabled: Boolean) {
         val endpointItem = endpointMap[shape] ?: return
-        val jsPlumbInstance = endpointItem.jsPlumbInstance
         val view = endpointItem.view
-        val html = view.html
-
-        if (jsPlumbInstance.isTargetEnabled(html) != enabled) {
-            //jsPlumbInstance.setTargetEnabled(html)
-        }
-
         view.classes["target-disabled"] = !enabled
     }
 
+    /**
+     * Function for checking if the elements at the current mouse position is a valid target for the new connection.
+     */
     private fun checkMousePosition() {
         if (jsTypeOf(document::elementsFromPoint) != "function") return
 
         val position = Root.mousePosition
         val elements = document.elementsFromPoint(position.x, position.y)
 
-        for (element in elements) {
-            val shape = endpointReverseMap[element] ?: continue
-            val entry = endpointMap[shape] ?: continue
+        createTargetShape?.let {
+            endpointMap[it]?.let {
+                it.view.classes -= "drop-target"
+            }
+        }
 
-            createTargetShape?.let { endpointMap[it]?.let { it.view.classes -= "drop-target" } }
+        val selectedDropTarget = elements
+            .filter { element ->
+                val shape = this.endpointReverseMap[element] ?: return@filter false
+                val entry = this.endpointMap[shape] ?: return@filter false
 
-            // Change break to continue to allow connections to visible hidden elements
-            if (isConnecting == shape || "target-disabled" in entry.view.classes) break
+                // Change break to continue to allow connections to visible hidden elements
+                return@filter !(isConnecting == shape || "target-disabled" in entry.view.classes)
+            }.map { element ->
+                val shape = this.endpointReverseMap[element]!!
+                val entry = this.endpointMap[shape]!!
+
+                return@map Pair(entry, shape)
+            }.toList()
+            .distinctBy { (_, s) ->
+                s.id
+            }.sortedWith { (_, s1), (_, s2) ->
+                compareValues(
+                    htmlRenderer.calculateDepthOfView(s1),
+                    htmlRenderer.calculateDepthOfView(s2)
+                )
+            }
+            .lastOrNull()
+
+        if (selectedDropTarget != null) {
+            val entry = selectedDropTarget.first
+            val shape = selectedDropTarget.second
 
             entry.view.classes += "drop-target"
             createTargetShape = shape
-
-            return
+        } else {
+            createTargetShape = null
         }
-
-        createTargetShape?.let { endpointMap[it]?.let { it.view.classes -= "drop-target" } }
-        createTargetShape = null
     }
 
+    /**
+     * Function adding the Add Symbol next to shape for creating a new connection.
+     */
     private fun createEndpointInternal(shape: Shape, canStart: Boolean) {
         if (shape in endpointMap) return
 
@@ -331,8 +422,8 @@ class HtmlConnections(
     }
 
     class EndpointItem(
-            val view: View<*>,
-            val handler: HTMLElement?,
-            val jsPlumbInstance: JsPlumbInstance
+        val view: View<*>,
+        val handler: HTMLElement?,
+        val jsPlumbInstance: JsPlumbInstance
     )
 }

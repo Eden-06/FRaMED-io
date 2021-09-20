@@ -4,36 +4,29 @@ import de.westermann.kobserve.property.FunctionAccessor
 import de.westermann.kobserve.property.constProperty
 import de.westermann.kobserve.property.property
 import de.westermann.kobserve.property.validate
-import io.framed.framework.*
+import io.framed.framework.ConnectionManager
+import io.framed.framework.Layouting
 import io.framed.framework.linker.*
 import io.framed.framework.model.ModelElement
 import io.framed.framework.pictogram.*
 import io.framed.framework.util.*
 import io.framed.framework.view.*
-import io.framed.model.Attribute
-import io.framed.model.Compartment
-import io.framed.model.Package
-import io.framed.model.Scene
+import io.framed.model.*
 
-/**
- * Linker component for the [Scene] model element.
- *
- * @author lars
- */
-class SceneLinker(
-        override val model: Scene,
-        override val connectionManager: ConnectionManager,
-        override val parent: ModelLinker<*, *, *>
-) : ModelLinker<Scene, BoxShape, BoxShape> {
+class RoleGroupLinker(
+    override val model: RoleGroup,
+    override val connectionManager: ConnectionManager,
+    override val parent: ModelLinker<*, *, *>
+) : ModelLinker<RoleGroup, BoxShape, BoxShape> {
 
     override val nameProperty = property(model::name)
-            .validate(RegexValidator.SCENENAME::validate)
-            .trackHistory()
+        .validate(RegexValidator.IDENTIFIER::validate)
+        .trackHistory()
     override var name by nameProperty
 
-    override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
+    private val cardinalityProperty = property(model::cardinality).trackHistory()
 
-    private val attributes = shapeBox<Attribute, AttributeLinker>(model::attributes, connectionManager)
+    override val container: BoxShape = boxShape(BoxShape.Position.ABSOLUTE) { }
 
     private val children = shapeBox<ModelElement, ShapeLinker<out ModelElement, out Shape>>(model::children, connectionManager) { box ->
         box.view = container
@@ -42,10 +35,10 @@ class SceneLinker(
         }
     }
     override val shapeLinkers: Set<ShapeLinker<*, *>>
-        get() = children.linkers.toSet()
+    get() = children.linkers.toSet()
 
     override val subTypes: Set<String>
-        get() = (attributes.linkers.flatMap { it.subTypes } + shapeLinkers.flatMap { it.subTypes }).toSet() + model.name
+    get() = (shapeLinkers.flatMap { it.subTypes }).toSet() + model.name
 
     override lateinit var autoLayoutBox: BoxShape
     override lateinit var borderBox: BoxShape
@@ -53,30 +46,23 @@ class SceneLinker(
 
     override val pictogram = boxShape {
         boxShape {
-            textShape(nameProperty)
+            textShape(nameProperty,
+                alignment = TextShape.TextAlignment.RIGHT
+            )
+            textShape(cardinalityProperty,
+                autocomplete = CardinalityPreset.STRING_VALUES,
+                surround = Surround.PARENTHESIS
+            )
             style {
                 padding = box(8.0)
-            }
-        }
-
-        attributes.view = boxShape {
-            style {
-                border {
-                    style = Border.BorderStyle.SOLID
-                    width = box(Border.DEFAULT_WIDTH, 0.0, 0.0, 0.0)
-                    color = box(color(0, 0, 0, 0.3))
-                }
-                padding = box(8.0)
+                flex = true
+                overflow = true
             }
         }
 
         autoLayoutBox = boxShape(BoxShape.Position.ABSOLUTE) {
             style {
-                border {
-                    style = Border.BorderStyle.SOLID
-                    width = box(Border.DEFAULT_WIDTH, 0.0, 0.0, 0.0)
-                    color = box(color(0, 0, 0, 0.3))
-                }
+                border = null
                 padding = box(8.0)
                 stretchHeight = true
             }
@@ -90,15 +76,13 @@ class SceneLinker(
         }
 
         style {
-            background = linearGradient("to bottom") {
-                add(color("#e5ffd9"), 0.0)
-                add(color("#edf6e2"), 1.0)
-            }
+            background = Color.TRANSPARENT
+
             border {
-                style = Border.BorderStyle.SOLID
+                style = Border.BorderStyle.DASHED
                 width = box(Border.DEFAULT_WIDTH)
                 color = box(color(0, 0, 0, 0.3))
-                leftDoubleBar = true
+                radius = box(20.0)
             }
         }
 
@@ -108,11 +92,11 @@ class SceneLinker(
             updatePreviewType()
         }
 
-        onAction {
-            ControllerManager.display(this@SceneLinker)
-        }
     }
 
+    /**
+     * Preview that is shown for the flatPreview of the parent.
+     */
     override val preview = boxShape(BoxShape.Position.HORIZONTAL) {
         iconShape(constProperty(info.icon))
         textShape(nameProperty)
@@ -165,9 +149,6 @@ class SceneLinker(
     private lateinit var sidebarPreviewGroup: SidebarGroup
     private lateinit var sidebarViewGroup: SidebarGroup
 
-    private lateinit var sidebarAttributes: SidebarGroup
-    private lateinit var sidebarAttributesAdd: ListView
-    private val sidebarAttributesList: MutableList<SidebarEntry<Attribute>> = mutableListOf()
 
     private fun updatePreviewType() {
         val shapeIsFlat = autoLayoutBox.position == BoxShape.Position.VERTICAL
@@ -186,26 +167,17 @@ class SceneLinker(
     }
 
     override val sidebar = sidebar {
-        title("Scene")
+        title("Role Group")
         group("General") {
             input("Name", nameProperty)
-        }
-        sidebarAttributes = group("Attributes") {
-            collapse()
-            sidebarAttributesAdd = custom {
-                iconView(MaterialIcon.ADD)
-                textView("Add attribute")
-                onClick {
-                    attributes += AttributeLinker(Attribute(), this@SceneLinker)
-                }
-            }
+            input("Cardinality", cardinalityProperty, CardinalityPreset.STRING_VALUES)
         }
         sidebarActionsGroup = group("Actions") {
             button("Auto layout") {
                 Layouting.autoLayout(
-                        container,
-                        connectionManager.connections.asSequence().map { it.pictogram }.toSet(),
-                        this@SceneLinker
+                    container,
+                    connectionManager.connections.asSequence().map { it.pictogram }.toSet(),
+                    this@RoleGroupLinker
                 )
             }
             button("Reset zoom") {
@@ -219,9 +191,9 @@ class SceneLinker(
             checkBox("Flat preview", isFlatPreviewProperty, CheckBox.Type.SWITCH)
             button("Auto layout") {
                 Layouting.autoLayout(
-                        autoLayoutBox,
-                        connectionManager.connections.asSequence().map { it.pictogram }.toSet(),
-                        this@SceneLinker
+                    autoLayoutBox,
+                    connectionManager.connections.asSequence().map { it.pictogram }.toSet(),
+                    this@RoleGroupLinker
                 )
             }
         }
@@ -242,33 +214,20 @@ class SceneLinker(
         sidebarPreviewGroup.display = isTargetRoot
     }
 
-    private lateinit var contextStepIn: ListView
-    private lateinit var contextStepOut: ListView
-
-    override val contextMenu = defaultContextMenu {
-        contextStepIn = addItem(MaterialIcon.ARROW_FORWARD, "Step in") {
-            ControllerManager.display(this@SceneLinker)
-        }
-        contextStepOut = addItem(MaterialIcon.ARROW_BACK, "Step out") {
-            ControllerManager.display(parent)
-        }
-    }
+    override val contextMenu = defaultContextMenu {}
 
     override fun remove(linker: ShapeLinker<*, *>) {
-        when (linker) {
-            is AttributeLinker -> attributes.remove(linker)
-            in children -> children -= linker
-            else -> super.remove(linker)
+        if (linker in children) {
+            children -= linker
+        } else {
+            super.remove(linker)
         }
         updatePorts()
     }
 
     override fun add(model: ModelElement): ShapeLinker<*, *> {
         val linker = LinkerManager.createLinker<ShapeLinker<*, *>>(model, this, connectionManager)
-        when (linker) {
-            is AttributeLinker -> attributes.add(linker)
-            else -> children += linker
-        }
+        children += linker
         updatePorts()
         return linker
     }
@@ -278,37 +237,12 @@ class SceneLinker(
         updatePorts()
     }
 
-    override fun ContextMenu.onOpen(event: ContextEvent) {
-        contextStepIn.display = event.target == pictogram
-        contextStepOut.display = event.target != pictogram
-    }
-
-    /**
-     * Update the sidebar attribute overview. Add/remove missing/old items.
-     */
-    private fun updateSidebarAttributes() {
-        while (sidebarAttributesList.size > attributes.linkers.size) {
-            val last = sidebarAttributesList.last()
-            last.remove()
-            sidebarAttributesList -= last
-        }
-
-        for (i in 0 until sidebarAttributesList.size) {
-            sidebarAttributesList[i].bind(attributes.linkers[i])
-        }
-
-        for (i in sidebarAttributesList.size until attributes.linkers.size) {
-            sidebarAttributesList += SidebarEntry(sidebarAttributes, attributes.linkers[i])
-        }
-
-        sidebarAttributes.toForeground(sidebarAttributesAdd)
-    }
+    override fun ContextMenu.onOpen(event: ContextEvent) {}
 
     /**
      * The model initializes a new instance of the linker
      */
     init {
-        attributes.view.visibleProperty.bind(isCompleteViewProperty)
         children.view.visibleProperty.bind(isCompleteViewProperty)
         children.previewBox?.visibleProperty?.bind(isCompleteViewProperty)
 
@@ -316,7 +250,6 @@ class SceneLinker(
             updateSize()
         }
 
-        model.attributes.forEach { attributes += AttributeLinker(it, this) }
         for (element in model.children) {
             add(element)
         }
@@ -327,32 +260,23 @@ class SceneLinker(
         connectionManager.onConnectionAdd { updatePorts() }
         connectionManager.onConnectionRemove { updatePorts() }
         updatePorts()
-
-        updateSidebarAttributes()
-
-        attributes.view.onAdd {
-            updateSidebarAttributes()
-        }
-        attributes.view.onRemove {
-            updateSidebarAttributes()
-        }
     }
 
     companion object : LinkerInfoItem {
 
-        override val info = ElementInfo("Scene", FramedIcon.SCENE)
+        override val info = ElementInfo("RoleGroup", FramedIcon.ROLEGROUP)
 
         override fun canCreateIn(container: ModelElement): Boolean {
-            return container is Package || container is Compartment || container is Scene
+            return container is Compartment || container is Scene || container is RoleGroup
         }
 
-        override fun isLinkerFor(element: ModelElement): Boolean = element is Scene
-        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is SceneLinker
+        override fun isLinkerFor(element: ModelElement): Boolean = element is RoleGroup
+        override fun isLinkerFor(linker: Linker<*, *>): Boolean = linker is RoleGroupLinker
 
-        override fun createModel(): ModelElement = Scene()
+        override fun createModel(): ModelElement = RoleGroup()
         override fun createLinker(model: ModelElement, parent: Linker<*, *>, connectionManager: ConnectionManager?): Linker<*, *> {
-            if (model is Scene && parent is ModelLinker<*, *, *> && connectionManager != null) {
-                return SceneLinker(model, connectionManager, parent)
+            if (model is RoleGroup && parent is ModelLinker<*, *, *> && connectionManager != null) {
+                return RoleGroupLinker(model, connectionManager, parent)
             } else throw IllegalArgumentException("Cannot create ${info.name} linker for model element ${model::class}")
         }
     }
