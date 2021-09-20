@@ -7,6 +7,16 @@ import kotlin.test.*
 
 class ModelLinkerTest : TestBase() {
 
+    @BeforeTest
+    override fun setUpTest() {
+        super.setUpTest()
+    }
+
+    @AfterTest
+    override fun tearDownTest() {
+        super.tearDownTest()
+    }
+
     @Test
     fun canDropShape() {
         roleGroupLinker1?.let { linker ->
